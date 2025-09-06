@@ -19,5 +19,6 @@ switch ($url) {
         break;
     default:
         http_response_code(404);
-        echo "404 Page Not Found";
+        include __DIR__ . '/../src/Views/errors/404.php';
+        break;
 }

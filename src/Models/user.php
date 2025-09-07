@@ -14,19 +14,38 @@ class User {
 
     public function findByIdentifier(string $identifier): ?array {
         try {
-            $stmt = $this->db->prepare("
+            $sql = "
                 SELECT u.*, s.student_number 
-                FROM users u 
+                FROM users u
                 LEFT JOIN students s ON u.user_id = s.user_id
                 WHERE (u.username = :identifier OR s.student_number = :identifier)
-                AND u.is_active = 1
+                  AND u.is_active = 1
                 LIMIT 1
-            ");
-            $stmt->execute(['identifier' => $identifier]);
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':identifier', $identifier, PDO::PARAM_STR);
+            $stmt->execute();
+
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             return $user ?: null;
         } catch (PDOException $e) {
             return null;
         }
+    }
+
+    public static function isAdmin(array $user): bool {
+        return isset($user['role']) && $user['role'] === 'admin';
+    }
+
+    public static function isLibrarian(array $user): bool {
+        return isset($user['role']) && $user['role'] === 'librarian';
+    }
+
+    public static function isStudent(array $user): bool {
+        return isset($user['role']) && $user['role'] === 'student';
+    }
+
+    public static function isSuperadmin(array $user): bool {
+        return isset($user['role']) && $user['role'] === 'superadmin';
     }
 }

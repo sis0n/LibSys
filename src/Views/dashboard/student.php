@@ -1,5 +1,4 @@
 <?php
-session_start();
 if ($_SESSION['role'] !== 'student') {
     header("Location: /libsys/public/index.php?url=login");
     exit;

@@ -7,6 +7,10 @@
     <title>Library | Login</title>
     <!-- Tailwind CSS -->
     <link href="/LibSys/public/css/output.css" rel="stylesheet">
+    <!-- PHOSPHOR ICONS -->
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
+
 </head>
 
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-green-50 font-sans">
@@ -14,7 +18,7 @@
         <div class="bg-white shadow-lg rounded-xl p-8">
             <!-- Logo -->
             <div class="flex justify-center mb-6">
-                <img src="assets/img/apple-touch-icon.png" alt="University Logo" class="h-16 w-16">
+                <img src="/LibSys/assets/ucc-icons/apple-touch-icon.png" alt="University Logo" class="h-24 w-24">
             </div>
 
             <!-- Title -->
@@ -28,7 +32,8 @@
             <!-- Login Form -->
             <form method="POST" action="/libsys/public/index.php?url=login_post" class="space-y-4">
                 <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700">
+                    <label for="username" class="flex items-center gap-x-1 text-sm font-medium text-gray-700">
+                        <i class="ph ph-user"></i>
                         Username
                     </label>
                     <input type="text" id="username" name="username"
@@ -37,7 +42,8 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">
+                    <label for="password" class="flex items-center gap-x-1 block text-sm font-medium text-gray-700">
+                        <i class="ph ph-key"></i>
                         Password
                     </label>
                     <input type="password" id="password" name="password"

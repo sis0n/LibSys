@@ -1,0 +1,23 @@
+# Node modules
+node_modules/
+
+# Build outputs (keep Tailwind output.css)
+dist/
+build/
+out/
+
+# CSS sourcemaps
+*.css.map
+
+# OS junk files
+.DS_Store
+Thumbs.db
+
+# IDE / editor folders
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
+*.lock

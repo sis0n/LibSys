@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'library/los-ucc',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'c23f3414df8cafa1efa0833992dc24846cd2da96',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'library/los-ucc' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'c23f3414df8cafa1efa0833992dc24846cd2da96',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -52,16 +52,10 @@
             </form>
 
             <!-- Extra Links -->
-            <div class="mt-6 text-center space-y-2">
+            <div class="mt-3 text-center space-y-2">
                 <a href="./ForgotPass.html" class="text-sm text-orange-600 hover:underline">
                     Forgot Password?
                 </a>
-                <p class="text-sm text-gray-700">
-                    Don’t have a student account?
-                    <a href="#" class="text-orange-600 font-medium hover:underline">
-                        Click here.
-                    </a>
-                </p>
             </div>
         </div>
     </div>

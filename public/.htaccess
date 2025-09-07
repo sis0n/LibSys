@@ -1,4 +1,9 @@
 RewriteEngine On
+RewriteBase /libsys/public/
+
+# Kung existing file or directory, hayaan si Apache
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+# Lahat ng iba, ipapasa sa index.php
+RewriteRule ^ index.php [QSA,L]

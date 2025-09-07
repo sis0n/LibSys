@@ -1,24 +1,20 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 
-use App\Controllers\UserController;
+use App\Config\Router;
 
-$controller = new UserController();
+$router = new Router();
+
+$router->get('login', 'UserController@showLogin');
+$router->post('login_post', 'UserController@login');
+$router->get('logout', 'UserController@logout');
+
+$router->get('dashboard/superadmin', 'DashboardController@superadmin', ['superadmin']);
+$router->get('dashboard/admin', 'DashboardController@admin', ['admin', 'superadmin']);
+$router->get('dashboard/librarian', 'DashboardController@librarian', ['librarian', 'admin', 'superadmin']);
+$router->get('dashboard/student', 'DashboardController@student', ['student']);
 
 $url = $_GET['url'] ?? 'login';
+$method = $_SERVER['REQUEST_METHOD'];
 
-switch ($url) {
-    case 'login':
-        $controller->showLogin();
-        break;
-    case 'login_post':
-        $controller->login();
-        break;
-    case 'logout':
-        $controller->logout();
-        break;
-    default:
-        http_response_code(404);
-        include __DIR__ . '/../src/Views/errors/404.php';
-        break;
-}
+$router->resolve($url, $method);

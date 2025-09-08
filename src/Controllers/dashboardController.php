@@ -7,7 +7,7 @@ class DashboardController{
         include __DIR__ . '/../Views/layout/header.php';
         include __DIR__ . '/../Views/dashboard/admin.php';
     }
-
+    
     public function librarian()
     {
         include __DIR__ . '/../Views/partials/header.php';

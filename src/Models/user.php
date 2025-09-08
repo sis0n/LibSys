@@ -12,7 +12,7 @@ class User {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function findByIdentifier(string $identifier): ?array {
+    public function findByIdentifier(string $identifier): ?array{
         try {
             $sql = "
                 SELECT u.*, s.student_number 

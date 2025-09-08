@@ -2,33 +2,36 @@
 namespace App\Controllers;
 
 use App\Models\User;
+use App\Core\Controller;
 
-class UserController {
+class UserController extends Controller{
     private $userModel;
 
-    public function __construct() {
+    public function __construct(){
         $this->userModel = new User();
     }
 
     public function showLogin() {
-        include __DIR__ . "/../Views/auth/login.php";
+        $this->view("auth/login", [
+            "title" => "Login Page"
+        ]);
     }
 
-    public function login() {
+    public function login(){
         session_start();
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $identifier = trim($_POST['username'] ?? '');
-            $password = $_POST['password'] ?? '';
+            $password   = $_POST['password'] ?? '';
 
-            if (empty($identifier) || empty($password)) {
+            if(empty($identifier) || empty($password)){
                 echo "Username and password are required.";
                 return;
             }
 
             $user = $this->userModel->findByIdentifier($identifier);
 
-            if ($user && $user['password'] === $password) {
+            if($user && $user['password'] === $password){
                 session_regenerate_id(true);
 
                 $_SESSION['user_id']  = $user['user_id'];
@@ -36,29 +39,32 @@ class UserController {
                 $_SESSION['role']     = $user['role'];
                 $_SESSION['fullname'] = $user['full_name'];
 
-                // Instead of header file path → route na lang
-                if (User::isAdmin($user)) {
-                    header("Location: /libsys/public/index.php?url=dashboard/admin");
+                // Clean URL redirects (wala nang index.php?url=...)
+                if(User::isAdmin($user)){
+                    header("Location: /libsys/public/dashboard/admin");
                 } elseif (User::isLibrarian($user)) {
-                    header("Location: /libsys/public/index.php?url=dashboard/librarian");
+                    header("Location: /libsys/public/dashboard/librarian");
                 } elseif (User::isStudent($user)) {
-                    header("Location: /libsys/public/index.php?url=dashboard/student");
+                    header("Location: /libsys/public/dashboard/student");
                 } elseif (User::isSuperadmin($user)) {
-                    header("Location: /libsys/public/index.php?url=dashboard/superadmin");
+                    header("Location: /libsys/public/dashboard/superadmin");
                 } else {
                     http_response_code(404);
-                    include __DIR__ . '/../Views/errors/404.php';
+                    $this->view("errors/404");
                 }
                 exit;
+            } else {
+                echo "Invalid login credentials.";
             }
         }
     }
 
-    public function logout() {
+    public function logout(){
         session_start();
         session_unset();
         session_destroy();
-        header("Location: /libsys/public/index.php?url=login");
+        
+        header("Location: /libsys/public/login");
         exit;
     }
 }

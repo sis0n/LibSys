@@ -4,3 +4,4 @@ if ($_SESSION['role'] !== 'student') {
     exit;
 }
 echo "Welcome student: " . $_SESSION['fullname'];
+?>

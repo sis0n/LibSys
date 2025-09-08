@@ -18,7 +18,7 @@
         <div class="bg-white shadow-lg rounded-xl p-8">
             <!-- Logo -->
             <div class="flex justify-center mb-6">
-                <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Library Logo" class=" w-24">
+                <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Library Logo" class=" w-32">
             </div>
 
             <!-- Title -->

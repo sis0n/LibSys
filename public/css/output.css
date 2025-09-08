@@ -386,6 +386,9 @@
   .w-26 {
     width: calc(var(--spacing) * 26);
   }
+  .w-32 {
+    width: calc(var(--spacing) * 32);
+  }
   .w-\[25px\] {
     width: 25px;
   }

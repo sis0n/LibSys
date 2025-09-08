@@ -1,24 +1,30 @@
 <?php
 namespace App\Controllers;
 
-class DashboardController{
-    public function admin()
-    {
-        include __DIR__ . '/../Views/dashboard/admin.php';
+use App\Core\Controller;
+
+class DashboardController extends Controller{
+    public function superadmin(){
+        $this->view("dashboard/superadmin", [
+            "title" => "Superadmin Dashboard"
+        ]);
     }
 
-    public function librarian()
-    {
-        include __DIR__ . '/../Views/dashboard/librarian.php';
+    public function admin(){
+        $this->view("dashboard/admin", [
+            "title" => "Admin Dashboard"
+        ]);
     }
 
-    public function student()
-    {
-        include __DIR__ . '/../Views/dashboard/student.php';
+    public function librarian(){
+        $this->view("dashboard/librarian", [
+            "title" => "Librarian Dashboard"
+        ]);
     }
 
-    public function superadmin()
-    {
-        include __DIR__ . '/../Views/dashboard/superadmin.php';
+    public function student(){
+        $this->view("dashboard/student", [
+            "title" => "Student Dashboard"
+        ]);
     }
 }

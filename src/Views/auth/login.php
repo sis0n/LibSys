@@ -59,7 +59,7 @@
 
             <!-- Extra Links -->
             <div class="mt-3 text-center space-y-2">
-                <a href="./ForgotPass.html" class="text-sm text-orange-600 hover:underline">
+                <a href="#" class="text-sm text-orange-600 hover:underline">
                     Forgot Password?
                 </a>
             </div>

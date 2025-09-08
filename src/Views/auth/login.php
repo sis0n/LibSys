@@ -17,8 +17,8 @@
     <div class="w-full max-w-md p-6">
         <div class="bg-white shadow-lg rounded-xl p-8">
             <!-- Logo -->
-            <div class="flex justify-center mb-6">
-                <img src="/LibSys/assets/ucc-icons/apple-touch-icon.png" alt="University Logo" class="h-24 w-24">
+            <div class="flex justify-center">
+                <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Library Logo" class=" w-32">
             </div>
 
             <!-- Title -->
@@ -30,7 +30,7 @@
             </p>
 
             <!-- Login Form -->
-            <form method="POST" action="/libsys/public/login_post" class="space-y-4">
+            <form method="POST" action="/libsys/public/login" class="space-y-4">
                 <div>
                     <label for="username" class="flex items-center gap-x-1 text-sm font-medium text-gray-700">
                         <i class="ph ph-user"></i>
@@ -59,7 +59,7 @@
 
             <!-- Extra Links -->
             <div class="mt-3 text-center space-y-2">
-                <a href="./ForgotPass.html" class="text-sm text-orange-600 hover:underline">
+                <a href="#" class="text-sm text-orange-600 hover:underline">
                     Forgot Password?
                 </a>
             </div>

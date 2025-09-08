@@ -12,9 +12,9 @@ class UserController extends Controller{
     }
 
     public function showLogin() {
-        $this->view("auth/login", [
+        $this->view("auth/login",[
             "title" => "Login Page"
-        ]);
+        ], false);
     }
 
     public function login(){

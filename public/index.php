@@ -7,7 +7,7 @@
 
     $router->get('login', 'UserController@showLogin');
     $router->post('login', 'UserController@login');
-    $router->get('logout', 'UserController@logout');
+    $router->post('logout', 'UserController@logout');
 
     $router->get('dashboard/superadmin', 'DashboardController@superadmin', ['superadmin']);
     $router->get('dashboard/admin', 'DashboardController@admin', ['admin', 'superadmin']);

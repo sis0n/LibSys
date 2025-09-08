@@ -30,7 +30,7 @@
             </p>
 
             <!-- Login Form -->
-            <form method="POST" action="/libsys/public/login_post" class="space-y-4">
+            <form method="POST" action="/libsys/public/login" class="space-y-4">
                 <div>
                     <label for="username" class="flex items-center gap-x-1 text-sm font-medium text-gray-700">
                         <i class="ph ph-user"></i>

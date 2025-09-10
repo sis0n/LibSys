@@ -6,13 +6,11 @@ use PDO;
 use PDOException;
 use Dotenv\Dotenv;
 
-class Database
-{
+class Database{
     private static $instance = null;
     private $connection;
 
-    private function __construct()
-    {
+    private function __construct(){
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
 
@@ -22,24 +20,22 @@ class Database
         $user = $_ENV['DB_USERNAME'] ?? 'root';
         $pass = $_ENV['DB_PASSWORD'] ?? '';
 
-        try {
+        try{
             $this->connection = new PDO("$driver:host=$host;dbname=$db;charset=utf8", $user, $pass);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
+        } catch (PDOException $e){
             die("Database connection failed: " . $e->getMessage());
         }
     }
 
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
+    public static function getInstance(){
+        if(self::$instance === null){
             self::$instance = new Database();
         }
         return self::$instance;
     }
 
-    public function getConnection()
-    {
+    public function getConnection(){
         return $this->connection;
     }
 }

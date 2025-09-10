@@ -1,29 +1,45 @@
 <?php
-    require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-    use App\Config\Router;
+use App\Config\Router;
 
-    $router = new Router();
+$router = new Router();
 
-    $router->get('login', 'UserController@showLogin');
-    $router->post('login', 'UserController@login');
-    $router->post('logout', 'UserController@logout');
+/**
+ * Auth routes
+ */
+$router->get('login', 'AuthController@showLogin');
+$router->post('login', 'AuthController@login');
+$router->post('logout', 'AuthController@logout');
 
-    $router->get('dashboard/superadmin', 'DashboardController@superadmin', ['superadmin']);
-    $router->get('dashboard/admin', 'DashboardController@admin', ['admin', 'superadmin']);
-    $router->get('dashboard/librarian', 'DashboardController@librarian', ['librarian', 'admin', 'superadmin']);
-    $router->get('dashboard/student', 'DashboardController@student', ['student']);
+/**
+ * user routes (CRUD, admin) SAMPLE LANG TO
+ */
+// $router->get('users', 'UserController@index');     //list users
+// $router->get('users/create', 'UserController@create');  //create form
+// $router->post('users/create', 'UserController@create');  //handle create
 
-    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+/**
+ * dashboard routes (role based access)
+ */
+$router->get('dashboard/superadmin', 'DashboardController@superadmin', ['superadmin']);
+$router->get('dashboard/admin', 'DashboardController@admin', ['admin', 'superadmin']);
+$router->get('dashboard/librarian', 'DashboardController@librarian', ['librarian', 'admin', 'superadmin']);
+$router->get('dashboard/student', 'DashboardController@student', ['student']);
 
-    $basePath = '/libsys/public/';
-    $uri = substr($uri, strlen($basePath));
+/**
+ * resolve URI
+ */
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-    $uri = $uri === '' ? 'login' : $uri;
+$basePath = '/libsys/public/';
+$uri = substr($uri, strlen($basePath));
 
-    $method = $_SERVER['REQUEST_METHOD'];
+$uri = $uri === '' ? 'login' : $uri;
 
-    $router->resolve($uri, $method);
+$method = $_SERVER['REQUEST_METHOD'];
+
+$router->resolve($uri, $method);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +49,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Online Software</title>
     <!-- Tailwind.v4 -->
-    <link href="/LibSys/public/css/output.css" rel="stylesheet">
+    <link href="/libsys/public/css/output.css" rel="stylesheet">
     <!-- PHOSPHOR ICONS -->
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />

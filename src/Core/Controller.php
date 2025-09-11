@@ -10,27 +10,33 @@ class Controller
      * @param array  $data  Data to extract into the view
      * @param bool   $withLayout Include header/footer (default: true)
      */
-    public function view($view, $data = [], $withLayout = true)
-    {
-        extract($data);
+    public function view(string $view, array $data = [], bool $withLayout = true): void{
+        extract($data, EXTR_SKIP);
 
-        $viewPath = __DIR__ . "/../Views/" . $view . ".php";
-        $header = __DIR__ . "/../Views/partials/header.php";
-        $footer = __DIR__ . "/../Views/partials/footer.php";
+        $basePath = __DIR__ . "/../Views/";
+        $viewPath = $basePath . $view . ".php";
 
-        // Include header if with layout
-        if ($withLayout && file_exists($header))
-            include $header;
+        $head = $basePath . "partials/head.php";
+        $header = $basePath . "partials/header.php";
+        $footer = $basePath . "partials/footer.php";
 
-        // Main content
-        if (file_exists($viewPath)) {
-            include $viewPath;
-        } else {
-            echo "<h1>View '{$view}' not found.</h1>";
+        if($withLayout && file_exists($head)){
+            include $head;
         }
 
-        // Include footer if with layout
-        if ($withLayout && file_exists($footer))
+        if($withLayout && file_exists($header)){
+            include $header;
+        }
+
+        if(file_exists($viewPath)){
+            include $viewPath;
+        } else {
+            http_response_code(404);
+            include $basePath . "errors/404.php";
+        }
+
+        if($withLayout && file_exists($footer)){
             include $footer;
+        }
     }
 }

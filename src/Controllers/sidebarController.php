@@ -31,37 +31,58 @@ class SidebarController extends Controller
 
     public function studentDashboard()
     {
-        $this->view("Student/dashboard", ["title" => "Student Dashboard"]);
+        $this->view("Student/dashboard", [
+            "title" => "Student Dashboard",
+            "currentPage" => "dashboard"
+        ]);
     }
 
     public function studentBookCatalog()
     {
-        $this->view("Student/bookCatalog", ["title" => "Book Catalog"]);
+        $this->view("Student/bookCatalog", [
+            "title" => "Book Catalog",
+            "currentPage" => "bookCatalog"
+        ]);
     }
 
     public function studentEquipmentCatalog()
     {
-        $this->view("Student/equipmentCatalog", ["title" => "Equipment Catalog"]);
+        $this->view("Student/equipmentCatalog", [
+            "title" => "Equipment Catalog",
+            "currentPage" => "equimentCatalog"
+        ]);
     }
 
     public function studentMyCart()
     {
-        $this->view("Student/myCart", ["title" => "My Cart"]);
+        $this->view("Student/myCart", [
+            "title" => "My Cart",
+            "currentPage" => "myCart"
+        ]);
     }
 
     public function studentQrBorrowingTicket()
     {
-        $this->view("Student/qrBorrowingTicket", ["title" => "QR Borrowing Ticket"]);
+        $this->view("Student/qrBorrowingTicket", [
+            "title" => "QR Borrowing Ticket",
+            "currentPage" => "qrBorrowingTicket"
+        ]);
     }
 
     public function studentMyAttendance()
     {
-        $this->view("Student/myAttendance", ["title" => "My Attendance"]);
+        $this->view("Student/myAttendance", [
+            "title" => "My Attendance",
+            "currentPage" => "myAttendance"
+        ]);
     }
 
     public function studentBorrowingHistory()
     {
-        $this->view("Student/borrowingHistory", ["title" => "Borrowing History"]);
+        $this->view("Student/borrowingHistory", [
+        "title" => "Borrowing History",
+        "currentPage" => "borrowingHistory"
+    ]);
     }
 
 }

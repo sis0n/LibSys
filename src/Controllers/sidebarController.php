@@ -7,7 +7,6 @@ class SidebarController extends Controller
 {
     public function superadmin()
     {
-        // ibahin kapag gumana yung student
         $this->view("dashboard/superadmin", [
             "title" => "Superadmin Dashboard"
         ]);
@@ -15,7 +14,6 @@ class SidebarController extends Controller
 
     public function admin()
     {
-        // ibahin kapag gumana yung student
         $this->view("dashboard/admin", [
             "title" => "Admin Dashboard"
         ]);
@@ -23,11 +21,12 @@ class SidebarController extends Controller
 
     public function librarian()
     {
-        // ibahin kapag gumana yung student
         $this->view("dashboard/librarian", [
             "title" => "Librarian Dashboard"
         ]);
     }
+
+    // Student Display Caller 
 
     public function studentDashboard()
     {
@@ -80,9 +79,9 @@ class SidebarController extends Controller
     public function studentBorrowingHistory()
     {
         $this->view("Student/borrowingHistory", [
-        "title" => "Borrowing History",
-        "currentPage" => "borrowingHistory"
-    ]);
+            "title" => "Borrowing History",
+            "currentPage" => "borrowingHistory"
+        ]);
     }
 
 }

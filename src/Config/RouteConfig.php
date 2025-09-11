@@ -28,7 +28,7 @@ class RouteConfig
         $router->get('dashboard/admin', 'SidebarController@admin', ['admin', 'superadmin']);
         $router->get('dashboard/librarian', 'SidebarController@librarian', ['librarian', 'admin', 'superadmin']);
 
-        // Student + Sub Pages
+        // Student Sidebar Page Navigation Display
         $router->get('Student/dashboard', 'SidebarController@studentDashboard', ['student']);
         $router->get('Student/bookCatalog', 'SidebarController@studentBookCatalog', ['student']);
         $router->get('Student/equipmentCatalog', 'SidebarController@studentEquipmentCatalog', ['student']);
@@ -37,9 +37,6 @@ class RouteConfig
         $router->get('Student/myAttendance', 'SidebarController@studentMyAttendance', ['student']);
         $router->get('Student/borrowingHistory', 'SidebarController@studentBorrowingHistory', ['student']);
 
-        
-        // taggalin na to 
-        // $router->get('dashboard/student', 'DashboardController@student', ['student']);
 
         /**
          * 

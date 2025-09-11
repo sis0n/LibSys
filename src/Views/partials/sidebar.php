@@ -1,17 +1,19 @@
 <?php
 namespace App\Views\partials;
-use App\Views\Students; 
+use App\Views\Students;
 
 ?>
 
 <aside class="w-64 bg-orange-50 border-r border-orange-200 flex flex-col sticky top-0 h-screen">
     <!-- Logo -->
-    <div class="flex items-center gap-4 px-6 py-4 border-b border-orange-200">
-       <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Logo" class="h-18">
+    <a href="/LibSys/public/Student/dashboard"
+        class="flex items-center gap-4 px-6 py-4 border-b border-orange-200 cursor-pointer">
+        <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Logo" class="h-18">
         <span class="font-semibold text-lg text-orange-700">
             Library Online Software
         </span>
-    </div>
+    </a>
+
 
     <!-- Navigation -->
     <nav class="flex-1 px-4 py-6 space-y-2">

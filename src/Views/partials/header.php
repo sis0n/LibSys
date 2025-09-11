@@ -22,7 +22,7 @@ switch ($role) {
         break;
 }
 ?>
-<!-- Header -->
+
 <header class="sticky top-0 z-10 bg-white border-b border-orange-200 px-6 py-2 flex justify-between items-center">
     <h1 class="text-lg font-semibold text-gray-800">
         <?= $roleTitle ?>
@@ -36,7 +36,7 @@ switch ($role) {
             </div>
         </div>
         <!-- Logout -->
-        <form method="POST" action="/libsys/public/logout">
+        <form method="POST" action="/LibSys/public/logout">
             <button type="submit" class="p-2 rounded hover:bg-gray-100">
                 <i class="ph ph-sign-out"></i>
             </button>

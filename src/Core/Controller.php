@@ -15,34 +15,60 @@ class Controller
         extract($data, EXTR_SKIP);
 
         $basePath = __DIR__ . "/../Views/";
-        $viewPath = $basePath . $view . ".php";
 
         $head = $basePath . "partials/head.php";
-        $header = $basePath . "partials/header.php";
         $sidebar = $basePath . "partials/sidebar.php";
+        $header = $basePath . "partials/header.php";
         $footer = $basePath . "partials/footer.php";
+        $viewPath = $basePath . $view . ".php";
+
 
         if ($withLayout && file_exists($head)) {
             include $head;
         }
 
-        if ($withLayout && file_exists($header)) {
-            include $header;
-        }
-        
-        if ($withLayout && file_exists($basePath . "partials/sidebar.php")) {
-            include $basePath . "partials/sidebar.php";
-        }
+        if ($withLayout) {
+            echo '<body class="bg-gray-50 font-sans">';
+            echo '<div class="flex min-h-screen">';
 
-        if (file_exists($viewPath)) {
-            include $viewPath;
+            // Sidebar
+            if (file_exists($sidebar)) {
+                include $sidebar;
+            }
+
+            // Right side (header + content + footer)
+            echo '<div class="flex-1 flex flex-col">';
+
+            // Header
+            if (file_exists($header)) {
+                include $header;
+            }
+
+            // Main Content
+            echo '<main class="flex-1 p-6">';
+            if (file_exists($viewPath)) {
+                include $viewPath;
+            } else {
+                http_response_code(404);
+                include $basePath . "errors/404.php";
+            }
+            echo '</main>';
+
+            // Footer
+            if (file_exists($footer)) {
+                include $footer;
+            }
+
+            echo '</div>'; // close right side
+            echo '</div>'; // close flex wrapper
+            echo '</body>';
         } else {
-            http_response_code(404);
-            include $basePath . "errors/404.php";
-        }
-
-        if ($withLayout && file_exists($footer)) {
-            include $footer;
+            if (file_exists($viewPath)) {
+                include $viewPath;
+            } else {
+                http_response_code(404);
+                include $basePath . "errors/404.php";
+            }
         }
     }
 }

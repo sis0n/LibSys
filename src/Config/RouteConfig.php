@@ -3,8 +3,11 @@ namespace App\Config;
 
 use App\Core\Router;
 
-class RouteConfig {
-    public static function register(): Router {
+class RouteConfig
+{
+    public static function register(): Router
+    {
+        // convert {param} style to regex
         $router = new Router();
 
         /**
@@ -21,10 +24,22 @@ class RouteConfig {
          * dashboard routes
          * 
          */
-        $router->get('dashboard/superadmin', 'DashboardController@superadmin', ['superadmin']);
-        $router->get('dashboard/admin', 'DashboardController@admin', ['admin', 'superadmin']);
-        $router->get('dashboard/librarian', 'DashboardController@librarian', ['librarian', 'admin', 'superadmin']);
-        $router->get('dashboard/student', 'DashboardController@student', ['student']);
+        $router->get('dashboard/superadmin', 'SidebarController@superadmin', ['superadmin']);
+        $router->get('dashboard/admin', 'SidebarController@admin', ['admin', 'superadmin']);
+        $router->get('dashboard/librarian', 'SidebarController@librarian', ['librarian', 'admin', 'superadmin']);
+
+        // Student + Sub Pages
+        $router->get('Student/dashboard', 'SidebarController@studentDashboard', ['student']);
+        $router->get('Student/bookCatalog', 'SidebarController@studentBookCatalog', ['student']);
+        $router->get('Student/equipmentCatalog', 'SidebarController@studentEquipmentCatalog', ['student']);
+        $router->get('Student/myCart', 'SidebarController@studentMyCart', ['student']);
+        $router->get('Student/qrBorrowingTicket', 'SidebarController@studentQrBorrowingTicket', ['student']);
+        $router->get('Student/myAttendance', 'SidebarController@studentMyAttendance', ['student']);
+        $router->get('Student/borrowingHistory', 'SidebarController@studentBorrowingHistory', ['student']);
+
+        
+        // taggalin na to 
+        // $router->get('dashboard/student', 'DashboardController@student', ['student']);
 
         /**
          * 
@@ -55,7 +70,7 @@ class RouteConfig {
          * $router->post('borrow/return', 'BorrowController@returN', ['librarian']);
          * $router->get('borrow/logs', 'BorrowController@logs', ['librarian', 'admin']);
          */
-    
+
 
         /**
          *
@@ -63,14 +78,14 @@ class RouteConfig {
          * $router->get('ticket/generate', 'TicketController@generate', ['student']);
          * $router->post('ticket/validate', 'TicketController@validate', ['librarian']);
          */
-        
+
 
         /**
          *
          * GUEST ROUTES (SAMPLE LANG TO BES)
          * $router->get('books/guest', 'BookController@guest');
          */
-        
+
 
         /**
          *
@@ -78,7 +93,7 @@ class RouteConfig {
          * $router->get('search', 'SearchController@index');
          * $router->get('guide', 'PageController@guide');
          */
-        
+
 
         /**
          *

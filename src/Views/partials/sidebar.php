@@ -294,8 +294,102 @@
                 <span>Backup & Restore</span>
             </a>
         </nav>
+
+        <!--Librarian Sidebar  -->
+        <!-- Navigation -->
+        <nav class="flex-1 px-4 py-6 space-y-2">
+        <?php elseif ($role === 'librarian'): ?>
+            <!-- Dashboard -->
+            <a href="/LibSys/public/Librarian/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'dashboard'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-house text-2xl"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <!-- User Management -->
+            <a href="/LibSys/public/Librarian/userManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'userManagement'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-users-three text-2xl"></i>
+                <span>User Management</span>
+            </a>
+
+            <!-- Features -->
+            <a href="/LibSys/public/Librarian/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'features'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-gear-six text-2xl"></i>
+                <span>Features</span>
+            </a>
+
+            <!-- Book Management -->
+            <a href="/LibSys/public/Librarian/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'bookManagement'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-book-open text-2xl"></i>
+                <span>Book Management</span>
+            </a>
+
+            <!-- Equipment Management -->
+            <a href="/LibSys/public/Librarian/equipmentManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'equipmentManagement'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-desktop text-2xl"></i>
+                <span>Equipment Management</span>
+            </a>
+
+            <!-- Attendance Logs -->
+            <a href="/LibSys/public/Librarian/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'attendanceLogs'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-clipboard-text text-2xl"></i>
+                <span>Attendance Logs</span>
+            </a>
+
+            <!-- Borrowing History -->
+            <a href="/LibSys/public/Librarian/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'borrowingHistory'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-clock-counter-clockwise text-2xl"></i>
+                <span>Borrowing History</span>
+            </a>
+
+            <!-- Overdue Alert -->
+            <a href="/LibSys/public/Librarian/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'overdueAlert'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-bell-ringing text-2xl"></i>
+                <span>Overdue Alert</span>
+            </a>
+
+            <!-- Global Logs -->
+            <a href="/LibSys/public/Librarian/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'globalLogs'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-database text-2xl"></i>
+                <span>Global Logs</span>
+            </a>
+
+            <!-- Backup and Restore -->
+            <a href="/LibSys/public/Librarian/backupAndRestore" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'backupAndRestore'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-cloud-arrow-up text-2xl"></i>
+                <span>Backup & Restore</span>
+            </a>
+        </nav>
+    
     </aside>
-
-
 <?php endif; ?>
 </aside>

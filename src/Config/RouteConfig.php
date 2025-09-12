@@ -24,8 +24,18 @@ class RouteConfig
          * dashboard routes
          * 
          */
-        $router->get('dashboard/librarian', 'SidebarController@librarian', ['librarian', 'admin', 'superadmin']);
-        
+        // Librarian Sidebar Page Navigation Display
+        $router->get('Librarian/dashboard', 'SidebarController@librarianDashboard', ['librarian']);
+        $router->get('Librarian/userManagement', 'SidebarController@librarianUserManagement', ['librarian']);
+        $router->get('Librarian/features', 'SidebarController@librarianFeatures', ['librarian']);
+        $router->get('Librarian/bookManagement', 'SidebarController@librarianBookManagement', ['librarian']);
+        $router->get('Librarian/equipmentManagement', 'SidebarController@librarianEquipmentManagement', ['librarian']);
+        $router->get('Librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
+        $router->get('Librarian/borrowingHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
+        $router->get('Librarian/overdueAlert', 'SidebarController@librarianOverdueAlert', ['librarian']);
+        $router->get('Librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
+        $router->get('Librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
+
         // Admin Sidebar Page Navigation Display
         $router->get('Admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
         $router->get('Admin/userManagement', 'SidebarController@adminUserManagement', ['admin']);

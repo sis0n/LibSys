@@ -37,7 +37,7 @@ class AuthController extends Controller{
             if(User::isAdmin($user)){
               header("Location: /libsys/public/Admin/dashboard");
             } elseif (User::isLibrarian($user)) {
-                header("Location: /libsys/public/dashboard/librarian");
+                header("Location: /libsys/public/Librarian/dashboard");
             } elseif (User::isStudent($user)) {
                 header("Location: /libsys/public/Student/dashboard");
                 // main landing page after mag login ni user

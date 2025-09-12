@@ -24,10 +24,32 @@ class RouteConfig
          * dashboard routes
          * 
          */
-        $router->get('dashboard/superadmin', 'SidebarController@superadmin', ['superadmin']);
-        $router->get('dashboard/admin', 'SidebarController@admin', ['admin', 'superadmin']);
         $router->get('dashboard/librarian', 'SidebarController@librarian', ['librarian', 'admin', 'superadmin']);
-
+        
+        // Admin Sidebar Page Navigation Display
+        $router->get('Admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
+        $router->get('Admin/userManagement', 'SidebarController@adminUserManagement', ['admin']);
+        $router->get('Admin/features', 'SidebarController@adminFeatures', ['admin']);
+        $router->get('Admin/bookManagement', 'SidebarController@adminBookManagement', ['admin']);
+        $router->get('Admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['admin']);
+        $router->get('Admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
+        $router->get('Admin/borrowingHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
+        $router->get('Admin/overdueAlert', 'SidebarController@adminOverdueAlert', ['admin']);
+        $router->get('Admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
+        $router->get('Admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
+        
+        // Super Admin Sidebar Page Navigation Display
+        $router->get('SuperAdmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
+        $router->get('SuperAdmin/userManagement', 'SidebarController@userManagement', ['superadmin']);
+        $router->get('SuperAdmin/features', 'SidebarController@features', ['superadmin']);
+        $router->get('SuperAdmin/bookManagement', 'SidebarController@bookManagement', ['superadmin']);
+        $router->get('SuperAdmin/equipmentManagement', 'SidebarController@equipmentManagement', ['superadmin']);
+        $router->get('SuperAdmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
+        $router->get('SuperAdmin/borrowingHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('SuperAdmin/overdueAlert', 'SidebarController@overdueAlert', ['superadmin']);
+        $router->get('SuperAdmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
+        $router->get('SuperAdmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
+        
         // Student Sidebar Page Navigation Display
         $router->get('Student/dashboard', 'SidebarController@studentDashboard', ['student']);
         $router->get('Student/bookCatalog', 'SidebarController@studentBookCatalog', ['student']);

@@ -28,7 +28,7 @@ class SidebarController extends Controller
     {
         $this->view("Student/equipmentCatalog", [
             "title" => "Equipment Catalog",
-            "currentPage" => "equimentCatalog"
+            "currentPage" => "equipmentCatalog"
         ]);
     }
 

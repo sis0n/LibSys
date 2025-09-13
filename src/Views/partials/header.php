@@ -1,7 +1,7 @@
 <?php
 $role = $_SESSION['role'] ?? 'guest';
-$username = $_SESSION['username'] ?? 'Guest User';
-$usernumber = $_SESSION['user_number'] ?? '0000';
+$fullname = $_SESSION['fullname'] ?? 'Guest User';
+$username = $_SESSION['username'] ?? '0000';
 
 // Role title
 switch ($role) {
@@ -31,8 +31,8 @@ switch ($role) {
         <!-- Profile -->
         <div class="flex justify-end items-center gap-2">
             <div>
-                <p class="text-sm font-medium text-gray-700"><?= htmlspecialchars($username) ?></p>
-                <p class="text-xs text-gray-500"><?= htmlspecialchars($usernumber) ?></p>
+                <p class="text-sm font-medium text-gray-700"><?= htmlspecialchars($fullname) ?></p>
+                <p class="text-xs text-gray-500"><?= htmlspecialchars($username) ?></p>
             </div>
         </div>
         <!-- Logout -->

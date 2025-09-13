@@ -3,8 +3,11 @@ namespace App\Config;
 
 use App\Core\Router;
 
-class RouteConfig {
-    public static function register(): Router {
+class RouteConfig
+{
+    public static function register(): Router
+    {
+        // convert {param} style to regex
         $router = new Router();
 
         /**
@@ -21,10 +24,51 @@ class RouteConfig {
          * dashboard routes
          * 
          */
-        $router->get('dashboard/superadmin', 'DashboardController@superadmin', ['superadmin']);
-        $router->get('dashboard/admin', 'DashboardController@admin', ['admin', 'superadmin']);
-        $router->get('dashboard/librarian', 'DashboardController@librarian', ['librarian', 'admin', 'superadmin']);
-        $router->get('dashboard/student', 'DashboardController@student', ['student']);
+        // Librarian Sidebar Page Navigation Display
+        $router->get('Librarian/dashboard', 'SidebarController@librarianDashboard', ['librarian']);
+        $router->get('Librarian/userManagement', 'SidebarController@librarianUserManagement', ['librarian']);
+        $router->get('Librarian/features', 'SidebarController@librarianFeatures', ['librarian']);
+        $router->get('Librarian/bookManagement', 'SidebarController@librarianBookManagement', ['librarian']);
+        $router->get('Librarian/equipmentManagement', 'SidebarController@librarianEquipmentManagement', ['librarian']);
+        $router->get('Librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
+        $router->get('Librarian/borrowingHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
+        $router->get('Librarian/overdueAlert', 'SidebarController@librarianOverdueAlert', ['librarian']);
+        $router->get('Librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
+        $router->get('Librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
+
+        // Admin Sidebar Page Navigation Display
+        $router->get('Admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
+        $router->get('Admin/userManagement', 'SidebarController@adminUserManagement', ['admin']);
+        $router->get('Admin/features', 'SidebarController@adminFeatures', ['admin']);
+        $router->get('Admin/bookManagement', 'SidebarController@adminBookManagement', ['admin']);
+        $router->get('Admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['admin']);
+        $router->get('Admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
+        $router->get('Admin/borrowingHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
+        $router->get('Admin/overdueAlert', 'SidebarController@adminOverdueAlert', ['admin']);
+        $router->get('Admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
+        $router->get('Admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
+        
+        // Super Admin Sidebar Page Navigation Display
+        $router->get('SuperAdmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
+        $router->get('SuperAdmin/userManagement', 'SidebarController@userManagement', ['superadmin']);
+        $router->get('SuperAdmin/features', 'SidebarController@features', ['superadmin']);
+        $router->get('SuperAdmin/bookManagement', 'SidebarController@bookManagement', ['superadmin']);
+        $router->get('SuperAdmin/equipmentManagement', 'SidebarController@equipmentManagement', ['superadmin']);
+        $router->get('SuperAdmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
+        $router->get('SuperAdmin/borrowingHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('SuperAdmin/overdueAlert', 'SidebarController@overdueAlert', ['superadmin']);
+        $router->get('SuperAdmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
+        $router->get('SuperAdmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
+        
+        // Student Sidebar Page Navigation Display
+        $router->get('Student/dashboard', 'SidebarController@studentDashboard', ['student']);
+        $router->get('Student/bookCatalog', 'SidebarController@studentBookCatalog', ['student']);
+        $router->get('Student/equipmentCatalog', 'SidebarController@studentEquipmentCatalog', ['student']);
+        $router->get('Student/myCart', 'SidebarController@studentMyCart', ['student']);
+        $router->get('Student/qrBorrowingTicket', 'SidebarController@studentQrBorrowingTicket', ['student']);
+        $router->get('Student/myAttendance', 'SidebarController@studentMyAttendance', ['student']);
+        $router->get('Student/borrowingHistory', 'SidebarController@studentBorrowingHistory', ['student']);
+
 
         /**
          * 
@@ -55,7 +99,7 @@ class RouteConfig {
          * $router->post('borrow/return', 'BorrowController@returN', ['librarian']);
          * $router->get('borrow/logs', 'BorrowController@logs', ['librarian', 'admin']);
          */
-    
+
 
         /**
          *
@@ -63,14 +107,14 @@ class RouteConfig {
          * $router->get('ticket/generate', 'TicketController@generate', ['student']);
          * $router->post('ticket/validate', 'TicketController@validate', ['librarian']);
          */
-        
+
 
         /**
          *
          * GUEST ROUTES (SAMPLE LANG TO BES)
          * $router->get('books/guest', 'BookController@guest');
          */
-        
+
 
         /**
          *
@@ -78,7 +122,7 @@ class RouteConfig {
          * $router->get('search', 'SearchController@index');
          * $router->get('guide', 'PageController@guide');
          */
-        
+
 
         /**
          *

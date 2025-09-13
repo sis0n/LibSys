@@ -9,16 +9,16 @@
     // Match the role to folder name
     switch ($role) {
         case 'student':
-            $roleFolder = 'Student';
+            $roleFolder = 'student';
             break;
         case 'librarian':
-            $roleFolder = 'Librarian';
+            $roleFolder = 'librarian';
             break;
         case 'admin':
-            $roleFolder = 'Admin';
+            $roleFolder = 'admin';
             break;
         case 'superadmin':
-            $roleFolder = 'SuperAdmin';
+            $roleFolder = 'superadmin';
             break;
         default:
             $roleFolder = 'Guest';
@@ -42,7 +42,7 @@
     <nav class="flex-1 px-4 py-6 space-y-2">
         <?php if ($role === 'student'): ?>
             <!-- Dashboard -->
-            <a href="/libsys/public/Student/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/libsys/public/student/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'dashboard')
                ? 'bg-green-600 text-white font-medium'
                : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -51,7 +51,7 @@
             </a>
 
             <!-- Book Catalog -->
-            <a href="/libsys/public/Student/bookCatalog" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/libsys/public/student/bookCatalog" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'bookCatalog')
                ? 'bg-green-600 text-white font-medium'
                : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -60,7 +60,7 @@
             </a>
 
             <!-- Equipment Catalog -->
-            <a href="/libsys/public/Student/equipmentCatalog" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/libsys/public/student/equipmentCatalog" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'equipmentCatalog')
                ? 'bg-green-600 text-white font-medium'
                : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -69,7 +69,7 @@
             </a>
 
             <!-- My Cart -->
-            <a href="/libsys/public/Student/myCart" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/libsys/public/student/myCart" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'myCart')
                ? 'bg-green-600 text-white font-medium'
                : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -78,7 +78,7 @@
             </a>
 
             <!-- QR Borrow Ticket -->
-            <a href="/libsys/public/Student/qrBorrowingTicket" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/libsys/public/student/qrBorrowingTicket" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'qrBorrowingTicket')
                ? 'bg-green-600 text-white font-medium'
                : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -87,7 +87,7 @@
             </a>
 
             <!-- My Attendance -->
-            <a href="/libsys/public/Student/myAttendance" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/libsys/public/student/myAttendance" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'myAttendance')
                ? 'bg-green-600 text-white font-medium'
                : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -96,7 +96,7 @@
             </a>
 
             <!-- My Borrowing History -->
-            <a href="/libsys/public/Student/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/libsys/public/student/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'borrowingHistory')
                ? 'bg-green-600 text-white font-medium'
                : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -110,7 +110,7 @@
         <nav class="flex-1 px-4 py-6 space-y-2">
         <?php elseif ($role === 'superadmin'): ?>
             <!-- Dashboard -->
-            <a href="/LibSys/public/SuperAdmin/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'dashboard'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -119,7 +119,7 @@
             </a>
 
             <!-- User Management -->
-            <a href="/LibSys/public/SuperAdmin/userManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/userManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'userManagement'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -128,7 +128,7 @@
             </a>
 
             <!-- Features -->
-            <a href="/LibSys/public/SuperAdmin/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'features'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -137,7 +137,7 @@
             </a>
 
             <!-- Book Management -->
-            <a href="/LibSys/public/SuperAdmin/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'bookManagement'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -146,7 +146,7 @@
             </a>
 
             <!-- Equipment Management -->
-            <a href="/LibSys/public/SuperAdmin/equipmentManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/equipmentManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'equipmentManagement'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -155,7 +155,7 @@
             </a>
 
             <!-- Attendance Logs -->
-            <a href="/LibSys/public/SuperAdmin/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'attendanceLogs'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -164,7 +164,7 @@
             </a>
 
             <!-- Borrowing History -->
-            <a href="/LibSys/public/SuperAdmin/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'borrowingHistory'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -173,7 +173,7 @@
             </a>
 
             <!-- Overdue Alert -->
-            <a href="/LibSys/public/SuperAdmin/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'overdueAlert'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -182,7 +182,7 @@
             </a>
 
             <!-- Global Logs -->
-            <a href="/LibSys/public/SuperAdmin/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'globalLogs'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -191,7 +191,7 @@
             </a>
 
             <!-- Backup and Restore -->
-            <a href="/LibSys/public/SuperAdmin/backupAndRestore" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/superadmin/backupAndRestore" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'backupAndRestore'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -205,7 +205,7 @@
         <nav class="flex-1 px-4 py-6 space-y-2">
         <?php elseif ($role === 'admin'): ?>
             <!-- Dashboard -->
-            <a href="/LibSys/public/Admin/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'dashboard'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -214,7 +214,7 @@
             </a>
 
             <!-- User Management -->
-            <a href="/LibSys/public/Admin/userManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/userManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'userManagement'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -223,7 +223,7 @@
             </a>
 
             <!-- Features -->
-            <a href="/LibSys/public/Admin/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'features'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -232,7 +232,7 @@
             </a>
 
             <!-- Book Management -->
-            <a href="/LibSys/public/Admin/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'bookManagement'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -241,7 +241,7 @@
             </a>
 
             <!-- Equipment Management -->
-            <a href="/LibSys/public/Admin/equipmentManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/equipmentManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'equipmentManagement'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -250,7 +250,7 @@
             </a>
 
             <!-- Attendance Logs -->
-            <a href="/LibSys/public/Admin/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'attendanceLogs'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -259,7 +259,7 @@
             </a>
 
             <!-- Borrowing History -->
-            <a href="/LibSys/public/Admin/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'borrowingHistory'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -268,7 +268,7 @@
             </a>
 
             <!-- Overdue Alert -->
-            <a href="/LibSys/public/Admin/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'overdueAlert'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -277,7 +277,7 @@
             </a>
 
             <!-- Global Logs -->
-            <a href="/LibSys/public/Admin/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'globalLogs'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -286,7 +286,7 @@
             </a>
 
             <!-- Backup and Restore -->
-            <a href="/LibSys/public/Admin/backupAndRestore" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/admin/backupAndRestore" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'backupAndRestore'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -300,7 +300,7 @@
         <nav class="flex-1 px-4 py-6 space-y-2">
         <?php elseif ($role === 'librarian'): ?>
             <!-- Dashboard -->
-            <a href="/LibSys/public/Librarian/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'dashboard'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -309,7 +309,7 @@
             </a>
 
             <!-- User Management -->
-            <a href="/LibSys/public/Librarian/userManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/userManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'userManagement'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -318,7 +318,7 @@
             </a>
 
             <!-- Features -->
-            <a href="/LibSys/public/Librarian/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'features'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -327,7 +327,7 @@
             </a>
 
             <!-- Book Management -->
-            <a href="/LibSys/public/Librarian/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'bookManagement'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -336,7 +336,7 @@
             </a>
 
             <!-- Equipment Management -->
-            <a href="/LibSys/public/Librarian/equipmentManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/equipmentManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'equipmentManagement'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -345,7 +345,7 @@
             </a>
 
             <!-- Attendance Logs -->
-            <a href="/LibSys/public/Librarian/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'attendanceLogs'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -354,7 +354,7 @@
             </a>
 
             <!-- Borrowing History -->
-            <a href="/LibSys/public/Librarian/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'borrowingHistory'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -363,7 +363,7 @@
             </a>
 
             <!-- Overdue Alert -->
-            <a href="/LibSys/public/Librarian/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'overdueAlert'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -372,7 +372,7 @@
             </a>
 
             <!-- Global Logs -->
-            <a href="/LibSys/public/Librarian/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'globalLogs'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -381,7 +381,7 @@
             </a>
 
             <!-- Backup and Restore -->
-            <a href="/LibSys/public/Librarian/backupAndRestore" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+            <a href="/LibSys/public/librarian/backupAndRestore" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'backupAndRestore'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">

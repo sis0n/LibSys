@@ -494,9 +494,6 @@
   .h-32 {
     height: calc(var(--spacing) * 32);
   }
-  .h-\[14px\] {
-    height: 14px;
-  }
   .h-screen {
     height: 100vh;
   }
@@ -852,16 +849,6 @@
     &:focus {
       --tw-outline-style: none;
       outline-style: none;
-    }
-  }
-  .sm\:px-6 {
-    @media (width >= 40rem) {
-      padding-inline: calc(var(--spacing) * 6);
-    }
-  }
-  .lg\:px-8 {
-    @media (width >= 64rem) {
-      padding-inline: calc(var(--spacing) * 8);
     }
   }
 }

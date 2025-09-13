@@ -105,12 +105,27 @@ class SidebarController extends Controller
             "currentPage" => "equipmentManagement"
         ]);
     }
+    
+    public function qrScanner()
+    {
+        $this->view("superadmin/qrScanner", [
+            "title"=> "Superadmin QR Code Scanner",
+            "currentPage" => "qrScanner"
+        ]);
+    }
 
     public function attendanceLogs()
     {
         $this->view("superadmin/attendanceLogs", [
             "title"=> "Superadmin Attendance Logs",
             "currentPage" => "attendanceLogs"
+        ]);
+    }
+    public function topVisitor()
+    {
+        $this->view("superadmin/topVisitor", [
+            "title"=> "Superadmin Top Visitor",
+            "currentPage" => "topVisitor"
         ]);
     }
 

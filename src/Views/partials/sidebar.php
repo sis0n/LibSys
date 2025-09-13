@@ -1,35 +1,35 @@
 <?php
-    namespace App\Views\partials;
-    use App\Views\Students;
+namespace App\Views\partials;
+use App\Views\Students;
 
-    $currentPage = $currentPage ?? ''; // galing sa Controller
+$currentPage = $currentPage ?? ''; // galing sa Controller
 
-    $role = $_SESSION['role'] ?? 'guest';
+$role = $_SESSION['role'] ?? 'guest';
 
-    // Match the role to folder name
-    switch ($role) {
-        case 'student':
-            $roleFolder = 'student';
-            break;
-        case 'librarian':
-            $roleFolder = 'librarian';
-            break;
-        case 'admin':
-            $roleFolder = 'admin';
-            break;
-        case 'superadmin':
-            $roleFolder = 'superadmin';
-            break;
-        default:
-            $roleFolder = 'Guest';
-            break;
-    }
+// Match the role to folder name
+switch ($role) {
+    case 'student':
+        $roleFolder = 'student';
+        break;
+    case 'librarian':
+        $roleFolder = 'librarian';
+        break;
+    case 'admin':
+        $roleFolder = 'admin';
+        break;
+    case 'superadmin':
+        $roleFolder = 'superadmin';
+        break;
+    default:
+        $roleFolder = 'Guest';
+        break;
+}
 
 ?>
 
 <aside class="w-64 bg-orange-50 border-r border-orange-200 flex flex-col sticky top-0 h-screen">
     <!-- Logo -->
-    <a href="/LibSys/public/<?= $roleFolder?>/dashboard"
+    <a href="/LibSys/public/<?= $roleFolder ?>/dashboard"
         class="flex items-center gap-4 px-6 py-4 border-b border-orange-200 cursor-pointer">
         <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Logo" class="h-18">
         <span class="font-semibold text-lg text-orange-700">
@@ -154,6 +154,15 @@
                 <span>Equipment Management</span>
             </a>
 
+            <!-- QR Code Scanner -->
+            <a href="/LibSys/public/superadmin/qrScanner" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'qrScanner'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-qr-code text-2xl"></i>
+                <span>QR Scanner</span>
+            </a>
+
             <!-- Attendance Logs -->
             <a href="/LibSys/public/superadmin/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'attendanceLogs'
@@ -161,6 +170,15 @@
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-clipboard-text text-2xl"></i>
                 <span>Attendance Logs</span>
+            </a>
+
+            <!-- Top Visitors -->
+            <a href="/LibSys/public/superadmin/topVisitor" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'topVisitor'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-chart-bar text-2xl"></i>
+                <span>Top Visitors</span>
             </a>
 
             <!-- Borrowing History -->
@@ -249,6 +267,15 @@
                 <span>Equipment Management</span>
             </a>
 
+             <!-- QR Code Scanner -->
+            <a href="/LibSys/public/admin/qrScanner" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'qrScanner'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-qr-code text-2xl"></i>
+                <span>QR Scanner</span>
+            </a>
+
             <!-- Attendance Logs -->
             <a href="/LibSys/public/admin/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'attendanceLogs'
@@ -256,6 +283,15 @@
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-clipboard-text text-2xl"></i>
                 <span>Attendance Logs</span>
+            </a>
+
+            <!-- Top Visitors -->
+            <a href="/LibSys/public/admin/topVisitor" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'topVisitor'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-chart-bar text-2xl"></i>
+                <span>Top Visitors</span>
             </a>
 
             <!-- Borrowing History -->
@@ -344,6 +380,15 @@
                 <span>Equipment Management</span>
             </a>
 
+             <!-- QR Code Scanner -->
+            <a href="/LibSys/public/librarian/qrScanner" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'qrScanner'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-qr-code text-2xl"></i>
+                <span>QR Scanner</span>
+            </a>
+
             <!-- Attendance Logs -->
             <a href="/LibSys/public/librarian/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'attendanceLogs'
@@ -351,6 +396,15 @@
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-clipboard-text text-2xl"></i>
                 <span>Attendance Logs</span>
+            </a>
+
+            <!-- Top Visitors -->
+            <a href="/LibSys/public/librarian/topVisitor" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'topVisitor'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-chart-bar text-2xl"></i>
+                <span>Top Visitors</span>
             </a>
 
             <!-- Borrowing History -->
@@ -389,7 +443,7 @@
                 <span>Backup & Restore</span>
             </a>
         </nav>
-    
+
     </aside>
 <?php endif; ?>
 </aside>

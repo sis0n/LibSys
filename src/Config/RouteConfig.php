@@ -54,7 +54,9 @@ class RouteConfig
         $router->get('superadmin/features', 'SidebarController@features', ['superadmin']);
         $router->get('superadmin/bookManagement', 'SidebarController@bookManagement', ['superadmin']);
         $router->get('superadmin/equipmentManagement', 'SidebarController@equipmentManagement', ['superadmin']);
+        $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
+        $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
         $router->get('superadmin/borrowingHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/overdueAlert', 'SidebarController@overdueAlert', ['superadmin']);
         $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);

@@ -105,12 +105,27 @@ class SidebarController extends Controller
             "currentPage" => "equipmentManagement"
         ]);
     }
+    
+    public function qrScanner()
+    {
+        $this->view("superadmin/qrScanner", [
+            "title"=> "Superadmin QR Code Scanner",
+            "currentPage" => "qrScanner"
+        ]);
+    }
 
     public function attendanceLogs()
     {
         $this->view("superadmin/attendanceLogs", [
             "title"=> "Superadmin Attendance Logs",
             "currentPage" => "attendanceLogs"
+        ]);
+    }
+    public function topVisitor()
+    {
+        $this->view("superadmin/topVisitor", [
+            "title"=> "Superadmin Top Visitor",
+            "currentPage" => "topVisitor"
         ]);
     }
 
@@ -189,12 +204,26 @@ class SidebarController extends Controller
             "currentPage" => "equipmentManagement"
         ]);
     }
+     public function adminQrScanner()
+    {
+        $this->view("admin/qrScanner", [
+            "title"=> "Admin QR Code Scanner",
+            "currentPage" => "qrScanner"
+        ]);
+    }
 
     public function adminAttendanceLogs()
     {
         $this->view("admin/attendanceLogs", [
             "title"=> "admin Attendance Logs",
             "currentPage" => "attendanceLogs"
+        ]);
+    }
+     public function adminTopVisitor()
+    {
+        $this->view("admin/topVisitor", [
+            "title"=> "Admin Top Visitor",
+            "currentPage" => "topVisitor"
         ]);
     }
 
@@ -273,11 +302,26 @@ class SidebarController extends Controller
         ]);
     }
 
+     public function librarianQrScanner()
+    {
+        $this->view("librarian/qrScanner", [
+            "title"=> "Librarian QR Code Scanner",
+            "currentPage" => "qrScanner"
+        ]);
+    }
+
     public function librarianAttendanceLogs()
     {
         $this->view("librarian/attendanceLogs", [
             "title"=> "librarian Attendance Logs",
             "currentPage" => "attendanceLogs"
+        ]);
+    }
+     public function librarianTopVisitor()
+    {
+        $this->view("librarian/topVisitor", [
+            "title"=> "Librarian Top Visitor",
+            "currentPage" => "topVisitor"
         ]);
     }
 

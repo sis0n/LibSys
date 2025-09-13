@@ -19,7 +19,7 @@
 
         <!-- Copyright -->
         <p class="text-xs text-orange-600 mt-6 mb-2">
-            © 2024 UCC Library Online Software. All rights reserved.
+            © 2025 UCC Library Online Software. All rights reserved.
         </p>
 
         <!-- Links -->

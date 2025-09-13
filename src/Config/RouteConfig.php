@@ -30,7 +30,9 @@ class RouteConfig
         $router->get('librarian/features', 'SidebarController@librarianFeatures', ['librarian']);
         $router->get('librarian/bookManagement', 'SidebarController@librarianBookManagement', ['librarian']);
         $router->get('librarian/equipmentManagement', 'SidebarController@librarianEquipmentManagement', ['librarian']);
+        $router->get('librarian/qrScanner', 'SidebarController@librarianQrScanner', ['librarian']);
         $router->get('librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
+        $router->get('librarian/topVisitor', 'SidebarController@librarianTopVisitor', ['librarian']);
         $router->get('librarian/borrowingHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
         $router->get('librarian/overdueAlert', 'SidebarController@librarianOverdueAlert', ['librarian']);
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
@@ -42,7 +44,9 @@ class RouteConfig
         $router->get('admin/features', 'SidebarController@adminFeatures', ['admin']);
         $router->get('admin/bookManagement', 'SidebarController@adminBookManagement', ['admin']);
         $router->get('admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['admin']);
+        $router->get('admin/qrScanner', 'SidebarController@adminQrScanner', ['admin']);
         $router->get('admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
+        $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['admin']);
         $router->get('admin/borrowingHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
         $router->get('admin/overdueAlert', 'SidebarController@adminOverdueAlert', ['admin']);
         $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);

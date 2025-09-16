@@ -20,7 +20,7 @@
         <div
             class="flex justify-between items-center w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <h1 class="flex items-center text-2xl    font-semibold text-orange-700">
-                UCC Library Attendance
+                UCC Library Online Software
             </h1>
             <form method="POST" action="/LibSys/public/logout">
                 <button type="submit" class="p-2 rounded hover:bg-gray-100 text-lg">

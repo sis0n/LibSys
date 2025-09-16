@@ -14,15 +14,20 @@
 
 <body class="bg-orange-50 font-sans flex flex-col min-h-screen">
     <!-- Header -->
-    <header class="flex justify-between items-center px-6 py-4 border-b border-orange-200">
-        <h1 class="flex items-center text-lg font-semibold text-orange-700">
-            UCC Library Attendance
-        </h1>
-        <form method="POST" action="/LibSys/public/logout">
-            <button type="submit" class="p-2 rounded hover:bg-gray-100">
-                <i class="ph ph-sign-out"></i>
-            </button>
-        </form>
+    <header
+        class="shadow group relative overflow-hidden transition-all duration-300 ease-in-out h-12 hover:h-16 bg-white border-b border-orange-200 flex items-center px-6">
+        <!-- Content inside -->
+        <div
+            class="flex justify-between items-center w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <h1 class="flex items-center text-2xl    font-semibold text-orange-700">
+                UCC Library Attendance
+            </h1>
+            <form method="POST" action="/LibSys/public/logout">
+                <button type="submit" class="p-2 rounded hover:bg-gray-100 text-lg">
+                    <i class="ph ph-sign-out"></i>
+                </button>
+            </form>
+        </div>
     </header>
 
     <!-- Main Content -->

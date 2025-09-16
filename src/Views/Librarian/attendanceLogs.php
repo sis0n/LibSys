@@ -181,7 +181,7 @@
       </div>
     </div>
 
-    <!-- Maria -->
+
     <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
       <div class="flex items-center gap-3">
         <div class="text-center text-sm">
@@ -200,7 +200,7 @@
       </div>
     </div>
 
-    <!-- Alex -->
+
     <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
       <div class="flex items-center gap-3">
         <div class="text-center text-sm">

@@ -39,8 +39,10 @@
   <!-- Main Content -->
   <main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
 
-    <!-- QR Code Scanner -->
-    <section class="bg-white shadow rounded-lg border border-orange-200 p-4 sm:p-6 text-center">
+    <!-- QR Code Scanner Form -->
+    <form action="QRController.php" method="POST"
+      class="bg-white shadow rounded-lg border border-orange-200 p-4 sm:p-6 text-center">
+
       <h2 class="text-xl sm:text-2xl font-semibold text-orange-700 mb-2">
         Attendance Scanner
       </h2>
@@ -53,7 +55,10 @@
         class="w-32 h-32 sm:w-40 sm:h-40 mx-auto border-2 border-dashed border-orange-300 rounded-lg flex items-center justify-center bg-orange-50">
         <i class="ph ph-qr-code text-[var(--color-primary)] text-7xl sm:text-9xl"></i>
       </div>
-    </section>
+
+      <!-- Hidden input para sa scanned value -->
+      <input type="hidden" id="qrCodeValue" name="qrCodeValue" value="">
+    </form>
 
     <!-- Manual Attendance Entry -->
     <section class="bg-white shadow rounded-lg border border-orange-200 p-4 sm:p-6">
@@ -64,22 +69,19 @@
         Manually record student attendance when you don't have ID or QR scanning is not available
       </p>
 
-      <form onsubmit="event.preventDefault(); recordAttendance();"
-        class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onsubmit="event.preventDefault(); recordAttendance();" class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <!-- Student Number -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Student Number</label>
-          <input type="text" id="studentNumber" placeholder="Enter student number"
-            class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
+          <input type="text" id="studentNumber" placeholder="Enter student number" class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
             focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50">
         </div>
 
         <!-- Student Name -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Student Name</label>
-          <input type="text" id="studentName" placeholder="Enter student name"
-            class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
+          <input type="text" id="studentName" placeholder="Enter student name" class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
             focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50">
         </div>
 
@@ -170,4 +172,5 @@
     }
   </script>
 </body>
+
 </html>

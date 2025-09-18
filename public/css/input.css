@@ -163,6 +163,7 @@
    2. Tailwind Directives
    ======================================== */
 @import "tailwindcss";
+
 /* ========================================
    3. Base Layer with Tokens
    ======================================== */
@@ -170,15 +171,25 @@
   body {
     font-size: var(--font-size-base);
     color: var(--color-foreground);
-    background: linear-gradient(
-      135deg,
-      var(--color-orange-50) 0%,
-      var(--color-green-50) 100%
-    );
+    background: linear-gradient(135deg,
+        var(--color-orange-50) 0%,
+        var(--color-green-50) 100%);
     background-attachment: fixed;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  input:-webkit-autofill {
+    @apply bg-orange-50 text-black;
+    -webkit-box-shadow: 0 0 0px 1000px #FFF7ED inset;
+    -webkit-text-fill-color: #000;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: var(--font-weight-medium);
     color: var(--color-foreground);
   }

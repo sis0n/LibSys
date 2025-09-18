@@ -20,9 +20,16 @@ class RouteConfig
         $router->post('logout', 'AuthController@logout');
 
         /**
-         * 
+         * ========================
+         * scanner route
+         * ========================
+         */
+        $router->get('scanner/attendance', 'ScannerController@scannerDisplay',['scanner']);
+
+        /**
+         * ========================
          * dashboard routes
-         * 
+         * ========================
          */
         // Librarian Sidebar Page Navigation Display
         $router->get('librarian/dashboard', 'SidebarController@librarianDashboard', ['librarian']);

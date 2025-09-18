@@ -48,4 +48,7 @@ class User {
     public static function isSuperadmin(array $user): bool {
         return isset($user['role']) && $user['role'] === 'superadmin';
     }
+    public static function isScanner(array $user): bool {
+        return isset($user['role']) && $user['role'] === 'scanner';
+    }
 }

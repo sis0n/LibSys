@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit0639f9dd1d82392927a54613f01475e7
+class ComposerStaticInitaa713e0abf436ef60cb848df8cff5bb9
 {
     public static $files = array (
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
@@ -13,64 +13,75 @@ class ComposerStaticInit0639f9dd1d82392927a54613f01475e7
     );
 
     public static $prefixLengthsPsr4 = array (
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
         ),
-        'P' => 
+        'P' =>
         array (
             'PhpOption\\' => 10,
         ),
-        'G' => 
+        'G' =>
         array (
             'GrahamCampbell\\ResultType\\' => 26,
         ),
-        'D' => 
+        'D' =>
         array (
             'Dotenv\\' => 7,
         ),
-        'A' => 
+        'A' =>
         array (
             'App\\' => 4,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Symfony\\Polyfill\\Php80\\' => 
+        'Symfony\\Polyfill\\Php80\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Ctype\\' => 
+        'Symfony\\Polyfill\\Ctype\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
-        'PhpOption\\' => 
+        'PhpOption\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
         ),
-        'GrahamCampbell\\ResultType\\' => 
+        'GrahamCampbell\\ResultType\\' =>
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
         ),
-        'Dotenv\\' => 
+        'Dotenv\\' =>
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
         ),
-        'App\\' => 
+        'App\\' =>
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
     );
 
     public static $classMap = array (
+        'App\\Config\\RouteConfig' => __DIR__ . '/../..' . '/src/Config/RouteConfig.php',
         'App\\Controllers\\UserController' => __DIR__ . '/../..' . '/src/Controllers/UserController.php',
+        'App\\Core\\Controller' => __DIR__ . '/../..' . '/src/Core/Controller.php',
         'App\\Core\\Database' => __DIR__ . '/../..' . '/src/Core/Database.php',
+        'App\\Repositories\\QRRepository' => __DIR__ . '/../..' . '/src/Repositories/QRRepository.php',
+        'App\\Repositories\\attendanceRepository' => __DIR__ . '/../..' . '/src/Repositories/attendanceRepository.php',
+        'App\\Repositories\\auditLogRepository' => __DIR__ . '/../..' . '/src/Repositories/auditLogRepository.php',
+        'App\\Repositories\\authRepository' => __DIR__ . '/../..' . '/src/Repositories/authRepository.php',
+        'App\\Repositories\\backUpRepository' => __DIR__ . '/../..' . '/src/Repositories/backUpRepository.php',
+        'App\\Repositories\\bookRepository' => __DIR__ . '/../..' . '/src/Repositories/bookRepository.php',
+        'App\\Repositories\\borrowRepository' => __DIR__ . '/../..' . '/src/Repositories/borrowRepository.php',
+        'App\\Repositories\\importExportRepository' => __DIR__ . '/../..' . '/src/Repositories/importExportRepository.php',
+        'App\\Repositories\\reportRepository' => __DIR__ . '/../..' . '/src/Repositories/reportRepository.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Dotenv\\Dotenv' => __DIR__ . '/..' . '/vlucas/phpdotenv/src/Dotenv.php',
@@ -134,9 +145,9 @@ class ComposerStaticInit0639f9dd1d82392927a54613f01475e7
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit0639f9dd1d82392927a54613f01475e7::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit0639f9dd1d82392927a54613f01475e7::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit0639f9dd1d82392927a54613f01475e7::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitaa713e0abf436ef60cb848df8cff5bb9::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitaa713e0abf436ef60cb848df8cff5bb9::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitaa713e0abf436ef60cb848df8cff5bb9::$classMap;
 
         }, null, ClassLoader::class);
     }

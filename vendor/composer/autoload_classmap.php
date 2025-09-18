@@ -6,8 +6,19 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Config\\RouteConfig' => $baseDir . '/src/Config/RouteConfig.php',
     'App\\Controllers\\UserController' => $baseDir . '/src/Controllers/UserController.php',
+    'App\\Core\\Controller' => $baseDir . '/src/Core/Controller.php',
     'App\\Core\\Database' => $baseDir . '/src/Core/Database.php',
+    'App\\Repositories\\QRRepository' => $baseDir . '/src/Repositories/QRRepository.php',
+    'App\\Repositories\\attendanceRepository' => $baseDir . '/src/Repositories/attendanceRepository.php',
+    'App\\Repositories\\auditLogRepository' => $baseDir . '/src/Repositories/auditLogRepository.php',
+    'App\\Repositories\\authRepository' => $baseDir . '/src/Repositories/authRepository.php',
+    'App\\Repositories\\backUpRepository' => $baseDir . '/src/Repositories/backUpRepository.php',
+    'App\\Repositories\\bookRepository' => $baseDir . '/src/Repositories/bookRepository.php',
+    'App\\Repositories\\borrowRepository' => $baseDir . '/src/Repositories/borrowRepository.php',
+    'App\\Repositories\\importExportRepository' => $baseDir . '/src/Repositories/importExportRepository.php',
+    'App\\Repositories\\reportRepository' => $baseDir . '/src/Repositories/reportRepository.php',
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'Dotenv\\Dotenv' => $vendorDir . '/vlucas/phpdotenv/src/Dotenv.php',

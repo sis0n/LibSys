@@ -38,7 +38,7 @@
   <main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
 
     <!-- QR Code Scanner Form -->
-    <form action="scannerController.php" method="POST"
+    <form action="/libsys/public/scanner/scan" method="POST"
       class="bg-white shadow rounded-lg border border-orange-200 p-4 sm:p-6 text-center">
 
       <h2 class="text-xl sm:text-2xl font-semibold text-orange-700 mb-2">
@@ -69,7 +69,7 @@
         Manually record student attendance when you don't have ID or QR scanning is not available
       </p>
 
-      <form action="attendanceController.php" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form action="/libsys/public/scanner/manual" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <!-- Student Number -->
         <div>
@@ -130,6 +130,30 @@
       </div>
     </div>
   </footer>
+  <script>
+  const qrInput = document.getElementById("qrCodeValue");
+
+  function keepFocus() {
+    qrInput.focus();
+  }
+
+  // Pag load ng page, focus agad sa QR input
+  window.addEventListener("load", keepFocus);
+
+  // Kung mawala ang focus (napindot mouse/click), ibalik ulit
+  qrInput.addEventListener("blur", () => {
+    setTimeout(keepFocus, 100);
+  });
+
+  // Pag na-detect Enter key (madalas ito nilalagay ng scanner), submit agad
+  qrInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      qrInput.form.submit();
+    }
+  });
+</script>
+
 </body>
 
 </html>

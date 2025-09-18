@@ -12,7 +12,7 @@ class UserRepository{
 
   public function findByIdentifier(string $identifier){
     $stmt = $this->db->prepare("
-        SELECT u.*, s.student_number 
+        SELECT u.*, s.student_id, s.student_number 
         FROM users u
         LEFT JOIN students s ON u.user_id = s.user_id
         WHERE u.username = :identifier OR s.student_number = :identifier
@@ -21,6 +21,7 @@ class UserRepository{
     $stmt->execute(['identifier' => $identifier]);
     return $stmt->fetch();
   }
+
 
   public function createUser(array $data){
     $stmt = $this->db->prepare("

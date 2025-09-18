@@ -24,7 +24,10 @@ class RouteConfig
          * scanner route
          * ========================
          */
-        $router->get('scanner/attendance', 'ScannerController@scannerDisplay',['scanner']);
+        $router->post('scanner/scan', 'ScannerController@scanQR', ['scanner']);
+        $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
+        $router->post('scanner/manual', 'ScannerController@manualEntry', ['scanner']);
+
 
         /**
          * ========================

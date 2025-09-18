@@ -1,5 +1,4 @@
 <body class="min-h-screen p-6">
-    <!-- Greeting (now a plain div so it won't conflict with your global header) -->
     <div class="mb-6">
         <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
         <div class="text-gray-700">Here's your library overview for today.</div>
@@ -87,7 +86,7 @@
             <p class="text-sm text-gray-600 mb-4">Common tasks</p>
 
             <div class="space-y-3">
-                <a href="#"
+                <a href="/libsys/public/student/bookCatalog"
                     class="flex items-start gap-3 bg-[var(--color-orange-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-orange-100)] transition">
                     <i class="ph ph-magnifying-glass text-lg mt-0.5"></i>
                     <span>
@@ -96,7 +95,7 @@
                     </span>
                 </a>
 
-                <a href="#"
+                <a href="/libsys/public/student/qrBorrowingTicket"
                     class="flex items-start gap-3 bg-[var(--color-green-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-green-100)] transition">
                     <i class="ph ph-qr-code text-lg mt-0.5"></i>
                     <span>
@@ -105,7 +104,7 @@
                     </span>
                 </a>
 
-                <a href="#"
+                <a href="/libsys/public/student/borrowingHistory"
                     class="flex items-start gap-3 bg-[var(--color-amber-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-amber-100)] transition">
                     <i class="ph ph-clock-counter-clockwise text-lg mt-0.5"></i>
                     <span>

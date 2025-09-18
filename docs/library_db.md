@@ -10,6 +10,15 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Attendance Logs
+CREATE TABLE attendance_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    method ENUM('qr','manual') DEFAULT 'qr',
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(student_id)
+) ENGINE=InnoDB;
+
 -- Permissions
 CREATE TABLE permissions (
   permission_id INT AUTO_INCREMENT PRIMARY KEY,

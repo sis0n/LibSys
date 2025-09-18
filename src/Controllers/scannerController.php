@@ -1,107 +1,61 @@
 <?php
 namespace App\Controllers;
 
-use App\Core\Controller;
+use App\Core\Controller;  
 use App\Repositories\UserRepository;
 use App\Repositories\AttendanceRepository;
+use App\Models\Attendance;
 
 class ScannerController extends Controller
 {
     private $userRepo;
+    private $attendanceRepo;
 
     public function __construct()
     {
         $this->userRepo = new UserRepository();
+        $this->attendanceRepo = new AttendanceRepository();
     }
 
-    public function scannerDisplay()
-    {
-        $this->view("scanner/attendance", [
-            "title" => "Scanner"
-        ], false);
+    public function scannerDisplay(){
+    $this->view("scanner/attendance",[
+        "title" => "Scanner"
+    ],false);
     }
 
-    public function scanQR()
+    public function attendance()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $studentNumber = $_POST['qrCodeValue'] ?? null;
+        $studentNumber = $_POST['qrCodeValue'] ?? null;
 
-            if ($studentNumber) {
-                $user = $this->userRepo->findByIdentifier($studentNumber);
-
-                if ($user && $user['role'] === 'student' && isset($user['student_id'])) {
-                    $attendanceRepo = new AttendanceRepository();
-                    $success = $attendanceRepo->logAttendance((int)$user['student_id'], 'qr');
-
-                    if ($success) {
-                        // Gumamit ng JS para mag alert at bumalik sa scanner page
-                        echo "<script>
-                                alert('✅ Successful Scan!\\nName: " . addslashes($user['full_name']) . " \\nStudent Number: " . addslashes($user['student_number']) . "');
-                                window.location.href = '/libsys/public/scanner/attendance';
-                              </script>";
-                    } else {
-                        echo "<script>
-                                alert('❌ Failed to log attendance. Please try again.');
-                                window.location.href = '/libsys/public/scanner/attendance';
-                              </script>";
-                    }
-                } else {
-                    echo "<script>
-                            alert('⚠️ Invalid student number or not a student.');
-                            window.location.href = '/libsys/public/scanner/attendance';
-                          </script>";
-                }
-            } else {
-                echo "<script>
-                        alert('⚠️ QR code value missing.');
-                        window.location.href = '/libsys/public/scanner/attendance';
-                      </script>";
-            }
-        } else {
-            http_response_code(405);
-            echo "Method Not Allowed";
+        if (!$studentNumber) {
+            echo "No student number provided.";
+            return;
         }
-    }
 
-    //manual entry
-    public function manualEntry() {
-      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-          $studentNumber = $_POST['studentNumber'] ?? null;
-          $studentName = $_POST['studentName'] ?? null;
+        $user = $this->userRepo->findByStudentNumber($studentNumber);
 
-          if ($studentNumber && $studentName) {
-              $user = $this->userRepo->findByIdentifier($studentNumber);
+        if (!$user) {
+            echo "User not found.";
+            return;
+        }
 
-              if ($user && $user['role'] === 'student' && isset($user['student_id'])) {
-                  $attendanceRepo = new AttendanceRepository();
-                  $success = $attendanceRepo->logAttendance((int)$user['student_id'], 'manual');
+        $attendance = new Attendance(
+            (int)$user['student_id'],
+            $user['student_number'],
+            $user['full_name'],
+            $user['year_level'],
+            $user['course'],
+            'qr'
+        );
 
-                  if ($success) {
-                      echo "<script>
-                              alert('✅ Manual attendance recorded!\\nName: " . addslashes($user['full_name']) . " \\nStudent Number: " . addslashes($user['student_number']) . "');
-                              window.location.href = '/libsys/public/scanner/attendance';
-                            </script>";
-                  } else {
-                      echo "<script>
-                              alert('❌ Failed to log attendance.');
-                              window.location.href = '/libsys/public/scanner/attendance';
-                            </script>";
-                  }
-              } else {
-                  echo "<script>
-                          alert('⚠️ Student not found or not a student.');
-                          window.location.href = '/libsys/public/scanner/attendance';
-                        </script>";
-              }
-          } else {
-              echo "<script>
-                      alert('⚠️ Please fill out all fields.');
-                      window.location.href = '/libsys/public/scanner/attendance';
-                    </script>";
-          }
-      } else {
-          http_response_code(405);
-          header("Location: /libsys/src/Views/errors/405.php");
-      }
+        // save db
+        $success = $this->attendanceRepo->logAttendance($attendance);
+
+        if ($success) {
+            //eto gagawan mo ng design col
+            echo "Attendance logged for: " . htmlspecialchars($user['full_name']) . '</br>' . htmlspecialchars($user['student_number']) . '<br>' . htmlspecialchars($user['course']);
+        } else {
+            echo "Failed to log attendance.";
+        }
     }
 }

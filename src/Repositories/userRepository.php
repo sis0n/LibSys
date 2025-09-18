@@ -12,14 +12,19 @@ class UserRepository{
 
   public function findByIdentifier(string $identifier){
     $stmt = $this->db->prepare("
-        SELECT u.*, s.student_id, s.student_number 
+        SELECT 
+            u.*, 
+            s.student_id, 
+            s.student_number,
+            s.year_level,
+            s.course
         FROM users u
         LEFT JOIN students s ON u.user_id = s.user_id
         WHERE u.username = :identifier OR s.student_number = :identifier
         LIMIT 1
     ");
     $stmt->execute(['identifier' => $identifier]);
-    return $stmt->fetch();
+    return $stmt->fetch(\PDO::FETCH_ASSOC); // para associative array
   }
 
 
@@ -39,5 +44,17 @@ class UserRepository{
   public function getAllUsers(){
     $stmt = $this->db->query("SELECT * FROM users");
     return $stmt->fetchAll();
+  }
+
+  public function findByStudentNumber(string $studentNumber){
+    $stmt = $this->db->prepare("
+        SELECT u.*, s.student_id, s.student_number, s.year_level, s.course
+        FROM users u
+        LEFT JOIN students s ON u.user_id = s.user_id
+        WHERE s.student_number = :student_number
+        LIMIT 1
+    ");
+    $stmt->execute(['student_number' => $studentNumber]);
+    return $stmt->fetch();
   }
 }

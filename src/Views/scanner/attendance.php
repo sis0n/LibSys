@@ -48,14 +48,14 @@
         Students can scan their QR in student ID, for automated attendance
       </p>
 
-      <!-- QR Box -->
+      <!-- QR Box (design lang) -->
       <div
         class="w-32 h-32 sm:w-40 sm:h-40 mx-auto border-2 border-dashed border-orange-300 rounded-lg flex items-center justify-center bg-orange-50">
         <i class="ph ph-qr-code text-[var(--color-primary)] text-7xl sm:text-9xl"></i>
       </div>
 
-      <!-- Hidden input para sa scanned value -->
-      <input type="hidden" id="qrCodeValue" name="qrCodeValue" value="">
+      <!-- Hidden/Text input for QR scanner -->
+      <input type="text" id="qrCodeValue" name="qrCodeValue" class="opacity-0 absolute" autofocus required>
     </form>
 
     <!-- Manual Attendance Entry -->

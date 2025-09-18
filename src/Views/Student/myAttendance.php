@@ -1,3 +1,75 @@
+<?php
+// Make sure the user is logged in
+if (!isset($_SESSION['user_id'])) {
+  header("Location: /login");
+  exit;
+}
+
+// ✅ Set timezone to Manila for PHP date functions
+date_default_timezone_set('Asia/Manila');
+
+use App\Repositories\AttendanceRepository;
+
+// Initialize repository
+$attendanceRepo = new AttendanceRepository();
+$userId = $_SESSION['user_id']; // logged-in user
+
+// Fetch all attendance logs for this user
+$allLogs = $attendanceRepo->getByUserId($userId);
+
+// Prepare data for JS tabs
+$attendanceJS = [
+  'day' => [],
+  'week' => [],
+  'month' => [],
+  'year' => []
+];
+
+$now = new DateTime(); // Manila time now
+
+foreach ($allLogs as $log) {
+  // DB timestamp is already in Manila (DATETIME)
+  $logTime = new DateTime($log['timestamp']);
+
+  // Format date and time for display
+  $dateStr = $logTime->format('D, M d, Y'); // e.g., Fri, Sep 19, 2025
+  $timeStr = $logTime->format('g:i A');      // e.g., 3:30 PM
+
+  // Calculate difference in days, months, years
+  $diff = $now->diff($logTime);
+
+  
+  $today = new DateTime('today');               // Midnight today
+$weekAgo = (clone $today)->modify('-6 days'); // Last 7 days include today
+$firstOfMonth = new DateTime('first day of this month');
+$firstOfYear = new DateTime('first day of January this year');
+
+foreach ($allLogs as $log) {
+    $logTime = new DateTime($log['timestamp']);
+    $entry = [
+        'date' => $logTime->format('D, M d, Y'),
+        'time' => $logTime->format('g:i A'),
+        'status' => 'Checked In'
+    ];
+
+    // Compare only dates (ignore hours)
+    $logDate = $logTime->format('Y-m-d');
+
+    if ($logDate === $today->format('Y-m-d')) {
+        $attendanceJS['day'][] = $entry;
+    } elseif ($logTime >= $weekAgo) {
+        $attendanceJS['week'][] = $entry;
+    } elseif ($logTime >= $firstOfMonth) {
+        $attendanceJS['month'][] = $entry;
+    } elseif ($logTime >= $firstOfYear) {
+        $attendanceJS['year'][] = $entry;
+    }
+}
+
+}
+?>
+
+
 <body class="min-h-screen p-6">
 
   <div class="mb-6">
@@ -60,66 +132,62 @@
       const tabs = document.querySelectorAll(".att-tab");
       const contents = document.querySelectorAll(".tab-content");
 
-      // Sample backend data (pwedeng palitan sa AJAX/fetch) dito mo lagay sa attendance.
-      const attendanceData = {
-        day: [
-          // Sample nalang din ng format para alam mo ano ilalagay
-          { date: "Sept 19, Fri", time: "3:30 PM", status: "Checked In" }
-        ],
-        week: [],
-        month: [],
-        year: []
-      };
+      // attendanceData is now dynamically injected from PHP
+      const attendanceData = <?php echo json_encode($attendanceJS); ?>;
 
-      // Function para mag-render ng data
       function renderContent(tabName, container) {
-        container.innerHTML = ""; // clear muna
+        const data = attendanceData[tabName] || [];
+        container.innerHTML = ""; // clear previous content
 
-        const data = attendanceData[tabName];
-
-        if (!data || data.length === 0) {
+        if (data.length === 0) {
           // No records template
           container.innerHTML = `
-        <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-          <i class="ph ph-clipboard text-6xl"></i>
-          <p class="text-sm font-medium">No attendance records</p>
-          <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
-        </div>
-      `;
-        } else {
-          // Records template
-          data.forEach(item => {
-            container.innerHTML += `
-          <div class="record p-4 mb-2 bg-[var(--color-orange-50)] rounded-lg flex justify-between">
-            <div>
-              <div class="flex items-center gap-2">
-                <i class="ph ph-calendar-check"></i>
-                <p class="font-medium">${item.date}</p>
-              </div>
-              <div class="flex items-center gap-2">
-                <i class="ph ph-clock"></i>
-                <p>Check-in: ${item.time}</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <span class="text-sm font-medium text-green-600">${item.status}</span><br>
-              <span class="text-xs text-gray-500">Status</span>
-            </div>
-          </div>
-        `;
-          });
+      <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
+        <i class="ph ph-clipboard text-6xl"></i>
+        <p class="text-sm font-medium">No attendance records</p>
+        <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
+      </div>
+    `;
+          return;
         }
+
+        // Render each record
+        const fragment = document.createDocumentFragment(); // better performance
+        data.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "record p-4 mb-2 bg-[var(--color-orange-50)] rounded-lg flex justify-between";
+          div.innerHTML = `
+      <div>
+        <div class="flex items-center gap-2">
+          <i class="ph ph-calendar-check"></i>
+          <p class="font-medium">${item.date}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <i class="ph ph-clock"></i>
+          <p>Check-in: ${item.time}</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-sm font-medium text-green-600">${item.status}</span><br>
+        <span class="text-xs text-gray-500">Status</span>
+      </div>
+    `;
+          fragment.appendChild(div);
+        });
+        container.appendChild(fragment);
       }
 
-      // Initial render (default active = day)
+      // Initial render: show the first tab that is active
       contents.forEach(c => renderContent(c.dataset.content, c));
 
       // Tab click handler
       tabs.forEach(tab => {
         tab.addEventListener("click", () => {
+          // Reset all tabs
           tabs.forEach(btn => btn.dataset.active = "false");
           tab.dataset.active = "true";
 
+          // Hide all contents and show the selected
           contents.forEach(c => c.classList.add("hidden"));
           const target = document.querySelector(`[data-content="${tab.dataset.tab}"]`);
           target.classList.remove("hidden");
@@ -128,9 +196,5 @@
         });
       });
     </script>
-
-
-
-
   </section>
 </body>

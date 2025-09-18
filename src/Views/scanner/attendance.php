@@ -38,9 +38,7 @@
   <main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
 
     <!-- QR Code Scanner Form -->
-    <form action="/libsys/public/scanner/scan" method="POST"
-      class="bg-white shadow rounded-lg border border-orange-200 p-4 sm:p-6 text-center">
-
+    <form action="/libsys/public/scanner/scan" method="POST" class="relative bg-white shadow rounded-lg border border-orange-200 p-4 sm:p-6 text-center">
       <h2 class="text-xl sm:text-2xl font-semibold text-orange-700 mb-2">
         Attendance Scanner
       </h2>
@@ -48,16 +46,13 @@
         Students can scan their QR in student ID, for automated attendance
       </p>
 
-      <!-- QR Box (design lang) -->
-      <div
-        class="w-32 h-32 sm:w-40 sm:h-40 mx-auto border-2 border-dashed border-orange-300 rounded-lg flex items-center justify-center bg-orange-50">
+      <!-- QR Box (clickable, auto-focus QR input) -->
+      <div class="w-32 h-32 sm:w-40 sm:h-40 mx-auto border-2 border-dashed border-orange-300 rounded-lg flex items-center justify-center bg-orange-50 cursor-pointer" id="qrBox">
         <i class="ph ph-qr-code text-[var(--color-primary)] text-7xl sm:text-9xl"></i>
       </div>
 
-      <!-- Hidden/Text input for QR scanner -->
-      <input type="text" id="qrCodeValue" name="qrCodeValue" class="opacity-0 absolute pointer-events-none"
-        tabindex="-1" autofocus required>
-
+      <!-- Hidden QR input -->
+      <input type="text" id="qrCodeValue" name="qrCodeValue" class="absolute opacity-0" autocomplete="off">
     </form>
 
     <!-- Manual Attendance Entry -->
@@ -66,34 +61,26 @@
         Manual Attendance Entry
       </h2>
       <p class="text-sm text-gray-600 mb-6">
-        Manually record student attendance when you don't have ID or QR scanning is not available
+        Manually record student attendance when you don't have ID or QR scanning
       </p>
 
       <form action="/libsys/public/scanner/manual" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-        <!-- Student Number -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Student Number</label>
           <input type="text" name="studentNumber" id="studentNumber" placeholder="Enter student number" class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
-        focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50" required>
+      focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50" required>
         </div>
-
-        <!-- Student Name -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Student Name</label>
           <input type="text" name="studentName" id="studentName" placeholder="Enter student name" class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
-        focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50" required>
+      focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50" required>
         </div>
-
-        <!-- Submit -->
         <div class="md:col-span-2 flex justify-center mt-4">
-          <button type="submit"
-            class="px-4 sm:px-5 py-2 bg-orange-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-orange-600 transition">
+          <button type="submit" class="px-4 sm:px-5 py-2 bg-orange-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-orange-600 transition">
             Record Attendance
           </button>
         </div>
       </form>
-
     </section>
   </main>
 
@@ -131,28 +118,38 @@
     </div>
   </footer>
   <script>
-  const qrInput = document.getElementById("qrCodeValue");
+const qrInput = document.getElementById("qrCodeValue");
+const qrBox = document.getElementById("qrBox");
+const qrForm = qrInput.form; // get parent form
 
-  function keepFocus() {
+// Kapag na-click QR box, mag-focus sa QR input
+qrBox.addEventListener('click', () => {
     qrInput.focus();
-  }
+});
 
-  // Pag load ng page, focus agad sa QR input
-  window.addEventListener("load", keepFocus);
+// Auto-focus QR input kapag page load
+window.addEventListener("load", () => {
+    qrInput.focus();
+});
 
-  // Kung mawala ang focus (napindot mouse/click), ibalik ulit
-  qrInput.addEventListener("blur", () => {
-    setTimeout(keepFocus, 100);
-  });
+$isSubmitting = false;
 
-  // Pag na-detect Enter key (madalas ito nilalagay ng scanner), submit agad
-  qrInput.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      qrInput.form.submit();
-    }
-  });
+qrForm.addEventListener("submit", () => {
+    setTimeout(() => {
+        qrInput.value = "";
+        isSubmitting = true;   // unlock para sa next scan
+        qrInput.focus();
+    }, 100); // konting delay para makumpleto ang submit
+});
+
+
+// Kapag nag-click sa manual input, i-unfocus QR input para di ma-block typing
+const manualInputs = document.querySelectorAll("#studentNumber, #studentName");
+manualInputs.forEach(input => {
+    input.addEventListener("focus", () => qrInput.blur());
+});
 </script>
+
 
 </body>
 

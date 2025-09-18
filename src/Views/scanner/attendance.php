@@ -55,7 +55,9 @@
       </div>
 
       <!-- Hidden/Text input for QR scanner -->
-      <input type="text" id="qrCodeValue" name="qrCodeValue" class="opacity-0 absolute" autofocus required>
+      <input type="text" id="qrCodeValue" name="qrCodeValue" class="opacity-0 absolute pointer-events-none"
+        tabindex="-1" autofocus required>
+
     </form>
 
     <!-- Manual Attendance Entry -->

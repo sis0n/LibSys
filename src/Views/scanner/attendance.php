@@ -40,7 +40,7 @@
   <main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
 
     <!-- QR Code Scanner Form -->
-    <form action="QRController.php" method="POST"
+    <form action="scannerController.php" method="POST"
       class="bg-white shadow rounded-lg border border-orange-200 p-4 sm:p-6 text-center">
 
       <h2 class="text-xl sm:text-2xl font-semibold text-orange-700 mb-2">
@@ -69,20 +69,20 @@
         Manually record student attendance when you don't have ID or QR scanning is not available
       </p>
 
-      <form onsubmit="event.preventDefault(); recordAttendance();" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form action="attendanceController.php" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <!-- Student Number -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Student Number</label>
-          <input type="text" id="studentNumber" placeholder="Enter student number" class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
-            focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50">
+          <input type="text" name="studentNumber" id="studentNumber" placeholder="Enter student number" class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
+        focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50" required>
         </div>
 
         <!-- Student Name -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Student Name</label>
-          <input type="text" id="studentName" placeholder="Enter student name" class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
-            focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50">
+          <input type="text" name="studentName" id="studentName" placeholder="Enter student name" class="text-sm text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
+        focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50" required>
         </div>
 
         <!-- Submit -->
@@ -93,6 +93,7 @@
           </button>
         </div>
       </form>
+
     </section>
   </main>
 

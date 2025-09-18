@@ -10,8 +10,6 @@
   <!-- PHOSPHOR ICONS -->
   <link rel="stylesheet" type="text/css"
     href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
-  <!-- Sweet Alert -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-orange-50 font-sans flex flex-col min-h-screen">
@@ -130,48 +128,6 @@
       </div>
     </div>
   </footer>
-
-  <script>
-    function recordAttendance() {
-      const studentNumber = document.getElementById("studentNumber").value.trim();
-      const studentName = document.getElementById("studentName").value.trim();
-
-      if (studentNumber === "" || studentName === "" || studentNumber === "0000") {
-        Swal.fire({
-          icon: "error",
-          title: "Attendance Failed!",
-          html: `
-            <div style="text-align:left; font-size:14px; line-height:1.6;">
-              <p><b>Reason:</b> Student not found in records</p>
-              <p><b>Entered Number:</b> ${studentNumber || "N/A"}</p>
-              <p><b>Entered Name:</b> ${studentName || "N/A"}</p>
-            </div>
-          `,
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-          position: "center",
-        });
-      } else {
-        Swal.fire({
-          icon: "success",
-          title: "Attendance Recorded!",
-          html: `
-            <div style="text-align:left; font-size:14px; line-height:1.6;">
-              <p><b>Student Name:</b> ${studentName}</p>
-              <p><b>Student Number:</b> ${studentNumber}</p>
-              <p><b>Course:</b> BSCS</p>
-              <p><b>Year & Section:</b> 3-A</p>
-            </div>
-          `,
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-          position: "center",
-        });
-      }
-    }
-  </script>
 </body>
 
 </html>

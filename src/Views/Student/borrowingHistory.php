@@ -1,11 +1,8 @@
 <body class="min-h-screen p-6">
-    <div class="mb-6">
+    <div class="mb-3">
         <h2 class="text-2xl font-bold mb-4">My Borrowing History</h2>
         <p class="text-gray-700">Complete record of your library borrowing activity with detailed information.</p>
     </div>
-
-    <div class="p-6 space-y-6">
-
         <div class="p-6 space-y-6">
 
             <!-- Top Stats -->

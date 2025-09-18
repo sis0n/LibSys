@@ -3,10 +3,10 @@
         <h2 class="text-2xl font-bold mb-4">My Borrowing History</h2>
         <p class="text-gray-700">Complete record of your library borrowing activity with detailed information.</p>
     </div>
-        <div class="p-6 space-y-6">
+        <!-- <div class="p-6 space-y-6"> -->
 
             <!-- Top Stats -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
                 <!-- Total Borrowed -->
                 <div
@@ -158,7 +158,7 @@
 
                 </div>
             </div>
-        </div>
+        <!-- </div> -->
 
 
 </body>

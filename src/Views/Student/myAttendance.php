@@ -50,78 +50,86 @@
 
     <!-- Tab Contents -->
     <div id="tab-contents">
-      <div class="tab-content" data-content="day">
-        <!-- No Records -->
-        <div
-          class="flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-          <i class="ph ph-clipboard text-6xl"></i>
-          <p class="text-sm font-medium">No attendance records</p>
-          <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
-        </div>
-
-      </div>
-
-      <div class="tab-content hidden" data-content="week">
-        <!-- No Records -->
-        <div
-          class="flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-          <i class="ph ph-clipboard text-6xl"></i>
-          <p class="text-sm font-medium">No attendance records</p>
-          <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
-        </div>
-      </div>
-
-      <div class="tab-content hidden" data-content="month">
-        <!-- No Records -->
-        <div
-          class="flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-          <i class="ph ph-clipboard text-6xl"></i>
-          <p class="text-sm font-medium">No attendance records</p>
-          <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
-        </div>
-      </div>
-
-      <div class="tab-content hidden" data-content="year">
-
-        <!-- Sample record -->
-        <div class="p-4 mb-2 bg-[var(--color-orange-50)] rounded-lg flex justify-between">
-          <div>
-            <div class="flex items-center gap-2 ">
-              <i class="ph ph-calendar-check"></i>
-              <p class="font-medium">Sept 19, Fri</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <i class="ph ph-clock"></i>
-              <p>Check-in: 3:30 PM</p>
-            </div>
-
-          </div>
-          <div class="text-right">
-            <span class="text-sm font-medium text-green-600">Checked In</span><br>
-            <span class="text-xs text-gray-500">Status</span>
-          </div>
-        </div>
-      </div>
+      <div class="tab-content" data-content="day"></div>
+      <div class="tab-content hidden" data-content="week"></div>
+      <div class="tab-content hidden" data-content="month"></div>
+      <div class="tab-content hidden" data-content="year"></div>
     </div>
 
     <script>
-      // Toggle tabs and content
       const tabs = document.querySelectorAll(".att-tab");
       const contents = document.querySelectorAll(".tab-content");
 
+      // Sample backend data (pwedeng palitan sa AJAX/fetch) dito mo lagay sa attendance.
+      const attendanceData = {
+        day: [
+          // Sample nalang din ng format para alam mo ano ilalagay
+          { date: "Sept 19, Fri", time: "3:30 PM", status: "Checked In" }
+        ],
+        week: [],
+        month: [],
+        year: []
+      };
+
+      // Function para mag-render ng data
+      function renderContent(tabName, container) {
+        container.innerHTML = ""; // clear muna
+
+        const data = attendanceData[tabName];
+
+        if (!data || data.length === 0) {
+          // No records template
+          container.innerHTML = `
+        <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
+          <i class="ph ph-clipboard text-6xl"></i>
+          <p class="text-sm font-medium">No attendance records</p>
+          <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
+        </div>
+      `;
+        } else {
+          // Records template
+          data.forEach(item => {
+            container.innerHTML += `
+          <div class="record p-4 mb-2 bg-[var(--color-orange-50)] rounded-lg flex justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <i class="ph ph-calendar-check"></i>
+                <p class="font-medium">${item.date}</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="ph ph-clock"></i>
+                <p>Check-in: ${item.time}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-medium text-green-600">${item.status}</span><br>
+              <span class="text-xs text-gray-500">Status</span>
+            </div>
+          </div>
+        `;
+          });
+        }
+      }
+
+      // Initial render (default active = day)
+      contents.forEach(c => renderContent(c.dataset.content, c));
+
+      // Tab click handler
       tabs.forEach(tab => {
         tab.addEventListener("click", () => {
-          // reset tabs
           tabs.forEach(btn => btn.dataset.active = "false");
           tab.dataset.active = "true";
 
-          // hide all contents
           contents.forEach(c => c.classList.add("hidden"));
-          // show target
-          document.querySelector(`[data-content="${tab.dataset.tab}"]`).classList.remove("hidden");
+          const target = document.querySelector(`[data-content="${tab.dataset.tab}"]`);
+          target.classList.remove("hidden");
+
+          renderContent(tab.dataset.tab, target);
         });
       });
     </script>
+
+
 
 
   </section>

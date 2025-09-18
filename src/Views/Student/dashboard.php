@@ -45,7 +45,7 @@
         <!-- Currently Borrowed Books -->
         <div
             class="bg-[var(--color-card)] shadow-md rounded-lg border border-[var(--color-border)] p-4 border-t-4 border-t-[var(--color-orange-500)]">
-            <h4 class="text-lg font-semibold mb-2">Currently Borrowed Books</h4>
+            <h4 class="text-lg font-semibold mb-2">Currently Borrowed</h4>
             <p class="text-sm text-gray-600 mb-4">Books you need to return</p>
 
             <!-- Book Item -->

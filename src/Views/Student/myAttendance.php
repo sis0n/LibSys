@@ -1,23 +1,18 @@
 <?php
-// Make sure the user is logged in
 if (!isset($_SESSION['user_id'])) {
   header("Location: /login");
   exit;
 }
 
-// ✅ Set timezone to Manila for PHP date functions
 date_default_timezone_set('Asia/Manila');
 
 use App\Repositories\AttendanceRepository;
 
-// Initialize repository
 $attendanceRepo = new AttendanceRepository();
 $userId = $_SESSION['user_id']; // logged-in user
 
-// Fetch all attendance logs for this user
 $allLogs = $attendanceRepo->getByUserId($userId);
 
-// Prepare data for JS tabs
 $attendanceJS = [
   'day' => [],
   'week' => [],
@@ -25,47 +20,46 @@ $attendanceJS = [
   'year' => []
 ];
 
-$now = new DateTime(); // Manila time now
+$now = new DateTime(); // manila time now
 
 foreach ($allLogs as $log) {
-  // DB timestamp is already in Manila (DATETIME)
+  // DB timestamp is already in manila (DATETIME)
   $logTime = new DateTime($log['timestamp']);
 
-  // Format date and time for display
-  $dateStr = $logTime->format('D, M d, Y'); // e.g., Fri, Sep 19, 2025
-  $timeStr = $logTime->format('g:i A');      // e.g., 3:30 PM
+  // format date and time for display
+  $dateStr = $logTime->format('D, M d, Y'); // Fri, Sep 19, 2025
+  $timeStr = $logTime->format('g:i A'); // 3:30 PM
 
-  // Calculate difference in days, months, years
+  // calculate difference in days, months, years
   $diff = $now->diff($logTime);
 
-  
-  $today = new DateTime('today');               // Midnight today
-$weekAgo = (clone $today)->modify('-6 days'); // Last 7 days include today
-$firstOfMonth = new DateTime('first day of this month');
-$firstOfYear = new DateTime('first day of January this year');
 
-foreach ($allLogs as $log) {
+  $today = new DateTime('today'); // midnight today
+  $weekAgo = (clone $today)->modify('-6 days'); // last 7 days including today
+  $firstOfMonth = new DateTime('first day of this month');
+  $firstOfYear = new DateTime('first day of January this year');
+
+  foreach ($allLogs as $log) {
     $logTime = new DateTime($log['timestamp']);
     $entry = [
-        'date' => $logTime->format('D, M d, Y'),
-        'time' => $logTime->format('g:i A'),
-        'status' => 'Checked In'
+      'date' => $logTime->format('D, M d, Y'),
+      'time' => $logTime->format('g:i A'),
+      'status' => 'Checked In'
     ];
 
-    // Compare only dates (ignore hours)
+    // compare only dates 
     $logDate = $logTime->format('Y-m-d');
 
     if ($logDate === $today->format('Y-m-d')) {
-        $attendanceJS['day'][] = $entry;
+      $attendanceJS['day'][] = $entry;
     } elseif ($logTime >= $weekAgo) {
-        $attendanceJS['week'][] = $entry;
+      $attendanceJS['week'][] = $entry;
     } elseif ($logTime >= $firstOfMonth) {
-        $attendanceJS['month'][] = $entry;
+      $attendanceJS['month'][] = $entry;
     } elseif ($logTime >= $firstOfYear) {
-        $attendanceJS['year'][] = $entry;
+      $attendanceJS['year'][] = $entry;
     }
-}
-
+  }
 }
 ?>
 
@@ -132,7 +126,6 @@ foreach ($allLogs as $log) {
       const tabs = document.querySelectorAll(".att-tab");
       const contents = document.querySelectorAll(".tab-content");
 
-      // attendanceData is now dynamically injected from PHP
       const attendanceData = <?php echo json_encode($attendanceJS); ?>;
 
       function renderContent(tabName, container) {
@@ -140,7 +133,6 @@ foreach ($allLogs as $log) {
         container.innerHTML = ""; // clear previous content
 
         if (data.length === 0) {
-          // No records template
           container.innerHTML = `
       <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
         <i class="ph ph-clipboard text-6xl"></i>
@@ -151,7 +143,6 @@ foreach ($allLogs as $log) {
           return;
         }
 
-        // Render each record
         const fragment = document.createDocumentFragment(); // better performance
         data.forEach(item => {
           const div = document.createElement("div");
@@ -177,17 +168,15 @@ foreach ($allLogs as $log) {
         container.appendChild(fragment);
       }
 
-      // Initial render: show the first tab that is active
       contents.forEach(c => renderContent(c.dataset.content, c));
 
-      // Tab click handler
       tabs.forEach(tab => {
         tab.addEventListener("click", () => {
-          // Reset all tabs
+
           tabs.forEach(btn => btn.dataset.active = "false");
           tab.dataset.active = "true";
 
-          // Hide all contents and show the selected
+          // hide all contents and show the selected
           contents.forEach(c => c.classList.add("hidden"));
           const target = document.querySelector(`[data-content="${tab.dataset.tab}"]`);
           target.classList.remove("hidden");

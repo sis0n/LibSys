@@ -67,7 +67,7 @@ class ScannerController extends Controller
         );
 
         // save db
-        $success = $this->attendanceRepo->logAttendance($attendance);
+        $success = $this->attendanceRepo->logBoth($attendance);
 
         if ($success) {
             echo "<div style='border:1px solid #ccc; padding:10px; text-align:center;'>
@@ -121,11 +121,12 @@ class ScannerController extends Controller
             $user['full_name'],
             $user['year_level'],
             $user['course'],
-            'manual', // source
+            'manual',
             $now->format('Y-m-d H:i:s')
         );
 
-        $success = $this->attendanceRepo->logAttendance($attendance);
+        $success = $this->attendanceRepo->logBoth($attendance);
+
 
         if ($success) {
             echo "<div style='border:1px solid #ccc; padding:10px; text-align:center;'>

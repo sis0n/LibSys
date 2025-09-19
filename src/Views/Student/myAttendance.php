@@ -1,7 +1,7 @@
 <?php
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /libsys/public/login");
-    exit;
+  header("Location: /libsys/public/login");
+  exit;
 }
 
 date_default_timezone_set('Asia/Manila');
@@ -14,10 +14,10 @@ $userId = $_SESSION['user_id']; // logged-in user
 $allLogs = $attendanceRepo->getByUserId($userId);
 
 $attendanceJS = [
-    'day' => [],
-    'week' => [],
-    'month' => [],
-    'year' => []
+  'day' => [],
+  'week' => [],
+  'month' => [],
+  'year' => []
 ];
 
 $now = new DateTime(); // current Manila time
@@ -38,20 +38,22 @@ foreach ($allLogs as $log) {
 
     if ($logDate === $today->format('Y-m-d')) {
         $attendanceJS['day'][] = $entry;
+        continue;
     }
 
-    if ($logTime >= $weekAgo) {
+    if ($logTime >= $weekAgo && $logTime < $today) {
         $attendanceJS['week'][] = $entry;
     }
 
-    if ($logTime >= $firstOfMonth) {
+    if ($logTime >= $firstOfMonth && $logTime < $today) {
         $attendanceJS['month'][] = $entry;
     }
 
-    if ($logTime >= $firstOfYear) {
+    if ($logTime >= $firstOfYear && $logTime < $today) {
         $attendanceJS['year'][] = $entry;
     }
 }
+
 ?>
 
 
@@ -125,12 +127,12 @@ foreach ($allLogs as $log) {
 
         if (data.length === 0) {
           container.innerHTML = `
-      <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-        <i class="ph ph-clipboard text-6xl"></i>
-        <p class="text-sm font-medium">No attendance records</p>
-        <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
-      </div>
-    `;
+          <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
+            <i class="ph ph-clipboard text-6xl"></i>
+            <p class="text-sm font-medium">No attendance records</p>
+            <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
+          </div>
+        `;
           return;
         }
 
@@ -139,27 +141,29 @@ foreach ($allLogs as $log) {
           const div = document.createElement("div");
           div.className = "record p-4 mb-2 bg-[var(--color-orange-50)] rounded-lg flex justify-between";
           div.innerHTML = `
-      <div>
-        <div class="flex items-center gap-2">
-          <i class="ph ph-calendar-check"></i>
-          <p class="font-medium">${item.date}</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <i class="ph ph-clock"></i>
-          <p>Check-in: ${item.time}</p>
-        </div>
-      </div>
-      <div class="text-right">
-        <span class="text-sm font-medium text-green-600">${item.status}</span><br>
-        <span class="text-xs text-gray-500">Status</span>
-      </div>
-    `;
+            <div>
+              <div class="flex items-center gap-2">
+                <i class="ph ph-calendar-check"></i>
+                <p class="font-medium">${item.date}</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="ph ph-clock"></i>
+                <p>Check-in: ${item.time}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-medium text-green-600">${item.status}</span><br>
+              <span class="text-xs text-gray-500">Status</span>
+            </div>
+          `;
           fragment.appendChild(div);
         });
         container.appendChild(fragment);
       }
 
-      contents.forEach(c => renderContent(c.dataset.content, c));
+      const activeTab = document.querySelector(".att-tab[data-active='true']");
+      const activeContent = document.querySelector(`[data-content="${activeTab.dataset.tab}"]`);
+      renderContent(activeTab.dataset.tab, activeContent);
 
       tabs.forEach(tab => {
         tab.addEventListener("click", () => {

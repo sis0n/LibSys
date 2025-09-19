@@ -1,3 +1,33 @@
+<?php
+use App\Repositories\AttendanceRepository;
+
+$attendanceRepo = new AttendanceRepository();
+$userId = $_SESSION['user_id'];
+
+// get all attendance logs for user
+$allLogs = $attendanceRepo->getByUserId($userId);
+
+// count days visited for current month
+date_default_timezone_set('Asia/Manila');
+$firstOfMonth = new DateTime('first day of this month');
+$lastOfMonth = new DateTime('last day of this month');
+
+$daysVisitedThisMonth = 0;
+$visitedDates = []; // para hindi double count
+
+foreach ($allLogs as $log) {
+    $logDate = (new DateTime($log['timestamp']))->format('Y-m-d');
+
+    if (!in_array($logDate, $visitedDates)) {
+        $logDT = new DateTime($log['timestamp']);
+        if ($logDT >= $firstOfMonth && $logDT <= $lastOfMonth) {
+            $daysVisitedThisMonth++;
+            $visitedDates[] = $logDate;
+        }
+    }
+}
+?>
+
 <body class="min-h-screen p-6">
     <div class="mb-6">
         <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
@@ -23,7 +53,7 @@
             <div class="absolute top-3 right-3 text-xl text-[var(--color-green-500)]"><i
                     class="ph ph-calendar-check"></i></div>
             <h3 class="text-sm text-gray-600">Days Visited</h3>
-            <p class="text-3xl font-bold mt-2">0</p>
+            <p class="text-3xl font-bold mt-2"><?php echo $daysVisitedThisMonth?></p>
             <span class="text-sm text-gray-500">This month</span>
         </div>
 

@@ -1,3 +1,26 @@
+<?php
+use App\Repositories\AttendanceRepository;
+
+$attendanceRepo = new AttendanceRepository();
+$logs = $attendanceRepo->getAllLogs(); 
+
+date_default_timezone_set('Asia/Manila');
+
+$formattedLogs = [];
+foreach ($logs as $log) {
+    $logTime = new DateTime($log['timestamp']); // gamit yung actual timestamp
+    $formattedLogs[] = [
+        'date' => $logTime->format("Y-m-d"),
+        'day' => $logTime->format("l"),
+        'studentName' => $log['full_name'],
+        'studentNumber' => $log['student_number'],
+        'time' => $logTime->format("H:i:s"),
+        'status' => "Present"
+    ];
+}
+?>
+
+
 <!-- Header -->
 <div class="flex items-center justify-between mb-6">
   <div>
@@ -139,84 +162,33 @@
 
   <div class="space-y-3">
     <!-- Record Item -->
+     <?php foreach($formattedLogs as $log):?>
     <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
       <div class="flex items-center gap-3">
         <!-- Date -->
         <div class="text-center text-sm">
-          <p class="font-semibold">Date</p>
-          <p class="text-gray-500 text-xs">Day</p>
+          <p class="font-semibold"><?= htmlspecialchars($log['date']) ?></p>
+          <p class="text-gray-500 text-xs"><?= htmlspecialchars($log['day']) ?></p>
         </div>
 
         <!-- Student Info -->
         <div>
-          <p class="font-medium text-gray-800">Alwyn Adriano <span
-              class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">Student Number</span></p>
-          <p class="text-gray-500 text-xs">Time</p>
+          <p class="font-medium text-gray-800">
+            <?= htmlspecialchars($log['studentName']) ?>
+            <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">
+              <?= htmlspecialchars($log['studentNumber']) ?>
+            </span>
+          </p>
+          <p class="text-gray-500 text-xs">Check-in: <?= htmlspecialchars($log['time']) ?></p>
         </div>
       </div>
       
       <!-- Status -->
       <div class="text-right">
-        <p class="text-green-600 font-medium text-sm">Visited</p>
+        <p class="text-green-600 font-medium text-sm"><?= htmlspecialchars($log['status']) ?></p>
         <p class="text-gray-500 text-xs">Library attendance</p>
       </div>
     </div>
-
-    <!-- Duplicate same block for other records -->
-    <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
-      <div class="flex items-center gap-3">
-        <div class="text-center text-sm">
-          <p class="font-semibold">Date</p>
-          <p class="text-gray-500 text-xs">Day</p>
-        </div>
-        <div>
-          <p class="font-medium text-gray-800">Joshua Colmo <span
-              class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">20230114-S</span></p>
-          <p class="text-gray-500 text-xs">Time</p>
-        </div>
-      </div>
-      <div class="text-right">
-        <p class="text-green-600 font-medium text-sm">Visited</p>
-        <p class="text-gray-500 text-xs">Library attendance</p>
-      </div>
-    </div>
-
-
-    <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
-      <div class="flex items-center gap-3">
-        <div class="text-center text-sm">
-          <p class="font-semibold">Aug 1</p>
-          <p class="text-gray-500 text-xs">Fri</p>
-        </div>
-        <div>
-          <p class="font-medium text-gray-800">Kyle Madriaga <span
-              class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">Student Number</span></p>
-          <p class="text-gray-500 text-xs">Check-in: 10:30 (Sample lang to)</p>
-        </div>
-      </div>
-      <div class="text-right">
-        <p class="text-green-600 font-medium text-sm">Visited</p>
-        <p class="text-gray-500 text-xs">Library attendance</p>
-      </div>
-    </div>
-
-
-    <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
-      <div class="flex items-center gap-3">
-        <div class="text-center text-sm">
-          <p class="font-semibold">Date</p>
-          <p class="text-gray-500 text-xs">Day</p>
-        </div>
-        <div>
-          <p class="font-medium text-gray-800">Renz Geronimo <span
-              class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">Student Number</span></p>
-          <p class="text-gray-500 text-xs">Check-in: 09:15 (Sample format ulit)</p>
-        </div>
-      </div>
-      <div class="text-right">
-        <p class="text-green-600 font-medium text-sm">Visited</p>
-        <p class="text-gray-500 text-xs">Library attendance</p>
-      </div>
-    </div>
+    <?php endforeach; ?>
   </div>
 </div>

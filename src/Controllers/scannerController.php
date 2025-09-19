@@ -38,6 +38,7 @@ class ScannerController extends Controller
 
         if (!$user) {
             echo "User not found.";
+            echo "<a href='/libsys/public/scanner/attendance'>back to scan</a>";
             return;
         }
 
@@ -45,7 +46,7 @@ class ScannerController extends Controller
         $now = new \DateTime('now', $manila); // current manila time
 
         // check if yung user nag log na ng attendance today, burahin na lang yung comment sa demo day.
-        
+
         // $today = (new \DateTime('now', new \DateTimeZone('Asia/Manila')))->format('Y-m-d');
         // $existing = $this->attendanceRepo->getByUserAndDate((int)$user['user_id'], $today);
 
@@ -76,7 +77,7 @@ class ScannerController extends Controller
                 <p><strong>Time:</strong> " . $now->format('g:i A') . "</p>
               </div>
               <br>
-              <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";    
+              <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
         } else {
             echo "Failed to log attendance.";
         }
@@ -94,6 +95,12 @@ class ScannerController extends Controller
 
         //check lang kung existing yung user
         $user = $this->userRepo->findByStudentNumber($studentNumber);
+
+        if (!$user) {
+            echo "Student not found in records.";
+            echo "<br><a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
+            return;
+        }
 
         if (!$user) {
             $user = [
@@ -128,7 +135,7 @@ class ScannerController extends Controller
                 <p><strong>Time:</strong> " . $now->format('g:i A') . "</p>
               </div>
               <br>
-              <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";    
+              <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
         } else {
             echo "Failed to log attendance.";
         }

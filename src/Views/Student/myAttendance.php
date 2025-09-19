@@ -1,3 +1,62 @@
+<?php
+if (!isset($_SESSION['user_id'])) {
+  header("Location: /libsys/public/login");
+  exit;
+}
+
+date_default_timezone_set('Asia/Manila');
+
+use App\Repositories\AttendanceRepository;
+
+$attendanceRepo = new AttendanceRepository();
+$userId = $_SESSION['user_id']; // logged-in user
+
+$allLogs = $attendanceRepo->getByUserId($userId);
+
+$attendanceJS = [
+  'day' => [],
+  'week' => [],
+  'month' => [],
+  'year' => []
+];
+
+$now = new DateTime(); // current Manila time
+$today = new DateTime('today');
+$weekAgo = (clone $today)->modify('-6 days'); // last 7 days including today
+$firstOfMonth = new DateTime('first day of this month');
+$firstOfYear = new DateTime('first day of January this year');
+
+foreach ($allLogs as $log) {
+    $logTime = new DateTime($log['timestamp']);
+    $entry = [
+        'date' => $logTime->format('D, M d, Y'),
+        'time' => $logTime->format('g:i A'),
+        'status' => 'Checked In'
+    ];
+
+    $logDate = $logTime->format('Y-m-d');
+
+    if ($logDate === $today->format('Y-m-d')) {
+        $attendanceJS['day'][] = $entry;
+        continue;
+    }
+
+    if ($logTime >= $weekAgo && $logTime < $today) {
+        $attendanceJS['week'][] = $entry;
+    }
+
+    if ($logTime >= $firstOfMonth && $logTime < $today) {
+        $attendanceJS['month'][] = $entry;
+    }
+
+    if ($logTime >= $firstOfYear && $logTime < $today) {
+        $attendanceJS['year'][] = $entry;
+    }
+}
+
+?>
+
+
 <body class="min-h-screen p-6">
 
   <div class="mb-6">
@@ -60,37 +119,28 @@
       const tabs = document.querySelectorAll(".att-tab");
       const contents = document.querySelectorAll(".tab-content");
 
-      // Sample backend data (pwedeng palitan sa AJAX/fetch) dito mo lagay sa attendance.
-      const attendanceData = {
-        day: [
-          // Sample nalang din ng format para alam mo ano ilalagay
-          { date: "Sept 19, Fri", time: "3:30 PM", status: "Checked In" }
-        ],
-        week: [],
-        month: [],
-        year: []
-      };
+      const attendanceData = <?php echo json_encode($attendanceJS); ?>;
 
-      // Function para mag-render ng data
       function renderContent(tabName, container) {
-        container.innerHTML = ""; // clear muna
+        const data = attendanceData[tabName] || [];
+        container.innerHTML = ""; // clear previous content
 
-        const data = attendanceData[tabName];
-
-        if (!data || data.length === 0) {
-          // No records template
+        if (data.length === 0) {
           container.innerHTML = `
-        <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-          <i class="ph ph-clipboard text-6xl"></i>
-          <p class="text-sm font-medium">No attendance records</p>
-          <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
-        </div>
-      `;
-        } else {
-          // Records template
-          data.forEach(item => {
-            container.innerHTML += `
-          <div class="record p-4 mb-2 bg-[var(--color-orange-50)] rounded-lg flex justify-between">
+          <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
+            <i class="ph ph-clipboard text-6xl"></i>
+            <p class="text-sm font-medium">No attendance records</p>
+            <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
+          </div>
+        `;
+          return;
+        }
+
+        const fragment = document.createDocumentFragment(); // better performance
+        data.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "record p-4 mb-2 bg-[var(--color-orange-50)] rounded-lg flex justify-between";
+          div.innerHTML = `
             <div>
               <div class="flex items-center gap-2">
                 <i class="ph ph-calendar-check"></i>
@@ -105,21 +155,23 @@
               <span class="text-sm font-medium text-green-600">${item.status}</span><br>
               <span class="text-xs text-gray-500">Status</span>
             </div>
-          </div>
-        `;
-          });
-        }
+          `;
+          fragment.appendChild(div);
+        });
+        container.appendChild(fragment);
       }
 
-      // Initial render (default active = day)
-      contents.forEach(c => renderContent(c.dataset.content, c));
+      const activeTab = document.querySelector(".att-tab[data-active='true']");
+      const activeContent = document.querySelector(`[data-content="${activeTab.dataset.tab}"]`);
+      renderContent(activeTab.dataset.tab, activeContent);
 
-      // Tab click handler
       tabs.forEach(tab => {
         tab.addEventListener("click", () => {
+
           tabs.forEach(btn => btn.dataset.active = "false");
           tab.dataset.active = "true";
 
+          // hide all contents and show the selected
           contents.forEach(c => c.classList.add("hidden"));
           const target = document.querySelector(`[data-content="${tab.dataset.tab}"]`);
           target.classList.remove("hidden");
@@ -128,9 +180,5 @@
         });
       });
     </script>
-
-
-
-
   </section>
 </body>

@@ -31,6 +31,7 @@
 
             <!-- Login Form -->
             <form method="POST" action="/libsys/public/login" class="space-y-4">
+                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?? '' ?>">
                 <div>
                     <label for="username" class="flex items-center gap-x-1 text-sm font-medium text-gray-700">
                         <i class="ph ph-user"></i>
@@ -50,6 +51,10 @@
                         class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                         placeholder="Enter your password" required>
                 </div>
+
+                <?php if(!empty($error)): ?>
+                    <p class="text-red-600 text-sm"><?= htmlspecialchars($error) ?></p>
+                <?php endif; ?>
 
                 <button type="submit"
                     class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg shadow hover:bg-orange-700 transition">

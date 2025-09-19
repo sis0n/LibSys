@@ -24,7 +24,10 @@ class RouteConfig
          * scanner route
          * ========================
          */
-        $router->get('scanner/attendance', 'ScannerController@scannerDisplay',['scanner']);
+        $router->post('scanner/scan', 'ScannerController@attendance', ['scanner']);
+        $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
+        $router->post('scanner/manual', 'ScannerController@manual', ['scanner']);
+        
 
         /**
          * ========================
@@ -81,6 +84,7 @@ class RouteConfig
         $router->get('student/qrBorrowingTicket', 'SidebarController@studentQrBorrowingTicket', ['student']);
         $router->get('student/myAttendance', 'SidebarController@studentMyAttendance', ['student']);
         $router->get('student/borrowingHistory', 'SidebarController@studentBorrowingHistory', ['student']);
+        $router->get('student/attendance/get', 'AttendanceController@getMyAttendance', ['student']);
 
 
         /**

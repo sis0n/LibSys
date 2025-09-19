@@ -33,22 +33,10 @@ class User {
         }
     }
 
-    public static function isAdmin(array $user): bool {
-        return isset($user['role']) && $user['role'] === 'admin';
-    }
-
-    public static function isLibrarian(array $user): bool {
-        return isset($user['role']) && $user['role'] === 'librarian';
-    }
-
-    public static function isStudent(array $user): bool {
-        return isset($user['role']) && $user['role'] === 'student';
-    }
-
-    public static function isSuperadmin(array $user): bool {
-        return isset($user['role']) && $user['role'] === 'superadmin';
-    }
-    public static function isScanner(array $user): bool {
-        return isset($user['role']) && $user['role'] === 'scanner';
-    }
+    // static role checks – secure role methods
+    public static function isAdmin(array $user): bool { return ($user['role'] ?? '') === 'admin'; }
+    public static function isLibrarian(array $user): bool { return ($user['role'] ?? '') === 'librarian'; }
+    public static function isStudent(array $user): bool { return ($user['role'] ?? '') === 'student'; }
+    public static function isSuperadmin(array $user): bool { return ($user['role'] ?? '') === 'superadmin'; }
+    public static function isScanner(array $user): bool { return ($user['role'] ?? '') === 'scanner'; }
 }

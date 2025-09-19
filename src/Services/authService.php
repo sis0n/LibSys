@@ -13,7 +13,7 @@ class AuthService {
     public function attemptLogin(string $identifier, string $password){
       $user = $this->userRepo->findByIdentifier($identifier);
 
-      if($user && $user['password'] === $password){
+      if($user && password_verify($password, $user['password'])){
           session_regenerate_id(true);
 
           $_SESSION['user_id'] = $user['user_id'];
@@ -27,7 +27,11 @@ class AuthService {
     }
 
     public function logout(){
-      session_unset();
-      session_destroy();
+      $_SESSION = [];
+        if(ini_get("session.use_cookies")){
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time()-42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
+        }
+        session_destroy();
     }
 }

@@ -13,16 +13,31 @@ class AuthController extends Controller{
   }
 
   public function showLogin(){
-    $this->view("auth/login", [
-        "title" => "Login Page"
-    ], false);
+    session_start();
+        if(empty($_SESSION['csrf_token'])){
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        $this->view("auth/login", [
+            "title" => "Login Page",
+            "csrf_token" => $_SESSION['csrf_token']
+        ], false);
   }
 
   public function login(){
     session_start();
+    if($_SERVER['REQUEST_METHOD'] !== 'POST'){
+        header("Location: /libsys/public/login");
+        exit;
+    }
+
+    // CSRF Check
+    if(!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])){
+        die('Invalid CSRF token.');
+    }
+    session_regenerate_id(true);
 
     if($_SERVER['REQUEST_METHOD'] === 'POST'){
-        $identifier = trim($_POST['username'] ?? '');
+        $identifier = htmlspecialchars(trim($_POST['username'] ?? ''));
         $password   = $_POST['password'] ?? '';
 
         if(empty($identifier) || empty($password)){
@@ -58,8 +73,15 @@ class AuthController extends Controller{
 
   public function logout(){
     session_start();
-    $this->authService->logout();
+    $_SESSION = [];
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+    session_destroy();
     header("Location: /libsys/public/login");
-    exit;
   }
 }

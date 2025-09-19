@@ -1,7 +1,7 @@
 <?php
 if (!isset($_SESSION['user_id'])) {
-  header("Location: /login");
-  exit;
+    header("Location: /libsys/public/login");
+    exit;
 }
 
 date_default_timezone_set('Asia/Manila');
@@ -14,52 +14,43 @@ $userId = $_SESSION['user_id']; // logged-in user
 $allLogs = $attendanceRepo->getByUserId($userId);
 
 $attendanceJS = [
-  'day' => [],
-  'week' => [],
-  'month' => [],
-  'year' => []
+    'day' => [],
+    'week' => [],
+    'month' => [],
+    'year' => []
 ];
 
-$now = new DateTime(); // manila time now
+$now = new DateTime(); // current Manila time
+$today = new DateTime('today');
+$weekAgo = (clone $today)->modify('-6 days'); // last 7 days including today
+$firstOfMonth = new DateTime('first day of this month');
+$firstOfYear = new DateTime('first day of January this year');
 
 foreach ($allLogs as $log) {
-  // DB timestamp is already in manila (DATETIME)
-  $logTime = new DateTime($log['timestamp']);
-
-  // format date and time for display
-  $dateStr = $logTime->format('D, M d, Y'); // Fri, Sep 19, 2025
-  $timeStr = $logTime->format('g:i A'); // 3:30 PM
-
-  // calculate difference in days, months, years
-  $diff = $now->diff($logTime);
-
-
-  $today = new DateTime('today'); // midnight today
-  $weekAgo = (clone $today)->modify('-6 days'); // last 7 days including today
-  $firstOfMonth = new DateTime('first day of this month');
-  $firstOfYear = new DateTime('first day of January this year');
-
-  foreach ($allLogs as $log) {
     $logTime = new DateTime($log['timestamp']);
     $entry = [
-      'date' => $logTime->format('D, M d, Y'),
-      'time' => $logTime->format('g:i A'),
-      'status' => 'Checked In'
+        'date' => $logTime->format('D, M d, Y'),
+        'time' => $logTime->format('g:i A'),
+        'status' => 'Checked In'
     ];
 
-    // compare only dates 
     $logDate = $logTime->format('Y-m-d');
 
     if ($logDate === $today->format('Y-m-d')) {
-      $attendanceJS['day'][] = $entry;
-    } elseif ($logTime >= $weekAgo) {
-      $attendanceJS['week'][] = $entry;
-    } elseif ($logTime >= $firstOfMonth) {
-      $attendanceJS['month'][] = $entry;
-    } elseif ($logTime >= $firstOfYear) {
-      $attendanceJS['year'][] = $entry;
+        $attendanceJS['day'][] = $entry;
     }
-  }
+
+    if ($logTime >= $weekAgo) {
+        $attendanceJS['week'][] = $entry;
+    }
+
+    if ($logTime >= $firstOfMonth) {
+        $attendanceJS['month'][] = $entry;
+    }
+
+    if ($logTime >= $firstOfYear) {
+        $attendanceJS['year'][] = $entry;
+    }
 }
 ?>
 

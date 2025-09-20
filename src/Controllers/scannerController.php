@@ -28,6 +28,9 @@ class ScannerController extends Controller
     public function attendance()
     {
         $qrValue  = $_POST['qrCodeValue'] ?? null;
+        if ($qrValue) {
+            $qrValue = strtoupper(trim($qrValue));  //force uppercase
+        }
 
         if (!$qrValue) {
             echo "No student number provided.";
@@ -35,6 +38,9 @@ class ScannerController extends Controller
         }
 
         $user = $this->userRepo->findByStudentNumber($qrValue);
+        // var_dump($user);
+        // exit;
+
 
         if (!$user) {
             echo "User not found.";
@@ -87,6 +93,9 @@ class ScannerController extends Controller
     {
         $studentNumber = $_POST['studentNumber'] ?? null;
         $studentName = $_POST['studentName'] ?? null;
+        if ($studentNumber) {
+            $studentNumber = strtoupper(trim($studentNumber)); //force uppercase rin
+        }
 
         if (!$studentNumber || !$studentName) {
             echo "Student number and name are required.";
@@ -95,6 +104,7 @@ class ScannerController extends Controller
 
         //check lang kung existing yung user
         $user = $this->userRepo->findByStudentNumber($studentNumber);
+        error_log("[ScannerController] Manual Lookup result for {$studentNumber}: " . print_r($user, true));
 
         if (!$user) {
             echo "Student not found in records.";

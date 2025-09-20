@@ -56,15 +56,22 @@ CREATE TABLE students (
 
 -- Books
 CREATE TABLE books (
-  book_id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(200),
-  author VARCHAR(100),
-  category VARCHAR(50),
-  location VARCHAR(50),
-  isbn VARCHAR(20),
-  availability ENUM('available','borrowed','lost','damaged') DEFAULT 'available',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    accession_number VARCHAR(50) NOT NULL,
+    call_number VARCHAR(50),
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255),
+    book_place VARCHAR(150),
+    book_publisher VARCHAR(150),
+    year YEAR,
+    book_edition VARCHAR(50),
+    description TEXT,
+    book_isbn VARCHAR(50),
+    book_supplementary VARCHAR(255),
+    subject VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- Borrowings
 CREATE TABLE borrowings (

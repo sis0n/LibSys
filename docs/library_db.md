@@ -57,7 +57,7 @@ CREATE TABLE students (
 -- Books
 CREATE TABLE books (
     book_id INT AUTO_INCREMENT PRIMARY KEY,
-    accession_number VARCHAR(50) NOT NULL,
+    accession_number VARCHAR(50) NOT NULL UNIQUE,
     call_number VARCHAR(50),
     title VARCHAR(255) NOT NULL,
     author VARCHAR(255),

@@ -18,22 +18,59 @@ class UserRepository
   public function findByIdentifier(string $identifier)
   {
     try {
+      // try student_number
       $stmt = $this->db->prepare("
-            SELECT u.*, s.student_id, s.student_number, s.year_level, s.course
-            FROM users u
-            LEFT JOIN students s ON u.user_id = s.user_id
-            WHERE (u.username = :identifier OR s.student_number = :identifier)
-              AND u.is_active = 1
+            SELECT 
+                u.user_id, 
+                u.username, 
+                u.password,
+                u.full_name, 
+                u.is_active, 
+                u.role,
+                s.student_id, 
+                s.student_number, 
+                s.year_level, 
+                s.course
+            FROM students s
+            LEFT JOIN users u ON u.user_id = s.user_id
+            WHERE LOWER(s.student_number) = LOWER(:identifier)
             LIMIT 1
         ");
       $stmt->execute(['identifier' => $identifier]);
-      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+      $student = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+      if ($student) {
+        return $student;
+      }
+
+      //fallback by username
+      $stmt = $this->db->prepare("
+            SELECT 
+                u.user_id, 
+                u.username, 
+                u.password,
+                u.full_name, 
+                u.is_active, 
+                u.role,
+                s.student_id, 
+                s.student_number, 
+                s.year_level, 
+                s.course
+            FROM users u
+            LEFT JOIN students s ON u.user_id = s.user_id
+            WHERE LOWER(u.username) = LOWER(:identifier)
+            LIMIT 1
+        ");
+      $stmt->execute(['identifier' => $identifier]);
+      $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+
       return $user ?: null;
-    } catch (PDOException $e) {
+    } catch (\PDOException $e) {
       error_log("[UserRepository::findByIdentifier] " . $e->getMessage());
       return null;
     }
   }
+
 
 
   public function createUser(array $data)
@@ -61,7 +98,16 @@ class UserRepository
   public function findByStudentNumber(string $studentNumber)
   {
     $stmt = $this->db->prepare("
-        SELECT u.*, s.student_id, s.student_number, s.year_level, s.course
+        SELECT 
+            u.user_id, 
+            u.username, 
+            u.full_name, 
+            u.is_active, 
+            u.role,
+            s.student_id, 
+            s.student_number, 
+            s.year_level, 
+            s.course
         FROM users u
         LEFT JOIN students s ON u.user_id = s.user_id
         WHERE s.student_number = :student_number

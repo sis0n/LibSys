@@ -60,6 +60,7 @@ class AttendanceRepository
 {
     try {
         $this->db->beginTransaction();
+        // echo "<pre>debug start\n";  
 
         // inser raw scan in attendance_logs
         $sqlLogs = "
@@ -70,22 +71,23 @@ class AttendanceRepository
         ";
         $stmtLogs = $this->db->prepare($sqlLogs);
         $ok1 = $stmtLogs->execute([
-            ':user_id' => $attendance->getUserId(),
-            ':student_number' => $attendance->getStudentNumber(),
-            ':full_name' => $attendance->getFullName(),
-            ':year_level' => $attendance->getYearLevel(),
-            ':course' => $attendance->getCourse(),
-            ':method' => $attendance->getSource(),   // qr o manual
-            ':timestamp' => $attendance->getTimestamp()
+            ':user_id'       => $attendance->getUserId(),
+            ':student_number'=> $attendance->getStudentNumber(),
+            ':full_name'     => $attendance->getFullName(),
+            ':year_level'    => $attendance->getYearLevel(),
+            ':course'        => $attendance->getCourse(),
+            ':method'        => $attendance->getSource(),
+            ':timestamp'     => $attendance->getTimestamp()
         ]);
+        // echo "after logs insert: " . ($ok1 ? "OK\n" : "FAILED\n");
 
         if (!$ok1) {
-            error_log("failed insert into attendance_logs: " . print_r($stmtLogs->errorInfo(), true));
+            var_dump($stmtLogs->errorInfo());
             $this->db->rollBack();
-            return false;
+            exit("STOP at logs insert");
         }
 
-        // inser or update summary in attendance
+        // insert or update summary in attendance
         $dt   = new \DateTime($attendance->getTimestamp(), new \DateTimeZone('Asia/Manila'));
         $date = $dt->format('Y-m-d');
         $ts   = $dt->format('Y-m-d H:i:s');
@@ -100,28 +102,30 @@ class AttendanceRepository
         ";
         $stmtSummary = $this->db->prepare($sqlSummary);
         $ok2 = $stmtSummary->execute([
-            ':user_id'             => $attendance->getUserId(),
-            ':date'                => $date,
-            ':first_scan_at'       => $ts,
-            ':last_scan_at'        => $ts,
-            ':created_at'          => $ts,
+            ':user_id' => $attendance->getUserId(),
+            ':date' => $date,
+            ':first_scan_at' => $ts,
+            ':last_scan_at' => $ts,
+            ':created_at' => $ts,
             ':last_scan_at_update' => $ts
         ]);
+        // echo "after attendance insert/update: " . ($ok2 ? "OK\n" : "FAILED\n");
 
         if (!$ok2) {
-            error_log("failed insert/update into attendance: " . print_r($stmtSummary->errorInfo(), true));
+            var_dump($stmtSummary->errorInfo());
             $this->db->rollBack();
-            return false;
+            exit("STOP at attendance insert");
         }
 
         $this->db->commit();
+        // echo "COMMIT OK\n</pre>";
         return true;
 
     } catch (\Exception $e) {
         $this->db->rollBack();
-        error_log("exception in logBoth: " . $e->getMessage());
-        return false;
+        exit("EXCEPTION: " . $e->getMessage());
     }
 }
+
 
 }

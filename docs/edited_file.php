@@ -1,2 +1,0 @@
-attendanceRepository.php
-scannerController.php

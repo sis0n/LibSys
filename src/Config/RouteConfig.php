@@ -115,13 +115,13 @@ class RouteConfig
          * STUDENT CART & CHECKOUT ROUTES
          * ========================
          */
-        $router->get('student/myCart', 'CartController@index', ['student']);
+        // $router->get('student/myCart', 'CartController@index', ['student']);
         $router->post('cart/add/{bookId}', 'CartController@add', ['student']);
         $router->post('cart/remove/{cartId}', 'CartController@remove', ['student']);
 
         // checkout routes
         $router->post('checkout', 'CheckoutController@checkout', ['student']);
-        $router->get('student/qrBorrowingTicket', 'CheckoutController@qrTicket', ['student']);
+        // $router->get('student/qrBorrowingTicket', 'CheckoutController@qrTicket', ['student']);
 
 
 

@@ -16,7 +16,7 @@ foreach ($logs as $log) {
     'studentName' => $log['full_name'],
     'studentNumber' => $log['student_number'],
     'time' => $logTime->format("H:i:s"),
-    'status' => "Visited"
+    'status' => "Present"
   ];
 }
 ?>
@@ -106,7 +106,7 @@ foreach ($logs as $log) {
   <!-- Search and Dropdown -->
   <div class="flex items-center gap-3">
     <!-- Search -->
-    <input type="text" placeholder="Search by student name or ID..."
+    <input type="text" id="attendanceSearch" placeholder="Search by student name or ID..."
       class="flex-1 border border-orange-100 rounded-lg p-2 bg-orange-50 focus:ring-2 focus:ring-orange-400 outline-none text-sm text-orange-900 font-medium" />
     <div class="relative inline-block w-48">
 
@@ -133,26 +133,79 @@ foreach ($logs as $log) {
 
     <!-- Sa style lang to dahil bawal malagyan ng tailwind yung option, kaya custom nalang option natin, nag provide lang sariling gawang option-->
     <script>
-      const dropdownBtn = document.getElementById("dropdownButton");
-      const dropdownMenu = document.getElementById("dropdownMenu");
-      const dropdownValue = document.getElementById("dropdownValue");
+      document.addEventListener("DOMContentLoaded", () => {
+        const dropdownBtn = document.getElementById("dropdownButton");
+        const dropdownMenu = document.getElementById("dropdownMenu");
+        const dropdownValue = document.getElementById("dropdownValue");
+        const logsContainer = document.querySelector(".space-y-3");
+        const searchInput = document.getElementById('attendanceSearch');
 
-      dropdownBtn.addEventListener("click", () => {
-        dropdownMenu.classList.toggle("hidden");
-      });
+        let currentPeriod = 'Today';
 
-      function selectOption(value) {
-        dropdownValue.textContent = value;
-        dropdownMenu.classList.add("hidden");
-      }
+        searchInput.addEventListener('input', () => {
+          const query = searchInput.value.trim();
+          fetchLogs(currentPeriod, query);
+        });
 
-      // Optional: close dropdown if click outside
-      document.addEventListener("click", (e) => {
-        if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+
+        dropdownBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          dropdownMenu.classList.toggle("hidden");
+        });
+
+        window.selectOption = function(value) {
+          currentPeriod = value;
+          dropdownValue.textContent = value;
           dropdownMenu.classList.add("hidden");
+          fetchLogs(currentPeriod, searchInput.value.trim());
+        };
+
+        document.addEventListener("click", () => {
+          dropdownMenu.classList.add("hidden");
+        });
+
+        function fetchLogs(period, search = '') {
+          const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
+          url.searchParams.append('period', period);
+          if (search) url.searchParams.append('search', search);
+
+          fetch(url)
+            .then(res => res.json())
+            .then(data => {
+              console.log(data);
+              logsContainer.innerHTML = '';
+              data.forEach(log => {
+                logsContainer.innerHTML += `
+                <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
+                  <div class="flex items-center gap-3">
+                    <div class="text-center text-sm">
+                      <p class="font-semibold">${log.date}</p>
+                      <p class="text-gray-500 text-xs">${log.day}</p>
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-800">
+                        ${log.studentName}
+                        <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">
+                          ${log.studentNumber}
+                        </span>
+                      </p>
+                      <p class="text-gray-500 text-xs">Check-in: ${log.time}</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-green-600 font-medium text-sm">${log.status}</p>
+                    <p class="text-gray-500 text-xs">Library attendance</p>
+                  </div>
+                </div>
+                `;
+              });
+            });
         }
+        fetchLogs('Today');
       });
     </script>
+
+
   </div>
 </div>
 

@@ -234,7 +234,7 @@
 
         books.forEach(book => {
             grid.innerHTML += `
-            <div class="relative bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden group transform transition duration-300 hover:-translate-y-1 hover:shadow-md max-w-[180px]">
+            <div class="relative bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden group transform transition duration-400 hover:-translate-y-1 hover:shadow-lg max-w-[180px]">
                 
                 <!-- Book Image / Fallback Icon -->
                 <div class="w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden">

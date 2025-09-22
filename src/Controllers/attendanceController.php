@@ -65,6 +65,7 @@ class AttendanceController extends Controller
     public function fetchLogsAjax()
     {
         $period = $_GET['period'] ?? 'Today';
+        $search = $_GET['search'] ?? '';
         date_default_timezone_set('Asia/Manila');
 
         switch ($period) {
@@ -83,7 +84,7 @@ class AttendanceController extends Controller
                 break;
         }
 
-        $logs = $this->attendanceRepo->getLogsByPeriod($start, $end);
+        $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search);
         // var_dump($logs);
         // exit;
 

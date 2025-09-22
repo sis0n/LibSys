@@ -106,7 +106,7 @@ foreach ($logs as $log) {
   <!-- Search and Dropdown -->
   <div class="flex items-center gap-3">
     <!-- Search -->
-    <input type="text" placeholder="Search by student name or ID..."
+    <input type="text" id="attendanceSearch" placeholder="Search by student name or ID..."
       class="flex-1 border border-orange-100 rounded-lg p-2 bg-orange-50 focus:ring-2 focus:ring-orange-400 outline-none text-sm text-orange-900 font-medium" />
     <div class="relative inline-block w-48">
 
@@ -138,6 +138,15 @@ foreach ($logs as $log) {
         const dropdownMenu = document.getElementById("dropdownMenu");
         const dropdownValue = document.getElementById("dropdownValue");
         const logsContainer = document.querySelector(".space-y-3");
+        const searchInput = document.getElementById('attendanceSearch');
+
+        let currentPeriod = 'Today';
+
+        searchInput.addEventListener('input', () => {
+          const query = searchInput.value.trim();
+          fetchLogs(currentPeriod, query);
+        });
+
 
         dropdownBtn.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -145,50 +154,53 @@ foreach ($logs as $log) {
         });
 
         window.selectOption = function(value) {
+          currentPeriod = value;
           dropdownValue.textContent = value;
           dropdownMenu.classList.add("hidden");
-          fetchLogs(value);
+          fetchLogs(currentPeriod, searchInput.value.trim());
         };
 
         document.addEventListener("click", () => {
           dropdownMenu.classList.add("hidden");
         });
 
-        function fetchLogs(period) {
-          fetch(`/libsys/public/attendance/logs/ajax?period=${period}`)
+        function fetchLogs(period, search = '') {
+          const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
+          url.searchParams.append('period', period);
+          if (search) url.searchParams.append('search', search);
+
+          fetch(url)
             .then(res => res.json())
             .then(data => {
               console.log(data);
               logsContainer.innerHTML = '';
               data.forEach(log => {
                 logsContainer.innerHTML += `
-            <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
-              <div class="flex items-center gap-3">
-                <div class="text-center text-sm">
-                  <p class="font-semibold">${log.date}</p>
-                  <p class="text-gray-500 text-xs">${log.day}</p>
+                <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
+                  <div class="flex items-center gap-3">
+                    <div class="text-center text-sm">
+                      <p class="font-semibold">${log.date}</p>
+                      <p class="text-gray-500 text-xs">${log.day}</p>
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-800">
+                        ${log.studentName}
+                        <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">
+                          ${log.studentNumber}
+                        </span>
+                      </p>
+                      <p class="text-gray-500 text-xs">Check-in: ${log.time}</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-green-600 font-medium text-sm">${log.status}</p>
+                    <p class="text-gray-500 text-xs">Library attendance</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="font-medium text-gray-800">
-                    ${log.studentName}
-                    <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">
-                      ${log.studentNumber}
-                    </span>
-                  </p>
-                  <p class="text-gray-500 text-xs">Check-in: ${log.time}</p>
-                </div>
-              </div>
-              <div class="text-right">
-                <p class="text-green-600 font-medium text-sm">${log.status}</p>
-                <p class="text-gray-500 text-xs">Library attendance</p>
-              </div>
-            </div>
-          `;
+                `;
               });
             });
         }
-
-        // Load default logs on page load
         fetchLogs('Today');
       });
     </script>

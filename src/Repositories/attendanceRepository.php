@@ -125,18 +125,20 @@ class AttendanceRepository
             exit("EXCEPTION: " . $e->getMessage());
         }
     }
-    public function getLogsByPeriod(?string $start = null, ?string $end = null): array
+    public function getLogsByPeriod(?string $start = null, ?string $end = null, string $search = ''): array
     {
-        $query = "SELECT * FROM attendance_logs";
+        $query = "SELECT * FROM attendance_logs WHERE 1=1";
         $params = [];
 
-
         if ($start && $end) {
-            $query .= " WHERE timestamp BETWEEN :start AND :end";
-            $params = [
-                ':start' => $start,
-                ':end' => $end
-            ];
+            $query .= " AND timestamp BETWEEN :start AND :end";
+            $params[':start'] = $start;
+            $params[':end'] = $end;
+        }
+
+        if ($search) {
+            $query .= " AND (full_name LIKE :search OR student_number LIKE :search)";
+            $params[':search'] = "%{$search}%";
         }
 
         $query .= " ORDER BY timestamp DESC";
@@ -144,6 +146,6 @@ class AttendanceRepository
         $stmt = $this->db->prepare($query);
         $stmt->execute($params);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

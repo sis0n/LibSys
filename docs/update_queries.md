@@ -67,3 +67,34 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (accession_number, call_number, title, author, book_place, book_publisher, year, book_edition, description, book_isbn, book_supplementary, subject);
+
+
+CREATE TABLE carts (
+  cart_id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL,
+  book_id INT NOT NULL,
+  added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (student_id) REFERENCES students(student_id),
+  FOREIGN KEY (book_id) REFERENCES books(book_id)
+);
+
+CREATE TABLE borrow_transactions (
+  transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL,
+  transaction_code VARCHAR(50) UNIQUE, -- for QR code
+  borrowed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  due_date DATETIME NOT NULL,
+  status ENUM('pending','borrowed','returned','overdue') DEFAULT 'pending',
+  FOREIGN KEY (student_id) REFERENCES students(student_id)
+);
+
+CREATE TABLE borrow_transaction_items (
+  item_id INT AUTO_INCREMENT PRIMARY KEY,
+  transaction_id INT NOT NULL,
+  book_id INT NOT NULL,
+  returned_at DATETIME NULL,
+  status ENUM('borrowed','returned','overdue') DEFAULT 'borrowed',
+  FOREIGN KEY (transaction_id) REFERENCES borrow_transactions(transaction_id),
+  FOREIGN KEY (book_id) REFERENCES books(book_id)
+);
+

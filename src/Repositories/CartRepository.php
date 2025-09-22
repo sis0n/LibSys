@@ -22,7 +22,7 @@ class CartRepository
         return false; // nasa cart na
     }
 
-    // pag wala sa cart, insert
+    // pag wala sa cart, insert na diretso
     $stmt = $this->db->prepare("INSERT INTO carts (student_id, book_id) VALUES (?, ?)");
     return $stmt->execute([$studentId, $bookId]);
   }
@@ -30,11 +30,11 @@ class CartRepository
   public function getCartByStudent($studentId)
   {
     $stmt = $this->db->prepare("
-            SELECT c.cart_id, b.book_id, b.accession_number, b.title, b.author, c.added_at
-            FROM carts c
-            JOIN books b ON c.book_id = b.book_id
-            WHERE c.student_id = ?
-        ");
+          SELECT c.cart_id, b.book_id, b.accession_number, b.title, b.author, c.added_at
+          FROM carts c
+          JOIN books b ON c.book_id = b.book_id
+          WHERE c.student_id = ?
+      ");
     $stmt->execute([$studentId]);
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
@@ -53,7 +53,7 @@ class CartRepository
 
   public function getCartItems($studentId)
   {
-      return $this->getCartByStudent($studentId);
+    return $this->getCartByStudent($studentId);
   }
 
 }

@@ -142,6 +142,15 @@ foreach ($allLogs as $log) {
                         <span class="block text-xs text-gray-500">Check your borrowing history</span>
                     </span>
                 </a>
+
+                <a href="/libsys/public/student/myAttendance"
+                    class="flex items-start gap-3 bg-[var(--color-green-100)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-green-200)] transition">
+                    <i class="ph ph-user-check text-lg mt-0.5"></i>
+                    <span>
+                        <span class="block font-medium">My Attedance</span>
+                        <span class="block text-xs text-gray-500">Check your atttedance history</span>
+                    </span>
+                </a>
             </div>
         </div>
 

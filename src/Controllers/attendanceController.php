@@ -62,23 +62,46 @@ class AttendanceController extends Controller
         echo json_encode($data);
     }
 
-    
-    //para sa admin to
-    // public function fetchAllAttendance()
-    // {
-    //     $allLogs = $this->attendanceRepo->getAll();
+    public function fetchLogsAjax()
+    {
+        $period = $_GET['period'] ?? 'Today';
+        date_default_timezone_set('Asia/Manila');
 
-    //     $data = [];
-    //     foreach ($allLogs as $log) {
-    //         $data[] = [
-    //             'student_number' => $log['student_number'],
-    //             'full_name' => $log['full_name'],
-    //             'timestamp' => $log['timestamp'],
-    //             'status' => 'Checked In'
-    //         ];
-    //     }
+        switch ($period) {
+            case 'Today':
+                $start = (new \DateTime('today'))->format('Y-m-d 00:00:00');
+                $end   = (new \DateTime('today'))->format('Y-m-d 23:59:59');
+                break;
+            case 'Yesterday':
+                $start = (new \DateTime('yesterday'))->format('Y-m-d 00:00:00');
+                $end   = (new \DateTime('yesterday'))->format('Y-m-d 23:59:59');
+                break;
+            case 'All dates':
+            default:
+                $start = null;
+                $end   = null;
+                break;
+        }
 
-    //     header('Content-Type: application/json');
-    //     echo json_encode($data);
-    // }
+        $logs = $this->attendanceRepo->getLogsByPeriod($start, $end);
+        // var_dump($logs);
+        // exit;
+
+        $formattedLogs = [];
+        foreach ($logs as $log) {
+            $logTime = new \DateTime($log['timestamp'], new \DateTimeZone('Asia/Manila'));
+            $formattedLogs[] = [
+                'date' => $logTime->format("Y-m-d"),
+                'day' => $logTime->format("l"),
+                'studentName' => $log['full_name'],
+                'studentNumber' => $log['student_number'],
+                'time' => $logTime->format("H:i:s"),
+                'status' => "Present"
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($formattedLogs);
+        exit;
+    }
 }

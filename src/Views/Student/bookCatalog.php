@@ -169,38 +169,53 @@
     </div>
 
     <!-- Books Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-        <!-- Book Card -->
-        <div
-            class="relative bg-[var(--color-card)] border border-[var(--color-border)] shadow-md rounded-xl overflow-hidden group transform transition duration-300 hover:-translate-y-2 hover:shadow-lg">
+    <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"></div>
 
-            <!-- Book Image -->
-            <div class="w-full bg-white flex items-center justify-center overflow-hidden">
-                <img src="/Libsys/assets/books-img/intro-to-comscie.png" alt="Book"
-                    class="max-h-48 w-auto object-contain group-hover:scale-105 transition duration-300" />
-            </div>
+    <script>
+    const books = [{
+            title: "Introduction to Computer Science",
+            author: "John Smith",
+            category: "Computer Science",
+            img: "/Libsys/assets/books-img/intro-to-comscie.png",
+            status: "Available",
+            left: 3
+        },
+        {
+            title: "Physics Fundamentals",
+            author: "Jane Doe",
+            category: "Physics",
+            img: "/Libsys/assets/books-img/physics.png",
+            status: "Borrowed",
+            left: 0
+        }
+        // add more books here...
+    ];
 
-            <!-- Status Badge (Left) -->
-            <span
-                class="absolute top-2 left-2 bg-[var(--color-green-500)] text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
-                <i class="ph ph-bookmark-simple"></i> 3 left
-            </span>
+    const grid = document.getElementById("booksGrid");
 
-            <!-- Status Badge (Right) -->
-            <span
-                class="absolute top-2 right-2 bg-[var(--color-orange-500)] text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
-                <i class="ph ph-check-circle"></i> Available
-            </span>
-
-            <!-- Info -->
-            <div class="p-3">
-                <h4 class="text-sm font-semibold mb-1">Introduction to Computer Science</h4>
-                <p class="text-xs text-gray-500">by John Smith</p>
-                <p class="text-xs font-medium text-[var(--color-primary)] mt-1">Computer Science</p>
-            </div>
+    books.forEach(book => {
+        grid.innerHTML += `
+      <div class="relative bg-[var(--color-card)] border border-[var(--color-border)] shadow-md rounded-xl overflow-hidden group transform transition duration-300 hover:-translate-y-2 hover:shadow-lg">
+        <div class="w-full bg-white flex items-center justify-center overflow-hidden">
+          <img src="${book.img}" alt="${book.title}"
+               class="max-h-48 w-auto object-contain group-hover:scale-105 transition duration-300" />
         </div>
-        <!-- Duplicate this card for each book -->
-    </div>
+        <span class="absolute top-2 left-2 ${book.left > 0 ? 'bg-[var(--color-green-500)]' : 'bg-gray-400'} text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
+          <i class="ph ph-bookmark-simple"></i> ${book.left} left
+        </span>
+        <span class="absolute top-2 right-2 ${book.status === 'Available' ? 'bg-[var(--color-orange-500)]' : 'bg-gray-500'} text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
+          <i class="ph ph-check-circle"></i> ${book.status}
+        </span>
+        <div class="p-3">
+          <h4 class="text-sm font-semibold mb-1">${book.title}</h4>
+          <p class="text-xs text-gray-500">by ${book.author}</p>
+          <p class="text-xs font-medium text-[var(--color-primary)] mt-1">${book.category}</p>
+        </div>
+      </div>
+    `;
+    });
+    </script>
+
 
 
 </body>

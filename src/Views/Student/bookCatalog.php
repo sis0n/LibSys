@@ -149,8 +149,8 @@
     <!-- Results Header -->
     <div class="flex justify-between items-center mb-4">
         <p class="font-medium">
-            <span class="font-bold">8 Books Found</span> <br />
-            <span class="text-sm text-gray-600">Total collection: 8 books</span>
+            <span class="font-bold">Books Found</span>
+
         </p>
 
         <div class="flex gap-3 items-center">
@@ -187,8 +187,31 @@
             img: "/Libsys/assets/books-img/physics.png",
             status: "Borrowed",
             left: 0
+        },
+        {
+            title: "Organic Chemistry Essentials",
+            author: "Mary Brown",
+            category: "Chemistry",
+            left: 1,
+            status: "Available",
+            img: "/Libsys/assets/books-img/organic-chemistry.png"
+        },
+        {
+            title: "Calculus Made Easy",
+            author: "Thomas Stewart",
+            category: "Mathematics",
+            left: 2,
+            status: "Available",
+            img: "/Libsys/assets/books-img/calculus.png"
+        },
+        {
+            title: "Philippine History",
+            author: "Jose Cruz",
+            category: "History",
+            left: 1,
+            status: "Available",
+            img: "/Libsys/assets/books-img/philippine-history.png"
         }
-        // add more books here...
     ];
 
     const grid = document.getElementById("booksGrid");
@@ -196,16 +219,30 @@
     books.forEach(book => {
         grid.innerHTML += `
       <div class="relative bg-[var(--color-card)] border border-[var(--color-border)] shadow-md rounded-xl overflow-hidden group transform transition duration-300 hover:-translate-y-2 hover:shadow-lg">
-        <div class="w-full bg-white flex items-center justify-center overflow-hidden">
-          <img src="${book.img}" alt="${book.title}"
-               class="max-h-48 w-auto object-contain group-hover:scale-105 transition duration-300" />
+        
+        <!-- Book Image / Fallback Icon -->
+        <div class="w-full aspect-[3/4] bg-white flex items-center justify-center overflow-hidden">
+        ${
+        book.img
+            ? `<img src="${book.img}" alt="${book.title}"
+                class="h-full w-auto object-contain group-hover:scale-105 transition duration-300"
+                onerror="this.outerHTML='<i class=&quot;ph ph-book text-6xl text-gray-400&quot;></i>'" />`
+            : `<i class="ph ph-book text-6xl text-gray-400"></i>`
+        }
         </div>
-        <span class="absolute top-2 left-2 ${book.left > 0 ? 'bg-[var(--color-green-500)]' : 'bg-gray-400'} text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
-          <i class="ph ph-bookmark-simple"></i> ${book.left} left
+
+        <!-- Status Badges -->
+        <span class="absolute top-2 left-2 ${book.left > 0 ? 'bg-[var(--color-green-500)]' : 'bg-gray-400'} text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1 leading-none">
+            <i class="ph ph-bookmark-simple text-[14px]"></i>
+            <span class="leading-none">${book.left} left</span>
         </span>
-        <span class="absolute top-2 right-2 ${book.status === 'Available' ? 'bg-[var(--color-orange-500)]' : 'bg-gray-500'} text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
-          <i class="ph ph-check-circle"></i> ${book.status}
+
+        <span class="absolute top-2 right-2 ${book.status === 'Available' ? 'bg-[var(--color-orange-500)]' : 'bg-gray-500'} text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1 leading-none">
+            <i class="ph ph-check-circle text-[14px]"></i>
+            <span class="leading-none">${book.status}</span>
         </span>
+
+        <!-- Info -->
         <div class="p-3">
           <h4 class="text-sm font-semibold mb-1">${book.title}</h4>
           <p class="text-xs text-gray-500">by ${book.author}</p>
@@ -215,7 +252,5 @@
     `;
     });
     </script>
-
-
 
 </body>

@@ -87,6 +87,7 @@ class AttendanceController extends Controller
         $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search);
         // var_dump($logs);
         // exit;
+        
 
         $formattedLogs = [];
         foreach ($logs as $log) {

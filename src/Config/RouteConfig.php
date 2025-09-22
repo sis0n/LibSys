@@ -96,7 +96,7 @@ class RouteConfig
          */
 
         // AJAX route para sa dropdown filter logs (librarian at admin)
-        $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['librarian', 'admin']);
+        $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['librarian', 'admin', 'superadmin']);
 
 
         /**

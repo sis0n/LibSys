@@ -95,6 +95,10 @@ class RouteConfig
          * $router->get('attendance/logs', 'AttendanceController@logs', ['librarian', 'admin']);
          */
 
+        // AJAX route para sa dropdown filter logs (librarian at admin)
+        $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['librarian', 'admin', 'superadmin']);
+
+
         /**
          * ========================
          * BOOK INVENTORY ROUTES
@@ -109,6 +113,20 @@ class RouteConfig
         $router->post('books/delete/{id}', 'BookController@destroy', ['librarian', 'admin']);
         $router->get('books/search', 'BookController@search', ['librarian', 'admin']);
         $router->get('books/filter', 'BookController@filter', ['librarian', 'admin']);
+
+        /**
+         * ========================
+         * STUDENT CART & CHECKOUT ROUTES
+         * ========================
+         */
+        // $router->get('student/myCart', 'CartController@index', ['student']);
+        $router->post('cart/add/{bookId}', 'CartController@add', ['student']);
+        $router->post('cart/remove/{cartId}', 'CartController@remove', ['student']);
+
+        // checkout routes
+        $router->post('checkout', 'CheckoutController@checkout', ['student']);
+        // $router->get('student/qrBorrowingTicket', 'CheckoutController@qrTicket', ['student']);
+
 
 
 

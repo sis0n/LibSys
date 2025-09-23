@@ -181,42 +181,47 @@
                     <div class="flex items-center gap-3">
                         <img id="modalImg" src="" alt="Book Cover" class="w-12 h-16 object-cover rounded bg-white" />
                         <div>
-                            <h2 id="modalTitle" class="text-lg font-bold">Book Title</h2>
+                            <h2 id="modalTitle" class="text-lg font-bold text-white">Book Title</h2>
                             <p id="modalAuthor" class="text-sm">by Author</p>
                         </div>
                     </div>
-                    <button id="closeModal" class="text-white text-xl">&times;</button>
+                    <button id="closeModal" class="text-white text-xl"><i class="ph ph-x-circle"></i></button>
                 </div>
 
 
                 <div class="p-4 space-y-4">
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="p-3 border rounded">
+                        <div class="p-3 shadow-md bg-orange-50 rounded">
                             <p class="text-xs text-gray-500">Availability</p>
                             <p id="modalAvailability" class="font-semibold text-green-600">0 of 0</p>
                         </div>
-                        <div class="p-3 border rounded">
-                            <p class="text-xs text-gray-500">Location</p>
-                            <p id="modalLocation" class="font-semibold">N/A</p>
+                        <div class="p-3 shadow-md bg-orange-50 rounded">
+                            <p class="text-xs text-gray-500">Call Number</p>
+                            <p id="modalCallNumber" class="font-semibold">N/A</p>
                         </div>
                     </div>
 
-                    <div class="p-3 border rounded">
+                    <div class="p-3 shadow-md rounded">
                         <p class="text-xs text-gray-500">Book Information</p>
-                        <p><span class="font-semibold">Book ID:</span> <span id="modalBookId"></span></p>
+                        <p><span class="font-semibold">Accession Number:</span> <span id="modalAccessionNumber"></span></p>
                         <p><span class="font-semibold">ISBN:</span> <span id="modalIsbn"></span></p>
-                        <p><span class="font-semibold">Category:</span> <span id="modalCategory"></span></p>
+                        <p><span class="font-semibold">Subject:</span> <span id="modalSubject"></span></p>
+                        <p><span class="font-semibold">Book Place:</span> <span id="modalPlace"></span></p>
+                        <p><span class="font-semibold">Book Publisher:</span> <span id="modalPublisher"></span></p>
+                        <p><span class="font-semibold">Year:</span> <span id="modalYear"></span></p>
+                        <p><span class="font-semibold">Book Edition:</span> <span id="modalEdition"></span></p>
+                        <p><span class="font-semibold">Book Suplementary:</span> <span id="modalSupplementary"></span></p>
                     </div>
 
-                    <div class="p-3 border rounded bg-[var(--color-orange-50)]">
+                    <div class="p-3 shadow-md rounded bg-[var(--color-green-50)]">
                         <p class="text-xs text-gray-500">Description</p>
                         <p id="modalDescription"></p>
                     </div>
                 </div>
 
 
-                <div class="px-4 py-3 bg-gray-50 flex justify-end">
-                    <button class="bg-[var(--color-green-500)] text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                <div class="md:col-span-4 flex justify-center mt-4 mb-6">
+                    <button class="px-4 sm:px-5 py-2 bg-green-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-green-600 transition">
                         Add to Cart
                     </button>
                 </div>
@@ -226,101 +231,127 @@
         <script>
         window.addEventListener("DOMContentLoaded", () => {
             const books = [{
-                    title: "Introduction to Computer Science",
-                    author: "John Smith",
-                    category: "Computer Science",
-                    img: "/Libsys/assets/books-img/intro-to-comscie.png",
+                    title: "On liberty: Man the sate",
+                    author: "Mayer, Milton",
+                    Subject: "State, The. Liberty.",
+                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                     status: "Available",
                     left: 3,
-                    bookId: "CS-001",
-                    isbn: "978-0-123456-78-9",
-                    location: "Section A, Shelf 2",
-                    description: "A comprehensive introduction to computer science fundamentals."
+                    AccessionNumber: "00007914",
+                    isbn: "N/A",
+                    callNumber: "A 536 M4661 1908",
+                    description: "192 pages ; 21 cm",
+                    Place:"California",
+                    Publisher:"The Center for the Study of Democratic Institutions",
+                    Year:"1908",
+                    Edition:"13th",
+                    Supplementary:"N/A"
+
                 },
                 {
-                    title: "Physics Fundamentals",
-                    author: "Jane Doe",
-                    category: "Physics",
-                    img: "/Libsys/assets/books-img/physics.png",
-                    status: "Borrowed",
-                    left: 0,
-                    bookId: "PH-002",
-                    isbn: "978-0-987654-32-1",
-                    location: "Section B, Shelf 1",
-                    description: "Essential concepts in physics for undergraduates."
-                },
-                {
-                    title: "Organic Chemistry Essentials",
-                    author: "Mary Brown",
-                    category: "Chemistry",
-                    img: "wala",
+                    title: "On liberty: Man the sate",
+                    author: "Mayer, Milton",
+                    Subject: "State, The. Liberty.",
+                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                     status: "Available",
-                    left: 1,
-                    bookId: "CH-003",
-                    isbn: "978-0-111222-33-4",
-                    location: "Section C, Shelf 4",
-                    description: "Introduction to organic molecules and reactions."
-                },
-                {
-                    title: "Organic Chemistry Essentials",
-                    author: "Mary Brown",
-                    category: "Chemistry",
-                    img: "wala",
+                    left: 3,
+                    AccessionNumber: "00007914",
+                    isbn: "N/A",
+                    callNumber: "A 536 M4661 1908",
+                    description: "192 pages ; 21 cm",
+                    Place:"California",
+                    Publisher:"The Center for the Study of Democratic Institutions",
+                    Year:"1908",
+                    Edition:"13th",
+                    Supplementary:"N/A"
+
+                },{
+                    title: "On liberty: Man the sate",
+                    author: "Mayer, Milton",
+                    Subject: "State, The. Liberty.",
+                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                     status: "Available",
-                    left: 1,
-                    bookId: "CH-003",
-                    isbn: "978-0-111222-33-4",
-                    location: "Section C, Shelf 4",
-                    description: "Introduction to organic molecules and reactions."
-                },
-                {
-                    title: "Organic Chemistry Essentials",
-                    author: "Mary Brown",
-                    category: "Chemistry",
-                    img: "wala",
+                    left: 3,
+                    AccessionNumber: "00007914",
+                    isbn: "N/A",
+                    callNumber: "A 536 M4661 1908",
+                    description: "192 pages ; 21 cm",
+                    Place:"California",
+                    Publisher:"The Center for the Study of Democratic Institutions",
+                    Year:"1908",
+                    Edition:"13th",
+                    Supplementary:"N/A"
+
+                },{
+                    title: "On liberty: Man the sate",
+                    author: "Mayer, Milton",
+                    Subject: "State, The. Liberty.",
+                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                     status: "Available",
-                    left: 1,
-                    bookId: "CH-003",
-                    isbn: "978-0-111222-33-4",
-                    location: "Section C, Shelf 4",
-                    description: "Introduction to organic molecules and reactions."
-                },
-                {
-                    title: "Organic Chemistry Essentials",
-                    author: "Mary Brown",
-                    category: "Chemistry",
-                    img: "wala",
+                    left: 3,
+                    AccessionNumber: "00007914",
+                    isbn: "N/A",
+                    callNumber: "A 536 M4661 1908",
+                    description: "192 pages ; 21 cm",
+                    Place:"California",
+                    Publisher:"The Center for the Study of Democratic Institutions",
+                    Year:"1908",
+                    Edition:"13th",
+                    Supplementary:"N/A"
+
+                },{
+                    title: "On liberty: Man the sate",
+                    author: "Mayer, Milton",
+                    Subject: "State, The. Liberty.",
+                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                     status: "Available",
-                    left: 1,
-                    bookId: "CH-003",
-                    isbn: "978-0-111222-33-4",
-                    location: "Section C, Shelf 4",
-                    description: "Introduction to organic molecules and reactions."
-                },
-                {
-                    title: "Organic Chemistry Essentials",
-                    author: "Mary Brown",
-                    category: "Chemistry",
-                    img: "wala",
+                    left: 3,
+                    AccessionNumber: "00007914",
+                    isbn: "N/A",
+                    callNumber: "A 536 M4661 1908",
+                    description: "192 pages ; 21 cm",
+                    Place:"California",
+                    Publisher:"The Center for the Study of Democratic Institutions",
+                    Year:"1908",
+                    Edition:"13th",
+                    Supplementary:"N/A"
+
+                },{
+                    title: "On liberty: Man the sate",
+                    author: "Mayer, Milton",
+                    Subject: "State, The. Liberty.",
+                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                     status: "Available",
-                    left: 1,
-                    bookId: "CH-003",
-                    isbn: "978-0-111222-33-4",
-                    location: "Section C, Shelf 4",
-                    description: "Introduction to organic molecules and reactions."
-                },
-                {
-                    title: "Organic Chemistry Essentials",
-                    author: "Mary Brown",
-                    category: "Chemistry",
-                    img: "wala",
+                    left: 3,
+                    AccessionNumber: "00007914",
+                    isbn: "N/A",
+                    callNumber: "A 536 M4661 1908",
+                    description: "192 pages ; 21 cm",
+                    Place:"California",
+                    Publisher:"The Center for the Study of Democratic Institutions",
+                    Year:"1908",
+                    Edition:"13th",
+                    Supplementary:"N/A"
+
+                },{
+                    title: "On liberty: Man the sate",
+                    author: "Mayer, Milton",
+                    Subject: "State, The. Liberty.",
+                    img: "Wala"//sample lang to test if wala ang image
+                    ,
                     status: "Available",
-                    left: 1,
-                    bookId: "CH-003",
-                    isbn: "978-0-111222-33-4",
-                    location: "Section C, Shelf 4",
-                    description: "Introduction to organic molecules and reactions."
-                }
+                    left: 3,
+                    AccessionNumber: "00007914",
+                    isbn: "N/A",
+                    callNumber: "A 536 M4661 1908",
+                    description: "192 pages ; 21 cm",
+                    Place:"California",
+                    Publisher:"The Center for the Study of Democratic Institutions",
+                    Year:"1908",
+                    Edition:"13th",
+                    Supplementary:"N/A"
+
+                },
             ];
 
             const grid = document.getElementById("booksGrid");
@@ -332,11 +363,16 @@
             const modalTitle = document.getElementById("modalTitle");
             const modalAuthor = document.getElementById("modalAuthor");
             const modalAvailability = document.getElementById("modalAvailability");
-            const modalLocation = document.getElementById("modalLocation");
-            const modalBookId = document.getElementById("modalBookId");
+            const modalCallNumber = document.getElementById("modalCallNumber");
+            const modalAccessionNumber = document.getElementById("modalAccessionNumber");
             const modalIsbn = document.getElementById("modalIsbn");
-            const modalCategory = document.getElementById("modalCategory");
+            const modalSubject = document.getElementById("modalSubject");
             const modalDescription = document.getElementById("modalDescription");
+            const modalPlace = document.getElementById("modalPlace");
+            const modalBookPublisher = document.getElementById("modalBookPublisher");
+            const modalYear = document.getElementById("modalYear");
+            const modalEdition = document.getElementById("modalEdition");
+            const modalSupplementary = document.getElementById("modalSupplementary");
 
             grid.innerHTML = "";
 
@@ -381,7 +417,7 @@
                 info.innerHTML = `
                 <h4 class="text-xs font-semibold mb-0.5">${book.title}</h4>
                 <p class="text-[10px] text-gray-500">by ${book.author}</p>
-                <p class="text-[10px] font-medium text-[var(--color-primary)] mt-0.5">${book.category}</p>
+                <p class="text-[10px] font-medium text-[var(--color-primary)] mt-0.5">${book.Subject}</p>
             `;
 
                 card.appendChild(imgWrap);
@@ -428,10 +464,15 @@
                 modalTitle.textContent = book.title;
                 modalAuthor.textContent = "by " + book.author;
                 modalAvailability.textContent = `${book.left} of ${book.left > 0 ? book.left + 2 : 0}`;
-                modalLocation.textContent = book.location || "N/A";
-                modalBookId.textContent = book.bookId || "";
+                modalCallNumber.textContent = book.callNumber || "N/A";
+                modalAccessionNumber.textContent = book.AccessionNumber || "";
                 modalIsbn.textContent = book.isbn || "";
-                modalCategory.textContent = book.category || "";
+                modalSubject.textContent = book.Subject || "";
+                modalPlace.textContent = book.Place || "";
+                modalPublisher.textContent = book.Publisher || "";
+                modalYear.textContent = book.Year || "";
+                modalEdition.textContent = book.Edition || "";
+                modalSupplementary.textContent = book.Supplementary || "";
                 modalDescription.textContent = book.description || "No description available.";
 
                 openModal();

@@ -190,19 +190,22 @@
 
 
             <div class="p-4 space-y-4">
+
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="p-3 shadow-md bg-orange-50 rounded">
-                        <p class="text-xs text-gray-500">Availability</p>
+                    <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
+                        <p class="text-xs text-orange-500 font-medium">Availability</p>
                         <p id="modalAvailability" class="font-semibold text-green-600">0 of 0</p>
+                        <p class="text-xs text-orange-500">copies available</p>
                     </div>
-                    <div class="p-3 shadow-md bg-orange-50 rounded">
-                        <p class="text-xs text-gray-500">Call Number</p>
+                    <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
+                        <p class="text-xs text-orange-500 font-medium">Call Number</p>
                         <p id="modalCallNumber" class="font-semibold">N/A</p>
+                        <p class="text-xs text-orange-500">in library</p>
                     </div>
                 </div>
 
-                <div class="p-3 shadow-md rounded">
-                    <p class="text-xs text-gray-500">Book Information</p>
+                <div class="text-sm bg-white rounded-lg border border-gray-200 p-3 space-y-1">
+                    <p class="font-medium text-orange-500">Book Information</p>
                     <p><span class="font-semibold">Accession Number:</span> <span id="modalAccessionNumber"></span></p>
                     <p><span class="font-semibold">ISBN:</span> <span id="modalIsbn"></span></p>
                     <p><span class="font-semibold">Subject:</span> <span id="modalSubject"></span></p>
@@ -213,24 +216,26 @@
                     <p><span class="font-semibold">Book Suplementary:</span> <span id="modalSupplementary"></span></p>
                 </div>
 
-                <div class="p-3 shadow-md rounded bg-[var(--color-green-50)]">
-                    <p class="text-xs text-gray-500">Description</p>
+                <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-3 border border-orange-200">
+                    <p class="font-semibold text-orange-900 mb-2 text-sm">Description</p>
                     <p id="modalDescription"></p>
                 </div>
             </div>
 
 
-            <div class="md:col-span-4 flex justify-center mt-4 mb-6">
-                <button
-                    class="px-4 sm:px-5 py-2 bg-green-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-green-600 transition">
-                    Add to Cart
+            <div class="px-3 py-4 bg-gray-50">
+                <button data-slot="add-to-cart"
+                    class="inline-flex items-center justify-center whitespace-nowrap text-sm disabled:pointer-events-none disabled:opacity-50 w-full gap-3 h-11 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl font-semibold">
+                    <span><i class="ph ph-shopping-cart-simple"></i></span> Add to Cart
                 </button>
             </div>
+
         </div>
     </div>
 
     <script>
     window.addEventListener("DOMContentLoaded", () => {
+        // Books sample data
         const books = [{
                 title: "On liberty: Man the sate",
                 author: "Mayer, Milton",

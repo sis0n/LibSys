@@ -35,7 +35,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex flex-col justify-center items-center px-4 sm:px-6 py-6 sm:py-10 space-y-6 overflow-auto">
+    <main class="flex flex-col justify-center items-center px-2 sm:px-2 py-4 sm:py-4 space-y-6 overflow-auto">
         <div class="w-full max-w-3xl mx-auto space-y-6">
 
 
@@ -71,12 +71,15 @@
 
                 <form action="/libsys/public/scanner/manual" method="POST"
                     class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2 flex justify-center">
-                        <label class="text-md font-medium text-gray-700 mr-2">Student <br>Number</label>
+                    <div class="md:col-span-2">
+                        <label for="studentNumber" class="block text-md font-medium text-gray-700 mb-1">
+                            Student Number
+                        </label>
                         <input type="text" name="studentNumber" id="studentNumber" placeholder="Enter student number"
                             class="text-md text-gray-700 w-full px-3 py-2 border border-orange-200 rounded-md 
-            focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50" required>
+    focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50" required>
                     </div>
+
                     <div class="md:col-span-2 flex justify-center mt-4">
                         <button type="submit"
                             class="px-4 sm:px-5 py-2 bg-orange-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-orange-600 transition">

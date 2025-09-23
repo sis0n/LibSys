@@ -133,7 +133,7 @@
                 }
             });
 
-            // ✅ Default highlight sa "All Categories" at "All Status"
+            // Default highlight sa "All Categories" at "All Status"
             window.addEventListener("DOMContentLoaded", () => {
                 const defaultCategory = document.querySelector("#categoryDropdownMenu .dropdown-item");
                 if (defaultCategory) defaultCategory.classList.add("bg-[var(--color-orange-200)]",
@@ -150,9 +150,7 @@
     <div class="flex justify-between items-center mb-4">
         <p class="font-medium">
             <span class="font-bold">Books Found</span>
-
         </p>
-
         <div class="flex gap-3 items-center">
             <span
                 class="bg-[var(--color-green-100)] text-[var(--color-green-700)] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
@@ -169,102 +167,287 @@
     </div>
 
     <!-- Books Grid -->
-    <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        <script>
-        const books = [{
-                title: "Introduction to Computer Science",
-                author: "John Smith",
-                category: "Computer Science",
-                img: "/Libsys/assets/books-img/intro-to-comscie.png",
-                status: "Available",
-                left: 3
-            },
-            {
-                title: "Physics Fundamentals",
-                author: "Jane Doe",
-                category: "Physics",
-                img: "/Libsys/assets/books-img/physics.png",
-                status: "Borrowed",
-                left: 0
-            },
-            {
-                title: "Organic Chemistry Essentials",
-                author: "Mary Brown",
-                category: "Chemistry",
-                left: 1,
-                status: "Available",
-                img: "/Libsys/assets/books-img/organic-chemistry.png"
-            },
-            {
-                title: "Calculus Made Easy",
-                author: "Thomas Stewart",
-                category: "Mathematics",
-                left: 2,
-                status: "Available",
-                img: "/Libsys/assets/books-img/calculus.png"
-            },
-            {
-                title: "Sample Book Without Image",
-                author: "Yours Truly",
-                category: "Random",
-                left: 1,
-                status: "Available",
-                img: "Wala" // This will trigger the fallback icon
-            },
-            {
-                title: "Philippine History",
-                author: "Jose Cruz",
-                category: "History",
-                left: 1,
-                status: "Available",
-                img: "/Libsys/assets/books-img/philippine-history.png"
-            },
-            {
-                title: "Philippine History",
-                author: "Jose Cruz",
-                category: "History",
-                left: 1,
-                status: "Available",
-                img: "/Libsys/assets/books-img/philippine-history.png"
-            }
-            
-        ];
+    <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4"></div>
 
-        const grid = document.getElementById("booksGrid");
+        <!-- MODAL -->
+        <div id="bookModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 
+                hidden opacity-0 transition-opacity duration-300 ease-out">
 
-        books.forEach(book => {
-            grid.innerHTML += `
-            <div class="relative bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden group transform transition duration-400 hover:-translate-y-1 hover:shadow-lg max-w-[200px]">
-                
-                <!-- Book Image / Fallback Icon -->
-                <div class="w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden">
-                    ${
-                        book.img
-                        ? `<img src="${book.img}" alt="${book.title}" 
-                            class="h-full w-auto object-contain group-hover:scale-105 transition duration-300" 
-                            onerror="this.outerHTML='<i class=&quot;ph ph-book text-5xl text-gray-400&quot;></i>'" />`
-                        : `<i class="ph ph-book text-5xl text-gray-400"></i>`
-                    }
+            <div id="bookModalContent" class="bg-[var(--color-card)] w-full max-w-lg rounded-2xl shadow-lg overflow-hidden 
+                    transform scale-95 transition-transform duration-300 ease-out">
+
+
+                <div class="flex justify-between items-center bg-[var(--color-orange-500)] text-white px-4 py-3">
+                    <div class="flex items-center gap-3">
+                        <img id="modalImg" src="" alt="Book Cover" class="w-12 h-16 object-cover rounded bg-white" />
+                        <div>
+                            <h2 id="modalTitle" class="text-lg font-bold">Book Title</h2>
+                            <p id="modalAuthor" class="text-sm">by Author</p>
+                        </div>
+                    </div>
+                    <button id="closeModal" class="text-white text-xl">&times;</button>
                 </div>
 
-                <!-- Status Badges -->
-                <span class="absolute top-2 left-2 ${book.left > 0 ? 'bg-[var(--color-green-500)]' : 'bg-gray-400'} text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
-                    <span>${book.left} left</span>
-                </span>
 
-                <span class="absolute top-2 right-2 ${book.status === 'Available' ? 'bg-[var(--color-orange-500)]' : 'bg-gray-500'} text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
-                    <span>${book.status}</span>
-                </span>
+                <div class="p-4 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 border rounded">
+                            <p class="text-xs text-gray-500">Availability</p>
+                            <p id="modalAvailability" class="font-semibold text-green-600">0 of 0</p>
+                        </div>
+                        <div class="p-3 border rounded">
+                            <p class="text-xs text-gray-500">Location</p>
+                            <p id="modalLocation" class="font-semibold">N/A</p>
+                        </div>
+                    </div>
 
-                <!-- Info -->
-                <div class="p-2">
-                    <h4 class="text-xs font-semibold mb-0.5">${book.title}</h4>
-                    <p class="text-[10px] text-gray-500">by ${book.author}</p>
-                    <p class="text-[10px] font-medium text-[var(--color-primary)] mt-0.5">${book.category}</p>
+                    <div class="p-3 border rounded">
+                        <p class="text-xs text-gray-500">Book Information</p>
+                        <p><span class="font-semibold">Book ID:</span> <span id="modalBookId"></span></p>
+                        <p><span class="font-semibold">ISBN:</span> <span id="modalIsbn"></span></p>
+                        <p><span class="font-semibold">Category:</span> <span id="modalCategory"></span></p>
+                    </div>
+
+                    <div class="p-3 border rounded bg-[var(--color-orange-50)]">
+                        <p class="text-xs text-gray-500">Description</p>
+                        <p id="modalDescription"></p>
+                    </div>
+                </div>
+
+
+                <div class="px-4 py-3 bg-gray-50 flex justify-end">
+                    <button class="bg-[var(--color-green-500)] text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                        Add to Cart
+                    </button>
                 </div>
             </div>
+        </div>
+
+        <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            const books = [{
+                    title: "Introduction to Computer Science",
+                    author: "John Smith",
+                    category: "Computer Science",
+                    img: "/Libsys/assets/books-img/intro-to-comscie.png",
+                    status: "Available",
+                    left: 3,
+                    bookId: "CS-001",
+                    isbn: "978-0-123456-78-9",
+                    location: "Section A, Shelf 2",
+                    description: "A comprehensive introduction to computer science fundamentals."
+                },
+                {
+                    title: "Physics Fundamentals",
+                    author: "Jane Doe",
+                    category: "Physics",
+                    img: "/Libsys/assets/books-img/physics.png",
+                    status: "Borrowed",
+                    left: 0,
+                    bookId: "PH-002",
+                    isbn: "978-0-987654-32-1",
+                    location: "Section B, Shelf 1",
+                    description: "Essential concepts in physics for undergraduates."
+                },
+                {
+                    title: "Organic Chemistry Essentials",
+                    author: "Mary Brown",
+                    category: "Chemistry",
+                    img: "wala",
+                    status: "Available",
+                    left: 1,
+                    bookId: "CH-003",
+                    isbn: "978-0-111222-33-4",
+                    location: "Section C, Shelf 4",
+                    description: "Introduction to organic molecules and reactions."
+                },
+                {
+                    title: "Organic Chemistry Essentials",
+                    author: "Mary Brown",
+                    category: "Chemistry",
+                    img: "wala",
+                    status: "Available",
+                    left: 1,
+                    bookId: "CH-003",
+                    isbn: "978-0-111222-33-4",
+                    location: "Section C, Shelf 4",
+                    description: "Introduction to organic molecules and reactions."
+                },
+                {
+                    title: "Organic Chemistry Essentials",
+                    author: "Mary Brown",
+                    category: "Chemistry",
+                    img: "wala",
+                    status: "Available",
+                    left: 1,
+                    bookId: "CH-003",
+                    isbn: "978-0-111222-33-4",
+                    location: "Section C, Shelf 4",
+                    description: "Introduction to organic molecules and reactions."
+                },
+                {
+                    title: "Organic Chemistry Essentials",
+                    author: "Mary Brown",
+                    category: "Chemistry",
+                    img: "wala",
+                    status: "Available",
+                    left: 1,
+                    bookId: "CH-003",
+                    isbn: "978-0-111222-33-4",
+                    location: "Section C, Shelf 4",
+                    description: "Introduction to organic molecules and reactions."
+                },
+                {
+                    title: "Organic Chemistry Essentials",
+                    author: "Mary Brown",
+                    category: "Chemistry",
+                    img: "wala",
+                    status: "Available",
+                    left: 1,
+                    bookId: "CH-003",
+                    isbn: "978-0-111222-33-4",
+                    location: "Section C, Shelf 4",
+                    description: "Introduction to organic molecules and reactions."
+                },
+                {
+                    title: "Organic Chemistry Essentials",
+                    author: "Mary Brown",
+                    category: "Chemistry",
+                    img: "wala",
+                    status: "Available",
+                    left: 1,
+                    bookId: "CH-003",
+                    isbn: "978-0-111222-33-4",
+                    location: "Section C, Shelf 4",
+                    description: "Introduction to organic molecules and reactions."
+                }
+            ];
+
+            const grid = document.getElementById("booksGrid");
+            const modal = document.getElementById("bookModal");
+            const modalContent = document.getElementById("bookModalContent");
+            const closeModalBtn = document.getElementById("closeModal");
+
+            const modalImg = document.getElementById("modalImg");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalAuthor = document.getElementById("modalAuthor");
+            const modalAvailability = document.getElementById("modalAvailability");
+            const modalLocation = document.getElementById("modalLocation");
+            const modalBookId = document.getElementById("modalBookId");
+            const modalIsbn = document.getElementById("modalIsbn");
+            const modalCategory = document.getElementById("modalCategory");
+            const modalDescription = document.getElementById("modalDescription");
+
+            grid.innerHTML = "";
+
+            // Render book cards
+            books.forEach((book, index) => {
+                const card = document.createElement("div");
+                card.className =
+                    "book-card relative bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden group transform transition duration-400 hover:-translate-y-1 hover:shadow-lg max-w-[230px] cursor-pointer";
+                card.dataset.index = index;
+
+                const imgWrap = document.createElement("div");
+                imgWrap.className =
+                    "w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden";
+
+                if (book.img && book.img !== "Wala" && book.img !== "wala") {
+                    const img = document.createElement("img");
+                    img.src = book.img;
+                    img.alt = book.title;
+                    img.className =
+                        "h-full w-auto object-contain group-hover:scale-105 transition duration-300";
+                    img.onerror = () => {
+                        img.remove();
+                        imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
+                    };
+                    imgWrap.appendChild(img);
+                } else {
+                    imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
+                }
+
+                const leftBadge = document.createElement("span");
+                leftBadge.className =
+                    `absolute top-2 left-2 ${book.left > 0 ? "bg-[var(--color-green-500)]" : "bg-gray-400"} text-white text-xs px-2 py-1 rounded-full shadow`;
+                leftBadge.textContent = `${book.left} left`;
+
+                const statusBadge = document.createElement("span");
+                statusBadge.className =
+                    `absolute top-2 right-2 ${book.status === "Available" ? "bg-[var(--color-orange-500)]" : "bg-gray-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
+                statusBadge.textContent = book.status;
+
+                const info = document.createElement("div");
+                info.className = "p-2";
+                info.innerHTML = `
+                <h4 class="text-xs font-semibold mb-0.5">${book.title}</h4>
+                <p class="text-[10px] text-gray-500">by ${book.author}</p>
+                <p class="text-[10px] font-medium text-[var(--color-primary)] mt-0.5">${book.category}</p>
             `;
+
+                card.appendChild(imgWrap);
+                card.appendChild(leftBadge);
+                card.appendChild(statusBadge);
+                card.appendChild(info);
+                grid.appendChild(card);
+            });
+
+            // --- Modal animation functions ---
+            function openModal() {
+                modal.classList.remove("hidden");
+                modal.classList.add("opacity-0");
+                modalContent.classList.add("scale-95");
+
+                requestAnimationFrame(() => {
+                    modal.classList.remove("opacity-0");
+                    modal.classList.add("opacity-100");
+                    modalContent.classList.remove("scale-95");
+                    modalContent.classList.add("scale-100");
+                });
+            }
+
+            function closeModal() {
+                modal.classList.remove("opacity-100");
+                modal.classList.add("opacity-0");
+                modalContent.classList.remove("scale-100");
+                modalContent.classList.add("scale-95");
+
+                setTimeout(() => {
+                    modal.classList.add("hidden");
+                }, 300);
+            }
+
+            // open on card click
+            grid.addEventListener("click", (e) => {
+                const card = e.target.closest(".book-card");
+                if (!card) return;
+                const book = books[card.dataset.index];
+
+                modalImg.src = book.img && book.img !== "Wala" && book.img !== "wala" ? book.img : "";
+                modalImg.classList.toggle("hidden", !book.img || book.img === "Wala" || book.img ===
+                    "wala");
+                modalTitle.textContent = book.title;
+                modalAuthor.textContent = "by " + book.author;
+                modalAvailability.textContent = `${book.left} of ${book.left > 0 ? book.left + 2 : 0}`;
+                modalLocation.textContent = book.location || "N/A";
+                modalBookId.textContent = book.bookId || "";
+                modalIsbn.textContent = book.isbn || "";
+                modalCategory.textContent = book.category || "";
+                modalDescription.textContent = book.description || "No description available.";
+
+                openModal();
+            });
+
+            // close handlers
+            closeModalBtn.addEventListener("click", closeModal);
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) closeModal();
+            });
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+                    closeModal();
+                }
+            });
         });
         </script>
-    </div>
+   
 </body>

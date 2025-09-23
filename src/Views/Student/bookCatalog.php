@@ -169,326 +169,327 @@
     <!-- Books Grid -->
     <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4"></div>
 
-        <!-- MODAL -->
-        <div id="bookModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 
+    <!-- MODAL -->
+    <div id="bookModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 
                 hidden opacity-0 transition-opacity duration-300 ease-out">
 
-            <div id="bookModalContent" class="bg-[var(--color-card)] w-full max-w-lg rounded-2xl shadow-lg overflow-hidden 
+        <div id="bookModalContent" class="bg-[var(--color-card)] w-full max-w-lg rounded-2xl shadow-lg overflow-hidden 
                     transform scale-95 transition-transform duration-300 ease-out">
 
 
-                <div class="flex justify-between items-center bg-[var(--color-orange-500)] text-white px-4 py-3">
-                    <div class="flex items-center gap-3">
-                        <img id="modalImg" src="" alt="Book Cover" class="w-12 h-16 object-cover rounded bg-white" />
-                        <div>
-                            <h2 id="modalTitle" class="text-lg font-bold text-white">Book Title</h2>
-                            <p id="modalAuthor" class="text-sm">by Author</p>
-                        </div>
+            <div class="flex justify-between items-center bg-[var(--color-orange-500)] text-white px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <img id="modalImg" src="" alt="Book Cover" class="w-12 h-16 object-cover rounded bg-white" />
+                    <div>
+                        <h2 id="modalTitle" class="text-lg font-bold text-white">Book Title</h2>
+                        <p id="modalAuthor" class="text-sm">by Author</p>
                     </div>
-                    <button id="closeModal" class="text-white text-xl"><i class="ph ph-x-circle"></i></button>
                 </div>
+                <button id="closeModal" class="text-white text-xl"><i class="ph ph-x-circle"></i></button>
+            </div>
 
 
-                <div class="p-4 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-3 shadow-md bg-orange-50 rounded">
-                            <p class="text-xs text-gray-500">Availability</p>
-                            <p id="modalAvailability" class="font-semibold text-green-600">0 of 0</p>
-                        </div>
-                        <div class="p-3 shadow-md bg-orange-50 rounded">
-                            <p class="text-xs text-gray-500">Call Number</p>
-                            <p id="modalCallNumber" class="font-semibold">N/A</p>
-                        </div>
+            <div class="p-4 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-3 shadow-md bg-orange-50 rounded">
+                        <p class="text-xs text-gray-500">Availability</p>
+                        <p id="modalAvailability" class="font-semibold text-green-600">0 of 0</p>
                     </div>
-
-                    <div class="p-3 shadow-md rounded">
-                        <p class="text-xs text-gray-500">Book Information</p>
-                        <p><span class="font-semibold">Accession Number:</span> <span id="modalAccessionNumber"></span></p>
-                        <p><span class="font-semibold">ISBN:</span> <span id="modalIsbn"></span></p>
-                        <p><span class="font-semibold">Subject:</span> <span id="modalSubject"></span></p>
-                        <p><span class="font-semibold">Book Place:</span> <span id="modalPlace"></span></p>
-                        <p><span class="font-semibold">Book Publisher:</span> <span id="modalPublisher"></span></p>
-                        <p><span class="font-semibold">Year:</span> <span id="modalYear"></span></p>
-                        <p><span class="font-semibold">Book Edition:</span> <span id="modalEdition"></span></p>
-                        <p><span class="font-semibold">Book Suplementary:</span> <span id="modalSupplementary"></span></p>
-                    </div>
-
-                    <div class="p-3 shadow-md rounded bg-[var(--color-green-50)]">
-                        <p class="text-xs text-gray-500">Description</p>
-                        <p id="modalDescription"></p>
+                    <div class="p-3 shadow-md bg-orange-50 rounded">
+                        <p class="text-xs text-gray-500">Call Number</p>
+                        <p id="modalCallNumber" class="font-semibold">N/A</p>
                     </div>
                 </div>
 
+                <div class="p-3 shadow-md rounded">
+                    <p class="text-xs text-gray-500">Book Information</p>
+                    <p><span class="font-semibold">Accession Number:</span> <span id="modalAccessionNumber"></span></p>
+                    <p><span class="font-semibold">ISBN:</span> <span id="modalIsbn"></span></p>
+                    <p><span class="font-semibold">Subject:</span> <span id="modalSubject"></span></p>
+                    <p><span class="font-semibold">Book Place:</span> <span id="modalPlace"></span></p>
+                    <p><span class="font-semibold">Book Publisher:</span> <span id="modalPublisher"></span></p>
+                    <p><span class="font-semibold">Year:</span> <span id="modalYear"></span></p>
+                    <p><span class="font-semibold">Book Edition:</span> <span id="modalEdition"></span></p>
+                    <p><span class="font-semibold">Book Suplementary:</span> <span id="modalSupplementary"></span></p>
+                </div>
 
-                <div class="md:col-span-4 flex justify-center mt-4 mb-6">
-                    <button class="px-4 sm:px-5 py-2 bg-green-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-green-600 transition">
-                        Add to Cart
-                    </button>
+                <div class="p-3 shadow-md rounded bg-[var(--color-green-50)]">
+                    <p class="text-xs text-gray-500">Description</p>
+                    <p id="modalDescription"></p>
                 </div>
             </div>
+
+
+            <div class="md:col-span-4 flex justify-center mt-4 mb-6">
+                <button
+                    class="px-4 sm:px-5 py-2 bg-green-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-green-600 transition">
+                    Add to Cart
+                </button>
+            </div>
         </div>
+    </div>
 
-        <script>
-        window.addEventListener("DOMContentLoaded", () => {
-            const books = [{
-                    title: "On liberty: Man the sate",
-                    author: "Mayer, Milton",
-                    Subject: "State, The. Liberty.",
-                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
-                    status: "Available",
-                    left: 3,
-                    AccessionNumber: "00007914",
-                    isbn: "N/A",
-                    callNumber: "A 536 M4661 1908",
-                    description: "192 pages ; 21 cm",
-                    Place:"California",
-                    Publisher:"The Center for the Study of Democratic Institutions",
-                    Year:"1908",
-                    Edition:"13th",
-                    Supplementary:"N/A"
+    <script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const books = [{
+                title: "On liberty: Man the sate",
+                author: "Mayer, Milton",
+                Subject: "State, The. Liberty.",
+                img: "/Libsys/assets/books-img/On-Liberty-Man.png",
+                status: "Available",
+                left: 3,
+                AccessionNumber: "00007914",
+                isbn: "N/A",
+                callNumber: "A 536 M4661 1908",
+                description: "192 pages ; 21 cm",
+                Place: "California",
+                Publisher: "The Center for the Study of Democratic Institutions",
+                Year: "1908",
+                Edition: "13th",
+                Supplementary: "N/A"
 
-                },
-                {
-                    title: "On liberty: Man the sate",
-                    author: "Mayer, Milton",
-                    Subject: "State, The. Liberty.",
-                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
-                    status: "Available",
-                    left: 3,
-                    AccessionNumber: "00007914",
-                    isbn: "N/A",
-                    callNumber: "A 536 M4661 1908",
-                    description: "192 pages ; 21 cm",
-                    Place:"California",
-                    Publisher:"The Center for the Study of Democratic Institutions",
-                    Year:"1908",
-                    Edition:"13th",
-                    Supplementary:"N/A"
+            },
+            {
+                title: "On liberty: Man the sate",
+                author: "Mayer, Milton",
+                Subject: "State, The. Liberty.",
+                img: "/Libsys/assets/books-img/On-Liberty-Man.png",
+                status: "Available",
+                left: 3,
+                AccessionNumber: "00007914",
+                isbn: "N/A",
+                callNumber: "A 536 M4661 1908",
+                description: "192 pages ; 21 cm",
+                Place: "California",
+                Publisher: "The Center for the Study of Democratic Institutions",
+                Year: "1908",
+                Edition: "13th",
+                Supplementary: "N/A"
 
-                },{
-                    title: "On liberty: Man the sate",
-                    author: "Mayer, Milton",
-                    Subject: "State, The. Liberty.",
-                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
-                    status: "Available",
-                    left: 3,
-                    AccessionNumber: "00007914",
-                    isbn: "N/A",
-                    callNumber: "A 536 M4661 1908",
-                    description: "192 pages ; 21 cm",
-                    Place:"California",
-                    Publisher:"The Center for the Study of Democratic Institutions",
-                    Year:"1908",
-                    Edition:"13th",
-                    Supplementary:"N/A"
+            }, {
+                title: "On liberty: Man the sate",
+                author: "Mayer, Milton",
+                Subject: "State, The. Liberty.",
+                img: "/Libsys/assets/books-img/On-Liberty-Man.png",
+                status: "Available",
+                left: 3,
+                AccessionNumber: "00007914",
+                isbn: "N/A",
+                callNumber: "A 536 M4661 1908",
+                description: "192 pages ; 21 cm",
+                Place: "California",
+                Publisher: "The Center for the Study of Democratic Institutions",
+                Year: "1908",
+                Edition: "13th",
+                Supplementary: "N/A"
 
-                },{
-                    title: "On liberty: Man the sate",
-                    author: "Mayer, Milton",
-                    Subject: "State, The. Liberty.",
-                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
-                    status: "Available",
-                    left: 3,
-                    AccessionNumber: "00007914",
-                    isbn: "N/A",
-                    callNumber: "A 536 M4661 1908",
-                    description: "192 pages ; 21 cm",
-                    Place:"California",
-                    Publisher:"The Center for the Study of Democratic Institutions",
-                    Year:"1908",
-                    Edition:"13th",
-                    Supplementary:"N/A"
+            }, {
+                title: "On liberty: Man the sate",
+                author: "Mayer, Milton",
+                Subject: "State, The. Liberty.",
+                img: "/Libsys/assets/books-img/On-Liberty-Man.png",
+                status: "Available",
+                left: 3,
+                AccessionNumber: "00007914",
+                isbn: "N/A",
+                callNumber: "A 536 M4661 1908",
+                description: "192 pages ; 21 cm",
+                Place: "California",
+                Publisher: "The Center for the Study of Democratic Institutions",
+                Year: "1908",
+                Edition: "13th",
+                Supplementary: "N/A"
 
-                },{
-                    title: "On liberty: Man the sate",
-                    author: "Mayer, Milton",
-                    Subject: "State, The. Liberty.",
-                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
-                    status: "Available",
-                    left: 3,
-                    AccessionNumber: "00007914",
-                    isbn: "N/A",
-                    callNumber: "A 536 M4661 1908",
-                    description: "192 pages ; 21 cm",
-                    Place:"California",
-                    Publisher:"The Center for the Study of Democratic Institutions",
-                    Year:"1908",
-                    Edition:"13th",
-                    Supplementary:"N/A"
+            }, {
+                title: "On liberty: Man the sate",
+                author: "Mayer, Milton",
+                Subject: "State, The. Liberty.",
+                img: "/Libsys/assets/books-img/On-Liberty-Man.png",
+                status: "Available",
+                left: 3,
+                AccessionNumber: "00007914",
+                isbn: "N/A",
+                callNumber: "A 536 M4661 1908",
+                description: "192 pages ; 21 cm",
+                Place: "California",
+                Publisher: "The Center for the Study of Democratic Institutions",
+                Year: "1908",
+                Edition: "13th",
+                Supplementary: "N/A"
 
-                },{
-                    title: "On liberty: Man the sate",
-                    author: "Mayer, Milton",
-                    Subject: "State, The. Liberty.",
-                    img: "/Libsys/assets/books-img/On-Liberty-Man.png",
-                    status: "Available",
-                    left: 3,
-                    AccessionNumber: "00007914",
-                    isbn: "N/A",
-                    callNumber: "A 536 M4661 1908",
-                    description: "192 pages ; 21 cm",
-                    Place:"California",
-                    Publisher:"The Center for the Study of Democratic Institutions",
-                    Year:"1908",
-                    Edition:"13th",
-                    Supplementary:"N/A"
+            }, {
+                title: "On liberty: Man the sate",
+                author: "Mayer, Milton",
+                Subject: "State, The. Liberty.",
+                img: "/Libsys/assets/books-img/On-Liberty-Man.png",
+                status: "Available",
+                left: 3,
+                AccessionNumber: "00007914",
+                isbn: "N/A",
+                callNumber: "A 536 M4661 1908",
+                description: "192 pages ; 21 cm",
+                Place: "California",
+                Publisher: "The Center for the Study of Democratic Institutions",
+                Year: "1908",
+                Edition: "13th",
+                Supplementary: "N/A"
 
-                },{
-                    title: "On liberty: Man the sate",
-                    author: "Mayer, Milton",
-                    Subject: "State, The. Liberty.",
-                    img: "Wala"//sample lang to test if wala ang image
+            }, {
+                title: "On liberty: Man the sate",
+                author: "Mayer, Milton",
+                Subject: "State, The. Liberty.",
+                img: "Wala" //sample lang to test if wala ang image
                     ,
-                    status: "Available",
-                    left: 3,
-                    AccessionNumber: "00007914",
-                    isbn: "N/A",
-                    callNumber: "A 536 M4661 1908",
-                    description: "192 pages ; 21 cm",
-                    Place:"California",
-                    Publisher:"The Center for the Study of Democratic Institutions",
-                    Year:"1908",
-                    Edition:"13th",
-                    Supplementary:"N/A"
+                status: "Available",
+                left: 3,
+                AccessionNumber: "00007914",
+                isbn: "N/A",
+                callNumber: "A 536 M4661 1908",
+                description: "192 pages ; 21 cm",
+                Place: "California",
+                Publisher: "The Center for the Study of Democratic Institutions",
+                Year: "1908",
+                Edition: "13th",
+                Supplementary: "N/A"
 
-                },
-            ];
+            },
+        ];
 
-            const grid = document.getElementById("booksGrid");
-            const modal = document.getElementById("bookModal");
-            const modalContent = document.getElementById("bookModalContent");
-            const closeModalBtn = document.getElementById("closeModal");
+        const grid = document.getElementById("booksGrid");
+        const modal = document.getElementById("bookModal");
+        const modalContent = document.getElementById("bookModalContent");
+        const closeModalBtn = document.getElementById("closeModal");
 
-            const modalImg = document.getElementById("modalImg");
-            const modalTitle = document.getElementById("modalTitle");
-            const modalAuthor = document.getElementById("modalAuthor");
-            const modalAvailability = document.getElementById("modalAvailability");
-            const modalCallNumber = document.getElementById("modalCallNumber");
-            const modalAccessionNumber = document.getElementById("modalAccessionNumber");
-            const modalIsbn = document.getElementById("modalIsbn");
-            const modalSubject = document.getElementById("modalSubject");
-            const modalDescription = document.getElementById("modalDescription");
-            const modalPlace = document.getElementById("modalPlace");
-            const modalBookPublisher = document.getElementById("modalBookPublisher");
-            const modalYear = document.getElementById("modalYear");
-            const modalEdition = document.getElementById("modalEdition");
-            const modalSupplementary = document.getElementById("modalSupplementary");
+        const modalImg = document.getElementById("modalImg");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalAuthor = document.getElementById("modalAuthor");
+        const modalAvailability = document.getElementById("modalAvailability");
+        const modalCallNumber = document.getElementById("modalCallNumber");
+        const modalAccessionNumber = document.getElementById("modalAccessionNumber");
+        const modalIsbn = document.getElementById("modalIsbn");
+        const modalSubject = document.getElementById("modalSubject");
+        const modalDescription = document.getElementById("modalDescription");
+        const modalPlace = document.getElementById("modalPlace");
+        const modalBookPublisher = document.getElementById("modalBookPublisher");
+        const modalYear = document.getElementById("modalYear");
+        const modalEdition = document.getElementById("modalEdition");
+        const modalSupplementary = document.getElementById("modalSupplementary");
 
-            grid.innerHTML = "";
+        grid.innerHTML = "";
 
-            // Render book cards
-            books.forEach((book, index) => {
-                const card = document.createElement("div");
-                card.className =
-                    "book-card relative bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden group transform transition duration-400 hover:-translate-y-1 hover:shadow-lg max-w-[230px] cursor-pointer";
-                card.dataset.index = index;
+        // Render book cards
+        books.forEach((book, index) => {
+            const card = document.createElement("div");
+            card.className =
+                "book-card relative bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden group transform transition duration-400 hover:-translate-y-1 hover:shadow-lg max-w-[230px] cursor-pointer";
+            card.dataset.index = index;
 
-                const imgWrap = document.createElement("div");
-                imgWrap.className =
-                    "w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden";
+            const imgWrap = document.createElement("div");
+            imgWrap.className =
+                "w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden";
 
-                if (book.img && book.img !== "Wala" && book.img !== "wala") {
-                    const img = document.createElement("img");
-                    img.src = book.img;
-                    img.alt = book.title;
-                    img.className =
-                        "h-full w-auto object-contain group-hover:scale-105 transition duration-300";
-                    img.onerror = () => {
-                        img.remove();
-                        imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
-                    };
-                    imgWrap.appendChild(img);
-                } else {
+            if (book.img && book.img !== "Wala" && book.img !== "wala") {
+                const img = document.createElement("img");
+                img.src = book.img;
+                img.alt = book.title;
+                img.className =
+                    "h-full w-auto object-contain group-hover:scale-105 transition duration-300";
+                img.onerror = () => {
+                    img.remove();
                     imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
-                }
+                };
+                imgWrap.appendChild(img);
+            } else {
+                imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
+            }
 
-                const leftBadge = document.createElement("span");
-                leftBadge.className =
-                    `absolute top-2 left-2 ${book.left > 0 ? "bg-[var(--color-green-500)]" : "bg-gray-400"} text-white text-xs px-2 py-1 rounded-full shadow`;
-                leftBadge.textContent = `${book.left} left`;
+            const leftBadge = document.createElement("span");
+            leftBadge.className =
+                `absolute top-2 left-2 ${book.left > 0 ? "bg-[var(--color-green-500)]" : "bg-gray-400"} text-white text-xs px-2 py-1 rounded-full shadow`;
+            leftBadge.textContent = `${book.left} left`;
 
-                const statusBadge = document.createElement("span");
-                statusBadge.className =
-                    `absolute top-2 right-2 ${book.status === "Available" ? "bg-[var(--color-orange-500)]" : "bg-gray-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
-                statusBadge.textContent = book.status;
+            const statusBadge = document.createElement("span");
+            statusBadge.className =
+                `absolute top-2 right-2 ${book.status === "Available" ? "bg-[var(--color-orange-500)]" : "bg-gray-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
+            statusBadge.textContent = book.status;
 
-                const info = document.createElement("div");
-                info.className = "p-2";
-                info.innerHTML = `
+            const info = document.createElement("div");
+            info.className = "p-2";
+            info.innerHTML = `
                 <h4 class="text-xs font-semibold mb-0.5">${book.title}</h4>
                 <p class="text-[10px] text-gray-500">by ${book.author}</p>
                 <p class="text-[10px] font-medium text-[var(--color-primary)] mt-0.5">${book.Subject}</p>
             `;
 
-                card.appendChild(imgWrap);
-                card.appendChild(leftBadge);
-                card.appendChild(statusBadge);
-                card.appendChild(info);
-                grid.appendChild(card);
-            });
-
-            // --- Modal animation functions ---
-            function openModal() {
-                modal.classList.remove("hidden");
-                modal.classList.add("opacity-0");
-                modalContent.classList.add("scale-95");
-
-                requestAnimationFrame(() => {
-                    modal.classList.remove("opacity-0");
-                    modal.classList.add("opacity-100");
-                    modalContent.classList.remove("scale-95");
-                    modalContent.classList.add("scale-100");
-                });
-            }
-
-            function closeModal() {
-                modal.classList.remove("opacity-100");
-                modal.classList.add("opacity-0");
-                modalContent.classList.remove("scale-100");
-                modalContent.classList.add("scale-95");
-
-                setTimeout(() => {
-                    modal.classList.add("hidden");
-                }, 300);
-            }
-
-            // open on card click
-            grid.addEventListener("click", (e) => {
-                const card = e.target.closest(".book-card");
-                if (!card) return;
-                const book = books[card.dataset.index];
-
-                modalImg.src = book.img && book.img !== "Wala" && book.img !== "wala" ? book.img : "";
-                modalImg.classList.toggle("hidden", !book.img || book.img === "Wala" || book.img ===
-                    "wala");
-                modalTitle.textContent = book.title;
-                modalAuthor.textContent = "by " + book.author;
-                modalAvailability.textContent = `${book.left} of ${book.left > 0 ? book.left + 2 : 0}`;
-                modalCallNumber.textContent = book.callNumber || "N/A";
-                modalAccessionNumber.textContent = book.AccessionNumber || "";
-                modalIsbn.textContent = book.isbn || "";
-                modalSubject.textContent = book.Subject || "";
-                modalPlace.textContent = book.Place || "";
-                modalPublisher.textContent = book.Publisher || "";
-                modalYear.textContent = book.Year || "";
-                modalEdition.textContent = book.Edition || "";
-                modalSupplementary.textContent = book.Supplementary || "";
-                modalDescription.textContent = book.description || "No description available.";
-
-                openModal();
-            });
-
-            // close handlers
-            closeModalBtn.addEventListener("click", closeModal);
-            modal.addEventListener("click", (e) => {
-                if (e.target === modal) closeModal();
-            });
-            document.addEventListener("keydown", (e) => {
-                if (e.key === "Escape" && !modal.classList.contains("hidden")) {
-                    closeModal();
-                }
-            });
+            card.appendChild(imgWrap);
+            card.appendChild(leftBadge);
+            card.appendChild(statusBadge);
+            card.appendChild(info);
+            grid.appendChild(card);
         });
-        </script>
-   
+
+        // --- Modal animation functions ---
+        function openModal() {
+            modal.classList.remove("hidden");
+            modal.classList.add("opacity-0");
+            modalContent.classList.add("scale-95");
+
+            requestAnimationFrame(() => {
+                modal.classList.remove("opacity-0");
+                modal.classList.add("opacity-100");
+                modalContent.classList.remove("scale-95");
+                modalContent.classList.add("scale-100");
+            });
+        }
+
+        function closeModal() {
+            modal.classList.remove("opacity-100");
+            modal.classList.add("opacity-0");
+            modalContent.classList.remove("scale-100");
+            modalContent.classList.add("scale-95");
+
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
+        }
+
+        // open on card click
+        grid.addEventListener("click", (e) => {
+            const card = e.target.closest(".book-card");
+            if (!card) return;
+            const book = books[card.dataset.index];
+
+            modalImg.src = book.img && book.img !== "Wala" && book.img !== "wala" ? book.img : "";
+            modalImg.classList.toggle("hidden", !book.img || book.img === "Wala" || book.img ===
+                "wala");
+            modalTitle.textContent = book.title;
+            modalAuthor.textContent = "by " + book.author;
+            modalAvailability.textContent = `${book.left} of ${book.left > 0 ? book.left + 2 : 0}`;
+            modalCallNumber.textContent = book.callNumber || "N/A";
+            modalAccessionNumber.textContent = book.AccessionNumber || "";
+            modalIsbn.textContent = book.isbn || "";
+            modalSubject.textContent = book.Subject || "";
+            modalPlace.textContent = book.Place || "";
+            modalPublisher.textContent = book.Publisher || "";
+            modalYear.textContent = book.Year || "";
+            modalEdition.textContent = book.Edition || "";
+            modalSupplementary.textContent = book.Supplementary || "";
+            modalDescription.textContent = book.description || "No description available.";
+
+            openModal();
+        });
+
+        // close handlers
+        closeModalBtn.addEventListener("click", closeModal);
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeModal();
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+                closeModal();
+            }
+        });
+    });
+    </script>
+
 </body>

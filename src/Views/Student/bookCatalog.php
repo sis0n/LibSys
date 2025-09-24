@@ -127,9 +127,6 @@
                 <div class="flex items-center gap-3">
                     <img id="modalImg" src="" alt="Book Cover" class="w-12 h-16 object-cover rounded-md bg-white" />
                     <div>
-                        <p id="modalStatus" class="text-xs mb-1"><span
-                                class="text-white text-xs bg-orange-600 px-2 py-1 rounded-md shadow">available</span>
-                        </p>
                         <h2 id="modalTitle" class="text-lg font-bold text-white">Book Title</h2>
                         <p id="modalAuthor" class="text-sm">by Author</p>
                     </div>
@@ -143,8 +140,8 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
                         <p class="text-xs text-orange-500 font-medium">Availability</p>
-                        <p id="modalAvailability" class="font-semibold text-green-600">0 of 0</p>
-                        <p class="text-xs text-orange-500">copies available</p>
+                        <p id="modalStatus" class="font-semibold">Available</p>
+                        <p class="text-xs text-orange-500">at library</p>
                     </div>
                     <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
                         <p class="text-xs text-orange-500 font-medium">Call Number</p>
@@ -202,7 +199,6 @@
                 Subject: "State, The. Liberty.",
                 img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                 status: "Available",
-                left: 3,
                 AccessionNumber: "00007914",
                 isbn: "N/A",
                 callNumber: "A 536 M4661 1908",
@@ -220,7 +216,6 @@
                 Subject: "State, The. Liberty.",
                 img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                 status: "Available",
-                left: 3,
                 AccessionNumber: "00007914",
                 isbn: "N/A",
                 callNumber: "A 536 M4661 1908",
@@ -237,7 +232,6 @@
                 Subject: "State, The. Liberty.",
                 img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                 status: "Available",
-                left: 3,
                 AccessionNumber: "00007914",
                 isbn: "N/A",
                 callNumber: "A 536 M4661 1908",
@@ -254,7 +248,6 @@
                 Subject: "State, The. Liberty.",
                 img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                 status: "Available",
-                left: 3,
                 AccessionNumber: "00007914",
                 isbn: "N/A",
                 callNumber: "A 536 M4661 1908",
@@ -271,7 +264,6 @@
                 Subject: "State, The. Liberty.",
                 img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                 status: "Available",
-                left: 3,
                 AccessionNumber: "00007914",
                 isbn: "N/A",
                 callNumber: "A 536 M4661 1908",
@@ -288,7 +280,6 @@
                 Subject: "State, The. Liberty.",
                 img: "/Libsys/assets/books-img/On-Liberty-Man.png",
                 status: "Borrowed",
-                left: 0,
                 AccessionNumber: "00007914",
                 isbn: "N/A",
                 callNumber: "A 536 M4661 1908",
@@ -306,7 +297,6 @@
                 img: "Wala" //sample lang to test if wala ang image
                     ,
                 status: "Available",
-                left: 3,
                 AccessionNumber: "00007914",
                 isbn: "N/A",
                 callNumber: "A 536 M4661 1908",
@@ -369,14 +359,9 @@
                 imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
             }
 
-            const leftBadge = document.createElement("span");
-            leftBadge.className =
-                `absolute top-2 left-2 ${book.left > 0 ? "bg-[var(--color-green-500)]" : "bg-gray-400"} text-white text-xs px-2 py-1 rounded-full shadow`;
-            leftBadge.textContent = `${book.left} left`;
-
             const statusBadge = document.createElement("span");
             statusBadge.className =
-                `absolute top-2 right-2 ${book.status === "Available" ? "bg-[var(--color-orange-500)]" : "bg-green-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
+                `absolute top-2 left-2 ${book.status === "Available" ? "bg-[var(--color-green-500)]" : "bg-orange-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
             statusBadge.textContent = book.status;
 
             const info = document.createElement("div");
@@ -388,7 +373,6 @@
             `;
 
             card.appendChild(imgWrap);
-            card.appendChild(leftBadge);
             card.appendChild(statusBadge);
             card.appendChild(info);
             grid.appendChild(card);
@@ -430,7 +414,6 @@
                 "wala");
             modalTitle.textContent = book.title;
             modalAuthor.textContent = "by " + book.author;
-            modalAvailability.textContent = `${book.left} of ${book.left > 0 ? book.left + 2 : 0}`;
             modalCallNumber.textContent = book.callNumber || "N/A";
             modalAccessionNumber.textContent = book.AccessionNumber || "";
             modalIsbn.textContent = book.isbn || "";
@@ -442,7 +425,7 @@
             modalSupplementary.textContent = book.Supplementary || "";
             modalDescription.textContent = book.description || "No description available.";
             modalStatus.innerHTML =
-                `<span class="text-white text-xs ${book.status === "Available" ? "bg-orange-600" : "bg-green-600"} px-2 py-1 rounded-md shadow">${book.status.toLowerCase()}</span>`;
+                `<span class="text-xs ${book.status === "Available" ? "text-green-600" : "text-orange-400"}">${book.status.toLowerCase()}</span>`;
 
             openModal();
         });

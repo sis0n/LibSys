@@ -139,13 +139,13 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
-                        <p class="text-xs text-orange-500 font-medium">Availability</p>
+                        <p class="text-sm text-orange-500 font-medium">Availability</p>
                         <p id="modalStatus" class="font-semibold">Available</p>
-                        <p class="text-xs text-orange-500">at library</p>
+                        <p class="text-xs text-orange-500">in library</p>
                     </div>
                     <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
-                        <p class="text-xs text-orange-500 font-medium">Call Number</p>
-                        <p id="modalCallNumber" class="font-semibold">N/A</p>
+                        <p class="text-sm text-orange-500 font-medium">Call Number</p>
+                        <p id="modalCallNumber" class="text-xs py-1 font-semibold">N/A</p>
                         <p class="text-xs text-orange-500">in library</p>
                     </div>
                 </div>
@@ -361,7 +361,7 @@
 
             const statusBadge = document.createElement("span");
             statusBadge.className =
-                `absolute top-2 left-2 ${book.status === "Available" ? "bg-[var(--color-green-500)]" : "bg-orange-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
+                `absolute top-2 right-3 ${book.status === "Available" ? "bg-[var(--color-green-500)]" : "bg-orange-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
             statusBadge.textContent = book.status;
 
             const info = document.createElement("div");
@@ -425,7 +425,7 @@
             modalSupplementary.textContent = book.Supplementary || "";
             modalDescription.textContent = book.description || "No description available.";
             modalStatus.innerHTML =
-                `<span class="text-xs ${book.status === "Available" ? "text-green-600" : "text-orange-400"}">${book.status.toLowerCase()}</span>`;
+                `<span class="text-xs ${book.status === "Available" ? "text-green-600" : "text-orange-700"}">${book.status}</span>`;
 
             openModal();
         });

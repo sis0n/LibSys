@@ -189,7 +189,7 @@
                         <p id="modalAuthor" class="text-sm">by Author</p>
                     </div>
                 </div>
-                <button id="closeModal" class="text-white text-xl"><i class="ph ph-x-circle"></i></button>
+                <button id="closeModal" class="text-white text-2xl"><i class="ph ph-x-circle"></i></button>
             </div>
 
 

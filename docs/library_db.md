@@ -5,7 +5,7 @@ CREATE TABLE users (
   password VARCHAR(255),
   full_name VARCHAR(100),
   email VARCHAR(100),
-  role ENUM('superadmin','admin','librarian','student'),
+  role ENUM('superadmin','admin','librarian','student','scanner'),
   is_active BOOLEAN DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -21,3 +21,18 @@ Thumbs.db
 *.tmp
 *.swp
 *.lock
+
+# -----------------------------
+# PHP / Composer specific
+# -----------------------------
+
+# Logs and cache
+*.log
+*.cache
+
+# Environment files
+.env
+.env.*
+
+# PHPUnit cache
+.phpunit.result.cache

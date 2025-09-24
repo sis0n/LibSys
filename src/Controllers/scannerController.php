@@ -97,10 +97,11 @@ class ScannerController extends Controller
             $studentNumber = strtoupper(trim($studentNumber)); //force uppercase rin
         }
 
-        if (!$studentNumber || !$studentName) {
-            echo "Student number and name are required.";
-            return;
-        }
+        // comment ko muna yung name ni rerequired kasi.
+        // if (!$studentNumber || !$studentName) {
+        //     echo "Student number and name are required.";
+        //     return;
+        // }
 
         //check lang kung existing yung user
         $user = $this->userRepo->findByStudentNumber($studentNumber);

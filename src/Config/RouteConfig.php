@@ -127,6 +127,9 @@ class RouteConfig
         $router->post('checkout', 'CheckoutController@checkout', ['student']);
         // $router->get('student/qrBorrowingTicket', 'CheckoutController@qrTicket', ['student']);
 
+        $router->get('student/bookCatalog', 'BookController@catalog', ['student']);
+        $router->get('student/fetch', 'BookController@fetch', ['student']);
+
 
 
 

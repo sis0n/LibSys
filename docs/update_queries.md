@@ -98,3 +98,8 @@ CREATE TABLE borrow_transaction_items (
   FOREIGN KEY (book_id) REFERENCES books(book_id)
 );
 
+ALTER TABLE books 
+ADD COLUMN availability ENUM('available','borrowed') DEFAULT 'available';
+
+ALTER TABLE books ADD COLUMN quantity INT NOT NULL DEFAULT 1;
+ALTER TABLE books ADD COLUMN cover VARCHAR(255) NULL;

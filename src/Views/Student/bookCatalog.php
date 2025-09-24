@@ -19,40 +19,6 @@
                     class="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-input-background)] focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition" />
             </div>
 
-            <!-- CATEGORY DROPDOWN -->
-            <div class="relative">
-                <button id="categoryDropdownBtn"
-                    class="w-48 flex items-center justify-between px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-input-background)] hover:bg-[var(--color-orange-50)] transition">
-                    <span class="flex items-center gap-2 text-gray-700">
-                        <i class="ph ph-list text-gray-500"></i>
-                        <span id="categoryDropdownValue"
-                            class="truncate block max-w-[120px] text-ellipsis whitespace-nowrap">
-                            All Categories
-                        </span>
-                    </span>
-                    <i class="ph ph-caret-down text-gray-500"></i>
-                </button>
-
-                <!-- Menu -->
-                <div id="categoryDropdownMenu"
-                    class="absolute mt-2 w-48 bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-lg hidden z-20">
-                    <ul class="py-1">
-                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
-                                onclick="selectCategory(this,'All Categories')">All Categories</button></li>
-                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
-                                onclick="selectCategory(this,'Computer Science')">Computer Science</button></li>
-                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
-                                onclick="selectCategory(this,'Physics')">Physics</button></li>
-                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
-                                onclick="selectCategory(this,'Chemistry')">Chemistry</button></li>
-                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
-                                onclick="selectCategory(this,'Mathematics')">Mathematics</button></li>
-                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
-                                onclick="selectCategory(this,'History')">History</button></li>
-                    </ul>
-                </div>
-            </div>
-
             <!-- STATUS DROPDOWN -->
             <div class="relative">
                 <button id="statusDropdownBtn"
@@ -79,27 +45,6 @@
             </div>
 
             <script>
-            // CATEGORY
-            const categoryBtn = document.getElementById("categoryDropdownBtn");
-            const categoryMenu = document.getElementById("categoryDropdownMenu");
-            const categoryValue = document.getElementById("categoryDropdownValue");
-
-            categoryBtn.addEventListener("click", () => {
-                categoryMenu.classList.toggle("hidden");
-            });
-
-            function selectCategory(el, value) {
-                categoryValue.textContent = value;
-
-                // Clear highlight
-                document.querySelectorAll("#categoryDropdownMenu .dropdown-item")
-                    .forEach(item => item.classList.remove("bg-[var(--color-orange-200)]", "font-semibold"));
-
-                // Highlight selected
-                el.classList.add("bg-[var(--color-orange-200)]", "font-semibold");
-
-                categoryMenu.classList.add("hidden");
-            }
 
             // STATUS
             const statusBtn = document.getElementById("statusDropdownBtn");

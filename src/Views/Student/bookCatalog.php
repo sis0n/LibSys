@@ -210,24 +210,24 @@
 
                 <div class="text-sm bg-white rounded-lg border border-gray-200 p-3 space-y-1">
                     <p class="font-semibold text-foreground text-sm">Book Information</p>
-                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Accession
+                    <p><span class="text-amber-700 text-sm">Accession
                             Number:</span> <span id="modalAccessionNumber"
                             class="font-mono text-sm font-semibold text-orange-600"></span>
                     </p>
-                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">ISBN:</span> <span
+                    <p><span class="text-amber-700 text-sm">ISBN:</span> <span
                             id="modalIsbn"></span></p>
-                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Subject:</span>
+                    <p><span class="text-amber-700 text-sm">Subject:</span>
                         <span id="modalSubject"></span></p>
-                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Book Place:</span>
+                    <p><span class="text-amber-700 text-sm">Book Place:</span>
                         <span id="modalPlace"></span></p>
-                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Book
+                    <p><span class="text-amber-700 text-sm">Book
                             Publisher:</span> <span id="modalPublisher"></span></p>
-                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Year:</span> <span
+                    <p><span class="text-amber-700 text-sm">Year:</span> <span
                             id="modalYear"></span></p>
-                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Book
+                    <p><span class="text-amber-700 text-sm">Book
                             Edition:</span> <span id="modalEdition"></span>
                     </p>
-                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Book
+                    <p><span class="text-amber-700 text-sm">Book
                             Suplementary:</span> <span id="modalSupplementary"></span></p>
                 </div>
 

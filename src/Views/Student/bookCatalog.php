@@ -180,8 +180,11 @@
             <div
                 class="bg-gradient-to-r from-orange-500 to-amber-500 p-4 text-white flex-shrink-0 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <img id="modalImg" src="" alt="Book Cover" class="w-12 h-16 object-cover rounded bg-white" />
+                    <img id="modalImg" src="" alt="Book Cover" class="w-12 h-16 object-cover rounded-md bg-white" />
                     <div>
+                        <p id="modalStatus" class="text-xs mb-1"><span
+                                class="text-white text-xs bg-orange-600 px-2 py-1 rounded-md shadow">available</span>
+                        </p>
                         <h2 id="modalTitle" class="text-lg font-bold text-white">Book Title</h2>
                         <p id="modalAuthor" class="text-sm">by Author</p>
                     </div>
@@ -206,25 +209,31 @@
                 </div>
 
                 <div class="text-sm bg-white rounded-lg border border-gray-200 p-3 space-y-1">
-                    <p class="font-medium text-orange-500">Book Information</p>
-                    <p><span class="text-muted-foreground text-sm">Accession Number:</span> <span
-                            id="modalAccessionNumber" class="font-mono text-sm font-semibold text-orange-600"></span>
+                    <p class="font-semibold text-foreground text-sm">Book Information</p>
+                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Accession
+                            Number:</span> <span id="modalAccessionNumber"
+                            class="font-mono text-sm font-semibold text-orange-600"></span>
                     </p>
-                    <p><span class="ftext-muted-foreground text-sm">ISBN:</span> <span id="modalIsbn"></span></p>
-                    <p><span class="text-muted-foreground text-sm">Subject:</span> <span id="modalSubject"></span></p>
-                    <p><span class="text-muted-foreground text-sm">Book Place:</span> <span id="modalPlace"></span></p>
-                    <p><span class="text-muted-foreground text-sm">Book Publisher:</span> <span
-                            id="modalPublisher"></span></p>
-                    <p><span class="text-muted-foreground text-sm">Year:</span> <span id="modalYear"></span></p>
-                    <p><span class="text-muted-foreground text-sm">Book Edition:</span> <span id="modalEdition"></span>
+                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">ISBN:</span> <span
+                            id="modalIsbn"></span></p>
+                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Subject:</span>
+                        <span id="modalSubject"></span></p>
+                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Book Place:</span>
+                        <span id="modalPlace"></span></p>
+                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Book
+                            Publisher:</span> <span id="modalPublisher"></span></p>
+                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Year:</span> <span
+                            id="modalYear"></span></p>
+                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Book
+                            Edition:</span> <span id="modalEdition"></span>
                     </p>
-                    <p><span class="text-muted-foreground text-sm">Book Suplementary:</span> <span
-                            id="modalSupplementary"></span></p>
+                    <p class="flex justify-between items-center"><span class="text-amber-700 text-sm">Book
+                            Suplementary:</span> <span id="modalSupplementary"></span></p>
                 </div>
 
                 <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-3 border border-orange-200">
                     <p class="font-semibold text-orange-900 mb-2 text-sm">Description</p>
-                    <p id="modalDescription"></p>
+                    <p class="text-amber-700 text-sm" id="modalDescription"></p>
                 </div>
             </div>
 
@@ -333,7 +342,7 @@
                 author: "Mayer, Milton",
                 Subject: "State, The. Liberty.",
                 img: "/Libsys/assets/books-img/On-Liberty-Man.png",
-                status: "Unavailable",
+                status: "Borrowed",
                 left: 0,
                 AccessionNumber: "00007914",
                 isbn: "N/A",
@@ -385,6 +394,7 @@
         const modalYear = document.getElementById("modalYear");
         const modalEdition = document.getElementById("modalEdition");
         const modalSupplementary = document.getElementById("modalSupplementary");
+        const modalStatus = document.getElementById("modalStatus");
 
         grid.innerHTML = "";
 
@@ -421,7 +431,7 @@
 
             const statusBadge = document.createElement("span");
             statusBadge.className =
-                `absolute top-2 right-2 ${book.status === "Available" ? "bg-[var(--color-orange-500)]" : "bg-gray-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
+                `absolute top-2 right-2 ${book.status === "Available" ? "bg-[var(--color-orange-500)]" : "bg-green-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
             statusBadge.textContent = book.status;
 
             const info = document.createElement("div");
@@ -486,6 +496,8 @@
             modalEdition.textContent = book.Edition || "";
             modalSupplementary.textContent = book.Supplementary || "";
             modalDescription.textContent = book.description || "No description available.";
+            modalStatus.innerHTML =
+                `<span class="text-white text-xs ${book.status === "Available" ? "bg-orange-600" : "bg-green-600"} px-2 py-1 rounded-md shadow">${book.status.toLowerCase()}</span>`;
 
             openModal();
         });

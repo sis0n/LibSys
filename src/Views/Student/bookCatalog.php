@@ -177,7 +177,8 @@
                     transform scale-95 transition-transform duration-300 ease-out">
 
 
-            <div class="flex justify-between items-center bg-[var(--color-orange-500)] text-white px-4 py-3">
+            <div
+                class="bg-gradient-to-r from-orange-500 to-amber-500 p-4 text-white flex-shrink-0 flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <img id="modalImg" src="" alt="Book Cover" class="w-12 h-16 object-cover rounded bg-white" />
                     <div>
@@ -206,14 +207,19 @@
 
                 <div class="text-sm bg-white rounded-lg border border-gray-200 p-3 space-y-1">
                     <p class="font-medium text-orange-500">Book Information</p>
-                    <p><span class="font-semibold">Accession Number:</span> <span id="modalAccessionNumber"></span></p>
-                    <p><span class="font-semibold">ISBN:</span> <span id="modalIsbn"></span></p>
-                    <p><span class="font-semibold">Subject:</span> <span id="modalSubject"></span></p>
-                    <p><span class="font-semibold">Book Place:</span> <span id="modalPlace"></span></p>
-                    <p><span class="font-semibold">Book Publisher:</span> <span id="modalPublisher"></span></p>
-                    <p><span class="font-semibold">Year:</span> <span id="modalYear"></span></p>
-                    <p><span class="font-semibold">Book Edition:</span> <span id="modalEdition"></span></p>
-                    <p><span class="font-semibold">Book Suplementary:</span> <span id="modalSupplementary"></span></p>
+                    <p><span class="text-muted-foreground text-sm">Accession Number:</span> <span
+                            id="modalAccessionNumber" class="font-mono text-sm font-semibold text-orange-600"></span>
+                    </p>
+                    <p><span class="ftext-muted-foreground text-sm">ISBN:</span> <span id="modalIsbn"></span></p>
+                    <p><span class="text-muted-foreground text-sm">Subject:</span> <span id="modalSubject"></span></p>
+                    <p><span class="text-muted-foreground text-sm">Book Place:</span> <span id="modalPlace"></span></p>
+                    <p><span class="text-muted-foreground text-sm">Book Publisher:</span> <span
+                            id="modalPublisher"></span></p>
+                    <p><span class="text-muted-foreground text-sm">Year:</span> <span id="modalYear"></span></p>
+                    <p><span class="text-muted-foreground text-sm">Book Edition:</span> <span id="modalEdition"></span>
+                    </p>
+                    <p><span class="text-muted-foreground text-sm">Book Suplementary:</span> <span
+                            id="modalSupplementary"></span></p>
                 </div>
 
                 <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-3 border border-orange-200">

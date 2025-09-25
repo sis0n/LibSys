@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Repositories\BookRepository;
 use App\Core\Controller;
+use PDO;
 
 class BookController extends Controller
 {
@@ -77,5 +78,34 @@ class BookController extends Controller
       "books" => $books,
       "title" => "Filtered Books"
     ]);
+  }
+
+  public function catalog()
+  {
+    $books = $this->bookRepo->getAllBooks();
+
+    $availableCount = count(array_filter($books, function ($book) {
+      return isset($book['availability']) && strtolower($book['availability']) === 'available';
+    }));
+
+    $this->view("Student/bookCatalog", [
+      "books" => $books,
+      "available_count" => $availableCount,
+      "title" => "Book Catalog"
+    ]);
+  }
+
+  public function fetch()
+  {
+    $search = $_GET['search'] ?? '';
+    $offset = (int)($_GET['offset'] ?? 0);
+    $limit  = (int)($_GET['limit'] ?? 30);
+    $category = $_GET['category'] ?? '';
+    $status   = $_GET['status'] ?? '';
+
+    $books = $this->bookRepo->getPaginatedFiltered($limit, $offset, $search, $category, $status);
+
+    header('Content-Type: application/json');
+    echo json_encode($books);
   }
 }

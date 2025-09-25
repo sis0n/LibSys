@@ -1,6 +1,5 @@
 <?php
 namespace App\Models;
-
 class Book {
     public $book_id;
     public $accession_number;
@@ -15,5 +14,6 @@ class Book {
     public $book_isbn;
     public $book_supplementary;
     public $subject;
+    public $availability;
     public $created_at;
 }

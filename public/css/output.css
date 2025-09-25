@@ -209,16 +209,12 @@
     --text-2xl--line-height: calc(2 / 1.5);
     --text-3xl: 1.875rem;
     --text-3xl--line-height: calc(2.25 / 1.875);
-    --text-4xl: 2.25rem;
-    --text-4xl--line-height: calc(2.5 / 2.25);
     --text-5xl: 3rem;
     --text-5xl--line-height: 1;
     --text-6xl: 3.75rem;
     --text-6xl--line-height: 1;
     --text-7xl: 4.5rem;
     --text-7xl--line-height: 1;
-    --text-8xl: 6rem;
-    --text-8xl--line-height: 1;
     --text-9xl: 8rem;
     --text-9xl--line-height: 1;
     --font-weight-normal: 400;
@@ -504,12 +500,6 @@
   .mt-10 {
     margin-top: calc(var(--spacing) * 10);
   }
-  .mt-\[var\(--spacing-1\)\] {
-    margin-top: var(--spacing-1);
-  }
-  .mt-\[var\(--spacing-6\)\] {
-    margin-top: var(--spacing-6);
-  }
   .mt-auto {
     margin-top: auto;
   }
@@ -518,9 +508,6 @@
   }
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
-  }
-  .mr-\[var\(--spacing-2\)\] {
-    margin-right: var(--spacing-2);
   }
   .mb-0 {
     margin-bottom: calc(var(--spacing) * 0);
@@ -542,9 +529,6 @@
   }
   .mb-6 {
     margin-bottom: calc(var(--spacing) * 6);
-  }
-  .mb-\[var\(--spacing-4\)\] {
-    margin-bottom: var(--spacing-4);
   }
   .block {
     display: block;
@@ -582,11 +566,17 @@
   .h-12 {
     height: calc(var(--spacing) * 12);
   }
+  .h-14 {
+    height: calc(var(--spacing) * 14);
+  }
   .h-16 {
     height: calc(var(--spacing) * 16);
   }
   .h-18 {
     height: calc(var(--spacing) * 18);
+  }
+  .h-20 {
+    height: calc(var(--spacing) * 20);
   }
   .h-32 {
     height: calc(var(--spacing) * 32);
@@ -605,6 +595,9 @@
   }
   .w-12 {
     width: calc(var(--spacing) * 12);
+  }
+  .w-20 {
+    width: calc(var(--spacing) * 20);
   }
   .w-32 {
     width: calc(var(--spacing) * 32);
@@ -801,6 +794,9 @@
   .rounded-\[var\(--radius-lg\)\] {
     border-radius: var(--radius-lg);
   }
+  .rounded-\[var\(--radius-md\)\] {
+    border-radius: var(--radius-md);
+  }
   .rounded-full {
     border-radius: calc(infinity * 1px);
   }
@@ -940,6 +936,12 @@
   .bg-\[var\(--color-popover\)\] {
     background-color: var(--color-popover);
   }
+  .bg-\[var\(--color-primary\)\] {
+    background-color: var(--color-primary);
+  }
+  .bg-amber-50 {
+    background-color: var(--color-amber-50);
+  }
   .bg-black {
     background-color: var(--color-black);
   }
@@ -954,12 +956,6 @@
   }
   .bg-gray-400 {
     background-color: var(--color-gray-400);
-  }
-  .bg-gray-500 {
-    background-color: var(--color-gray-500);
-  }
-  .bg-gray-600 {
-    background-color: var(--color-gray-600);
   }
   .bg-green-50 {
     background-color: var(--color-green-50);
@@ -976,17 +972,11 @@
   .bg-orange-100 {
     background-color: var(--color-orange-100);
   }
-  .bg-orange-200 {
-    background-color: var(--color-orange-200);
-  }
   .bg-orange-500 {
     background-color: var(--color-orange-500);
   }
   .bg-orange-600 {
     background-color: var(--color-orange-600);
-  }
-  .bg-orange-700 {
-    background-color: var(--color-orange-700);
   }
   .bg-white {
     background-color: var(--color-white);
@@ -1051,9 +1041,6 @@
   .p-8 {
     padding: calc(var(--spacing) * 8);
   }
-  .p-\[var\(--spacing-6\)\] {
-    padding: var(--spacing-6);
-  }
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
   }
@@ -1081,14 +1068,8 @@
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
   }
-  .py-3 {
-    padding-block: calc(var(--spacing) * 3);
-  }
   .py-4 {
     padding-block: calc(var(--spacing) * 4);
-  }
-  .py-5 {
-    padding-block: calc(var(--spacing) * 5);
   }
   .py-6 {
     padding-block: calc(var(--spacing) * 6);
@@ -1101,9 +1082,6 @@
   }
   .py-\[var\(--spacing-1\)\] {
     padding-block: var(--spacing-1);
-  }
-  .py-\[var\(--spacing-20\)\] {
-    padding-block: var(--spacing-20);
   }
   .pr-4 {
     padding-right: calc(var(--spacing) * 4);
@@ -1134,10 +1112,6 @@
     font-size: var(--text-3xl);
     line-height: var(--tw-leading, var(--text-3xl--line-height));
   }
-  .text-4xl {
-    font-size: var(--text-4xl);
-    line-height: var(--tw-leading, var(--text-4xl--line-height));
-  }
   .text-5xl {
     font-size: var(--text-5xl);
     line-height: var(--tw-leading, var(--text-5xl--line-height));
@@ -1149,10 +1123,6 @@
   .text-7xl {
     font-size: var(--text-7xl);
     line-height: var(--tw-leading, var(--text-7xl--line-height));
-  }
-  .text-8xl {
-    font-size: var(--text-8xl);
-    line-height: var(--tw-leading, var(--text-8xl--line-height));
   }
   .text-base {
     font-size: var(--text-base);
@@ -1237,23 +1207,14 @@
   .text-\[var\(--color-primary\)\] {
     color: var(--color-primary);
   }
-  .text-\[var\(--font-size-4xl\)\] {
-    color: var(--font-size-4xl);
+  .text-\[var\(--color-primary-foreground\)\] {
+    color: var(--color-primary-foreground);
   }
   .text-\[var\(--font-size-base\)\] {
     color: var(--font-size-base);
   }
   .text-\[var\(--font-size-sm\)\] {
     color: var(--font-size-sm);
-  }
-  .text-\[var\(--font-size-xl\)\] {
-    color: var(--font-size-xl);
-  }
-  .text-amber-500 {
-    color: var(--color-amber-500);
-  }
-  .text-amber-600 {
-    color: var(--color-amber-600);
   }
   .text-amber-700 {
     color: var(--color-amber-700);
@@ -1273,29 +1234,8 @@
   .text-gray-800 {
     color: var(--color-gray-800);
   }
-  .text-green-200 {
-    color: var(--color-green-200);
-  }
-  .text-green-500 {
-    color: var(--color-green-500);
-  }
   .text-green-600 {
     color: var(--color-green-600);
-  }
-  .text-green-700 {
-    color: var(--color-green-700);
-  }
-  .text-orange-100 {
-    color: var(--color-orange-100);
-  }
-  .text-orange-200 {
-    color: var(--color-orange-200);
-  }
-  .text-orange-300 {
-    color: var(--color-orange-300);
-  }
-  .text-orange-400 {
-    color: var(--color-orange-400);
   }
   .text-orange-500 {
     color: var(--color-orange-500);
@@ -1467,6 +1407,13 @@
       }
     }
   }
+  .hover\:bg-\[var\(--color-orange-400\)\] {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-orange-400);
+      }
+    }
+  }
   .hover\:bg-\[var\(--color-orange-600\)\] {
     &:hover {
       @media (hover: hover) {
@@ -1499,6 +1446,13 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-orange-100);
+      }
+    }
+  }
+  .hover\:bg-orange-500 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-orange-500);
       }
     }
   }
@@ -1536,6 +1490,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-orange-600);
+      }
+    }
+  }
+  .hover\:text-\[var\(--color-orange-700\)\] {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-orange-700);
       }
     }
   }

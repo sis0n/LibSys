@@ -48,7 +48,7 @@
         <div id="selected-items"></div>
     </div>
 
-      <!-- Simulation Button pang testing lang pwede mo link to sa add to cart-->
+    <!-- Simulation Button pang testing lang pwede mo link to sa add to cart after nun tanggalin mo na to.-->
     <button onclick="simulateAdd()"
         class="mt-4 bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition">
         Simulate Add to Cart
@@ -57,16 +57,15 @@
     <script>
     //sample data for testing
     const sampleBooks = [{
-            id: 1,
-            title: "Columbia Encylopedia",
-            author: "Raimes, James",
-            accessionNumber: "978-0-123456-78-9",
-            subject: "Encyclopedias",
-            callnumber: "AE 5 R1329 1975 v.5",
-            icon: "ph-book",
-            type: "book"
-        },
-    ];
+        id: 1,
+        title: "Columbia Encylopedia",
+        author: "Raimes, James",
+        accessionNumber: "978-0-123456-78-9",
+        subject: "Encyclopedias",
+        callnumber: "AE 5 R1329 1975 v.5",
+        icon: "ph-book",
+        type: "book"
+    }, ];
 
     let cart = [];
 
@@ -79,7 +78,7 @@
     function clearCart() {
         cart = [];
         renderCart();
-                }
+    }
     // pang remove individual item sa cart
     function removeFromCart(index) {
         cart.splice(index, 1);
@@ -118,13 +117,17 @@
                         <div>
                             <h4 class="font-semibold">${item.title}</h4>
                             ${item.author ? `<p class="text-sm text-gray-600">by ${item.author}</p>` : ""}
-                            ${item.accessionNumber ? `<p class="text-sm text-gray-600">Accession Number: ${item.accessionNumber}</p>` : ""}
-                            ${item.subject ? `<p class="text-sm text-gray-600"><span class="font-semibold">Subject:</span> ${item.subject}</p>` : ""}
-                            ${item.callnumber ? `<p class="text-sm text-gray-600"><span class="font-semibold">Call Number:</span> ${item.callnumber}</p>` : ""}
+                            ${(item.accessionNumber || item.subject || item.callnumber) ? `
+                            <div class="flex flex-wrap gap-6 text-sm text-gray-600 mt-1">
+                                ${item.accessionNumber ? `<span class="font-semibold">Accession Number: ${item.accessionNumber}</span>` : ""}
+                                ${item.subject ? `<span><span class="font-semibold">Subject:</span> ${item.subject}</span>` : ""}
+                                ${item.callnumber ? `<span><span class="font-semibold">Call Number:</span> ${item.callnumber}</span>` : ""}
+                            </div>
+                        ` : ""}
                         </div>
                     </div>
                     <button onclick="removeFromCart(${index})" 
-                            class="text-[var(--color-foreground)] hover:text-[var(--color-orange-700)] transition">
+                            class="text-xl text-[var(--color-foreground)] hover:text-[var(--color-orange-700)] transition">
                         <i class="ph ph-trash"></i>
                     </button>
                 </div>`;

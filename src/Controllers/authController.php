@@ -83,4 +83,20 @@ class AuthController extends Controller{
     session_destroy();
     header("Location: /libsys/public/login");
   }
+
+
+
+// forgot password
+
+  public function forgotPassword(){
+    session_start();
+        if(empty($_SESSION['csrf_token'])){
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        $this->view("auth/forgotPassword", [
+            "title" => "Forgot Password",
+            "csrf_token" => $_SESSION['csrf_token']
+        ], false);
+  }
+  
 }

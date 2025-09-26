@@ -11,7 +11,7 @@ class SidebarController extends Controller
     public function studentDashboard()
     {
         $this->view("student/dashboard", [
-            "title" => "student Dashboard",
+            "title" => "Student Dashboard",
             "currentPage" => "dashboard"
         ]);
     }
@@ -64,12 +64,20 @@ class SidebarController extends Controller
         ]);
     }
 
+        public function studentChangePassword()
+    {
+        $this->view("student/changePassword", [
+            "title" => "Change Password",
+            "currentPage" => "changePassword"
+        ]);
+    }
+
     // Super Admin Display Caller 
 
     public function superAdminDashboard()
     {
         $this->view("superadmin/dashboard", [
-            "title" => "Superadmin Dashboard",
+            "title" => "Dashboard",
             "currentPage" => "dashboard"
         ]);
     }
@@ -77,7 +85,7 @@ class SidebarController extends Controller
     public function userManagement()
     {
         $this->view("superadmin/userManagement", [
-            "title"=> "Superadmin User Management",
+            "title"=> "User Management",
             "currentPage" => "userManagement"
         ]);
     }
@@ -85,7 +93,7 @@ class SidebarController extends Controller
     public function features()
     {
         $this->view("superadmin/features", [
-            "title"=> "Superadmin Features",
+            "title"=> "Features",
             "currentPage" => "features"
         ]);
     }
@@ -93,7 +101,7 @@ class SidebarController extends Controller
     public function bookManagement()
     {
         $this->view("superadmin/bookManagement", [
-            "title"=> "Superadmin Book Management",
+            "title"=> "Book Management",
             "currentPage" => "bookManagement"
         ]);
     }
@@ -101,7 +109,7 @@ class SidebarController extends Controller
     public function equipmentManagement()
     {
         $this->view("superadmin/equipmentManagement", [
-            "title"=> "Superadmin Equipment Management",
+            "title"=> "Equipment Management",
             "currentPage" => "equipmentManagement"
         ]);
     }
@@ -109,7 +117,7 @@ class SidebarController extends Controller
     public function qrScanner()
     {
         $this->view("superadmin/qrScanner", [
-            "title"=> "Superadmin QR Code Scanner",
+            "title"=> "QR Code Scanner",
             "currentPage" => "qrScanner"
         ]);
     }
@@ -117,14 +125,14 @@ class SidebarController extends Controller
     public function attendanceLogs()
     {
         $this->view("superadmin/attendanceLogs", [
-            "title"=> "Superadmin Attendance Logs",
+            "title"=> "Attendance Logs",
             "currentPage" => "attendanceLogs"
         ]);
     }
     public function topVisitor()
     {
         $this->view("superadmin/topVisitor", [
-            "title"=> "Superadmin Top Visitor",
+            "title"=> "Top Visitor",
             "currentPage" => "topVisitor"
         ]);
     }
@@ -132,7 +140,7 @@ class SidebarController extends Controller
     public function borrowingHistory()
     {
         $this->view("superadmin/borrowingHistory", [
-            "title"=> "Superadmin Borrowing History",
+            "title"=> "Borrowing History",
             "currentPage" => "borrowingHistory"
         ]);
     }
@@ -140,7 +148,7 @@ class SidebarController extends Controller
     public function overdueAlert()
     {
         $this->view("superadmin/overdueAlert", [
-            "title"=> "Superadmin Overdue Alert",
+            "title"=> "Overdue Alert",
             "currentPage" => "overdueAlert"
         ]);
     }
@@ -148,7 +156,7 @@ class SidebarController extends Controller
     public function globalLogs()
     {
         $this->view("superadmin/globalLogs", [
-            "title"=> "Superadmin Global Logs",
+            "title"=> "Global Logs",
             "currentPage" => "globalLogs"
         ]);
     }
@@ -157,18 +165,25 @@ class SidebarController extends Controller
     public function backupAndRestore()
     {
         $this->view("superadmin/backupAndRestore", [
-            "title"=> "Superadmin Backup & Restore",
+            "title"=> "Backup & Restore",
             "currentPage" => "backupAndRestore"
         ]);
     }
-    
+
+     public function superadminChangePassword()
+    {
+        $this->view("superadmin/changePassword", [
+            "title" => "Change Password",
+            "currentPage" => "changePassword"
+        ]);
+    }
     
     // Admin Display Caller
 
     public function adminDashboard()
     {
         $this->view("admin/dashboard", [
-            "title" => "admin Dashboard",
+            "title" => "Admin Dashboard",
             "currentPage" => "dashboard"
         ]);
     }
@@ -176,7 +191,7 @@ class SidebarController extends Controller
     public function adminUserManagement()
     {
         $this->view("admin/userManagement", [
-            "title"=> "admin User Management",
+            "title"=> "Admin User Management",
             "currentPage" => "userManagement"
         ]);
     }
@@ -184,7 +199,7 @@ class SidebarController extends Controller
     public function adminFeatures()
     {
         $this->view("admin/features", [
-            "title"=> "admin Features",
+            "title"=> "Admin Features",
             "currentPage" => "features"
         ]);
     }
@@ -192,7 +207,7 @@ class SidebarController extends Controller
     public function adminBookManagement()
     {
         $this->view("admin/bookManagement", [
-            "title"=> "admin Book Management",
+            "title"=> "Admin Book Management",
             "currentPage" => "bookManagement"
         ]);
     }
@@ -200,7 +215,7 @@ class SidebarController extends Controller
     public function adminEquipmentManagement()
     {
         $this->view("admin/equipmentManagement", [
-            "title"=> "admin Equipment Management",
+            "title"=> "Admin Equipment Management",
             "currentPage" => "equipmentManagement"
         ]);
     }
@@ -215,7 +230,7 @@ class SidebarController extends Controller
     public function adminAttendanceLogs()
     {
         $this->view("admin/attendanceLogs", [
-            "title"=> "admin Attendance Logs",
+            "title"=> "Admin Attendance Logs",
             "currentPage" => "attendanceLogs"
         ]);
     }
@@ -230,7 +245,7 @@ class SidebarController extends Controller
     public function adminBorrowingHistory()
     {
         $this->view("admin/borrowingHistory", [
-            "title"=> "admin Borrowing History",
+            "title"=> "Admin Borrowing History",
             "currentPage" => "borrowingHistory"
         ]);
     }
@@ -238,7 +253,7 @@ class SidebarController extends Controller
     public function adminOverdueAlert()
     {
         $this->view("admin/overdueAlert", [
-            "title"=> "admin Overdue Alert",
+            "title"=> "Admin Overdue Alert",
             "currentPage" => "overdueAlert"
         ]);
     }
@@ -246,7 +261,7 @@ class SidebarController extends Controller
     public function adminGlobalLogs()
     {
         $this->view("admin/globalLogs", [
-            "title"=> "admin Global Logs",
+            "title"=> "Admin Global Logs",
             "currentPage" => "globalLogs"
         ]);
     }
@@ -255,8 +270,16 @@ class SidebarController extends Controller
     public function adminBackupAndRestore()
     {
         $this->view("admin/backupAndRestore", [
-            "title"=> "admin Backup & Restore",
+            "title"=> "Admin Backup & Restore",
             "currentPage" => "backupAndRestore"
+        ]);
+    }
+
+     public function adminChangePassword()
+    {
+        $this->view("admin/changePassword", [
+            "title" => "Admin Change Password",
+            "currentPage" => "changePassword"
         ]);
     }
 
@@ -265,7 +288,7 @@ class SidebarController extends Controller
     public function librarianDashboard()
     {
         $this->view("librarian/dashboard", [
-            "title" => "librarian Dashboard",
+            "title" => "Librarian Dashboard",
             "currentPage" => "dashboard"
         ]);
     }
@@ -273,7 +296,7 @@ class SidebarController extends Controller
     public function librarianUserManagement()
     {
         $this->view("librarian/userManagement", [
-            "title"=> "librarian User Management",
+            "title"=> "Librarian User Management",
             "currentPage" => "userManagement"
         ]);
     }
@@ -281,7 +304,7 @@ class SidebarController extends Controller
     public function librarianFeatures()
     {
         $this->view("librarian/features", [
-            "title"=> "librarian Features",
+            "title"=> "Librarian Features",
             "currentPage" => "features"
         ]);
     }
@@ -289,7 +312,7 @@ class SidebarController extends Controller
     public function librarianBookManagement()
     {
         $this->view("librarian/bookManagement", [
-            "title"=> "librarian Book Management",
+            "title"=> "Librarian Book Management",
             "currentPage" => "bookManagement"
         ]);
     }
@@ -297,7 +320,7 @@ class SidebarController extends Controller
     public function librarianEquipmentManagement()
     {
         $this->view("librarian/equipmentManagement", [
-            "title"=> "librarian Equipment Management",
+            "title"=> "Librarian Equipment Management",
             "currentPage" => "equipmentManagement"
         ]);
     }
@@ -313,7 +336,7 @@ class SidebarController extends Controller
     public function librarianAttendanceLogs()
     {
         $this->view("librarian/attendanceLogs", [
-            "title"=> "librarian Attendance Logs",
+            "title"=> "Librarian Attendance Logs",
             "currentPage" => "attendanceLogs"
         ]);
     }
@@ -328,7 +351,7 @@ class SidebarController extends Controller
     public function librarianBorrowingHistory()
     {
         $this->view("librarian/borrowingHistory", [
-            "title"=> "librarian Borrowing History",
+            "title"=> "Librarian Borrowing History",
             "currentPage" => "borrowingHistory"
         ]);
     }
@@ -336,7 +359,7 @@ class SidebarController extends Controller
     public function librarianOverdueAlert()
     {
         $this->view("librarian/overdueAlert", [
-            "title"=> "librarian Overdue Alert",
+            "title"=> "Librarian Overdue Alert",
             "currentPage" => "overdueAlert"
         ]);
     }
@@ -344,7 +367,7 @@ class SidebarController extends Controller
     public function librarianGlobalLogs()
     {
         $this->view("librarian/globalLogs", [
-            "title"=> "librarian Global Logs",
+            "title"=> "Librarian Global Logs",
             "currentPage" => "globalLogs"
         ]);
     }
@@ -353,8 +376,16 @@ class SidebarController extends Controller
     public function librarianBackupAndRestore()
     {
         $this->view("librarian/backupAndRestore", [
-            "title"=> "librarian Backup & Restore",
+            "title"=> "Librarian Backup & Restore",
             "currentPage" => "backupAndRestore"
+        ]);
+    }
+
+     public function librarianChangePassword()
+    {
+        $this->view("librarian/changePassword", [
+            "title" => "Librarian Change Password",
+            "currentPage" => "changePassword"
         ]);
     }
     

@@ -117,7 +117,7 @@
     <!-- Results Header -->
     <div class="flex justify-between items-center mb-4">
         <p class="font-medium">
-            <span class="font-bold">Books Found</span>
+            <span class="font-bold">Book/s</span>
         </p>
         <div class="flex gap-3 items-center">
             <span id="availableCount"
@@ -136,7 +136,7 @@
     <!-- Books Grid -->
     <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4"></div>
 
-    <p id="noBooksFound" class="text-gray-500 text-center w-full hidden">No books found.</p>
+    <p id="noBooksFound" class="text-gray-500 text-center text-xl w-full hidden">No books found.</p>
 
 
     <div id="loadingSkeletons" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
@@ -328,11 +328,11 @@
                 statusBadge.textContent = book.availability === "available" ? "Available" : "Borrowed";
 
                 const info = document.createElement("div");
-                info.className = "p-2";
+                info.className = "p-2 group-hover:bg-gray-200 transition";
                 info.innerHTML = `
-                <h4 class="text-xs font-semibold mb-0.5">${book.title}</h4>
-                <p class="text-[10px] text-gray-500">by ${book.author || "Unknown"}</p>
-                <p class="text-[10px] font-medium text-[var(--color-primary)] mt-0.5 truncate w-full" title="${book.subject || ''}"> ${book.subject || ""}</p>
+                <h4 class="text-xs font-semibold mb-0.5 truncate w-full group-hover:text-[var(--color-primary)] transition">${book.title}</h4>
+                <p class="text-[10px] text-gray-500 truncate w-full">by ${book.author || "Unknown"}</p>
+                <p class="text-[10px] font-medium text-[var(--color-primary)] mt-0.5 truncate w-full" title="${book.subject || ''}"> ${book.subject || "N/A"}</p>
                  `;
                 card.appendChild(imgWrap);
                 card.appendChild(statusBadge);
@@ -359,7 +359,7 @@
             modalAccessionNumber.textContent = book.accession_number || "";
             modalIsbn.textContent = book.book_isbn || "";
             modalSubject.textContent = book.subject || "";
-            modalPlace.textContent = book.book_place || "";
+            modalPlace.textContent = book.book_place || "Unknown";
             modalPublisher.textContent = book.book_publisher || "";
             modalYear.textContent = book.year || "";
             modalEdition.textContent = book.book_edition || "";

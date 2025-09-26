@@ -119,7 +119,7 @@
                             ${item.author ? `<p class="text-sm text-gray-600">by ${item.author}</p>` : ""}
                             ${(item.accessionNumber || item.subject || item.callnumber) ? `
                             <div class="flex flex-wrap gap-6 text-sm text-gray-600 mt-1">
-                                ${item.accessionNumber ? `<span class="font-semibold">Accession Number: ${item.accessionNumber}</span>` : ""}
+                                ${item.accessionNumber ? `<span><span class="font-semibold">Accession Number:</span> ${item.accessionNumber}</span>` : ""}
                                 ${item.subject ? `<span><span class="font-semibold">Subject:</span> ${item.subject}</span>` : ""}
                                 ${item.callnumber ? `<span><span class="font-semibold">Call Number:</span> ${item.callnumber}</span>` : ""}
                             </div>

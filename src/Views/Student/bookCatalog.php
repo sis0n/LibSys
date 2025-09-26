@@ -168,7 +168,7 @@
                         <p id="modalAuthor" class="text-sm">by Author</p>
                     </div>
                 </div>
-                <button id="closeModal" class="text-white text-2xl"><i class="ph ph-x-circle"></i></button>
+                <button id="closeModal" class="text-white text-3xl"><i class="ph ph-x-circle"></i></button>
             </div>
 
             <div class="p-4 space-y-4">

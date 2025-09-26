@@ -103,6 +103,16 @@ switch ($role) {
                 <i class="ph ph-clock-counter-clockwise text-2xl"></i>
                 <span class="text-base">My Borrowing History</span>
             </a>
+
+            
+             <!-- Change Password -->
+            <a href="/libsys/public/student/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'changePassword')
+               ? 'bg-green-600 text-white font-medium'
+               : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-key text-2xl"></i>
+                <span class="text-base">Change Password</span>
+            </a>
         </nav>
 
         <!-- Super Admin Sidebar  -->

@@ -168,7 +168,10 @@
                         <p id="modalAuthor" class="text-sm">by Author</p>
                     </div>
                 </div>
-                <button id="closeModal" class="text-white text-3xl"><i class="ph ph-x-circle"></i></button>
+                <button id="closeModal" class="text-white text-3xl hover:text-orange-800 transition-colors duration-200">
+                    <i class="ph ph-x-circle"></i>
+                </button>
+
             </div>
 
             <div class="p-4 space-y-4">
@@ -321,7 +324,7 @@
 
                 const statusBadge = document.createElement("span");
                 statusBadge.className =
-                    `absolute top-2 right-2 ${book.availability === "available" ? "bg-[var(--color-orange-500)]" : "bg-red-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
+                    `absolute top-2 left-3 ${book.availability === "available" ? "bg-[var(--color-orange-500)]" : "bg-red-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
                 statusBadge.textContent = book.availability === "available" ? "Available" : "Borrowed";
 
                 const info = document.createElement("div");
@@ -329,9 +332,8 @@
                 info.innerHTML = `
                 <h4 class="text-xs font-semibold mb-0.5">${book.title}</h4>
                 <p class="text-[10px] text-gray-500">by ${book.author || "Unknown"}</p>
-                <p class="text-[10px] font-medium text-[var(--color-primary)] mt-0.5">${book.subject || ""}</p>
-            `;
-
+                <p class="text-[10px] font-medium text-[var(--color-primary)] mt-0.5 truncate w-full" title="${book.subject || ''}"> ${book.subject || ""}</p>
+                 `;
                 card.appendChild(imgWrap);
                 card.appendChild(statusBadge);
                 card.appendChild(info);

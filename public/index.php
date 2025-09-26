@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 // pang load lang ng lahat ng classes
 require __DIR__ . '/../vendor/autoload.php';

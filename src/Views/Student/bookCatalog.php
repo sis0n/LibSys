@@ -115,11 +115,8 @@
     </div>
 
     <!-- Results Header -->
-    <div class="flex justify-between items-center mb-4">
-        <p class="font-medium">
-            <span class="font-bold">Book/s</span>
-        </p>
-        <div class="flex gap-3 items-center">
+    <div class="flex items-end mb-4">
+        <div class="flex gap-3 items-center ml-auto">
             <span id="availableCount"
                 class="bg-[var(--color-green-100)] text-[var(--color-green-700)] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                 <i class="ph ph-check-circle"></i>
@@ -132,6 +129,7 @@
             </span>
         </div>
     </div>
+
 
     <!-- Books Grid -->
     <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4"></div>
@@ -168,7 +166,8 @@
                         <p id="modalAuthor" class="text-sm">by Author</p>
                     </div>
                 </div>
-                <button id="closeModal" class="text-white text-3xl hover:text-orange-800 transition-colors duration-200">
+                <button id="closeModal"
+                    class="text-white text-3xl hover:text-orange-800 transition-colors duration-200">
                     <i class="ph ph-x-circle"></i>
                 </button>
 

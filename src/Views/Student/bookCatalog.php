@@ -61,7 +61,7 @@
                         <li><button class="status-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
                                 onclick="selectStatus(this,'Available')">Available</button></li>
                         <li><button class="status-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
-                                onclick="selectStatus(this,'Borrowed')">Borrowed</button></li>
+                                onclick="selectStatus(this,'Borrowed')">Borrowed</button></li>  
                     </ul>
                 </div>
             </div>
@@ -174,14 +174,14 @@
             <div class="p-4 space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
-                        <p class="text-xs text-orange-500 font-medium">STATUS</p>
-                        <p id="modalStatus" class="font-semibold text-green-600">Available</p>
-                        <p class="text-xs text-orange-500">in library</p>
+                        <p class="text-md text-orange-500 font-medium">STATUS</p>
+                        <p id="modalStatus" class="font-semibold text-xs text-green-600 pl-1"> Available</p>
+                        <p class="text-xs text-orange-500 pl-1"> in library</p>
                     </div>
                     <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
-                        <p class="text-xs text-orange-500 font-medium">CALL NUMBER</p>
-                        <p id="modalCallNumber" class="text-md font-semibold">N/A</p>
-                        <p class="text-xs text-orange-500">in library</p>
+                        <p class="text-md text-orange-500 font-medium">CALL NUMBER</p>
+                        <p id="modalCallNumber" class="pl-1 text-xs font-semibold"> N/A</p>
+                        <p class="text-xs text-orange-500 pl-1 "> in library</p>
                     </div>
                 </div>
 

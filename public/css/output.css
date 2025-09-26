@@ -137,6 +137,7 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
+    --color-red-500: oklch(63.7% 0.237 25.331);
     --color-red-600: oklch(57.7% 0.245 27.325);
     --color-orange-50: oklch(98% 0.016 73.684);
     --color-orange-100: oklch(95.4% 0.038 75.164);
@@ -233,6 +234,7 @@
     --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
     --ease-out: cubic-bezier(0, 0, 0.2, 1);
     --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     --blur-sm: 8px;
     --default-transition-duration: 150ms;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -560,6 +562,12 @@
   .aspect-\[2\/3\] {
     aspect-ratio: 2/3;
   }
+  .h-3 {
+    height: calc(var(--spacing) * 3);
+  }
+  .h-4 {
+    height: calc(var(--spacing) * 4);
+  }
   .h-11 {
     height: calc(var(--spacing) * 11);
   }
@@ -592,6 +600,15 @@
   }
   .w-1 {
     width: calc(var(--spacing) * 1);
+  }
+  .w-1\/2 {
+    width: calc(1/2 * 100%);
+  }
+  .w-2\/3 {
+    width: calc(2/3 * 100%);
+  }
+  .w-3\/4 {
+    width: calc(3/4 * 100%);
   }
   .w-12 {
     width: calc(var(--spacing) * 12);
@@ -675,6 +692,9 @@
   }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
+  }
+  .animate-pulse {
+    animation: var(--animate-pulse);
   }
   .cursor-pointer {
     cursor: pointer;
@@ -793,9 +813,6 @@
   }
   .rounded-\[var\(--radius-lg\)\] {
     border-radius: var(--radius-lg);
-  }
-  .rounded-\[var\(--radius-md\)\] {
-    border-radius: var(--radius-md);
   }
   .rounded-full {
     border-radius: calc(infinity * 1px);
@@ -942,6 +959,9 @@
   .bg-amber-50 {
     background-color: var(--color-amber-50);
   }
+  .bg-amber-600 {
+    background-color: var(--color-amber-600);
+  }
   .bg-black {
     background-color: var(--color-black);
   }
@@ -953,6 +973,9 @@
   }
   .bg-gray-50 {
     background-color: var(--color-gray-50);
+  }
+  .bg-gray-200 {
+    background-color: var(--color-gray-200);
   }
   .bg-gray-400 {
     background-color: var(--color-gray-400);
@@ -977,6 +1000,12 @@
   }
   .bg-orange-600 {
     background-color: var(--color-orange-600);
+  }
+  .bg-red-500 {
+    background-color: var(--color-red-500);
+  }
+  .bg-red-600 {
+    background-color: var(--color-red-600);
   }
   .bg-white {
     background-color: var(--color-white);
@@ -1207,9 +1236,6 @@
   .text-\[var\(--color-primary\)\] {
     color: var(--color-primary);
   }
-  .text-\[var\(--color-primary-foreground\)\] {
-    color: var(--color-primary-foreground);
-  }
   .text-\[var\(--font-size-base\)\] {
     color: var(--font-size-base);
   }
@@ -1407,13 +1433,6 @@
       }
     }
   }
-  .hover\:bg-\[var\(--color-orange-400\)\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-orange-400);
-      }
-    }
-  }
   .hover\:bg-\[var\(--color-orange-600\)\] {
     &:hover {
       @media (hover: hover) {
@@ -1425,6 +1444,13 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-popover);
+      }
+    }
+  }
+  .hover\:bg-amber-700 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-amber-700);
       }
     }
   }
@@ -2048,6 +2074,11 @@
 @property --tw-ease {
   syntax: "*";
   inherits: false;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
 }
 @layer properties {
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {

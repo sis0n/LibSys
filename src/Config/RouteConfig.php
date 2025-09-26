@@ -21,6 +21,13 @@ class RouteConfig
 
         /**
          * ========================
+         * forgot password route
+         * ========================
+         */
+        $router->get('forgotPassword', 'AuthController@forgotPassword');
+
+        /**
+         * ========================
          * scanner route
          * ========================
          */

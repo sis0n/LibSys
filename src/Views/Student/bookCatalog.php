@@ -161,10 +161,9 @@
                 <i class="ph ph-check-circle"></i>
                 Available: <?= isset($available_count) ? $available_count : 0 ?>
             </span>
-            <span
+            <span id="cart-count"
                 class="bg-[var(--color-orange-100)] text-[var(--color-orange-700)] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                <i class="ph ph-shopping-cart"></i>
-                <!-- condition na mag lalagay ng laman ng cart --> in cart
+                <i class="ph ph-shopping-cart text-xs"></i> 0 total items
             </span>
         </div>
     </div>
@@ -236,7 +235,9 @@
             </div>
 
             <div class="px-3 py-4 bg-gray-50">
-                <button data-slot="add-to-cart" class="inline-flex items-center justify-center whitespace-nowrap text-sm disabled:pointer-events-none disabled:opacity-50 w-full gap-3 h-11 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl font-semibold">
+                <button id="addToCartBtn"
+                    data-id=""
+                    class="inline-flex items-center justify-center whitespace-nowrap text-sm disabled:pointer-events-none disabled:opacity-50 w-full gap-3 h-11 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl font-semibold">
                     <span><i class="ph ph-shopping-cart-simple"></i></span> Add to Cart
                 </button>
             </div>
@@ -248,6 +249,8 @@
             const grid = document.getElementById("booksGrid");
             const skeletons = document.getElementById("loadingSkeletons");
             const searchInput = document.querySelector("input[placeholder*='Search']");
+            const cartCount = document.getElementById("cart-count");
+
 
             const modal = document.getElementById("bookModal");
             const modalContent = document.getElementById("bookModalContent");
@@ -267,13 +270,83 @@
             const modalEdition = document.getElementById("modalEdition");
             const modalSupplementary = document.getElementById("modalSupplementary");
             const modalStatus = document.getElementById("modalStatus");
+            const addToCartBtn = document.getElementById("addToCartBtn");
 
             let offset = 0;
             const limit = 30;
             let isLoading = false;
             let hasMore = true;
             let searchValue = "";
+            let cart = [];
 
+            async function loadCart() {
+                try {
+                    const res = await fetch("/libsys/public/student/cart/json");
+                    if (!res.ok) throw new Error("Failed to load cart");
+                    cart = await res.json();
+                    updateCartBadge();
+                } catch (err) {
+                    console.error("Error loading cart:", err);
+                }
+            }
+
+            async function updateCartBadge() {
+                cartCount.textContent = `${cart.length} total item(s)`;
+                const cartIcon = document.createElement("i");
+                cartIcon.className = "ph ph-shopping-cart text-xs";
+                cartCount.insertBefore(cartIcon, cartCount.firstChild);
+            }
+
+            async function addToCart(bookId) {
+                try {
+                    const res = await fetch(`/libsys/public/student/cart/add/${bookId}`);
+                    const data = await res.json();
+                    if (data.success) {
+                        cart = data.cart;
+                        updateCartBadge();
+                        alert("Book added to cart!");
+                    } else {
+                        alert("Book is already in cart!");
+                    }
+                } catch (err) {
+                    console.error("Error adding to cart:", err);
+                }
+            }
+
+            async function removeFromCart(cartId) {
+                try {
+                    const res = await fetch(`/libsys/public/student/cart/remove/${cartId}`, {
+                        method: "POST"
+                    });
+                    if (!res.ok) throw new Error("Failed to remove item");
+                    cart = cart.filter(item => item.cart_id !== cartId);
+                    updateCartBadge();
+                    alert("Item removed from cart");
+                } catch (err) {
+                    console.error("Error removing item:", err);
+                }
+            }
+
+            async function clearCart() {
+                try {
+                    const res = await fetch("/libsys/public/student/cart/clear", {
+                        method: "POST"
+                    });
+                    if (!res.ok) throw new Error("Failed to clear cart");
+                    cart = [];
+                    updateCartBadge();
+                    alert("Cart cleared!");
+                } catch (err) {
+                    console.error("Error clearing cart:", err);
+                }
+            }
+
+            addToCartBtn.addEventListener("click", () => {
+                const bookId = addToCartBtn.dataset.id;
+                if (bookId) addToCart(bookId);
+            });
+
+            // ====== LOAD BOOKS ======
             async function loadBooks(reset = false) {
                 if (isLoading || (!hasMore && !reset)) return;
                 isLoading = true;
@@ -286,8 +359,7 @@
                 }
 
                 skeletons.style.display = "grid";
-
-                const skeletonStart = Date.now(); 
+                const skeletonStart = Date.now();
 
                 try {
                     const params = new URLSearchParams({
@@ -295,27 +367,20 @@
                         offset,
                         search: searchValue
                     });
-
                     const res = await fetch(`/libsys/public/student/fetch?${params.toString()}`);
                     const data = await res.json();
-                    const filtered = searchValue ? filterBooks(data, searchValue) : data;
-
                     if (reset) grid.innerHTML = "";
 
                     const elapsed = Date.now() - skeletonStart;
-                    const minTime = 600;
-                    if (elapsed < minTime) {
-                        await new Promise(resolve => setTimeout(resolve, minTime - elapsed));
-                    }
-
+                    if (elapsed < 600) await new Promise(r => setTimeout(r, 600 - elapsed));
                     skeletons.style.display = "none";
 
-                    if (filtered.length === 0) {
+                    if (!data.length) {
                         document.getElementById("noBooksFound").classList.remove("hidden");
                         hasMore = false;
                     } else {
                         document.getElementById("noBooksFound").classList.add("hidden");
-                        await renderBooks(filtered);
+                        renderBooks(data);
                         offset += limit;
                         if (data.length < limit) hasMore = false;
                     }
@@ -334,6 +399,7 @@
                     card.className = "book-card relative bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden group transform transition duration-400 hover:-translate-y-1 hover:shadow-lg max-w-[230px] cursor-pointer";
                     card.dataset.book = JSON.stringify(book);
 
+                    // Book cover
                     const imgWrap = document.createElement("div");
                     imgWrap.className = "w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden";
                     if (book.cover) {
@@ -342,10 +408,9 @@
                         img.alt = book.title;
                         img.className = "h-full w-auto object-contain group-hover:scale-105 transition duration-300";
                         imgWrap.appendChild(img);
-                    } else {
-                        imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
-                    }
+                    } else imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
 
+                    // Badges
                     const leftBadge = document.createElement("span");
                     leftBadge.className = `absolute top-2 left-2 ${book.quantity > 0 ? "bg-[var(--color-green-500)]" : "bg-gray-400"} text-white text-xs px-2 py-1 rounded-full shadow`;
                     leftBadge.textContent = `${book.quantity ?? 0} left`;
@@ -368,19 +433,22 @@
                     card.appendChild(info);
                     grid.appendChild(card);
 
+                    // Highlight if in cart
+                    if (cart.some(c => c.book_id == book.book_id)) {
+                        const badge = document.createElement("span");
+                        badge.className = "absolute bottom-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full shadow";
+                        badge.textContent = "In Cart";
+                        card.appendChild(badge);
+                    }
                 });
             }
 
-
-
             function openModal(book) {
+                addToCartBtn.dataset.id = book.book_id;
                 if (book.cover) {
                     modalImg.src = book.cover;
                     modalImg.classList.remove("hidden");
-                } else {
-                    modalImg.classList.add("hidden");
-                }
-
+                } else modalImg.classList.add("hidden");
                 modalTitle.textContent = book.title;
                 modalAuthor.textContent = "by " + (book.author || "Unknown");
                 modalAvailability.textContent = `${book.quantity ?? 0} of ${book.quantity ?? 0}`;
@@ -394,8 +462,7 @@
                 modalEdition.textContent = book.book_edition || "";
                 modalSupplementary.textContent = book.book_supplementary || "";
                 modalDescription.textContent = book.description || "No description available.";
-
-                modalStatus.innerHTML = `<span class="text-white text-xs ${book.availability === "available" ? "bg-orange-600" : "bg-red-600"} px-2 py-1 rounded-md shadow">${book.availability}</span>`;
+                modalStatus.innerHTML = `<span class="text-white text-xs ${book.availability==="available"?"bg-orange-600":"bg-red-600"} px-2 py-1 rounded-md shadow">${book.availability}</span>`;
 
                 modal.classList.remove("hidden");
                 modal.classList.add("opacity-0");
@@ -408,27 +475,15 @@
                 });
             }
 
-            function filterBooks(books, query) {
-                const normalize = str => str.toLowerCase().replace(/[^\w\s]/g, "");
-                const q = normalize(query).trim().split(/\s+/);
-
-                return books.filter(book => {
-                    const text = normalize(`${book.title} ${book.author} ${book.subject}`);
-                    return q.every(word => text.includes(word));
-                });
-            }
-
             function closeModal() {
                 modal.classList.remove("opacity-100");
                 modal.classList.add("opacity-0");
                 modalContent.classList.remove("scale-100");
                 modalContent.classList.add("scale-95");
-                setTimeout(() => {
-                    modal.classList.add("hidden");
-                }, 300);
+                setTimeout(() => modal.classList.add("hidden"), 300);
             }
 
-            grid.addEventListener("click", (e) => {
+            grid.addEventListener("click", e => {
                 const card = e.target.closest(".book-card");
                 if (!card) return;
                 const book = JSON.parse(card.dataset.book);
@@ -436,33 +491,26 @@
             });
 
             closeModalBtn.addEventListener("click", closeModal);
-            modal.addEventListener("click", (e) => {
+            modal.addEventListener("click", e => {
                 if (e.target === modal) closeModal();
             });
-            document.addEventListener("keydown", (e) => {
-                if (e.key === "Escape" && !modal.classList.contains("hidden")) {
-                    closeModal();
-                }
+            document.addEventListener("keydown", e => {
+                if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
             });
 
-            let searchTimeout;
-            searchInput.addEventListener("input", (e) => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    searchValue = e.target.value.trim();
-                    loadBooks(true);
-                }, 400);
+            searchInput.addEventListener("input", e => {
+                searchValue = e.target.value.trim();
+                loadBooks(true);
             });
 
             window.addEventListener("scroll", () => {
-                if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
-                    loadBooks();
-                }
+                if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) loadBooks();
             });
 
-            loadBooks();
+            loadCart().then(() => loadBooks(true));
         });
     </script>
+
 
 
 </body>

@@ -19,6 +19,28 @@
                     class="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-input-background)] focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition" />
             </div>
 
+            <!-- CATEGORY DROPDOWN -->
+            <div class="relative">
+                <!-- Menu -->
+                <div id="categoryDropdownMenu"
+                    class="absolute mt-2 w-48 bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-lg hidden z-20">
+                    <ul class="py-1">
+                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
+                                onclick="selectCategory(this,'All Categories')">All Categories</button></li>
+                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
+                                onclick="selectCategory(this,'Computer Science')">Computer Science</button></li>
+                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
+                                onclick="selectCategory(this,'Physics')">Physics</button></li>
+                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
+                                onclick="selectCategory(this,'Chemistry')">Chemistry</button></li>
+                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
+                                onclick="selectCategory(this,'Mathematics')">Mathematics</button></li>
+                        <li><button class="dropdown-item w-full text-left px-4 py-2 hover:bg-[var(--color-orange-100)]"
+                                onclick="selectCategory(this,'History')">History</button></li>
+                    </ul>
+                </div>
+            </div>
+
             <!-- STATUS DROPDOWN -->
             <div class="relative">
                 <button id="statusDropdownBtn"
@@ -141,6 +163,7 @@
                     <img id="modalImg" src="" alt="Book Cover"
                         class="w-12 h-16 object-cover rounded-md bg-white hidden" />
                     <div>
+
                         <h2 id="modalTitle" class="text-lg font-bold text-white">Book Title</h2>
                         <p id="modalAuthor" class="text-sm">by Author</p>
                     </div>
@@ -150,14 +173,14 @@
 
             <div class="p-4 space-y-4">
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded flex flex-col items-center justify-center text-center">
-                        <p id="modalStatus" class="font-semibold text-lg">Available</p>
+                    <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
+                        <p class="text-xs text-orange-500 font-medium">STATUS</p>
+                        <p id="modalStatus" class="font-semibold text-green-600">Available</p>
                         <p class="text-xs text-orange-500">in library</p>
                     </div>
-
                     <div class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded">
-                        <p class="text-sm text-orange-500 font-medium">Call Number</p>
-                        <p id="modalCallNumber" class="text-xs py-1 font-semibold">N/A</p>
+                        <p class="text-xs text-orange-500 font-medium">CALL NUMBER</p>
+                        <p id="modalCallNumber" class="text-md font-semibold">N/A</p>
                         <p class="text-xs text-orange-500">in library</p>
                     </div>
                 </div>
@@ -202,7 +225,7 @@
         const modalImg = document.getElementById("modalImg");
         const modalTitle = document.getElementById("modalTitle");
         const modalAuthor = document.getElementById("modalAuthor");
-        const modalAvailability = document.getElementById("modalAvailability");
+        // const modalAvailability = document.getElementById("modalAvailability");
         const modalCallNumber = document.getElementById("modalCallNumber");
         const modalAccessionNumber = document.getElementById("modalAccessionNumber");
         const modalIsbn = document.getElementById("modalIsbn");
@@ -285,26 +308,22 @@
                 const imgWrap = document.createElement("div");
                 imgWrap.className =
                     "w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden";
-
-                if (book.img && book.img !== "Wala" && book.img !== "wala") {
+                if (book.cover) {
                     const img = document.createElement("img");
-                    img.src = book.img;
+                    img.src = book.cover;
                     img.alt = book.title;
                     img.className =
                         "h-full w-auto object-contain group-hover:scale-105 transition duration-300";
-                    img.onerror = () => {
-                        img.remove();
-                        imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
-                    };
                     imgWrap.appendChild(img);
                 } else {
                     imgWrap.innerHTML = `<i class="ph ph-book text-5xl text-gray-400"></i>`;
                 }
 
+
                 const statusBadge = document.createElement("span");
                 statusBadge.className =
-                    `absolute top-2 right-3 ${book.status === "Available" ? "bg-[var(--color-green-500)]" : "bg-orange-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
-                statusBadge.textContent = book.status;
+                    `absolute top-2 right-2 ${book.availability === "available" ? "bg-[var(--color-orange-500)]" : "bg-red-500"} text-white text-xs px-2 py-1 rounded-full shadow`;
+                statusBadge.textContent = book.availability === "available" ? "Available" : "Borrowed";
 
                 const info = document.createElement("div");
                 info.className = "p-2";
@@ -315,7 +334,6 @@
             `;
 
                 card.appendChild(imgWrap);
-                card.appendChild(leftBadge);
                 card.appendChild(statusBadge);
                 card.appendChild(info);
                 grid.appendChild(card);
@@ -335,7 +353,7 @@
 
             modalTitle.textContent = book.title;
             modalAuthor.textContent = "by " + (book.author || "Unknown");
-            modalAvailability.textContent = `${book.quantity ?? 0} of ${book.quantity ?? 0}`;
+            // modalAvailability.textContent = `${book.quantity ?? 0} of ${book.quantity ?? 0}`;
             modalCallNumber.textContent = book.call_number || "N/A";
             modalAccessionNumber.textContent = book.accession_number || "";
             modalIsbn.textContent = book.book_isbn || "";
@@ -347,8 +365,8 @@
             modalSupplementary.textContent = book.book_supplementary || "";
             modalDescription.textContent = book.description || "No description available.";
 
-            modalStatus.innerHTML =
-                `<span class="text-white text-xs ${book.availability === "available" ? "bg-orange-600" : "bg-red-600"} px-2 py-1 rounded-md shadow">${book.availability}</span>`;
+            modalStatus.innerHTML = `<span class="text-md ${(book.availability || "").toLowerCase() === "available"
+? "text-green-600" : "text-orange-600"}">${book.availability}</span>`;
 
             modal.classList.remove("hidden");
             modal.classList.add("opacity-0");

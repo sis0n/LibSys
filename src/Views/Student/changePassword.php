@@ -1,7 +1,3 @@
-<!-- Import Phosphor Icons -->
-<link rel="stylesheet" href="https://unpkg.com/phosphor-icons@1.4.2/src/css/phosphor.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
 
 <div class="flex justify-center items-center min-h-[80vh]">
   <div class="w-full max-w-md bg-white shadow-md rounded-xl p-6">
@@ -85,46 +81,6 @@
 
 <br>
 
-<!-- Security Section -->
-<div class="flex justify-center items-center min-h-[60vh] px-4">
-  <div class="max-w-[550px] bg-white shadow-md rounded-xl p-4">
-    <h2 class="text-xl font-semibold text-gray-800 flex items-center justify-center gap-2 mb-5">
-      <i class="ph ph-shield-check text-2xl"></i>
-      Password Security
-    </h2>
-    <br>
-    <!-- Two columns -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Column 1: Security Tips -->
-      <div>
-        <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
-          <i class="ph ph-check-circle text-green-500 text-2xl"></i>
-          Security Tips
-        </h3>
-        <ul class="list-disc list-inside text-gray-700 space-y-1 text-sm">
-          <li>At least 6 characters long</li>
-          <li>Mix of letters, numbers, and symbols</li>
-          <li>Avoid common words or phrases</li>
-          <li>Don't use personal information</li>
-        </ul>
-      </div>
-
-      <!-- Column 2: Security Reminders -->
-      <div>
-        <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
-          <i class="ph ph-info 2xl"></i>
-          Security Reminders
-        </h3>
-        <ul class="list-disc list-inside text-gray-700 space-y-1 text-sm">
-          <li>Never share your password</li>
-          <li>Log out from public computers</li>
-          <li>Change password if compromised</li>
-          <li>Use different passwords for different accounts</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

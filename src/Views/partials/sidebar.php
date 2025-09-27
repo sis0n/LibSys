@@ -36,9 +36,14 @@ switch ($role) {
             Library Online Software
         </span>
     </a>
-    <div class="flex-1 overflow-y-auto space-y-2">
-
-
+    <div  class="flex-1 overflow-y-auto space-y-2 
+               [scrollbar-width:none] 
+               [&::-webkit-scrollbar]:w-0 
+               hover:[scrollbar-width:thin] 
+               hover:[scrollbar-color:#d4d4d4_transparent] 
+               hover:[&::-webkit-scrollbar]:w-2 
+               hover:[&::-webkit-scrollbar-thumb]:bg-gray-300 
+               hover:[&::-webkit-scrollbar-thumb]:rounded">
 
         <!-- Student Sidebar -->
         <!-- Navigation -->

@@ -1294,6 +1294,9 @@
     --tw-outline-style: none;
     outline-style: none;
   }
+  .\[scrollbar-width\:none\] {
+    scrollbar-width: none;
+  }
   .group-hover\:scale-105 {
     &:is(:where(.group):hover *) {
       @media (hover: hover) {
@@ -1481,6 +1484,20 @@
       @media (hover: hover) {
         --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
         box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+      }
+    }
+  }
+  .hover\:\[scrollbar-color\:\#d4d4d4_transparent\] {
+    &:hover {
+      @media (hover: hover) {
+        scrollbar-color: #d4d4d4 transparent;
+      }
+    }
+  }
+  .hover\:\[scrollbar-width\:thin\] {
+    &:hover {
+      @media (hover: hover) {
+        scrollbar-width: thin;
       }
     }
   }
@@ -1680,6 +1697,38 @@
   .lg\:grid-cols-6 {
     @media (width >= 64rem) {
       grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+  .\[\&\:\:-webkit-scrollbar\]\:w-0 {
+    &::-webkit-scrollbar {
+      width: calc(var(--spacing) * 0);
+    }
+  }
+  .hover\:\[\&\:\:-webkit-scrollbar\]\:w-2 {
+    &:hover {
+      @media (hover: hover) {
+        &::-webkit-scrollbar {
+          width: calc(var(--spacing) * 2);
+        }
+      }
+    }
+  }
+  .hover\:\[\&\:\:-webkit-scrollbar-thumb\]\:rounded {
+    &:hover {
+      @media (hover: hover) {
+        &::-webkit-scrollbar-thumb {
+          border-radius: 0.25rem;
+        }
+      }
+    }
+  }
+  .hover\:\[\&\:\:-webkit-scrollbar-thumb\]\:bg-gray-300 {
+    &:hover {
+      @media (hover: hover) {
+        &::-webkit-scrollbar-thumb {
+          background-color: var(--color-gray-300);
+        }
+      }
     }
   }
 }

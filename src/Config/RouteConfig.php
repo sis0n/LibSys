@@ -131,7 +131,6 @@ class RouteConfig
          * STUDENT CART & CHECKOUT ROUTES
          * ========================
          */
-        // $router->get('student/myCart', 'CartController@index', ['student']);
         $router->get('student/cart', 'CartController@index', ['student']);
         $router->get('student/cart/add/{id}', 'CartController@add', ['student']);
         $router->post('student/cart/remove/{id}', 'CartController@remove', ['student']);
@@ -141,10 +140,9 @@ class RouteConfig
 
         // checkout routes
         $router->post('checkout', 'CheckoutController@checkout', ['student']);
-        // $router->get('student/qrBorrowingTicket', 'CheckoutController@qrTicket', ['student']);
 
-        // $router->get('student/bookCatalog', 'BookController@catalog', ['student']);
-        $router->get('student/fetch', 'BookController@fetch', ['student']);
+        $router->get('student/bookCatalog/availableCount', 'BookController@getAvailableCount', ['student']);
+        $router->get('student/bookCatalog/fetch', 'BookController@fetch', ['student']);
 
 
 

@@ -246,6 +246,7 @@ foreach ($logs as $log) {
         <?php endforeach; ?>
     </div>
     <?php else: ?>
+    <p class="text-gray-500 text-sm mb-4">No records found</p>
     <div
         class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
         <i class="ph ph-clipboard text-6xl"></i>

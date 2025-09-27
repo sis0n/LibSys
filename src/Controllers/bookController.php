@@ -91,7 +91,8 @@ class BookController extends Controller
     $this->view("Student/bookCatalog", [
       "books" => $books,
       "available_count" => $availableCount,
-      "title" => "Book Catalog"
+      "title" => "Book Catalog",
+      "currentPage" => "bookCatalog"
     ]);
   }
 

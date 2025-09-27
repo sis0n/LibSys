@@ -156,4 +156,10 @@ class BookRepository
 
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
+
+  public function countAvailableBooks(): int
+  {
+    $stmt = $this->db->query("SELECT COUNT(*) FROM books WHERE availability = 'available'");
+    return (int) $stmt->fetchColumn();
+  }
 }

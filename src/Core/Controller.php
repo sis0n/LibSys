@@ -26,10 +26,9 @@ class Controller
         if ($withLayout && file_exists($head)) {
             include $head;
         }
-
         if ($withLayout) {
-            echo '<body class="bg-gray-50 font-sans">';
-            echo '<div class="flex min-h-screen">';
+            echo '<body class="bg-gray-50 font-sans min-h-screen flex">'; // full screen height
+            echo '<div class="flex min-h-screen w-full">';
 
             // Sidebar
             if (file_exists($sidebar)) {
@@ -44,7 +43,7 @@ class Controller
                 include $header;
             }
 
-            // Main Content
+            // Main Content (expandable)
             echo '<main class="flex-1 p-6">';
             if (file_exists($viewPath)) {
                 include $viewPath;
@@ -54,15 +53,19 @@ class Controller
             }
             echo '</main>';
 
-            // Footer
+            // Footer (push to bottom)
             if (file_exists($footer)) {
+                echo '<div class="mt-auto">';
                 include $footer;
+                echo '</div>';
             }
 
             echo '</div>'; // close right side
             echo '</div>'; // close flex wrapper
             echo '</body>';
-        } else {
+        }
+
+         else {
             if (file_exists($viewPath)) {
                 include $viewPath;
             } else {

@@ -170,7 +170,7 @@ class SidebarController extends Controller
         ]);
     }
 
-     public function superadminChangePassword()
+     public function changePassword()
     {
         $this->view("superadmin/changePassword", [
             "title" => "Change Password",

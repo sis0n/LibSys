@@ -36,11 +36,14 @@ switch ($role) {
             Library Online Software
         </span>
     </a>
+    <div class="flex-1 overflow-y-auto space-y-2">
 
-    <!-- Student Sidebar -->
-    <!-- Navigation -->
-    <nav class="flex-1 px-4 py-6 space-y-2">
-        <?php if ($role === 'student'): ?>
+
+
+        <!-- Student Sidebar -->
+        <!-- Navigation -->
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <?php if ($role === 'student'): ?>
             <!-- Dashboard -->
             <a href="/libsys/public/student/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'dashboard')
@@ -104,8 +107,8 @@ switch ($role) {
                 <span class="text-base">My Borrowing History</span>
             </a>
 
-            
-             <!-- Change Password -->
+
+            <!-- Change Password -->
             <a href="/libsys/public/student/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'changePassword')
                ? 'bg-green-600 text-white font-medium'
@@ -118,7 +121,7 @@ switch ($role) {
         <!-- Super Admin Sidebar  -->
         <!-- Navigation -->
         <nav class="flex-1 px-4 py-6 space-y-2">
-        <?php elseif ($role === 'superadmin'): ?>
+            <?php elseif ($role === 'superadmin'): ?>
             <!-- Dashboard -->
             <a href="/LibSys/public/superadmin/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'dashboard'
@@ -226,12 +229,20 @@ switch ($role) {
                 <i class="ph ph-cloud-arrow-up text-2xl"></i>
                 <span>Backup & Restore</span>
             </a>
+            <!-- Change Password -->
+            <a href="/libsys/public/superadmin/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'changePassword')
+               ? 'bg-green-600 text-white font-medium'
+               : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-key text-2xl"></i>
+                <span class="text-base">Change Password</span>
+            </a>
         </nav>
 
         <!--Admin Sidebar  -->
         <!-- Navigation -->
         <nav class="flex-1 px-4 py-6 space-y-2">
-        <?php elseif ($role === 'admin'): ?>
+            <?php elseif ($role === 'admin'): ?>
             <!-- Dashboard -->
             <a href="/LibSys/public/admin/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'dashboard'
@@ -277,7 +288,7 @@ switch ($role) {
                 <span>Equipment Management</span>
             </a>
 
-             <!-- QR Code Scanner -->
+            <!-- QR Code Scanner -->
             <a href="/LibSys/public/admin/qrScanner" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'qrScanner'
                     ? 'bg-green-600 text-white font-medium'
@@ -339,12 +350,20 @@ switch ($role) {
                 <i class="ph ph-cloud-arrow-up text-2xl"></i>
                 <span>Backup & Restore</span>
             </a>
+            <!-- Change Password -->
+            <a href="/libsys/public/admin/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'changePassword')
+               ? 'bg-green-600 text-white font-medium'
+               : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-key text-2xl"></i>
+                <span class="text-base">Change Password</span>
+            </a>
         </nav>
 
         <!--Librarian Sidebar  -->
         <!-- Navigation -->
         <nav class="flex-1 px-4 py-6 space-y-2">
-        <?php elseif ($role === 'librarian'): ?>
+            <?php elseif ($role === 'librarian'): ?>
             <!-- Dashboard -->
             <a href="/LibSys/public/librarian/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'dashboard'
@@ -390,7 +409,7 @@ switch ($role) {
                 <span>Equipment Management</span>
             </a>
 
-             <!-- QR Code Scanner -->
+            <!-- QR Code Scanner -->
             <a href="/LibSys/public/librarian/qrScanner" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'qrScanner'
                     ? 'bg-green-600 text-white font-medium'
@@ -452,8 +471,17 @@ switch ($role) {
                 <i class="ph ph-cloud-arrow-up text-2xl"></i>
                 <span>Backup & Restore</span>
             </a>
+            <!-- Change Password -->
+            <a href="/libsys/public/librarian/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'changePassword')
+               ? 'bg-green-600 text-white font-medium'
+               : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-key text-2xl"></i>
+                <span class="text-base">Change Password</span>
+            </a>
         </nav>
+    </div>
 
-    </aside>
+</aside>
 <?php endif; ?>
 </aside>

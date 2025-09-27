@@ -1,27 +1,35 @@
-<!-- Outside Container -->
-<div class="flex flex-col items-center mt-6 min-h-[80vh]">
+<!-- Custom placeholder style -->
+<style>
+  .placeholder-orange-small::placeholder {
+    color: #AE400E;
+    /* orange */
+    font-size: 10px;
+    /* sobrang liit */
+  }
+</style>
 
-  <!-- Title -->
-  <div>
+<!-- Outside Container -->
+<div class="flex flex-col items-center mt-6 mb-6">
+
+  <!-- Title (same container width para align with form) -->
+  <div class="w-full max-w-[550px]">
     <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
       <i class="ph ph-lock-simple text-2xl"></i>
       Change Password
     </h1>
-    <p class="text-sm text-gray-500 mt-1 text-center">
+    <p class="text-sm text-gray-500 mt-1">
       Update your account password to keep your account secure.
     </p>
   </div>
 
   <!-- Card/Form -->
-  <div class="max-w-[550px] bg-white shadow-md rounded-xl p-6 mt-4">
-
+  <div class="w-full max-w-[550px] bg-white shadow-md rounded-xl p-6 mt-4">
     <!-- Header -->
     <h2 class="text-xl font-semibold text-gray-800 flex items-center mb-2 gap-2">
       <i class="ph ph-shield text-2xl"></i>
       Update Password
     </h2>
-
-    <p class="text-sm text-gray-500 text-center mb-5">
+    <p class="text-sm text-gray-500 mb-5">
       Update your account password to keep your account secure.
     </p>
 
@@ -40,7 +48,9 @@
             id="current_password"
             placeholder="Enter current password"
             required
-            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder:text-[#AE400E] placeholder:text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:outline-none transition duration-200">
+            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder-orange-small
+                   focus:border-orange-500 focus:ring-2 focus:ring-orange-500 
+                   focus:outline-none transition duration-200">
           <button
             type="button"
             onclick="togglePassword('current_password', this)"
@@ -62,7 +72,9 @@
             id="new_password"
             placeholder="Enter new password"
             required
-            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder:text-[#AE400E] placeholder:text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:outline-none transition duration-200">
+            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder-orange-small
+                   focus:border-orange-500 focus:ring-2 focus:ring-orange-500 
+                   focus:outline-none transition duration-200">
           <button
             type="button"
             onclick="togglePassword('new_password', this)"
@@ -84,7 +96,9 @@
             id="confirm_password"
             placeholder="Confirm new password"
             required
-            class="w-full px-4 py-2 border border-gray-200 rounded-lg bg-orange-50 placeholder:text-[#AE400E] placeholder:text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:outline-none transition duration-200">
+            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder-orange-small
+                   focus:border-orange-500 focus:ring-2 focus:ring-orange-500 
+                   focus:outline-none transition duration-200">
           <button
             type="button"
             onclick="togglePassword('confirm_password', this)"
@@ -108,6 +122,53 @@
     </form>
   </div>
 </div>
+
+<!-- Security Section -->
+<div class="flex justify-center px-4 mt-0">
+  <div class="w-full max-w-[550px] bg-white shadow-md rounded-xl p-4">
+
+    <!-- Header -->
+    <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-5">
+      <i class="ph ph-shield-check text-2xl text-orange-500"></i>
+      Password Security
+    </h2>
+
+    <!-- Two columns -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Column 1: Security Tips -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2 p-2 rounded ">
+          <i class="ph ph-check-circle text-green-600 text-2xl"></i>
+          Security Tips
+        </h3>
+        <ul class="list-disc list-inside text-gray-700 space-y-1 text-sm">
+          <li>At least 6 characters long</li>
+          <li>Mix of letters, numbers, and symbols</li>
+          <li>Avoid common words or phrases</li>
+          <li>Don't use personal information</li>
+        </ul>
+      </div>
+
+      <!-- Column 2: Security Reminders -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2 p-2 rounded ">
+          <i class="ph ph-info text-orange-500 text-2xl"></i>
+          Security Reminders
+        </h3>
+        <ul class="list-disc list-inside text-gray-700 space-y-1 text-sm">
+          <li>Never share your password</li>
+          <li>Log out from public computers</li>
+          <li>Change password if compromised</li>
+          <li>Use different passwords for different accounts</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
 <script>
   // Toggle Password Function

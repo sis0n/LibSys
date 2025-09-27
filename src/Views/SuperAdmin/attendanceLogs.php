@@ -176,13 +176,13 @@ foreach ($logs as $log) {
                         logsContainer.innerHTML = '';
                         if (data.length === 0) {
                             logsContainer.innerHTML = `
-                  <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-                    <i class="ph ph-clipboard text-6xl"></i>
-                    <p class="text-sm font-medium">No attendance records</p>
-                    <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
-                  </div>
-                `;
-                            return; // exit early
+                            <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
+                                <i class="ph ph-clipboard text-6xl"></i>
+                                <p class="text-sm font-medium">No attendance records</p>
+                                <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
+                            </div>
+                            `;
+                            return; 
                         }
                         data.forEach(log => {
                             logsContainer.innerHTML += `

@@ -80,21 +80,6 @@ class BookController extends Controller
     ]);
   }
 
-  public function catalog()
-  {
-    $books = $this->bookRepo->getAllBooks();
-
-    $availableCount = count(array_filter($books, function ($book) {
-      return isset($book['availability']) && strtolower($book['availability']) === 'available';
-    }));
-
-    $this->view("Student/bookCatalog", [
-      "books" => $books,
-      "available_count" => $availableCount,
-      "title" => "Book Catalog"
-    ]);
-  }
-
   public function fetch()
   {
     $search = $_GET['search'] ?? '';
@@ -107,5 +92,12 @@ class BookController extends Controller
 
     header('Content-Type: application/json');
     echo json_encode($books);
+  }
+
+  public function getAvailableCount()
+  {
+    $count = $this->bookRepo->countAvailableBooks();
+    header('Content-Type: application/json');
+    echo json_encode(['available' => $count]);
   }
 }

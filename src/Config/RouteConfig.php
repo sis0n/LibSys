@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Config;
 
 use App\Core\Router;
@@ -34,7 +35,7 @@ class RouteConfig
         $router->post('scanner/scan', 'ScannerController@attendance', ['scanner']);
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
         $router->post('scanner/manual', 'ScannerController@manual', ['scanner']);
-        
+
 
         /**
          * ========================
@@ -70,7 +71,7 @@ class RouteConfig
         $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
         $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
         $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['admin']);
-        
+
         // Super Admin Sidebar Page Navigation Display
         $router->get('superadmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
         $router->get('superadmin/userManagement', 'SidebarController@userManagement', ['superadmin']);
@@ -85,7 +86,7 @@ class RouteConfig
         $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
         $router->get('superadmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
-        
+
         // Student Sidebar Page Navigation Display
         $router->get('student/dashboard', 'SidebarController@studentDashboard', ['student']);
         $router->get('student/bookCatalog', 'SidebarController@studentBookCatalog', ['student']);
@@ -131,8 +132,12 @@ class RouteConfig
          * ========================
          */
         // $router->get('student/myCart', 'CartController@index', ['student']);
-        $router->post('cart/add/{bookId}', 'CartController@add', ['student']);
-        $router->post('cart/remove/{cartId}', 'CartController@remove', ['student']);
+        $router->get('student/cart', 'CartController@index', ['student']);
+        $router->get('student/cart/add/{id}', 'CartController@add', ['student']);
+        $router->post('student/cart/remove/{id}', 'CartController@remove', ['student']);
+        $router->post('student/cart/clear', 'CartController@clearCart', ['student']);
+        $router->get('student/cart/json', 'CartController@getCartJson', ['student']);
+
 
         // checkout routes
         $router->post('checkout', 'CheckoutController@checkout', ['student']);

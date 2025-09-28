@@ -103,3 +103,28 @@ ADD COLUMN availability ENUM('available','borrowed') DEFAULT 'available';
 
 ALTER TABLE books ADD COLUMN quantity INT NOT NULL DEFAULT 1;
 ALTER TABLE books ADD COLUMN cover VARCHAR(255) NULL;
+
+
+-- pang tanggal lang ng c sa year column ng books table
+UPDATE books
+SET year = REPLACE(year, 'c', '')
+WHERE year LIKE 'c%';
+
+-- ITO TALAGA 
+ALTER TABLE borrow_transaction_items DROP FOREIGN KEY borrow_transaction_items_ibfk_2;
+ALTER TABLE borrowings DROP FOREIGN KEY borrowings_ibfk_2;
+ALTER TABLE carts DROP FOREIGN KEY carts_ibfk_2;
+
+TRUNCATE TABLE books;
+
+-- then ibalik ulit foreign keys
+ALTER TABLE borrow_transaction_items 
+    ADD CONSTRAINT borrow_transaction_items_ibfk_2 FOREIGN KEY (book_id) REFERENCES books(book_id);
+ALTER TABLE borrowings 
+    ADD CONSTRAINT borrowings_ibfk_2 FOREIGN KEY (book_id) REFERENCES books(book_id);
+ALTER TABLE carts 
+    ADD CONSTRAINT carts_ibfk_2 FOREIGN KEY (book_id) REFERENCES books(book_id);
+
+-- IRESET UNG AUTO INCREMENT
+ALTER TABLE books AUTO_INCREMENT = 1;
+

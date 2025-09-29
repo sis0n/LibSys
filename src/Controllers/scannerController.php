@@ -35,7 +35,7 @@ class ScannerController extends Controller
 
         if (!$qrValue) {
             echo json_encode([
-                "status" => "Error.",
+                "status" => "error",
                 "message" => "No student number provided."
                 // echo "No student number provided.";
             ]); 
@@ -49,7 +49,7 @@ class ScannerController extends Controller
 
         if (!$user) {
             echo json_encode([
-                "status" => "Error.",
+                "status" => "error",
                 "message" => "Student not found in records."
                 // echo "User not found.";
                 // echo "<a href='/libsys/public/scanner/attendance'>back to scan</a>";

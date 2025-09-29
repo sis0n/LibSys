@@ -211,8 +211,7 @@
                         }
                     });
 
-                    manualForm.reset(); // clear input after success
-
+                    manualForm.reset();
                 } else {
                     // failed alert
                     Swal.fire({

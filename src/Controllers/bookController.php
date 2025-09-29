@@ -18,7 +18,7 @@ class BookController extends Controller
   public function index()
   {
     $books = $this->bookRepo->getAllBooks();
-    $this->view("books/index", [
+    $this->view("Student/bookCatalog", [
       "books" => $books,
       "title" => "Books Inventory"
     ]);

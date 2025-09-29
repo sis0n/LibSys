@@ -97,9 +97,12 @@ class ScannerController extends Controller
             //     echo "Failed to log attendance.";
             // }
 
-             echo json_encode([
-                "status" => "Success",
-                "message" => "Attendance logged for " . htmlspecialchars($user['full_name']) . " at " . $now->format('g:i A')
+            echo json_encode([
+                "status" => "success",
+                "full_name" => $user['full_name'],
+                "student_number" => $user['student_number'],
+                "time" => $now->format('g:i A'),
+                "message" => "Attendance logged successfully"
             ]);
         }
               else {
@@ -177,9 +180,12 @@ class ScannerController extends Controller
         //     echo "Failed to log attendance.";
         // }
             echo json_encode([
-                "status" => "success",
-                "message" => "Attendance logged for " . htmlspecialchars($user['full_name']) . " at " . $now->format('g:i A')
-            ]);
+            "status" => "success",
+            "full_name" => $user['full_name'],
+            "student_number" => $user['student_number'],
+            "time" => $now->format('g:i A'),
+            "message" => "Attendance logged successfully"
+        ]);
         } else {
             echo json_encode([
                 "status" => "error",

@@ -153,6 +153,216 @@
         input.addEventListener("focus", () => qrInput.blur());
     });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // === QR FORM ===
+        const qrForm = document.querySelector("form[action='/libsys/public/scanner/scan']");
+        if (qrForm) {
+            qrForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(qrForm);
+                const res = await fetch("/libsys/public/scanner/attendance", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.status === "success") {
+                    //success alert
+                    Swal.fire({
+                        position: "center",
+                        showConfirmButton: false,
+                        backdrop: `
+                    rgba(0,0,0,0.3)
+                    backdrop-filter: blur(6px)
+                `,
+                        timer: 3000,
+                        didOpen: () => {
+                            const progressBar = Swal.getHtmlContainer().querySelector(
+                                "#progress-bar");
+                            let width = 100;
+                            timerInterval = setInterval(() => {
+                                width -= 100 / 30;
+                                if (progressBar) {
+                                    progressBar.style.width = width + "%";
+                                }
+                            }, 100);
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval);
+                        },
+                        html: `
+                    <div class="w-[450px] bg-orange-50 border-2 border-orange-300 rounded-2xl p-8 shadow-lg text-center">
+                        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 mx-auto mb-4">
+                            <i class="ph ph-qr-code text-orange-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-orange-700">Scanned Successfully</h3>
+                        <p class="text-base text-orange-600 mt-1">QR code processed successfully</p>
+                        <div class="w-full bg-orange-100 h-2 rounded mt-4 overflow-hidden">
+                            <div id="progress-bar" class="bg-orange-500 h-2 w-full transition-all"></div>
+                        </div>
+                    </div>
+                `,
+                        customClass: {
+                            popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
+                        }
+                    });
+
+                    manualForm.reset(); // clear input after success
+
+                } else {
+                    // failed alert
+                    Swal.fire({
+                        position: "center",
+                        showConfirmButton: false,
+                        backdrop: `
+                    rgba(0,0,0,0.3)
+                    backdrop-filter: blur(6px)
+                `,
+                        timer: 3000,
+                        didOpen: () => {
+                            const progressBar = Swal.getHtmlContainer().querySelector(
+                                "#progress-bar");
+                            let width = 100;
+                            timerInterval = setInterval(() => {
+                                width -= 100 / 30;
+                                if (progressBar) {
+                                    progressBar.style.width = width + "%";
+                                }
+                            }, 100);
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval);
+                        },
+                        html: `
+                    <div class="w-[450px] bg-red-50 border-2 border-red-300 rounded-2xl p-8 shadow-lg text-center">
+                        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
+                            <i class="ph ph-x-circle text-red-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-red-700">Failed</h3>
+                        <p class="text-base text-red-600 mt-1">Please try again. Invalid QR</p>
+                        <div class="w-full bg-red-100 h-2 rounded mt-4 overflow-hidden">
+                            <div id="progress-bar" class="bg-red-500 h-2 w-full transition-all"></div>
+                        </div>
+                    </div>
+                `,
+                        customClass: {
+                            popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
+                        }
+                    });
+                }
+            });
+        }
+
+        // === MANUAL FORM ===
+        const manualForm = document.querySelector("form[action='/libsys/public/scanner/manual']");
+        if (manualForm) {
+            manualForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(manualForm);
+                const res = await fetch("/libsys/public/scanner/manual", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+
+                let timerInterval;
+
+                if (data.status === "success") {
+                    //success alert
+                    Swal.fire({
+                        position: "center",
+                        showConfirmButton: false,
+                        backdrop: `
+                    rgba(0,0,0,0.3)
+                    backdrop-filter: blur(6px)
+                `,
+                        timer: 3000,
+                        didOpen: () => {
+                            const progressBar = Swal.getHtmlContainer().querySelector(
+                                "#progress-bar");
+                            let width = 100;
+                            timerInterval = setInterval(() => {
+                                width -= 100 / 30;
+                                if (progressBar) {
+                                    progressBar.style.width = width + "%";
+                                }
+                            }, 100);
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval);
+                        },
+                        html: `
+                    <div class="w-[450px] bg-orange-50 border-2 border-orange-300 rounded-2xl p-8 shadow-lg text-center">
+                        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 mx-auto mb-4">
+                           <i class="ph ph-user-check text-orange-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-orange-700">Attendance Successfully</h3>
+                        <p class="text-base text-orange-600 mt-1">Manual entry successfully</p>
+                        <div class="w-full bg-orange-100 h-2 rounded mt-4 overflow-hidden">
+                            <div id="progress-bar" class="bg-orange-500 h-2 w-full transition-all"></div>
+                        </div>
+                    </div>
+                `,
+                        customClass: {
+                            popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
+                        }
+                    });
+
+                    manualForm.reset(); // clear input after success
+
+                } else {
+                    // failed alert
+                    Swal.fire({
+                        position: "center",
+                        showConfirmButton: false,
+                        backdrop: `
+                    rgba(0,0,0,0.3)
+                    backdrop-filter: blur(6px)
+                `,
+                        timer: 3000,
+                        didOpen: () => {
+                            const progressBar = Swal.getHtmlContainer().querySelector(
+                                "#progress-bar");
+                            let width = 100;
+                            timerInterval = setInterval(() => {
+                                width -= 100 / 30;
+                                if (progressBar) {
+                                    progressBar.style.width = width + "%";
+                                }
+                            }, 100);
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval);
+                        },
+                        html: `
+                    <div class="w-[450px] bg-red-50 border-2 border-red-300 rounded-2xl p-8 shadow-lg text-center">
+                        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
+                            <i class="ph ph-x-circle text-red-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-red-700">Failed</h3>
+                        <p class="text-base text-red-600 mt-1">Please try again. Invalid Student Number.</p>
+                        <div class="w-full bg-red-100 h-2 rounded mt-4 overflow-hidden">
+                            <div id="progress-bar" class="bg-red-500 h-2 w-full transition-all"></div>
+                        </div>
+                    </div>
+                `,
+                        customClass: {
+                            popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
+                        }
+                    });
+                }
+            });
+        }
+
+    });
+    </script>
+
+
 
 </body>
 

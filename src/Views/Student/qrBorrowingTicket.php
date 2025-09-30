@@ -1,9 +1,8 @@
 <body class="min-h-screen p-6">
-    <div class="mb-6">
-        <h2 class="text-2xl font-bold mb-4">QR Borrowing Ticket</h2>
-        <p class="text-gray-700">Your QR code for book borrowing and library access.</p>
-    </div>
+    <h2 class="text-2xl font-bold mb-1">QR Borrowing Ticket</h2>
+    <p class="text-gray-700">Your QR code for book borrowing and library access.</p>
     <div class="container mx-auto px-4 py-6 flex flex-col md:flex-row gap-6 justify-center items-stretch">
+
         <!-- QR Ticket Card -->
         <div
             class="flex-1 bg-[var(--color-card)] rounded-[var(--radius-lg)] shadow-md border border-[var(--color-border)] p-6 flex flex-col items-center text-center">
@@ -95,67 +94,67 @@
         </div>
     </div>
 
-        <!-- tanggalin mo nalang to pag ipapadisplay mo na,
+    <!-- tanggalin mo nalang to pag ipapadisplay mo na,
          pangsumulation lang to
          Simulation Button -->
-        <div class="flex justify-center mb-2">
-            <button id="showItemsBtn"
-                class="px-5 py-2 rounded-lg bg-[var(--color-primary)] text-[var(--color-primary-foreground)] font-medium shadow hover:bg-[var(--color-orange-600)] transition">
-                Simulate Checked Out Items
-            </button>
-        </div>
+    <div class="flex justify-center mb-2">
+        <button id="showItemsBtn"
+            class="px-5 py-2 rounded-lg bg-[var(--color-primary)] text-[var(--color-primary-foreground)] font-medium shadow hover:bg-[var(--color-orange-600)] transition">
+            Simulate Checked Out Items
+        </button>
+    </div>
 
-        <!-- Checked Out Items Section (Hidden by default) -->
-        <div id="checkedOutSection" class="hidden space-y-6">
+    <!-- Checked Out Items Section (Hidden by default) -->
+    <div id="checkedOutSection" class="hidden space-y-6">
 
-            <div class="p-4 border border-amber-200 bg-amber-50 rounded-lg flex items-center justify-between mt-6">
-                <div class="flex items-center gap-3">
-                    <i class="ph ph-qr-code text-2xl text-amber-600"></i>
-                    <div>
-                        <h3 class="font-medium text-amber-900">Checked Out Items</h3>
-                        <p class="text-sm text-amber-700">Items included in this QR checkout ticket</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-2xl font-bold text-amber-700">1</p>
-                    <p class="text-xs text-amber-600">Total Item(s)</p>
+        <div class="p-4 border border-amber-200 bg-amber-50 rounded-lg flex items-center justify-between mt-6">
+            <div class="flex items-center gap-3">
+                <i class="ph ph-qr-code text-2xl text-amber-600"></i>
+                <div>
+                    <h3 class="font-medium text-amber-900">Checked Out Items</h3>
+                    <p class="text-sm text-amber-700">Items included in this QR checkout ticket</p>
                 </div>
             </div>
-
-            <!-- Books Section -->
-            <div class="border border-green-300 bg-green-50 rounded-xl">
-                <div class="p-4 flex items-center justify-between border-b border-green-200">
-                    <h4 class="font-medium text-green-700 flex items-center gap-2">
-                        <!-- count ng items -->
-                        <i class="ph ph-book text-lg"></i> Books (1)
-                    </h4>
-                    <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600 font-medium">Book #1</span>
-                </div>
-                <div class="bg-white p-4 flex gap-3 rounded-xl">
-                    <!-- Icon Wrapper -->
-                    <div class="flex items-center">
-                        <i class="ph ph-book-open text-3xl text-green-500"></i>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="flex-1">
-                        <p class="font-medium">Book Title</p>
-                        <p class="text-sm text-gray-600">by Author's name</p>
-                        <div class="flex flex-wrap gap-2 mt-2 text-xs">
-                            <span class="px-2 py-1 bg-gray-100 rounded">AccNo: ####</span>
-                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">Call Number</span>
-                            <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Subject</span>
-                        </div>
-                    </div>
-
-                    <!-- Count -->
-                    <span
-                        class="w-6 h-6 flex items-center justify-center rounded-full bg-green-600 text-white text-xs font-bold">
-                        1
-                    </span>
-                </div>
+            <div class="text-right">
+                <p class="text-2xl font-bold text-amber-700">1</p>
+                <p class="text-xs text-amber-600">Total Item(s)</p>
             </div>
         </div>
+
+        <!-- Books Section -->
+        <div class="border border-green-300 bg-green-50 rounded-xl">
+            <div class="p-4 flex items-center justify-between border-b border-green-200">
+                <h4 class="font-medium text-green-700 flex items-center gap-2">
+                    <!-- count ng items -->
+                    <i class="ph ph-book text-lg"></i> Books (1)
+                </h4>
+                <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600 font-medium">Book #1</span>
+            </div>
+            <div class="bg-white p-4 flex gap-3 rounded-xl">
+                <!-- Icon Wrapper -->
+                <div class="flex items-center">
+                    <i class="ph ph-book-open text-3xl text-green-500"></i>
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1">
+                    <p class="font-medium">Book Title</p>
+                    <p class="text-sm text-gray-600">by Author's name</p>
+                    <div class="flex flex-wrap gap-2 mt-2 text-xs">
+                        <span class="px-2 py-1 bg-gray-100 rounded">AccNo: ####</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">Call Number</span>
+                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Subject</span>
+                    </div>
+                </div>
+
+                <!-- Count -->
+                <span
+                    class="w-6 h-6 flex items-center justify-center rounded-full bg-green-600 text-white text-xs font-bold">
+                    1
+                </span>
+            </div>
+        </div>
+    </div>
 
 
     <script>

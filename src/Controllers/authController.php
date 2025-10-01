@@ -23,7 +23,6 @@ class AuthController extends Controller{
   }
 
   public function login(){
-    session_start();
     if($_SERVER['REQUEST_METHOD'] !== 'POST'){
         header("Location: /libsys/public/login");
         exit;

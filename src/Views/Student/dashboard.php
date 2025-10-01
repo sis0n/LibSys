@@ -9,8 +9,8 @@ $allLogs = $attendanceRepo->getByUserId($userId);
 
 // count days visited for current month
 date_default_timezone_set('Asia/Manila');
-$firstOfMonth = new DateTime('first day of this month');
-$lastOfMonth = new DateTime('last day of this month');
+$firstOfMonth = new DateTime('first day of this month 00:00:00');
+$lastOfMonth = new DateTime('last day of this month 23:59:59');
 
 $daysVisitedThisMonth = 0;
 $visitedDates = []; // para hindi double count

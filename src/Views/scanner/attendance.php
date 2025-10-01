@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library | Login</title>
@@ -10,6 +11,8 @@
     <!-- PHOSPHOR ICONS -->
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
+    <!-- SWEETALERT2 -->
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-orange-50 font-sans flex flex-col min-h-screen">
@@ -124,9 +127,8 @@
             </div>
         </div>
     </footer>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        
     // === QR SCANNER ===
     const qrInput = document.getElementById("qrCodeValue");
     const qrBox = document.getElementById("qrBox");

@@ -173,13 +173,13 @@
                         rgba(0,0,0,0.3)
                         backdrop-filter: blur(6px)
                     `,
-                        timer: 3000,
+                        timer: 2000,
                         didOpen: () => {
                             const progressBar = Swal.getHtmlContainer().querySelector(
                                 "#progress-bar");
                             let width = 100;
                             timerInterval = setInterval(() => {
-                                width -= 100 / 30;
+                                width -= 100 / 20;
                                 if (progressBar) {
                                     progressBar.style.width = width + "%";
                                 }
@@ -271,13 +271,13 @@
                         rgba(0,0,0,0.3)
                         backdrop-filter: blur(6px)
                     `,
-                        timer: 3000,
+                        timer: 2000,
                         didOpen: () => {
                             const progressBar = Swal.getHtmlContainer().querySelector(
                                 "#progress-bar");
                             let width = 100;
                             timerInterval = setInterval(() => {
-                                width -= 100 / 30;
+                                width -= 100 / 20;
                                 if (progressBar) {
                                     progressBar.style.width = width + "%";
                                 }

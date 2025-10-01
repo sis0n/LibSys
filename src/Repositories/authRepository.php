@@ -38,4 +38,14 @@ class authRepository
     }
     session_destroy();
   }
+public function changePassword($userId, $newPassword)
+{
+    // hash the new password
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+    // call userRepo to update
+    return $this->userRepo->updatePassword($userId, $hashedPassword);
+}
+
+
 }

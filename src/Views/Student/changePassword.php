@@ -34,7 +34,8 @@
     </p>
 
     <!-- Form -->
-    <form id="passwordForm" action="change_password.php" method="POST" class="space-y-4">
+    <form id="passwordForm" action="/libsys/public/change-password" method="POST" class="space-y-4">
+
 
       <!-- Current Password -->
       <div>
@@ -200,4 +201,84 @@
       errorMsg.classList.add("hidden"); // hide error if valid
     }
   });
+
+  
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.getElementById("passwordForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // stop page reload
+
+    const form = this;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        Swal.fire({
+          icon: "success",
+          title: "Password Changed",
+          text: data.message,
+          width: 500,                // maliit na box gaya ng sample
+          padding: "1em",
+          background: "#d4edda",     // light green background (same family ng sample)
+          color: "#155724",          // dark green text
+          iconColor: "#28a745",      // success green
+          confirmButtonText: "OK",
+          confirmButtonColor: "#28a745",
+          customClass: {
+            popup: "rounded-lg shadow-md border border-green-300",
+            title: "text-base font-bold",
+            confirmButton: "px-4 py-1 text-sm rounded-md"
+          }
+        });
+        form.reset();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: data.message,
+          width: 320,
+          padding: "1em",
+          background: "#f8d7da",     // light red background
+          color: "#721c24",          // dark red text
+          iconColor: "#dc3545",      // error red
+          confirmButtonText: "OK",
+          confirmButtonColor: "#dc3545",
+          customClass: {
+            popup: "rounded-lg shadow-md border border-red-300",
+            title: "text-base font-bold",
+            confirmButton: "px-4 py-1 text-sm rounded-md"
+          }
+        });
+      }
+    })
+    .catch(() => {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong!",
+        width: 320,
+        padding: "1em",
+        background: "#f8d7da",
+        color: "#721c24",
+        iconColor: "#dc3545",
+        confirmButtonColor: "#dc3545",
+        customClass: {
+          popup: "rounded-lg shadow-md border border-red-300",
+          title: "text-base font-bold"
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+

@@ -98,4 +98,54 @@ class AuthController extends Controller{
         ], false);
   }
   
+//change password 
+public function changePassword()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+        return;
+    }
+
+    header('Content-Type: application/json'); // JSON response
+
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) {
+        echo json_encode(['status' => 'error', 'message' => 'You must be logged in.']);
+        return;
+    }
+
+    $currentPassword = $_POST['current_password'] ?? '';
+    $newPassword     = $_POST['new_password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
+
+    // 1. Check match
+    if ($newPassword !== $confirmPassword) {
+        echo json_encode(['status' => 'error', 'message' => 'New passwords do not match!']);
+        return;
+    }
+
+    $userRepo = new \App\Repositories\UserRepository();
+    $user = $userRepo->findUserById($userId);
+
+    if (!$user || !password_verify($currentPassword, $user['password'])) {
+        echo json_encode(['status' => 'error', 'message' => 'Current password is incorrect!']);
+        return;
+    }
+
+    // 2. Hash and update
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+    $update = $userRepo->updatePassword($userId, $hashedPassword);
+
+    if ($update) {
+        echo json_encode(['status' => 'success', 'message' => 'Password successfully updated!']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Failed to update password.']);
+    }
 }
+
+
+  
+}
+
+  

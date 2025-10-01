@@ -16,14 +16,8 @@ class AttendanceController extends Controller
         $this->attendanceRepo = new AttendanceRepository();
     }
 
-    /**
-     * fetch all attendance logs for the looged in user
-     * and return JSON formatted for JS tabs
-     * wala pa to pero iimplement ko to para sa future.
-     */
     public function fetchAttendance()
     {
-        // Make sure user is logged in
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
             echo json_encode(['error' => 'Unauthorized']);
@@ -57,7 +51,6 @@ class AttendanceController extends Controller
             if ($diff->m === 0 && $diff->y === 0) $data['month'][] = $entry;
             if ($diff->y === 0) $data['year'][] = $entry;
         }
-
         header('Content-Type: application/json');
         echo json_encode($data);
     }
@@ -87,7 +80,6 @@ class AttendanceController extends Controller
         $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search);
         // var_dump($logs);
         // exit;
-        
 
         $formattedLogs = [];
         foreach ($logs as $log) {

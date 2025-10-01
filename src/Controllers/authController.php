@@ -1,15 +1,15 @@
 <?php
 namespace App\Controllers;
 
-use App\Services\AuthService;
+use App\Repositories\AuthRepository;
 use App\Core\Controller;
 use App\Models\User;
 
 class AuthController extends Controller{
-  private $authService;
+  private $AuthRepository;
 
   public function __construct(){
-    $this->authService = new AuthService();
+    $this->AuthRepository = new AuthRepository();
   }
 
   public function showLogin(){
@@ -36,15 +36,15 @@ class AuthController extends Controller{
     session_regenerate_id(true);
 
     if($_SERVER['REQUEST_METHOD'] === 'POST'){
-        $identifier = htmlspecialchars(trim($_POST['username'] ?? ''));
+        $username = htmlspecialchars(trim($_POST['username'] ?? ''));
         $password   = $_POST['password'] ?? '';
 
-        if(empty($identifier) || empty($password)){
+        if(empty($username) || empty($password)){
             echo "Username and password are required.";
             return;
         }
 
-        $user = $this->authService->attemptLogin($identifier, $password);
+        $user = $this->AuthRepository->attemptLogin($username, $password);
 
         if($user){
             // redirect based on role

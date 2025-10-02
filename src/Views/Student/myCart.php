@@ -100,19 +100,21 @@
         }
     }
 
+    let checkedMap = JSON.parse(localStorage.getItem("checkedMap")) || {};
+
+    function saveCheckedMap() {
+        localStorage.setItem("checkedMap", JSON.stringify(checkedMap));
+    }
+
     function renderCart() {
         const emptyState = document.getElementById("empty-state");
         const cartItemsDiv = document.getElementById("cart-items");
         const cartCount = document.getElementById("cart-count");
-        const summaryText = document.getElementById("summary-text");
         const itemsContainer = document.getElementById("selected-items");
         const selectAllCheckbox = document.getElementById("select-all");
         const selectedItemsSection = document.getElementById("selected-items-section");
-        const checkedMap = {};
-        document.querySelectorAll("#selected-items input[type='checkbox']").forEach(cb => {
-            checkedMap[cb.dataset.id] = cb.checked;
-        });
 
+        // Clear container
         while (itemsContainer.firstChild) {
             itemsContainer.removeChild(itemsContainer.firstChild);
         }
@@ -126,8 +128,6 @@
             const cartIcon = document.createElement("i");
             cartIcon.className = "ph ph-shopping-cart text-xs";
             cartCount.insertBefore(cartIcon, cartCount.firstChild);
-
-            updateSummary();
 
             cart.forEach(item => {
                 const itemDiv = document.createElement("div");
@@ -144,6 +144,7 @@
                 checkbox.dataset.type = item.type;
                 checkbox.dataset.id = item.cart_id;
 
+                // Restore state from checkedMap
                 if (checkedMap[item.cart_id]) {
                     checkbox.checked = true;
                     toggleHighlight(itemDiv, true);
@@ -221,20 +222,26 @@
                 removeBtn.appendChild(removeIcon);
                 removeBtn.addEventListener("click", (e) => {
                     e.stopPropagation();
+                    delete checkedMap[item.cart_id];
+                    saveCheckedMap();
                     removeFromCart(item.cart_id);
                 });
 
                 // === Card Click Toggle ===
                 itemDiv.addEventListener("click", () => {
                     checkbox.checked = !checkbox.checked;
+                    checkedMap[item.cart_id] = checkbox.checked;
+                    saveCheckedMap();
                     toggleHighlight(itemDiv, checkbox.checked);
                     updateSummary();
                     syncSelectAll();
                 });
 
-                // === Sync checkbox state with highlight ===
+                // === Checkbox Click ===
                 checkbox.addEventListener("click", (e) => {
                     e.stopPropagation();
+                    checkedMap[item.cart_id] = checkbox.checked;
+                    saveCheckedMap();
                     toggleHighlight(itemDiv, checkbox.checked);
                     updateSummary();
                     syncSelectAll();
@@ -245,6 +252,9 @@
                 itemsContainer.appendChild(itemDiv);
             });
 
+            updateSummary();
+            syncSelectAll();
+
         } else {
             emptyState.classList.remove("hidden");
             cartItemsDiv.classList.add("hidden");
@@ -253,19 +263,20 @@
             const cartIcon = document.createElement("i");
             cartIcon.className = "ph ph-shopping-cart text-xs";
             cartCount.insertBefore(cartIcon, cartCount.firstChild);
-
         }
 
         // === Select All handler ===
         if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener("change", () => {
+            selectAllCheckbox.onchange = () => {
                 const allItems = document.querySelectorAll("#selected-items input[type='checkbox']");
                 allItems.forEach(cb => {
                     cb.checked = selectAllCheckbox.checked;
+                    checkedMap[cb.dataset.id] = cb.checked;
                     toggleHighlight(cb.closest("div.mt-4"), cb.checked);
                 });
+                saveCheckedMap();
                 updateSummary();
-            });
+            };
         }
     }
 

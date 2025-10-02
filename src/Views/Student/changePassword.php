@@ -1,20 +1,9 @@
-<!-- Custom placeholder style -->
-<style>
-  .placeholder-orange-small::placeholder {
-    color: #AE400E;
-    /* orange */
-    font-size: 10px;
-    /* sobrang liit */
-  }
-</style>
-
 <!-- Outside Container -->
 <div class="flex flex-col items-center mt-6 mb-6">
 
   <!-- Title (same container width para align with form) -->
   <div class="w-full max-w-[550px]">
     <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-      <i class="ph ph-lock-simple text-2xl"></i>
       Change Password
     </h1>
     <p class="text-sm text-gray-500 mt-1">
@@ -48,16 +37,17 @@
             id="current_password"
             placeholder="Enter current password"
             required
-            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder-orange-small
+            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder:text-orange-700 placeholder:text-sm
+
                    focus:border-orange-500 focus:ring-2 focus:ring-orange-500 
                    focus:outline-none transition duration-200">
           <button
-            type="button"
-            onclick="togglePassword('current_password', this)"
-            class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-gray-600 hover:bg-orange-500 hover:text-white transition">
-            <i class="ph ph-eye text-sm"></i>
-          </button>
-        </div>
+  type="button"
+  onclick="togglePassword('current_password', this)"
+  class="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:bg-orange-500 hover:text-white p-1.5 rounded-full transition">
+  <i class="ph ph-eye text-sm"></i>
+</button>
+
       </div>
 
       <!-- New Password -->
@@ -72,15 +62,16 @@
             id="new_password"
             placeholder="Enter new password"
             required
-            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder-orange-small
+            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder:text-orange-700 placeholder:text-sm
                    focus:border-orange-500 focus:ring-2 focus:ring-orange-500 
                    focus:outline-none transition duration-200">
-          <button
-            type="button"
-            onclick="togglePassword('new_password', this)"
-            class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-gray-600 hover:bg-orange-500 hover:text-white transition">
-            <i class="ph ph-eye text-sm"></i>
-          </button>
+         <button
+  type="button"
+  onclick="togglePassword('new_password', this)"
+  class="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:bg-orange-500 hover:text-white p-1.5 rounded-full transition">
+  <i class="ph ph-eye text-sm"></i>
+</button>
+
         </div>
       </div>
 
@@ -96,15 +87,16 @@
             id="confirm_password"
             placeholder="Confirm new password"
             required
-            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder-orange-small
+            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg bg-orange-50 placeholder:text-orange-700 placeholder:text-sm
                    focus:border-orange-500 focus:ring-2 focus:ring-orange-500 
                    focus:outline-none transition duration-200">
-          <button
-            type="button"
-            onclick="togglePassword('confirm_password', this)"
-            class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-gray-600 hover:bg-orange-500 hover:text-white transition">
-            <i class="ph ph-eye text-sm"></i>
-          </button>
+         <button
+  type="button"
+  onclick="togglePassword('confirm_password', this)"
+  class="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:bg-orange-500 hover:text-white p-1.5 rounded-full transition">
+  <i class="ph ph-eye text-sm"></i>
+</button>
+
         </div>
 
         <!-- Error Message -->
@@ -112,7 +104,7 @@
           Passwords do not match!
         </p>
       </div>
-
+<br>
       <!-- Submit -->
       <button
         type="submit"

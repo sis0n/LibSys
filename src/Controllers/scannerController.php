@@ -27,14 +27,19 @@ class ScannerController extends Controller
 
     public function attendance()
     {
+        header('Content-Type: application/json');
         $qrValue  = $_POST['qrCodeValue'] ?? null;
         if ($qrValue) {
             $qrValue = strtoupper(trim($qrValue));  //force uppercase
         }
 
         if (!$qrValue) {
-            echo "No student number provided.";
-            return;
+            echo json_encode([
+                "status" => "error",
+                "message" => "No student number provided."
+                // echo "No student number provided.";
+            ]); 
+             return;
         }
 
         $user = $this->userRepo->findByStudentNumber($qrValue);
@@ -43,8 +48,12 @@ class ScannerController extends Controller
 
 
         if (!$user) {
-            echo "User not found.";
-            echo "<a href='/libsys/public/scanner/attendance'>back to scan</a>";
+            echo json_encode([
+                "status" => "error",
+                "message" => "Student not found in records."
+                // echo "User not found.";
+                // echo "<a href='/libsys/public/scanner/attendance'>back to scan</a>";
+            ]);
             return;
         }
 
@@ -76,17 +85,32 @@ class ScannerController extends Controller
         $success = $this->attendanceRepo->logBoth($attendance);
 
         if ($success) {
-            echo "<div style='border:1px solid #ccc; padding:10px; text-align:center;'>
-                <h3>Attendance Logged </h3>
-                <p><strong>Name:</strong> " . htmlspecialchars($user['full_name']) . "</p>
-                <p><strong>Student Number:</strong> " . htmlspecialchars($user['student_number']) . "</p>
-                <p><strong>Time:</strong> " . $now->format('g:i A') . "</p>
-              </div>
-              <br>
-              <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
-        } else {
-            echo "Failed to log attendance.";
+            //     echo "<div style='border:1px solid #ccc; padding:10px; text-align:center;'>
+            //         <h3>Attendance Logged </h3>
+            //         <p><strong>Name:</strong> " . htmlspecialchars($user['full_name']) . "</p>
+            //         <p><strong>Student Number:</strong> " . htmlspecialchars($user['student_number']) . "</p>
+            //         <p><strong>Time:</strong> " . $now->format('g:i A') . "</p>
+            //       </div>
+            //       <br>
+            //       <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
+            // } else {
+            //     echo "Failed to log attendance.";
+            // }
+
+            echo json_encode([
+                "status" => "success",
+                "full_name" => $user['full_name'],
+                "student_number" => $user['student_number'],
+                "time" => $now->format('g:i A'),
+                "message" => "Attendance logged successfully"
+            ]);
         }
+              else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Failed to log attendance."
+            ]);
+        } 
     }
 
     public function manual()
@@ -108,8 +132,12 @@ class ScannerController extends Controller
         error_log("[ScannerController] Manual Lookup result for {$studentNumber}: " . print_r($user, true));
 
         if (!$user) {
-            echo "Student not found in records.";
-            echo "<br><a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
+            echo json_encode([
+                "status" => "error",
+                "message" => "Student not found in records."
+            ]);
+            // echo "Student not found in records.";
+            // echo "<br><a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
             return;
         }
 
@@ -140,16 +168,29 @@ class ScannerController extends Controller
 
 
         if ($success) {
-            echo "<div style='border:1px solid #ccc; padding:10px; text-align:center;'>
-                <h3>Attendance Logged</h3>
-                <p><strong>Name:</strong> " . htmlspecialchars($user['full_name']) . "</p>
-                <p><strong>Student Number:</strong> " . htmlspecialchars($user['student_number']) . "</p>
-                <p><strong>Time:</strong> " . $now->format('g:i A') . "</p>
-              </div>
-              <br>
-              <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
+        //     echo "<div style='border:1px solid #ccc; padding:10px; text-align:center;'>
+        //         <h3>Attendance Logged</h3>
+        //         <p><strong>Name:</strong> " . htmlspecialchars($user['full_name']) . "</p>
+        //         <p><strong>Student Number:</strong> " . htmlspecialchars($user['student_number']) . "</p>
+        //         <p><strong>Time:</strong> " . $now->format('g:i A') . "</p>
+        //       </div>
+        //       <br>
+        //       <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
+        // } else {
+        //     echo "Failed to log attendance.";
+        // }
+            echo json_encode([
+            "status" => "success",
+            "full_name" => $user['full_name'],
+            "student_number" => $user['student_number'],
+            "time" => $now->format('g:i A'),
+            "message" => "Attendance logged successfully"
+        ]);
         } else {
-            echo "Failed to log attendance.";
-        }
+            echo json_encode([
+                "status" => "error",
+                "message" => "Failed to log attendance."
+            ]);
+        }   
     }
 }

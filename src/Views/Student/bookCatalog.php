@@ -286,14 +286,35 @@
                 const res = await fetch(`/libsys/public/student/cart/remove/${cartId}`, {
                     method: "POST"
                 });
+
                 if (!res.ok) throw new Error("Failed to remove item");
+
                 cart = cart.filter(item => item.cart_id !== cartId);
                 updateCartBadge();
-                alert("Item removed from cart");
+
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    icon: "success",
+                    title: "Removed from Cart",
+                    text: "The item has been successfully removed from your cart!",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
             } catch (err) {
                 console.error("Error removing item:", err);
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong while removing the item. Please try again.",
+                    confirmButtonColor: "#ea580c", // para match sa theme
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
             }
         }
+
 
         async function clearCart() {
             try {

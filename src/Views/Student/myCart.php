@@ -74,31 +74,111 @@
 
     async function clearCart() {
         try {
+            const confirm = await Swal.fire({
+                title: "Are you sure?",
+                text: "This will remove all items from your cart.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#ea580c",
+                cancelButtonColor: "#6b7280",
+                confirmButtonText: "Yes, clear it!",
+                cancelButtonText: "Cancel"
+            });
+
+            if (!confirm.isConfirmed) return;
+
             const res = await fetch("/libsys/public/student/cart/clear", {
                 method: "POST"
             });
-            if (!res.ok) throw new Error("Failed to clear cart");
+
+            // allow 200 or 204 (success without body)
+            if (![200, 204].includes(res.status)) {
+                throw new Error(`Failed to clear cart, status: ${res.status}`);
+            }
+
             cart = [];
-            alert("are u sure?");
             renderCart();
+            updateCartBadge();
+
+            Swal.fire({
+                toast: true,
+                position: "bottom-end",
+                icon: "success",
+                title: "Cart Cleared",
+                text: "All items have been removed from your cart.",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+            });
         } catch (err) {
-            console.error(err);
+            console.error("Error clearing cart:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong while clearing your cart. Please try again.",
+                confirmButtonColor: "#ea580c",
+                timer: 3000,
+                timerProgressBar: true,
+            });
         }
     }
 
+
+
     async function removeFromCart(cartId) {
         try {
+            const confirm = await Swal.fire({
+                title: "Are you sure?",
+                text: "This item will be removed from your cart.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#ea580c",
+                cancelButtonColor: "#6b7280",
+                confirmButtonText: "Yes, remove it!",
+                cancelButtonText: "Cancel"
+            });
+
+            if (!confirm.isConfirmed) return;
+
             const res = await fetch(`/libsys/public/student/cart/remove/${cartId}`, {
                 method: "POST"
             });
-            if (!res.ok) throw new Error("Failed to remove item");
+
+            console.log("Remove status:", res.status); // debug
+
+            // Instead of throwing error agad, check muna
+            if (res.status !== 200 && res.status !== 204) {
+                throw new Error("Failed to remove item");
+            }
+
             cart = cart.filter(item => item.cart_id !== cartId);
-            alert("are u sure?");
             renderCart();
+            updateCartBadge();
+
+            Swal.fire({
+                toast: true,
+                position: "bottom-end",
+                icon: "success",
+                title: "Item Removed",
+                text: "The item has been successfully removed from your cart.",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+            });
         } catch (err) {
-            console.error(err);
+            console.error("Error removing item:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong while removing the item. Please try again.",
+                confirmButtonColor: "#ea580c",
+                timer: 3000,
+                timerProgressBar: true,
+            });
         }
     }
+
+
 
     let checkedMap = JSON.parse(localStorage.getItem("checkedMap")) || {};
 

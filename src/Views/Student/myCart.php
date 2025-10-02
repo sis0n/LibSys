@@ -23,31 +23,40 @@
         </p>
     </div>
 
-    <!-- Cart with Items -->
     <div id="cart-items" class="hidden">
         <!-- Checkout Summary -->
         <div class="mt-4 border rounded-[var(--radius-lg)] border-[var(--color-border)] bg-white shadow-sm p-4">
-            <h3 class="font-semibold text-[var(--color-foreground)] mb-1">Checkout Summary</h3>
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="font-semibold text-[var(--color-foreground)]">Checkout Summary</h3>
+
+                <label class="flex items-center gap-2 cursor-pointer text-sm text-[var(--color-muted-foreground)]">
+                    <input type="checkbox" id="select-all" class="w-4 h-4 accent-orange-600 rounded cursor-pointer" />
+                    Select All
+                </label>
+            </div>
+
             <p id="summary-text" class="text-[var(--color-muted-foreground)] text-[var(--font-size-sm)]">
                 0 book(s) and 0 equipment item(s) selected for borrowing
             </p>
+
             <div class="mt-4 flex items-center gap-2">
                 <button
                     class="flex-1 bg-orange-600 text-white font-semibold rounded-[var(--radius-lg)] py-2 hover:bg-orange-500 transition">
-                    Checkout All Items & Generate QR
+                    Check Out
                 </button>
-                <button id="clear-cart-btn"
-                    class="px-4 py-2 border rounded-[var(--radius-lg)] border-[var(--color-border)] 
-                               text-[var(--color-orange-700)] font-medium hover:bg-[var(--color-orange-100)] transition">
+                <button id="clear-cart-btn" class="px-4 py-2 border rounded-[var(--radius-lg)] border-[var(--color-border)] 
+                           text-[var(--color-orange-700)] font-medium hover:bg-[var(--color-orange-100)] transition">
                     Clear Cart
                 </button>
             </div>
         </div>
-
-        <!-- Selected Items -->
+    </div>
+    <!-- Selected Items -->
+    <div id="selected-items-section" class="hidden">
         <h3 class="mt-6 font-semibold text-[var(--color-foreground)]">Selected Items</h3>
         <div id="selected-items"></div>
     </div>
+
 
     <script>
     let cart = [];
@@ -97,6 +106,12 @@
         const cartCount = document.getElementById("cart-count");
         const summaryText = document.getElementById("summary-text");
         const itemsContainer = document.getElementById("selected-items");
+        const selectAllCheckbox = document.getElementById("select-all");
+        const selectedItemsSection = document.getElementById("selected-items-section");
+        const checkedMap = {};
+        document.querySelectorAll("#selected-items input[type='checkbox']").forEach(cb => {
+            checkedMap[cb.dataset.id] = cb.checked;
+        });
 
         while (itemsContainer.firstChild) {
             itemsContainer.removeChild(itemsContainer.firstChild);
@@ -105,41 +120,47 @@
         if (cart.length > 0) {
             emptyState.classList.add("hidden");
             cartItemsDiv.classList.remove("hidden");
-
-            const bookCount = cart.filter(i => i.type === "book").length;
-            const equipmentCount = cart.filter(i => i.type === "equipment").length;
+            selectedItemsSection.classList.remove("hidden");
 
             cartCount.textContent = `${cart.length} total item(s)`;
             const cartIcon = document.createElement("i");
             cartIcon.className = "ph ph-shopping-cart text-xs";
             cartCount.insertBefore(cartIcon, cartCount.firstChild);
 
-            summaryText.textContent =
-                `${bookCount} book(s) and ${equipmentCount} equipment item(s) selected for borrowing`;
+            updateSummary();
 
             cart.forEach(item => {
                 const itemDiv = document.createElement("div");
                 itemDiv.className =
-                    "mt-4 border rounded-lg border-gray-300 bg-white shadow-sm flex items-center justify-between p-4 cursor-pointer transition";
+                    "mt-4 border rounded-lg border-gray-300 bg-white shadow-sm flex items-center justify-between p-4 transition cursor-pointer";
 
                 const leftDiv = document.createElement("div");
-                leftDiv.className = "flex items-center gap-4";
+                leftDiv.className = "flex items-center gap-3 w-full";
 
-                // === ICON ===
-                const iconDiv = document.createElement("div");
-                iconDiv.className = "w-20 h-20 flex items-center justify-center";
-                const iconEl = document.createElement("i");
-                iconEl.className = `ph ${item.icon || 'ph-book'} text-5xl text-amber-700`;
-                iconDiv.appendChild(iconEl);
-
-                // === CHECKBOX (ililipat dito, after icon) ===
+                // === Checkbox ===
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
-                checkbox.value = item.cart_id;
-                checkbox.className = "w-5 h-5 cursor-pointer accent-orange-600";
+                checkbox.className = "w-4 h-4 accent-orange-600 cursor-pointer rounded-full";
+                checkbox.dataset.type = item.type;
+                checkbox.dataset.id = item.cart_id;
 
-                // === INFO ===
+                if (checkedMap[item.cart_id]) {
+                    checkbox.checked = true;
+                    toggleHighlight(itemDiv, true);
+                }
+
+                // === Icon ===
+                const iconDiv = document.createElement("div");
+                iconDiv.className = "flex-shrink-0 w-20 h-20 flex items-center justify-center";
+                const iconEl = document.createElement("i");
+                iconEl.className =
+                    `ph ${item.icon || 'ph-book'} text-5xl text-amber-700 w-10 h-10 leading-[2rem] text-center`;
+                iconDiv.appendChild(iconEl);
+
+                // === Info ===
                 const infoDiv = document.createElement("div");
+                infoDiv.className = "flex-1";
+
                 const titleEl = document.createElement("h4");
                 titleEl.className = "font-semibold";
                 titleEl.textContent = item.title;
@@ -152,9 +173,9 @@
                     infoDiv.appendChild(authorEl);
                 }
 
-                if (item.accessionNumber || item.subject || item.callNumber) {
+                if (item.accessionNumber || item.callNumber || item.subject) {
                     const infoWrap = document.createElement("div");
-                    infoWrap.className = "flex flex-wrap gap-6 text-sm text-gray-600 mt-1";
+                    infoWrap.className = "flex flex-wrap gap-x-6 text-sm text-gray-600 mt-4";
 
                     if (item.accessionNumber) {
                         const span = document.createElement("span");
@@ -163,15 +184,6 @@
                         strong.textContent = "Accession Number: ";
                         span.appendChild(strong);
                         span.appendChild(document.createTextNode(item.accessionNumber));
-                        infoWrap.appendChild(span);
-                    }
-                    if (item.subject) {
-                        const span = document.createElement("span");
-                        const strong = document.createElement("span");
-                        strong.className = "font-semibold";
-                        strong.textContent = "Subject: ";
-                        span.appendChild(strong);
-                        span.appendChild(document.createTextNode(item.subject));
                         infoWrap.appendChild(span);
                     }
                     if (item.callNumber) {
@@ -183,21 +195,27 @@
                         span.appendChild(document.createTextNode(item.callNumber));
                         infoWrap.appendChild(span);
                     }
+                    if (item.subject) {
+                        const span = document.createElement("span");
+                        const strong = document.createElement("span");
+                        strong.className = "font-semibold";
+                        strong.textContent = "Subject: ";
+                        span.appendChild(strong);
+                        span.appendChild(document.createTextNode(item.subject));
+                        infoWrap.appendChild(span);
+                    }
 
                     infoDiv.appendChild(infoWrap);
                 }
 
-                // === Assemble leftDiv ===
-                leftDiv.appendChild(checkbox); // << dito na yung checkbox
+                // === Assemble left side ===
+                leftDiv.appendChild(checkbox);
                 leftDiv.appendChild(iconDiv);
                 leftDiv.appendChild(infoDiv);
 
-                // === Right side (remove button only) ===
-                const rightDiv = document.createElement("div");
-                rightDiv.className = "flex flex-col items-center gap-2";
-
+                // === Remove Button ===
                 const removeBtn = document.createElement("button");
-                removeBtn.className = "text-xl text-gray-800 hover:text-orange-700 transition";
+                removeBtn.className = "text-2xl text-gray-800 hover:text-orange-700 transition ml-4";
                 const removeIcon = document.createElement("i");
                 removeIcon.className = "ph ph-trash";
                 removeBtn.appendChild(removeIcon);
@@ -206,41 +224,80 @@
                     removeFromCart(item.cart_id);
                 });
 
-                rightDiv.appendChild(removeBtn);
-
-                // === Final assembly ===
-                itemDiv.appendChild(leftDiv);
-                itemDiv.appendChild(rightDiv);
-
-                // ✅ Toggle checkbox + highlight kapag na-click ang buong card
-                itemDiv.addEventListener("click", (e) => {
-                    if (e.target.tagName.toLowerCase() !== "input") {
-                        checkbox.checked = !checkbox.checked;
-                    }
-                    toggleHighlight();
+                // === Card Click Toggle ===
+                itemDiv.addEventListener("click", () => {
+                    checkbox.checked = !checkbox.checked;
+                    toggleHighlight(itemDiv, checkbox.checked);
+                    updateSummary();
+                    syncSelectAll();
                 });
 
-                checkbox.addEventListener("change", toggleHighlight);
+                // === Sync checkbox state with highlight ===
+                checkbox.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    toggleHighlight(itemDiv, checkbox.checked);
+                    updateSummary();
+                    syncSelectAll();
+                });
 
-                function toggleHighlight() {
-                    if (checkbox.checked) {
-                        itemDiv.classList.add("bg-orange-100", "border-orange-400");
-                    } else {
-                        itemDiv.classList.remove("bg-orange-100", "border-orange-400");
-                    }
-                }
-
+                itemDiv.appendChild(leftDiv);
+                itemDiv.appendChild(removeBtn);
                 itemsContainer.appendChild(itemDiv);
             });
-
 
         } else {
             emptyState.classList.remove("hidden");
             cartItemsDiv.classList.add("hidden");
+            selectedItemsSection.classList.add("hidden");
             cartCount.textContent = "0 total items";
             const cartIcon = document.createElement("i");
             cartIcon.className = "ph ph-shopping-cart text-xs";
             cartCount.insertBefore(cartIcon, cartCount.firstChild);
+
+        }
+
+        // === Select All handler ===
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener("change", () => {
+                const allItems = document.querySelectorAll("#selected-items input[type='checkbox']");
+                allItems.forEach(cb => {
+                    cb.checked = selectAllCheckbox.checked;
+                    toggleHighlight(cb.closest("div.mt-4"), cb.checked);
+                });
+                updateSummary();
+            });
+        }
+    }
+
+    function toggleHighlight(itemDiv, checked) {
+        itemDiv.classList.toggle("bg-orange-100", checked);
+        itemDiv.classList.toggle("border-orange-500", checked);
+    }
+
+    function updateSummary() {
+        const summaryText = document.getElementById("summary-text");
+        const allItems = document.querySelectorAll("#selected-items input[type='checkbox']");
+        let books = 0,
+            equipment = 0;
+
+        allItems.forEach(cb => {
+            if (cb.checked) {
+                if (cb.dataset.type === "book") books++;
+                if (cb.dataset.type === "equipment") equipment++;
+            }
+        });
+
+        summaryText.textContent =
+            `${books} book(s) and ${equipment} equipment item(s) selected for borrowing`;
+    }
+
+    function syncSelectAll() {
+        const selectAllCheckbox = document.getElementById("select-all");
+        const allItems = document.querySelectorAll("#selected-items input[type='checkbox']");
+        if (allItems.length > 0) {
+            selectAllCheckbox.checked = [...allItems].every(cb => cb.checked);
+        } else {
+            selectAllCheckbox.checked = false;
         }
     }
 

@@ -32,7 +32,8 @@
                 0 book(s) and 0 equipment item(s) selected for borrowing
             </p>
             <div class="mt-4 flex items-center gap-2">
-                <button class="flex-1 bg-orange-600 text-white font-semibold rounded-[var(--radius-lg)] py-2 hover:bg-orange-500 transition">
+                <button
+                    class="flex-1 bg-orange-600 text-white font-semibold rounded-[var(--radius-lg)] py-2 hover:bg-orange-500 transition">
                     Checkout All Items & Generate QR
                 </button>
                 <button id="clear-cart-btn"
@@ -49,163 +50,204 @@
     </div>
 
     <script>
-        let cart = [];
+    let cart = [];
 
-        async function loadCart() {
-            try {
-                const res = await fetch("/libsys/public/student/cart/json");
-                if (!res.ok) throw new Error("Failed to load cart");
-                cart = await res.json();
-                renderCart();
-            } catch (err) {
-                console.error("Error loading cart:", err);
-            }
+    async function loadCart() {
+        try {
+            const res = await fetch("/libsys/public/student/cart/json");
+            if (!res.ok) throw new Error("Failed to load cart");
+            cart = await res.json();
+            renderCart();
+        } catch (err) {
+            console.error("Error loading cart:", err);
+        }
+    }
+
+    async function clearCart() {
+        try {
+            const res = await fetch("/libsys/public/student/cart/clear", {
+                method: "POST"
+            });
+            if (!res.ok) throw new Error("Failed to clear cart");
+            cart = [];
+            alert("are u sure?");
+            renderCart();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async function removeFromCart(cartId) {
+        try {
+            const res = await fetch(`/libsys/public/student/cart/remove/${cartId}`, {
+                method: "POST"
+            });
+            if (!res.ok) throw new Error("Failed to remove item");
+            cart = cart.filter(item => item.cart_id !== cartId);
+            alert("are u sure?");
+            renderCart();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function renderCart() {
+        const emptyState = document.getElementById("empty-state");
+        const cartItemsDiv = document.getElementById("cart-items");
+        const cartCount = document.getElementById("cart-count");
+        const summaryText = document.getElementById("summary-text");
+        const itemsContainer = document.getElementById("selected-items");
+
+        while (itemsContainer.firstChild) {
+            itemsContainer.removeChild(itemsContainer.firstChild);
         }
 
-        async function clearCart() {
-            try {
-                const res = await fetch("/libsys/public/student/cart/clear", {
-                    method: "POST"
-                });
-                if (!res.ok) throw new Error("Failed to clear cart");
-                cart = [];
-                alert("are u sure?");
-                renderCart();
-            } catch (err) {
-                console.error(err);
-            }
-        }
+        if (cart.length > 0) {
+            emptyState.classList.add("hidden");
+            cartItemsDiv.classList.remove("hidden");
 
-        async function removeFromCart(cartId) {
-            try {
-                const res = await fetch(`/libsys/public/student/cart/remove/${cartId}`, {
-                    method: "POST"
-                });
-                if (!res.ok) throw new Error("Failed to remove item");
-                cart = cart.filter(item => item.cart_id !== cartId);
-                alert("are u sure?");
-                renderCart();
-            } catch (err) {
-                console.error(err);
-            }
-        }
+            const bookCount = cart.filter(i => i.type === "book").length;
+            const equipmentCount = cart.filter(i => i.type === "equipment").length;
 
-        function renderCart() {
-            const emptyState = document.getElementById("empty-state");
-            const cartItemsDiv = document.getElementById("cart-items");
-            const cartCount = document.getElementById("cart-count");
-            const summaryText = document.getElementById("summary-text");
-            const itemsContainer = document.getElementById("selected-items");
+            cartCount.textContent = `${cart.length} total item(s)`;
+            const cartIcon = document.createElement("i");
+            cartIcon.className = "ph ph-shopping-cart text-xs";
+            cartCount.insertBefore(cartIcon, cartCount.firstChild);
 
-            while (itemsContainer.firstChild) {
-                itemsContainer.removeChild(itemsContainer.firstChild);
-            }
+            summaryText.textContent =
+                `${bookCount} book(s) and ${equipmentCount} equipment item(s) selected for borrowing`;
 
-            if (cart.length > 0) {
-                emptyState.classList.add("hidden");
-                cartItemsDiv.classList.remove("hidden");
+            cart.forEach(item => {
+                const itemDiv = document.createElement("div");
+                itemDiv.className =
+                    "mt-4 border rounded-lg border-gray-300 bg-white shadow-sm flex items-center justify-between p-4 cursor-pointer transition";
 
-                const bookCount = cart.filter(i => i.type === "book").length;
-                const equipmentCount = cart.filter(i => i.type === "equipment").length;
+                const leftDiv = document.createElement("div");
+                leftDiv.className = "flex items-center gap-4";
 
-                cartCount.textContent = `${cart.length} total item(s)`;
-                const cartIcon = document.createElement("i");
-                cartIcon.className = "ph ph-shopping-cart text-xs";
-                cartCount.insertBefore(cartIcon, cartCount.firstChild);
+                // === ICON ===
+                const iconDiv = document.createElement("div");
+                iconDiv.className = "w-20 h-20 flex items-center justify-center";
+                const iconEl = document.createElement("i");
+                iconEl.className = `ph ${item.icon || 'ph-book'} text-5xl text-amber-700`;
+                iconDiv.appendChild(iconEl);
 
-                summaryText.textContent = `${bookCount} book(s) and ${equipmentCount} equipment item(s) selected for borrowing`;
+                // === CHECKBOX (ililipat dito, after icon) ===
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.value = item.cart_id;
+                checkbox.className = "w-5 h-5 cursor-pointer accent-orange-600";
 
-                cart.forEach(item => {
-                    const itemDiv = document.createElement("div");
-                    itemDiv.className = "mt-4 border rounded-lg border-gray-300 bg-white shadow-sm flex items-center justify-between p-4";
+                // === INFO ===
+                const infoDiv = document.createElement("div");
+                const titleEl = document.createElement("h4");
+                titleEl.className = "font-semibold";
+                titleEl.textContent = item.title;
+                infoDiv.appendChild(titleEl);
 
-                    const leftDiv = document.createElement("div");
-                    leftDiv.className = "flex items-center gap-4";
+                if (item.author) {
+                    const authorEl = document.createElement("p");
+                    authorEl.className = "text-sm text-gray-600";
+                    authorEl.textContent = `by ${item.author}`;
+                    infoDiv.appendChild(authorEl);
+                }
 
-                    const iconDiv = document.createElement("div");
-                    iconDiv.className = "w-20 h-20 flex items-center justify-center";
-                    const iconEl = document.createElement("i");
-                    iconEl.className = `ph ${item.icon || 'ph-book'} text-5xl text-amber-700`;
-                    iconDiv.appendChild(iconEl);
+                if (item.accessionNumber || item.subject || item.callNumber) {
+                    const infoWrap = document.createElement("div");
+                    infoWrap.className = "flex flex-wrap gap-6 text-sm text-gray-600 mt-1";
 
-                    const infoDiv = document.createElement("div");
-                    const titleEl = document.createElement("h4");
-                    titleEl.className = "font-semibold";
-                    titleEl.textContent = item.title;
-                    infoDiv.appendChild(titleEl);
-
-                    if (item.author) {
-                        const authorEl = document.createElement("p");
-                        authorEl.className = "text-sm text-gray-600";
-                        authorEl.textContent = `by ${item.author}`;
-                        infoDiv.appendChild(authorEl);
+                    if (item.accessionNumber) {
+                        const span = document.createElement("span");
+                        const strong = document.createElement("span");
+                        strong.className = "font-semibold";
+                        strong.textContent = "Accession Number: ";
+                        span.appendChild(strong);
+                        span.appendChild(document.createTextNode(item.accessionNumber));
+                        infoWrap.appendChild(span);
+                    }
+                    if (item.subject) {
+                        const span = document.createElement("span");
+                        const strong = document.createElement("span");
+                        strong.className = "font-semibold";
+                        strong.textContent = "Subject: ";
+                        span.appendChild(strong);
+                        span.appendChild(document.createTextNode(item.subject));
+                        infoWrap.appendChild(span);
+                    }
+                    if (item.callNumber) {
+                        const span = document.createElement("span");
+                        const strong = document.createElement("span");
+                        strong.className = "font-semibold";
+                        strong.textContent = "Call Number: ";
+                        span.appendChild(strong);
+                        span.appendChild(document.createTextNode(item.callNumber));
+                        infoWrap.appendChild(span);
                     }
 
-                    if (item.accessionNumber || item.subject || item.callNumber) {
-                        const infoWrap = document.createElement("div");
-                        infoWrap.className = "flex flex-wrap gap-6 text-sm text-gray-600 mt-1";
+                    infoDiv.appendChild(infoWrap);
+                }
 
-                        if (item.accessionNumber) {
-                            const span = document.createElement("span");
-                            const strong = document.createElement("span");
-                            strong.className = "font-semibold";
-                            strong.textContent = "Accession Number: ";
-                            span.appendChild(strong);
-                            span.appendChild(document.createTextNode(item.accessionNumber));
-                            infoWrap.appendChild(span);
-                        }
-                        if (item.subject) {
-                            const span = document.createElement("span");
-                            const strong = document.createElement("span");
-                            strong.className = "font-semibold";
-                            strong.textContent = "Subject: ";
-                            span.appendChild(strong);
-                            span.appendChild(document.createTextNode(item.subject));
-                            infoWrap.appendChild(span);
-                        }
-                        if (item.callNumber) {
-                            const span = document.createElement("span");
-                            const strong = document.createElement("span");
-                            strong.className = "font-semibold";
-                            strong.textContent = "Call Number: ";
-                            span.appendChild(strong);
-                            span.appendChild(document.createTextNode(item.callNumber));
-                            infoWrap.appendChild(span);
-                        }
+                // === Assemble leftDiv ===
+                leftDiv.appendChild(checkbox); // << dito na yung checkbox
+                leftDiv.appendChild(iconDiv);
+                leftDiv.appendChild(infoDiv);
 
-                        infoDiv.appendChild(infoWrap);
-                    }
+                // === Right side (remove button only) ===
+                const rightDiv = document.createElement("div");
+                rightDiv.className = "flex flex-col items-center gap-2";
 
-                    leftDiv.appendChild(iconDiv);
-                    leftDiv.appendChild(infoDiv);
-
-                    const removeBtn = document.createElement("button");
-                    removeBtn.className = "text-xl text-gray-800 hover:text-orange-700 transition";
-                    const removeIcon = document.createElement("i");
-                    removeIcon.className = "ph ph-trash";
-                    removeBtn.appendChild(removeIcon);
-                    removeBtn.addEventListener("click", () => removeFromCart(item.cart_id));
-
-                    itemDiv.appendChild(leftDiv);
-                    itemDiv.appendChild(removeBtn);
-
-                    itemsContainer.appendChild(itemDiv);
+                const removeBtn = document.createElement("button");
+                removeBtn.className = "text-xl text-gray-800 hover:text-orange-700 transition";
+                const removeIcon = document.createElement("i");
+                removeIcon.className = "ph ph-trash";
+                removeBtn.appendChild(removeIcon);
+                removeBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    removeFromCart(item.cart_id);
                 });
 
-            } else {
-                emptyState.classList.remove("hidden");
-                cartItemsDiv.classList.add("hidden");
-                cartCount.textContent = "0 total items";
-                const cartIcon = document.createElement("i");
-                cartIcon.className = "ph ph-shopping-cart text-xs";
-                cartCount.insertBefore(cartIcon, cartCount.firstChild);
-            }
-        }
+                rightDiv.appendChild(removeBtn);
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadCart();
-            document.getElementById("clear-cart-btn").addEventListener("click", clearCart);
-        });
+                // === Final assembly ===
+                itemDiv.appendChild(leftDiv);
+                itemDiv.appendChild(rightDiv);
+
+                // ✅ Toggle checkbox + highlight kapag na-click ang buong card
+                itemDiv.addEventListener("click", (e) => {
+                    if (e.target.tagName.toLowerCase() !== "input") {
+                        checkbox.checked = !checkbox.checked;
+                    }
+                    toggleHighlight();
+                });
+
+                checkbox.addEventListener("change", toggleHighlight);
+
+                function toggleHighlight() {
+                    if (checkbox.checked) {
+                        itemDiv.classList.add("bg-orange-100", "border-orange-400");
+                    } else {
+                        itemDiv.classList.remove("bg-orange-100", "border-orange-400");
+                    }
+                }
+
+                itemsContainer.appendChild(itemDiv);
+            });
+
+
+        } else {
+            emptyState.classList.remove("hidden");
+            cartItemsDiv.classList.add("hidden");
+            cartCount.textContent = "0 total items";
+            const cartIcon = document.createElement("i");
+            cartIcon.className = "ph ph-shopping-cart text-xs";
+            cartCount.insertBefore(cartIcon, cartCount.firstChild);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCart();
+        document.getElementById("clear-cart-btn").addEventListener("click", clearCart);
+    });
     </script>
 
 </body>

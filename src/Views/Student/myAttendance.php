@@ -22,36 +22,38 @@ $attendanceJS = [
 
 $now = new DateTime(); // current Manila time
 $today = new DateTime('today');
-$weekAgo = (clone $today)->modify('-6 days'); // last 7 days including today
-$firstOfMonth = new DateTime('first day of this month');
-$firstOfYear = new DateTime('first day of January this year');
+
+$firstOfMonth = new DateTime('first day of this month 00:00:00');
+$firstOfYear = new DateTime('first day of January this year 23:59:59');
+
+$startOfWeek = (clone $today)->modify('monday this week 00:00:00');
+$endOfWeek = (clone $today)->modify('sunday this week 23:59:59');
 
 foreach ($allLogs as $log) {
-    $logTime = new DateTime($log['timestamp']);
-    $entry = [
-        'date' => $logTime->format('D, M d, Y'),
-        'time' => $logTime->format('g:i A'),
-        'status' => 'Checked In'
-    ];
+  $logTime = new DateTime($log['timestamp']);
+  $entry = [
+    'date' => $logTime->format('D, M d, Y'),
+    'time' => $logTime->format('g:i A'),
+    'status' => 'Checked In'
+  ];
 
-    $logDate = $logTime->format('Y-m-d');
+  $logDate = $logTime->format('Y-m-d');
 
-    if ($logDate === $today->format('Y-m-d')) {
-        $attendanceJS['day'][] = $entry;
-        continue;
-    }
+  if ($logDate === $today->format('Y-m-d')) {
+    $attendanceJS['day'][] = $entry;
+  }
 
-    if ($logTime >= $weekAgo && $logTime < $today) {
-        $attendanceJS['week'][] = $entry;
-    }
+  if ($logTime >= $startOfWeek && $logTime <= $endOfWeek) {
+    $attendanceJS['week'][] = $entry;
+  }
 
-    if ($logTime >= $firstOfMonth && $logTime < $today) {
-        $attendanceJS['month'][] = $entry;
-    }
+  if ($logTime >= $firstOfMonth) {
+    $attendanceJS['month'][] = $entry;
+  }
 
-    if ($logTime >= $firstOfYear && $logTime < $today) {
-        $attendanceJS['year'][] = $entry;
-    }
+  if ($logTime >= $firstOfYear) {
+    $attendanceJS['year'][] = $entry;
+  }
 }
 
 ?>

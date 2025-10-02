@@ -23,189 +23,299 @@
         </p>
     </div>
 
-    <!-- Cart with Items -->
     <div id="cart-items" class="hidden">
         <!-- Checkout Summary -->
         <div class="mt-4 border rounded-[var(--radius-lg)] border-[var(--color-border)] bg-white shadow-sm p-4">
-            <h3 class="font-semibold text-[var(--color-foreground)] mb-1">Checkout Summary</h3>
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="font-semibold text-[var(--color-foreground)]">Checkout Summary</h3>
+
+                <label class="flex items-center gap-2 cursor-pointer text-sm text-[var(--color-muted-foreground)]">
+                    <input type="checkbox" id="select-all" class="w-4 h-4 accent-orange-600 rounded cursor-pointer" />
+                    Select All
+                </label>
+            </div>
+
             <p id="summary-text" class="text-[var(--color-muted-foreground)] text-[var(--font-size-sm)]">
                 0 book(s) and 0 equipment item(s) selected for borrowing
             </p>
+
             <div class="mt-4 flex items-center gap-2">
-                <button class="flex-1 bg-orange-600 text-white font-semibold rounded-[var(--radius-lg)] py-2 hover:bg-orange-500 transition">
-                    Checkout All Items & Generate QR
+                <button
+                    class="flex-1 bg-orange-600 text-white font-semibold rounded-[var(--radius-lg)] py-2 hover:bg-orange-500 transition">
+                    Check Out
                 </button>
-                <button id="clear-cart-btn"
-                    class="px-4 py-2 border rounded-[var(--radius-lg)] border-[var(--color-border)] 
-                               text-[var(--color-orange-700)] font-medium hover:bg-[var(--color-orange-100)] transition">
+                <button id="clear-cart-btn" class="px-4 py-2 border rounded-[var(--radius-lg)] border-[var(--color-border)] 
+                           text-[var(--color-orange-700)] font-medium hover:bg-[var(--color-orange-100)] transition">
                     Clear Cart
                 </button>
             </div>
         </div>
-
-        <!-- Selected Items -->
+    </div>
+    <!-- Selected Items -->
+    <div id="selected-items-section" class="hidden">
         <h3 class="mt-6 font-semibold text-[var(--color-foreground)]">Selected Items</h3>
         <div id="selected-items"></div>
     </div>
 
+
     <script>
-        let cart = [];
+    let cart = [];
 
-        async function loadCart() {
-            try {
-                const res = await fetch("/libsys/public/student/cart/json");
-                if (!res.ok) throw new Error("Failed to load cart");
-                cart = await res.json();
-                renderCart();
-            } catch (err) {
-                console.error("Error loading cart:", err);
-            }
+    async function loadCart() {
+        try {
+            const res = await fetch("/libsys/public/student/cart/json");
+            if (!res.ok) throw new Error("Failed to load cart");
+            cart = await res.json();
+            renderCart();
+        } catch (err) {
+            console.error("Error loading cart:", err);
+        }
+    }
+
+    async function clearCart() {
+        try {
+            const res = await fetch("/libsys/public/student/cart/clear", {
+                method: "POST"
+            });
+            if (!res.ok) throw new Error("Failed to clear cart");
+            cart = [];
+            alert("are u sure?");
+            renderCart();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async function removeFromCart(cartId) {
+        try {
+            const res = await fetch(`/libsys/public/student/cart/remove/${cartId}`, {
+                method: "POST"
+            });
+            if (!res.ok) throw new Error("Failed to remove item");
+            cart = cart.filter(item => item.cart_id !== cartId);
+            alert("are u sure?");
+            renderCart();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    let checkedMap = JSON.parse(localStorage.getItem("checkedMap")) || {};
+
+    function saveCheckedMap() {
+        localStorage.setItem("checkedMap", JSON.stringify(checkedMap));
+    }
+
+    function renderCart() {
+        const emptyState = document.getElementById("empty-state");
+        const cartItemsDiv = document.getElementById("cart-items");
+        const cartCount = document.getElementById("cart-count");
+        const itemsContainer = document.getElementById("selected-items");
+        const selectAllCheckbox = document.getElementById("select-all");
+        const selectedItemsSection = document.getElementById("selected-items-section");
+
+        // Clear container
+        while (itemsContainer.firstChild) {
+            itemsContainer.removeChild(itemsContainer.firstChild);
         }
 
-        async function clearCart() {
-            try {
-                const res = await fetch("/libsys/public/student/cart/clear", {
-                    method: "POST"
-                });
-                if (!res.ok) throw new Error("Failed to clear cart");
-                cart = [];
-                alert("are u sure?");
-                renderCart();
-            } catch (err) {
-                console.error(err);
-            }
-        }
+        if (cart.length > 0) {
+            emptyState.classList.add("hidden");
+            cartItemsDiv.classList.remove("hidden");
+            selectedItemsSection.classList.remove("hidden");
 
-        async function removeFromCart(cartId) {
-            try {
-                const res = await fetch(`/libsys/public/student/cart/remove/${cartId}`, {
-                    method: "POST"
-                });
-                if (!res.ok) throw new Error("Failed to remove item");
-                cart = cart.filter(item => item.cart_id !== cartId);
-                alert("are u sure?");
-                renderCart();
-            } catch (err) {
-                console.error(err);
-            }
-        }
+            cartCount.textContent = `${cart.length} total item(s)`;
+            const cartIcon = document.createElement("i");
+            cartIcon.className = "ph ph-shopping-cart text-xs";
+            cartCount.insertBefore(cartIcon, cartCount.firstChild);
 
-        function renderCart() {
-            const emptyState = document.getElementById("empty-state");
-            const cartItemsDiv = document.getElementById("cart-items");
-            const cartCount = document.getElementById("cart-count");
-            const summaryText = document.getElementById("summary-text");
-            const itemsContainer = document.getElementById("selected-items");
+            cart.forEach(item => {
+                const itemDiv = document.createElement("div");
+                itemDiv.className =
+                    "mt-4 border rounded-lg border-gray-300 bg-white shadow-sm flex items-center justify-between p-4 transition cursor-pointer";
 
-            while (itemsContainer.firstChild) {
-                itemsContainer.removeChild(itemsContainer.firstChild);
-            }
+                const leftDiv = document.createElement("div");
+                leftDiv.className = "flex items-center gap-3 w-full";
 
-            if (cart.length > 0) {
-                emptyState.classList.add("hidden");
-                cartItemsDiv.classList.remove("hidden");
+                // === Checkbox ===
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "w-4 h-4 accent-orange-600 cursor-pointer rounded-full";
+                checkbox.dataset.type = item.type;
+                checkbox.dataset.id = item.cart_id;
 
-                const bookCount = cart.filter(i => i.type === "book").length;
-                const equipmentCount = cart.filter(i => i.type === "equipment").length;
+                // Restore state from checkedMap
+                if (checkedMap[item.cart_id]) {
+                    checkbox.checked = true;
+                    toggleHighlight(itemDiv, true);
+                }
 
-                cartCount.textContent = `${cart.length} total item(s)`;
-                const cartIcon = document.createElement("i");
-                cartIcon.className = "ph ph-shopping-cart text-xs";
-                cartCount.insertBefore(cartIcon, cartCount.firstChild);
+                // === Icon ===
+                const iconDiv = document.createElement("div");
+                iconDiv.className = "flex-shrink-0 w-20 h-20 flex items-center justify-center";
+                const iconEl = document.createElement("i");
+                iconEl.className =
+                    `ph ${item.icon || 'ph-book'} text-5xl text-amber-700 w-10 h-10 leading-[2rem] text-center`;
+                iconDiv.appendChild(iconEl);
 
-                summaryText.textContent = `${bookCount} book(s) and ${equipmentCount} equipment item(s) selected for borrowing`;
+                // === Info ===
+                const infoDiv = document.createElement("div");
+                infoDiv.className = "flex-1";
 
-                cart.forEach(item => {
-                    const itemDiv = document.createElement("div");
-                    itemDiv.className = "mt-4 border rounded-lg border-gray-300 bg-white shadow-sm flex items-center justify-between p-4";
+                const titleEl = document.createElement("h4");
+                titleEl.className = "font-semibold";
+                titleEl.textContent = item.title;
+                infoDiv.appendChild(titleEl);
 
-                    const leftDiv = document.createElement("div");
-                    leftDiv.className = "flex items-center gap-4";
+                if (item.author) {
+                    const authorEl = document.createElement("p");
+                    authorEl.className = "text-sm text-gray-600";
+                    authorEl.textContent = `by ${item.author}`;
+                    infoDiv.appendChild(authorEl);
+                }
 
-                    const iconDiv = document.createElement("div");
-                    iconDiv.className = "w-20 h-20 flex items-center justify-center";
-                    const iconEl = document.createElement("i");
-                    iconEl.className = `ph ${item.icon || 'ph-book'} text-5xl text-amber-700`;
-                    iconDiv.appendChild(iconEl);
+                if (item.accessionNumber || item.callNumber || item.subject) {
+                    const infoWrap = document.createElement("div");
+                    infoWrap.className = "flex flex-wrap gap-x-6 text-sm text-gray-600 mt-4";
 
-                    const infoDiv = document.createElement("div");
-                    const titleEl = document.createElement("h4");
-                    titleEl.className = "font-semibold";
-                    titleEl.textContent = item.title;
-                    infoDiv.appendChild(titleEl);
-
-                    if (item.author) {
-                        const authorEl = document.createElement("p");
-                        authorEl.className = "text-sm text-gray-600";
-                        authorEl.textContent = `by ${item.author}`;
-                        infoDiv.appendChild(authorEl);
+                    if (item.accessionNumber) {
+                        const span = document.createElement("span");
+                        const strong = document.createElement("span");
+                        strong.className = "font-semibold";
+                        strong.textContent = "Accession Number: ";
+                        span.appendChild(strong);
+                        span.appendChild(document.createTextNode(item.accessionNumber));
+                        infoWrap.appendChild(span);
+                    }
+                    if (item.callNumber) {
+                        const span = document.createElement("span");
+                        const strong = document.createElement("span");
+                        strong.className = "font-semibold";
+                        strong.textContent = "Call Number: ";
+                        span.appendChild(strong);
+                        span.appendChild(document.createTextNode(item.callNumber));
+                        infoWrap.appendChild(span);
+                    }
+                    if (item.subject) {
+                        const span = document.createElement("span");
+                        const strong = document.createElement("span");
+                        strong.className = "font-semibold";
+                        strong.textContent = "Subject: ";
+                        span.appendChild(strong);
+                        span.appendChild(document.createTextNode(item.subject));
+                        infoWrap.appendChild(span);
                     }
 
-                    if (item.accessionNumber || item.subject || item.callNumber) {
-                        const infoWrap = document.createElement("div");
-                        infoWrap.className = "flex flex-wrap gap-6 text-sm text-gray-600 mt-1";
+                    infoDiv.appendChild(infoWrap);
+                }
 
-                        if (item.accessionNumber) {
-                            const span = document.createElement("span");
-                            const strong = document.createElement("span");
-                            strong.className = "font-semibold";
-                            strong.textContent = "Accession Number: ";
-                            span.appendChild(strong);
-                            span.appendChild(document.createTextNode(item.accessionNumber));
-                            infoWrap.appendChild(span);
-                        }
-                        if (item.subject) {
-                            const span = document.createElement("span");
-                            const strong = document.createElement("span");
-                            strong.className = "font-semibold";
-                            strong.textContent = "Subject: ";
-                            span.appendChild(strong);
-                            span.appendChild(document.createTextNode(item.subject));
-                            infoWrap.appendChild(span);
-                        }
-                        if (item.callNumber) {
-                            const span = document.createElement("span");
-                            const strong = document.createElement("span");
-                            strong.className = "font-semibold";
-                            strong.textContent = "Call Number: ";
-                            span.appendChild(strong);
-                            span.appendChild(document.createTextNode(item.callNumber));
-                            infoWrap.appendChild(span);
-                        }
+                // === Assemble left side ===
+                leftDiv.appendChild(checkbox);
+                leftDiv.appendChild(iconDiv);
+                leftDiv.appendChild(infoDiv);
 
-                        infoDiv.appendChild(infoWrap);
-                    }
-
-                    leftDiv.appendChild(iconDiv);
-                    leftDiv.appendChild(infoDiv);
-
-                    const removeBtn = document.createElement("button");
-                    removeBtn.className = "text-xl text-gray-800 hover:text-orange-700 transition";
-                    const removeIcon = document.createElement("i");
-                    removeIcon.className = "ph ph-trash";
-                    removeBtn.appendChild(removeIcon);
-                    removeBtn.addEventListener("click", () => removeFromCart(item.cart_id));
-
-                    itemDiv.appendChild(leftDiv);
-                    itemDiv.appendChild(removeBtn);
-
-                    itemsContainer.appendChild(itemDiv);
+                // === Remove Button ===
+                const removeBtn = document.createElement("button");
+                removeBtn.className = "text-2xl text-gray-800 hover:text-orange-700 transition ml-4";
+                const removeIcon = document.createElement("i");
+                removeIcon.className = "ph ph-trash";
+                removeBtn.appendChild(removeIcon);
+                removeBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    delete checkedMap[item.cart_id];
+                    saveCheckedMap();
+                    removeFromCart(item.cart_id);
                 });
 
-            } else {
-                emptyState.classList.remove("hidden");
-                cartItemsDiv.classList.add("hidden");
-                cartCount.textContent = "0 total items";
-                const cartIcon = document.createElement("i");
-                cartIcon.className = "ph ph-shopping-cart text-xs";
-                cartCount.insertBefore(cartIcon, cartCount.firstChild);
-            }
+                // === Card Click Toggle ===
+                itemDiv.addEventListener("click", () => {
+                    checkbox.checked = !checkbox.checked;
+                    checkedMap[item.cart_id] = checkbox.checked;
+                    saveCheckedMap();
+                    toggleHighlight(itemDiv, checkbox.checked);
+                    updateSummary();
+                    syncSelectAll();
+                });
+
+                // === Checkbox Click ===
+                checkbox.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    checkedMap[item.cart_id] = checkbox.checked;
+                    saveCheckedMap();
+                    toggleHighlight(itemDiv, checkbox.checked);
+                    updateSummary();
+                    syncSelectAll();
+                });
+
+                itemDiv.appendChild(leftDiv);
+                itemDiv.appendChild(removeBtn);
+                itemsContainer.appendChild(itemDiv);
+            });
+
+            updateSummary();
+            syncSelectAll();
+
+        } else {
+            emptyState.classList.remove("hidden");
+            cartItemsDiv.classList.add("hidden");
+            selectedItemsSection.classList.add("hidden");
+            cartCount.textContent = "0 total items";
+            const cartIcon = document.createElement("i");
+            cartIcon.className = "ph ph-shopping-cart text-xs";
+            cartCount.insertBefore(cartIcon, cartCount.firstChild);
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadCart();
-            document.getElementById("clear-cart-btn").addEventListener("click", clearCart);
+        // === Select All handler ===
+        if (selectAllCheckbox) {
+            selectAllCheckbox.onchange = () => {
+                const allItems = document.querySelectorAll("#selected-items input[type='checkbox']");
+                allItems.forEach(cb => {
+                    cb.checked = selectAllCheckbox.checked;
+                    checkedMap[cb.dataset.id] = cb.checked;
+                    toggleHighlight(cb.closest("div.mt-4"), cb.checked);
+                });
+                saveCheckedMap();
+                updateSummary();
+            };
+        }
+    }
+
+    function toggleHighlight(itemDiv, checked) {
+        itemDiv.classList.toggle("bg-orange-100", checked);
+        itemDiv.classList.toggle("border-orange-500", checked);
+    }
+
+    function updateSummary() {
+        const summaryText = document.getElementById("summary-text");
+        const allItems = document.querySelectorAll("#selected-items input[type='checkbox']");
+        let books = 0,
+            equipment = 0;
+
+        allItems.forEach(cb => {
+            if (cb.checked) {
+                if (cb.dataset.type === "book") books++;
+                if (cb.dataset.type === "equipment") equipment++;
+            }
         });
+
+        summaryText.textContent =
+            `${books} book(s) and ${equipment} equipment item(s) selected for borrowing`;
+    }
+
+    function syncSelectAll() {
+        const selectAllCheckbox = document.getElementById("select-all");
+        const allItems = document.querySelectorAll("#selected-items input[type='checkbox']");
+        if (allItems.length > 0) {
+            selectAllCheckbox.checked = [...allItems].every(cb => cb.checked);
+        } else {
+            selectAllCheckbox.checked = false;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCart();
+        document.getElementById("clear-cart-btn").addEventListener("click", clearCart);
+    });
     </script>
 
 </body>

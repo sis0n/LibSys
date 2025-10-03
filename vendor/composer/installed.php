@@ -3,7 +3,7 @@
         'name' => 'library/los-ucc',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '296bd509fc25f058044f0ffeec8b04c13943a9a3',
+        'reference' => 'd219b7dc6f4e7530b608e7434579f041876295f3',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -51,7 +51,7 @@
         'library/los-ucc' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '296bd509fc25f058044f0ffeec8b04c13943a9a3',
+            'reference' => 'd219b7dc6f4e7530b608e7434579f041876295f3',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

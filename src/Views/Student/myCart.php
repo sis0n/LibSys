@@ -98,7 +98,6 @@
 
             cart = [];
             renderCart();
-            updateCartBadge();
 
             Swal.fire({
                 toast: true,
@@ -122,8 +121,6 @@
             });
         }
     }
-
-
 
     async function removeFromCart(cartId) {
         try {
@@ -153,7 +150,6 @@
 
             cart = cart.filter(item => item.cart_id !== cartId);
             renderCart();
-            updateCartBadge();
 
             Swal.fire({
                 toast: true,
@@ -364,6 +360,7 @@
         itemDiv.classList.toggle("bg-orange-100", checked);
         itemDiv.classList.toggle("border-orange-500", checked);
     }
+    
 
     function updateSummary() {
         const summaryText = document.getElementById("summary-text");

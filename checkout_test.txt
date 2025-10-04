@@ -1,0 +1,12 @@
+18:52:33 checkout() CALLED
+SESSION DATA: {"csrf_token":"35ec61e1a151ba405f4a4d3eb4b2dc535302941ce03f8e52d5e83640b9aabdb7","user_id":4,"username":"20230335-S","role":"student","fullname":"alwyn"}
+18:52:33 checkout triggered by user_id=4, selected=["110"]
+DEBUG student_id=4
+DEBUG selectedIds=["110"]
+DEBUG fetched cartItems=[{"cart_id":110,"book_id":256,"title":"Research methods in psychology ","author":"Shaughnessy, John J.  and Zechmeister,  Eugene B. "}]
+18:52:43 checkout() CALLED
+SESSION DATA: {"csrf_token":"35ec61e1a151ba405f4a4d3eb4b2dc535302941ce03f8e52d5e83640b9aabdb7","user_id":4,"username":"20230335-S","role":"student","fullname":"alwyn"}
+18:52:43 checkout triggered by user_id=4, selected=["110","111"]
+DEBUG student_id=4
+DEBUG selectedIds=["110","111"]
+DEBUG fetched cartItems=[{"cart_id":110,"book_id":256,"title":"Research methods in psychology ","author":"Shaughnessy, John J.  and Zechmeister,  Eugene B. "},{"cart_id":111,"book_id":512,"title":"\r\nThe life and works of Jose Rizal\r\n","author":"Wani-Obias, Rhodalyn"}]

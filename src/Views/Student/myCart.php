@@ -73,7 +73,7 @@
         }
 
         async function checkoutCart() {
-            console.log("btn clicked");
+            console.log("Checkout button clicked");
             const selectedIds = Object.keys(checkedMap).filter(id => checkedMap[id]);
             console.log("Selected IDs for checkout:", selectedIds);
 
@@ -85,27 +85,42 @@
             try {
                 const res = await fetch("/libsys/public/student/cart/checkout", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        cart_ids: selectedIds
-                    })
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ cart_ids: selectedIds })
                 });
 
-                if (!res.ok) throw new Error("Checkout failed");
+                // Try to read as JSON first
+                const text = await res.text();
+                console.log("Raw response:", text);
 
-                const data = await res.json();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    console.warn("Response was not JSON, maybe redirected or HTML page.");
+                    // if not JSON, assume redirect happened (server handled it)
+                    document.open();
+                    document.write(text);
+                    document.close();
+                    return;
+                }
+
+                console.log("Parsed data:", data);
 
                 if (data.success) {
-                    window.location.href = `/libsys/public/student/qrborrowingticket/${data.ticket_id}`;
+                    alert("Checkout successful! You can now view your QR Borrowing Ticket in the Borrowing Ticket page.");
+                    // Optional: reload cart to clear selected items
+                    loadCart();
                 } else {
-                    alert("Checkout failed: " + (data.message || "Unknown error"));
+                    alert(data.message || "Checkout failed");
                 }
             } catch (err) {
                 console.error("Checkout error:", err);
+                alert("Something went wrong. Please try again.");
             }
         }
+
+
 
         async function clearCart() {
             try {

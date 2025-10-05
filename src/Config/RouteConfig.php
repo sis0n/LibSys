@@ -140,7 +140,7 @@ class RouteConfig
 
         // checkout routes
         $router->post('student/cart/checkout', 'TicketController@checkout', ['student']);
-        $router->get('student/qrBorrowingTicket/{transactionCode}', 'TicketController@show', ['student']);
+        $router->get('student/qrBorrowingTicket', 'TicketController@show', ['student']);
 
 
 

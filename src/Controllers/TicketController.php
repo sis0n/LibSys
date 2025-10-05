@@ -17,9 +17,6 @@ class TicketController extends Controller
     $this->ticketRepo = new TicketRepository();
   }
 
-  /**
-   * Generate QR code image and return its path
-   */
   private function generateQr(string $transactionCode): string
   {
     $qrPath = __DIR__ . "/../../public/qrcodes/{$transactionCode}.png";
@@ -39,57 +36,87 @@ class TicketController extends Controller
     $result = $builder->build();
     $result->saveToFile($qrPath);
 
-    return "/qrcodes/{$transactionCode}.png";
+    return "/libsys/public/qrcodes/{$transactionCode}.png";
   }
 
   public function checkout()
   {
-    file_put_contents(__DIR__ . '/../../checkout_test.txt', date('H:i:s') . " checkout() CALLED\n", FILE_APPEND);
-
     if (session_status() === PHP_SESSION_NONE) {
       session_start();
     }
 
-    file_put_contents(
-      __DIR__ . '/../../checkout_test.txt',
-      "SESSION DATA: " . json_encode($_SESSION) . "\n",
-      FILE_APPEND
-    );
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) {
+      http_response_code(403);
+      echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+      exit;
+    }
 
-    $studentId = $_SESSION['student_id'] ?? $_SESSION['user_id'] ?? null;
-
+    $studentId = $this->ticketRepo->getStudentIdByUserId((int)$userId);
     if (!$studentId) {
       http_response_code(403);
-      echo json_encode(['success' => false, 'message' => 'Unauthorized - no session']);
+      echo json_encode(['success' => false, 'message' => 'No student record found']);
       exit;
     }
 
     $input = json_decode(file_get_contents('php://input'), true);
     $selectedIds = $input['cart_ids'] ?? [];
 
-    $logFile = __DIR__ . '/../../checkout_test.txt';
-    file_put_contents($logFile, date('H:i:s') . " checkout triggered by user_id={$studentId}, selected=" . json_encode($selectedIds) . "\n", FILE_APPEND);
+    if (!is_array($selectedIds)) {
+      http_response_code(400);
+      echo json_encode(['success' => false, 'message' => 'cart_ids must be an array']);
+      exit;
+    }
 
     try {
-      if (!empty($selectedIds)) {
-        $cartItems = $this->ticketRepo->getCartItemsByIds($studentId, $selectedIds);
-      } else {
-        $cartItems = $this->ticketRepo->getCartItems($studentId);
-      }
-
-      file_put_contents($logFile, "DEBUG student_id={$studentId}\n", FILE_APPEND);
-      file_put_contents($logFile, "DEBUG selectedIds=" . json_encode($selectedIds) . "\n", FILE_APPEND);
-      file_put_contents($logFile, "DEBUG fetched cartItems=" . json_encode($cartItems) . "\n", FILE_APPEND);
+      $cartItems = !empty($selectedIds)
+        ? $this->ticketRepo->getCartItemsByIds($studentId, $selectedIds)
+        : $this->ticketRepo->getCartItems($studentId);
 
       if (empty($cartItems)) {
         echo json_encode(['success' => false, 'message' => 'Cart is empty']);
         exit;
       }
 
-      $transactionCode = strtoupper(uniqid("TICKET-"));
-      $dueDate = date("Y-m-d H:i:s", strtotime("+7 days"));
+      $existingTransaction = $this->ticketRepo->getLatestTransactionByStudentId($studentId);
 
-      $transactionId = $this->ticketRepo->createTransaction($studentId, $transactionCode, $dueDate);
+      $useExisting = false;
+      if ($existingTransaction) {
+        $dueDate = strtotime($existingTransaction['due_date']);
+        if ($dueDate > time()) { // still valid
+          $useExisting = true;
+          $transactionId = $existingTransaction['transaction_id'];
+          $transactionCode = $existingTransaction['transaction_code'];
+        }
+      }
+
+      if ($useExisting) {
+        $borrowedBooks = $this->ticketRepo->getBorrowedBooksByTransaction($transactionId);
+
+        $borrowedAccessions = array_column($borrowedBooks, 'accession_number');
+        $duplicateBooks = [];
+
+        foreach ($cartItems as $book) {
+          if (in_array($book['accession_number'], $borrowedAccessions)) {
+            $duplicateBooks[] = $book['title'];
+          }
+        }
+
+        if (!empty($duplicateBooks)) {
+          echo json_encode([
+            'success' => false,
+            'message' => 'Some books are already in your active ticket: ' . implode(', ', $duplicateBooks)
+          ]);
+          exit;
+        }
+      }
+
+      if (!$useExisting) {
+        $transactionCode = strtoupper(uniqid("TICKET-"));
+        $dueDate = date("Y-m-d H:i:s", strtotime("+7 days"));
+        $transactionId = $this->ticketRepo->createTransaction($studentId, $transactionCode, $dueDate);
+      }
+
       $this->ticketRepo->addTransactionItems($transactionId, $cartItems);
 
       if (!empty($selectedIds)) {
@@ -98,35 +125,95 @@ class TicketController extends Controller
         $this->ticketRepo->clearCart($studentId);
       }
 
-      echo json_encode(['success' => true, 'ticket_id' => $transactionCode]);
+      $_SESSION['last_ticket_code'] = $transactionCode;
+
+      $qrPath = $this->generateQr($transactionCode);
+
+      header('Content-Type: application/json');
+      echo json_encode([
+        'success' => true,
+        'message' => $useExisting
+          ? 'Books added to your existing Borrowing Ticket!'
+          : 'Checkout successful! A new Borrowing Ticket has been created.',
+        'ticket_code' => $transactionCode,
+        'qrPath' => $qrPath
+      ]);
       exit;
     } catch (\Throwable $e) {
-      file_put_contents($logFile, "ERROR: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", FILE_APPEND);
-      echo json_encode(['success' => false, 'message' => 'Internal server error']);
+      http_response_code(500);
+      echo json_encode([
+        'success' => false,
+        'message' => 'Internal server error: ' . $e->getMessage()
+      ]);
       exit;
     }
   }
 
-  public function show(string $transactionCode)
+  public function show(string $transactionCode = null)
   {
-
-    $transaction = $this->ticketRepo->getTransactionByCode($transactionCode);
-
-    if (!$transaction) {
-      die("Transaction not found.");
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) {
+      http_response_code(403);
+      echo "Unauthorized - Please login.";
+      exit;
     }
 
-    $books = $this->ticketRepo->getTransactionItems($transaction['transaction_id']);
+    $studentId = $this->ticketRepo->getStudentIdByUserId((int)$userId);
 
-    $student = $this->ticketRepo->getStudentInfo($transaction['student_id']);
+    $transaction = [
+      'transaction_id' => null,
+      'transaction_code' => 'N/A',
+      'due_date' => 'N/A',
+      'borrowed_at' => null
+    ];
+
+    $books = [];
+    $student = [
+      'student_number' => 'N/A',
+      'name' => 'Student Name',
+      'year_level' => 'N/A',
+      'course' => 'N/A'
+    ];
+
+    $qrPath = null;
+
+    try {
+      if (!$transactionCode) {
+        $transactionCode = $_SESSION['last_ticket_code'] ?? null;
+      }
+
+      if (!$transactionCode && $studentId) {
+        $latestTransaction = $this->ticketRepo->getLatestTransactionByStudentId($studentId);
+        $transactionCode = $latestTransaction['transaction_code'] ?? null;
+      }
+
+      if ($transactionCode) {
+        $transaction = $this->ticketRepo->getTransactionByCode($transactionCode);
+        $books = $this->ticketRepo->getTransactionItems($transaction['transaction_id']);
+        $student = $this->ticketRepo->getStudentInfo($transaction['student_id']);
+        $qrPath = $this->generateQr($transaction['transaction_code']);
+      }
+    } catch (\Throwable $e) {
+      file_put_contents(__DIR__ . '/../../checkout_test.txt', "ERROR in show(): " . $e->getMessage() . "\n", FILE_APPEND); //pang debug
+    }
+    file_put_contents(
+      __DIR__ . '/../../checkout_test.txt',
+      "SHOW DEBUG:\n" .
+        "transactionCode: " . ($transactionCode ?? 'NULL') . "\n" .
+        "transaction_id: " . ($transaction['transaction_id'] ?? 'NULL') . "\n" .
+        "books count: " . count($books) . "\n" .
+        "qrPath: " . ($qrPath ?? 'NULL') . "\n\n",
+      FILE_APPEND
+    );
 
     $this->view("student/qrBorrowingTicket", [
       "transaction_id"   => $transaction['transaction_id'],
       "transaction_code" => $transaction['transaction_code'],
-      "books"            => $books,
-      "qrPath"           => "/qrcodes/{$transaction['transaction_code']}.png",
-      "due_date"         => $transaction['due_date'],
-      "student"          => $student
+      "books" => $books,
+      "qrPath" => $qrPath,
+      "due_date" => $transaction['due_date'],
+      "student" => $student,
+      "borrowed_at" => $transaction['borrowed_at']
     ]);
   }
 }

@@ -1,0 +1,18 @@
+SQL: 
+        SELECT c.cart_id, c.book_id, b.title, b.author
+        FROM carts c
+        JOIN books b ON c.book_id = b.book_id
+        WHERE c.student_id = ? AND c.cart_id IN (?)
+    
+Params: [4,110]
+RESULT: []
+
+SQL: 
+        SELECT c.cart_id, c.book_id, b.title, b.author
+        FROM carts c
+        JOIN books b ON c.book_id = b.book_id
+        WHERE c.student_id = ? AND c.cart_id IN (?)
+    
+Params: [4,110]
+RESULT: []
+

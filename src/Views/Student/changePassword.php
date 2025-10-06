@@ -6,10 +6,10 @@
 
   <!-- Title (same container wdth para align with form) -->
   <div class="w-full max-w-[550px]">
-    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-4">
       Change Password
     </h1>
-    <p class="text-sm text-gray-500 mt-1">
+    <p class="text-sm text-gray-500">
       Update your account password to keep your account secure.
     </p>
   </div>

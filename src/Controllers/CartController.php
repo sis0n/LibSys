@@ -99,4 +99,34 @@ class CartController extends Controller
     header('Content-Type: application/json');
     echo json_encode($cartItems);
   }
+
+  public function checkout()
+  {
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) $this->showErrorPage(401, "Not logged in");
+
+    $studentId = $this->getStudentId($userId);
+    if (!$studentId) $this->showErrorPage(400, "No student record found for this user");
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    $cartIds = $data['cart_ids'] ?? [];
+
+    if (empty($cartIds)) {
+      header('Content-Type: application/json');
+      echo json_encode(["success" => false, "message" => "No items selected"]);
+      return;
+    }
+
+    $ticketId = uniqid("TICKET-");
+
+    foreach ($cartIds as $cid) {
+      $this->cartRepo->removeFromCart((int)$cid, $studentId);
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode([
+      "success" => true,
+      "ticket_id" => $ticketId
+    ]);
+  }
 }

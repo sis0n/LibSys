@@ -26,6 +26,9 @@ Thumbs.db
 # PHP / Composer specific
 # -----------------------------
 
+# Composer dependencies
+/vendor/
+
 # Logs and cache
 *.log
 *.cache

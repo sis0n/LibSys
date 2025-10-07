@@ -118,40 +118,37 @@ class UserRepository
   }
 
   // ===== Change Password Functions =====
-public function findUserById($userId)
-{
+  public function findUserById($userId)
+  {
     try {
-        $stmt = $this->db->prepare("
+      $stmt = $this->db->prepare("
             SELECT * FROM users 
             WHERE user_id = :id 
             LIMIT 1
         ");
-        $stmt->bindParam(':id', $userId, \PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+      $stmt->bindParam(':id', $userId, \PDO::PARAM_INT);
+      $stmt->execute();
+      return $stmt->fetch(\PDO::FETCH_ASSOC);
     } catch (\PDOException $e) {
-        error_log("[UserRepository::findUserById] " . $e->getMessage());
-        return null;
+      error_log("[UserRepository::findUserById] " . $e->getMessage());
+      return null;
     }
-}
+  }
 
-public function updatePassword($userId, $hashedPassword)
-{
+  public function updatePassword($userId, $hashedPassword)
+  {
     try {
-        $stmt = $this->db->prepare("
+      $stmt = $this->db->prepare("
             UPDATE users 
             SET password = :password 
             WHERE user_id = :id
         ");
-        $stmt->bindParam(':password', $hashedPassword);
-        $stmt->bindParam(':id', $userId, \PDO::PARAM_INT);
-        return $stmt->execute();
+      $stmt->bindParam(':password', $hashedPassword);
+      $stmt->bindParam(':id', $userId, \PDO::PARAM_INT);
+      return $stmt->execute();
     } catch (\PDOException $e) {
-        error_log("[UserRepository::updatePassword] " . $e->getMessage());
-        return false;
+      error_log("[UserRepository::updatePassword] " . $e->getMessage());
+      return false;
     }
-}
-
-
-
+  }
 }

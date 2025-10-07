@@ -291,7 +291,8 @@
 
  <!-- Edit User Modal -->
  <div id="editUserModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
-     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 w-full max-w-2xl animate-fadeIn">
+     <div
+         class="rounded-xl overflow-hidden shadow-lg border border-[var(--color-border)] bg-[var(--color-card)] w-full max-w-lg animate-fadeIn">
          <div class="p-6 max-h-[90vh] overflow-y-auto">
 
              <!-- Header -->
@@ -318,7 +319,8 @@
 
                      <!-- Full Name -->
                      <div>
-                         <label class="block text-sm text-gray-700 mb-1">Full Name *</label>
+                         <label class="block text-sm text-gray-700 mb-1">Full Name <span
+                                 class="text-red-500">*</span></label>
                          <input id="editName" type="text"
                              class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
                              placeholder="Enter full name">
@@ -326,7 +328,8 @@
 
                      <!-- Email -->
                      <div>
-                         <label class="block text-sm text-gray-700 mb-1">Email *</label>
+                         <label class="block text-sm text-gray-700 mb-1">Email <span
+                                 class="text-red-500">*</span></label>
                          <input id="editEmail" type="email"
                              class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
                              placeholder="user@university.edu">
@@ -393,7 +396,8 @@
                      <div class="grid grid-cols-2 gap-4">
                          <!-- New Password -->
                          <div>
-                             <label class="block text-sm text-gray-700 mb-1">New Password *</label>
+                             <label class="block text-sm text-gray-700 mb-1">New Password <span
+                                     class="text-red-500">*</span></label>
                              <div class="relative">
                                  <input id="editPassword" type="password"
                                      class="w-full bg-orange-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none pr-10"
@@ -403,12 +407,12 @@
                                      <i class="ph ph-eye"></i>
                                  </button>
                              </div>
-                             <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
                          </div>
 
                          <!-- Confirm Password -->
                          <div>
-                             <label class="block text-sm text-gray-700 mb-1">Confirm Password *</label>
+                             <label class="block text-sm text-gray-700 mb-1">Confirm Password <span
+                                     class="text-red-500">*</span></label>
                              <div class="relative">
                                  <input id="confirmPassword" type="password"
                                      class="w-full bg-orange-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none pr-10"
@@ -420,7 +424,7 @@
                              </div>
                          </div>
                      </div>
-
+                     <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
                      <!-- Note -->
                      <div class="mt-4 bg-amber-50 border border-orange-200 rounded-md p-3 text-sm text-amber-700">
                          <strong>Note:</strong> Changing the password will require the user to sign in with the new
@@ -528,201 +532,201 @@
      </div>
  </div>
  <script>
-     const modal = document.getElementById("importModal");
-     const openBtn = document.getElementById("bulkImportBtn");
-     const closeBtn = document.getElementById("closeImportModal");
-     const cancelBtn = document.getElementById("cancelImport");
+const modal = document.getElementById("importModal");
+const openBtn = document.getElementById("bulkImportBtn");
+const closeBtn = document.getElementById("closeImportModal");
+const cancelBtn = document.getElementById("cancelImport");
 
-     function closeModal() {
-         modal.classList.add("hidden");
-         document.body.classList.remove("overflow-hidden");
-     }
+function closeModal() {
+    modal.classList.add("hidden");
+    document.body.classList.remove("overflow-hidden");
+}
 
-     openBtn.addEventListener("click", () => {
-         modal.classList.remove("hidden");
-         document.body.classList.add("overflow-hidden");
-     });
+openBtn.addEventListener("click", () => {
+    modal.classList.remove("hidden");
+    document.body.classList.add("overflow-hidden");
+});
 
-     closeBtn.addEventListener("click", closeModal);
-     cancelBtn.addEventListener("click", closeModal);
+closeBtn.addEventListener("click", closeModal);
+cancelBtn.addEventListener("click", closeModal);
 
-     modal.addEventListener("click", e => {
-         if (e.target === modal) closeModal();
-     });
-     const addUserModal = document.getElementById("addUserModal");
-     const openAddUserBtn = document.getElementById("addUserBtn");
-     const closeAddUserBtn = document.getElementById("closeAddUserModal");
-     const cancelAddUserBtn = document.getElementById("cancelAddUser");
+modal.addEventListener("click", e => {
+    if (e.target === modal) closeModal();
+});
+const addUserModal = document.getElementById("addUserModal");
+const openAddUserBtn = document.getElementById("addUserBtn");
+const closeAddUserBtn = document.getElementById("closeAddUserModal");
+const cancelAddUserBtn = document.getElementById("cancelAddUser");
 
-     function closeAddUserModal() {
-         addUserModal.classList.add("hidden");
-         document.body.classList.remove("overflow-hidden");
-     }
+function closeAddUserModal() {
+    addUserModal.classList.add("hidden");
+    document.body.classList.remove("overflow-hidden");
+}
 
-     openAddUserBtn.addEventListener("click", () => {
-         addUserModal.classList.remove("hidden");
-         document.body.classList.add("overflow-hidden");
-     });
+openAddUserBtn.addEventListener("click", () => {
+    addUserModal.classList.remove("hidden");
+    document.body.classList.add("overflow-hidden");
+});
 
-     [closeAddUserBtn, cancelAddUserBtn].forEach(btn => {
-         btn.addEventListener("click", closeAddUserModal);
-     });
+[closeAddUserBtn, cancelAddUserBtn].forEach(btn => {
+    btn.addEventListener("click", closeAddUserModal);
+});
 
-     addUserModal.addEventListener("click", e => {
-         if (e.target === addUserModal) closeAddUserModal();
-     });
-
-
-     // === ROLE DROPDOWN ===
-     const roleBtn = document.getElementById("roleDropdownBtn");
-     const roleMenu = document.getElementById("roleDropdownMenu");
-     const roleValue = document.getElementById("roleDropdownValue");
-
-     roleBtn.addEventListener("click", () => {
-         roleMenu.classList.toggle("hidden");
-     });
-
-     function selectRole(el, value) {
-         roleValue.textContent = value;
-         // Clear highlight
-         document.querySelectorAll("#roleDropdownMenu .dropdown-item")
-             .forEach(item => item.classList.remove("bg-orange-100", "font-semibold"));
-         // Highlight selected
-         el.classList.add("bg-orange-100", "font-semibold");
-         roleMenu.classList.add("hidden");
-     }
-
-     // === STATUS DROPDOWN ===
-     const statusBtn = document.getElementById("statusDropdownBtn");
-     const statusMenu = document.getElementById("statusDropdownMenu");
-     const statusValue = document.getElementById("statusDropdownValue");
-
-     statusBtn.addEventListener("click", () => {
-         statusMenu.classList.toggle("hidden");
-     });
-
-     function selectStatus(el, value) {
-         statusValue.textContent = value;
-         document.querySelectorAll("#statusDropdownMenu .status-item")
-             .forEach(item => item.classList.remove("bg-orange-100", "font-semibold"));
-         el.classList.add("bg-orange-100", "font-semibold");
-         statusMenu.classList.add("hidden");
-     }
-
-     // === CLICK OUTSIDE CLOSE ===
-     document.addEventListener("click", (e) => {
-         if (!roleBtn.contains(e.target) && !roleMenu.contains(e.target)) {
-             roleMenu.classList.add("hidden");
-         }
-         if (!statusBtn.contains(e.target) && !statusMenu.contains(e.target)) {
-             statusMenu.classList.add("hidden");
-         }
-     });
-
-     // === DEFAULT HIGHLIGHT ON LOAD ===
-     window.addEventListener("DOMContentLoaded", () => {
-         const defaultRole = document.querySelector("#roleDropdownMenu .dropdown-item");
-         if (defaultRole) defaultRole.classList.add("bg-orange-100", "font-semibold");
-
-         const defaultStatus = document.querySelector("#statusDropdownMenu .status-item");
-         if (defaultStatus) defaultStatus.classList.add("bg-orange-100", "font-semibold");
-     });
+addUserModal.addEventListener("click", e => {
+    if (e.target === addUserModal) closeAddUserModal();
+});
 
 
-     // === USER ROLE DROPDOWN ===
-    const userRoleBtn = document.getElementById("userRoleDropdownBtn");
-    const userRoleMenu = document.getElementById("userRoleDropdownMenu");
-    const userRoleValue = document.getElementById("userRoleDropdownValue");
+// === ROLE DROPDOWN ===
+const roleBtn = document.getElementById("roleDropdownBtn");
+const roleMenu = document.getElementById("roleDropdownMenu");
+const roleValue = document.getElementById("roleDropdownValue");
 
-    userRoleBtn.addEventListener("click", () => userRoleMenu.classList.toggle("hidden"));
+roleBtn.addEventListener("click", () => {
+    roleMenu.classList.toggle("hidden");
+});
 
-    function selectUserRole(el, value) {
-        userRoleValue.textContent = value;
-        document.querySelectorAll("#userRoleDropdownMenu .user-role-item")
-            .forEach(item => item.classList.remove("bg-orange-100", "font-semibold"));
-        el.classList.add("bg-orange-100", "font-semibold");
+function selectRole(el, value) {
+    roleValue.textContent = value;
+    // Clear highlight
+    document.querySelectorAll("#roleDropdownMenu .dropdown-item")
+        .forEach(item => item.classList.remove("bg-orange-100", "font-semibold"));
+    // Highlight selected
+    el.classList.add("bg-orange-100", "font-semibold");
+    roleMenu.classList.add("hidden");
+}
+
+// === STATUS DROPDOWN ===
+const statusBtn = document.getElementById("statusDropdownBtn");
+const statusMenu = document.getElementById("statusDropdownMenu");
+const statusValue = document.getElementById("statusDropdownValue");
+
+statusBtn.addEventListener("click", () => {
+    statusMenu.classList.toggle("hidden");
+});
+
+function selectStatus(el, value) {
+    statusValue.textContent = value;
+    document.querySelectorAll("#statusDropdownMenu .status-item")
+        .forEach(item => item.classList.remove("bg-orange-100", "font-semibold"));
+    el.classList.add("bg-orange-100", "font-semibold");
+    statusMenu.classList.add("hidden");
+}
+
+// === CLICK OUTSIDE CLOSE ===
+document.addEventListener("click", (e) => {
+    if (!roleBtn.contains(e.target) && !roleMenu.contains(e.target)) {
+        roleMenu.classList.add("hidden");
+    }
+    if (!statusBtn.contains(e.target) && !statusMenu.contains(e.target)) {
+        statusMenu.classList.add("hidden");
+    }
+});
+
+// === DEFAULT HIGHLIGHT ON LOAD ===
+window.addEventListener("DOMContentLoaded", () => {
+    const defaultRole = document.querySelector("#roleDropdownMenu .dropdown-item");
+    if (defaultRole) defaultRole.classList.add("bg-orange-100", "font-semibold");
+
+    const defaultStatus = document.querySelector("#statusDropdownMenu .status-item");
+    if (defaultStatus) defaultStatus.classList.add("bg-orange-100", "font-semibold");
+});
+
+
+// === USER ROLE DROPDOWN ===
+const userRoleBtn = document.getElementById("userRoleDropdownBtn");
+const userRoleMenu = document.getElementById("userRoleDropdownMenu");
+const userRoleValue = document.getElementById("userRoleDropdownValue");
+
+userRoleBtn.addEventListener("click", () => userRoleMenu.classList.toggle("hidden"));
+
+function selectUserRole(el, value) {
+    userRoleValue.textContent = value;
+    document.querySelectorAll("#userRoleDropdownMenu .user-role-item")
+        .forEach(item => item.classList.remove("bg-orange-100", "font-semibold"));
+    el.classList.add("bg-orange-100", "font-semibold");
+    userRoleMenu.classList.add("hidden");
+}
+
+// === CLICK OUTSIDE CLOSE ===
+document.addEventListener("click", (e) => {
+    if (!userRoleBtn.contains(e.target) && !userRoleMenu.contains(e.target)) {
         userRoleMenu.classList.add("hidden");
     }
+});
 
-    // === CLICK OUTSIDE CLOSE ===
-    document.addEventListener("click", (e) => {
-        if (!userRoleBtn.contains(e.target) && !userRoleMenu.contains(e.target)) {
-            userRoleMenu.classList.add("hidden");
-        }
-    });
+// === DEFAULT HIGHLIGHT ON LOAD ===
+window.addEventListener("DOMContentLoaded", () => {
+    const defaultRole = document.querySelector("#userRoleDropdownMenu .user-role-item");
+    if (defaultRole) defaultRole.classList.add("bg-orange-100", "font-semibold");
+});
 
-    // === DEFAULT HIGHLIGHT ON LOAD ===
-    window.addEventListener("DOMContentLoaded", () => {
-        const defaultRole = document.querySelector("#userRoleDropdownMenu .user-role-item");
-        if (defaultRole) defaultRole.classList.add("bg-orange-100", "font-semibold");
-    });
+//  === SAMPLE DATA ===
+const users = [{
+        name: "Joshua Colmo",
+        username: "2023114-S",
+        role: "Student",
+        status: "Active",
+        joinDate: "MM/DD/YYYY",
+    },
+    {
+        name: "Librarian",
+        username: "Librarian Account",
+        role: "Librarian",
+        status: "Active",
+        joinDate: "MM/DD/YYYY",
+    },
+    {
+        name: "Admin",
+        username: "Admin Account",
+        role: "Admin",
+        status: "Active",
+        joinDate: "MM/DD/YYYY",
+    },
+];
 
-     //  === SAMPLE DATA ===
-     const users = [{
-             name: "Joshua Colmo",
-             username: "2023114-S",
-             role: "Student",
-             status: "Active",
-             joinDate: "MM/DD/YYYY",
-         },
-         {
-             name: "Librarian",
-             username: "Librarian Account",
-             role: "Librarian",
-             status: "Active",
-             joinDate: "MM/DD/YYYY",
-         },
-         {
-             name: "Admin",
-             username: "Admin Account",
-             role: "Admin",
-             status: "Active",
-             joinDate: "MM/DD/YYYY",
-         },
-     ];
+const userTableBody = document.getElementById("userTableBody");
 
-     const userTableBody = document.getElementById("userTableBody");
+function getRoleBadge(role) {
+    const base = "px-2 py-1 text-xs rounded-md font-medium";
+    const normalized = role.toLowerCase();
 
-     function getRoleBadge(role) {
-         const base = "px-2 py-1 text-xs rounded-md font-medium";
-         const normalized = role.toLowerCase();
+    if (normalized === "student")
+        return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
+    if (normalized === "librarian")
+        return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
+    if (normalized === "admin")
+        return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
+    if (normalized === "superadmin")
+        return `<span class="bg-red-600 text-white ${base}">${role}</span>`;
 
-         if (normalized === "student")
-             return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
-         if (normalized === "librarian")
-             return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
-         if (normalized === "admin")
-             return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
-         if (normalized === "superadmin")
-             return `<span class="bg-red-600 text-white ${base}">${role}</span>`;
+    return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
+}
 
-         return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
-     }
+function getStatusBadge(status) {
+    const base = "px-2 py-1 text-xs rounded-md font-medium cursor-pointer transition";
 
-     function getStatusBadge(status) {
-         const base = "px-2 py-1 text-xs rounded-md font-medium cursor-pointer transition";
+    if (status.toLowerCase() === "active") {
+        return `<span class="bg-orange-500 text-white ${base}">${status}</span>`;
+    }
+    if (status.toLowerCase() === "inactive" || status.toLowerCase() === "inactive") {
+        return `<span class="bg-gray-300 text-gray-700 ${base}">${status}</span>`;
+    }
+    return `<span class="bg-gray-200 text-gray-700 ${base}">${status}</span>`;
+}
 
-         if (status.toLowerCase() === "active") {
-             return `<span class="bg-orange-500 text-white ${base}">${status}</span>`;
-         }
-         if (status.toLowerCase() === "inactive" || status.toLowerCase() === "inactive") {
-             return `<span class="bg-gray-300 text-gray-700 ${base}">${status}</span>`;
-         }
-         return `<span class="bg-gray-200 text-gray-700 ${base}">${status}</span>`;
-     }
+// === RENDER USER TABLE ===
+function renderTable() {
+    userTableBody.innerHTML = "";
 
-     // === RENDER USER TABLE ===
-     function renderTable() {
-         userTableBody.innerHTML = "";
+    users.forEach((user, index) => {
+        const row = document.createElement("tr");
+        row.className =
+            user.status === "Disable" ?
+            "bg-gray-100 text-gray-500" :
+            "bg-white hover:bg-orange-50 transition";
 
-         users.forEach((user, index) => {
-             const row = document.createElement("tr");
-             row.className =
-                 user.status === "Disable" ?
-                 "bg-gray-100 text-gray-500" :
-                 "bg-white hover:bg-orange-50 transition";
-
-             row.innerHTML = `
+        row.innerHTML = `
         <td class="px-4 py-3">
             <p class="font-medium text-gray-800">${user.username}</p>
             <p class="text-gray-500 text-xs">${user.name}</p>
@@ -745,191 +749,191 @@
         </td>
     `;
 
-             // === TOGGLE STATUS ===
-             const statusEl = row.querySelector(".status-badge");
-             statusEl.addEventListener("click", () => {
-                 if (user.role.toLowerCase() === "superadmin") {
-                     alert("Superadmin status cannot be changed!");
-                     return;
-                 }
-                 user.status = user.status === "Active" ? "Disable" : "Active";
-                 renderTable();
-             });
+        // === TOGGLE STATUS ===
+        const statusEl = row.querySelector(".status-badge");
+        statusEl.addEventListener("click", () => {
+            if (user.role.toLowerCase() === "superadmin") {
+                alert("Superadmin status cannot be changed!");
+                return;
+            }
+            user.status = user.status === "Active" ? "Disable" : "Active";
+            renderTable();
+        });
 
-             userTableBody.appendChild(row);
-         });
-     }
+        userTableBody.appendChild(row);
+    });
+}
 
-     // === EDIT USER MODAL LOGIC ===
-     const editUserModal = document.getElementById("editUserModal");
-     const closeEditUserBtn = document.getElementById("closeEditUserModal");
-     const cancelEditUserBtn = document.getElementById("cancelEditUser");
-     const updateUserBtn = document.querySelector("#editUserModal button.bg-orange-500");
-     let currentEditingIndex = null;
+// === EDIT USER MODAL LOGIC ===
+const editUserModal = document.getElementById("editUserModal");
+const closeEditUserBtn = document.getElementById("closeEditUserModal");
+const cancelEditUserBtn = document.getElementById("cancelEditUser");
+const updateUserBtn = document.querySelector("#editUserModal button.bg-orange-500");
+let currentEditingIndex = null;
 
-     // === CLOSE MODAL ===
-     function closeEditUserModal() {
-         editUserModal.classList.add("hidden");
-         document.body.classList.remove("overflow-hidden");
-         currentEditingIndex = null;
-     }
+// === CLOSE MODAL ===
+function closeEditUserModal() {
+    editUserModal.classList.add("hidden");
+    document.body.classList.remove("overflow-hidden");
+    currentEditingIndex = null;
+}
 
-     // === OPEN MODAL ===
-     function openEditUserModal(user, index) {
-         currentEditingIndex = index;
+// === OPEN MODAL ===
+function openEditUserModal(user, index) {
+    currentEditingIndex = index;
 
-         // Fill modal fields
-         document.getElementById("editName").value = user.name;
-         document.getElementById("editEmail").value = user.username;
+    // Fill modal fields
+    document.getElementById("editName").value = user.name;
+    document.getElementById("editEmail").value = user.username;
 
-         // Set dropdown values dynamically
-         document.getElementById("editRoleDropdownValue").textContent = user.role;
-         document.getElementById("editStatusDropdownValue").textContent = user.status;
+    // Set dropdown values dynamically
+    document.getElementById("editRoleDropdownValue").textContent = user.role;
+    document.getElementById("editStatusDropdownValue").textContent = user.status;
 
-         // Update modal title dynamically
-         const modalTitle = document.querySelector("#editUserTitle span");
-         if (modalTitle) modalTitle.textContent = user.name;
+    // Update modal title dynamically
+    const modalTitle = document.querySelector("#editUserTitle span");
+    if (modalTitle) modalTitle.textContent = user.name;
 
-         editUserModal.classList.remove("hidden");
-         document.body.classList.add("overflow-hidden");
-     }
+    editUserModal.classList.remove("hidden");
+    document.body.classList.add("overflow-hidden");
+}
 
-     // === CHANGE PASSWORD TOGGLE ===
-     const togglePassword = document.getElementById("togglePassword");
-     const passwordFields = document.getElementById("passwordFields");
+// === CHANGE PASSWORD TOGGLE ===
+const togglePassword = document.getElementById("togglePassword");
+const passwordFields = document.getElementById("passwordFields");
 
-     togglePassword.addEventListener("change", () => {
-         passwordFields.classList.toggle("hidden", !togglePassword.checked);
-     });
+togglePassword.addEventListener("change", () => {
+    passwordFields.classList.toggle("hidden", !togglePassword.checked);
+});
 
-     // === TOGGLE SHOW/HIDE PASSWORD ===
-     const toggleNewPass = document.getElementById("toggleNewPass");
-     const toggleConfirmPass = document.getElementById("toggleConfirmPass");
-     const editPassword = document.getElementById("editPassword");
-     const confirmPassword = document.getElementById("confirmPassword");
+// === TOGGLE SHOW/HIDE PASSWORD ===
+const toggleNewPass = document.getElementById("toggleNewPass");
+const toggleConfirmPass = document.getElementById("toggleConfirmPass");
+const editPassword = document.getElementById("editPassword");
+const confirmPassword = document.getElementById("confirmPassword");
 
-     toggleNewPass.addEventListener("click", () => {
-         const isHidden = editPassword.type === "password";
-         editPassword.type = isHidden ? "text" : "password";
-         toggleNewPass.innerHTML = isHidden ?
-             `<i class="ph ph-eye-slash"></i>` :
-             `<i class="ph ph-eye"></i>`;
-     });
+toggleNewPass.addEventListener("click", () => {
+    const isHidden = editPassword.type === "password";
+    editPassword.type = isHidden ? "text" : "password";
+    toggleNewPass.innerHTML = isHidden ?
+        `<i class="ph ph-eye-slash"></i>` :
+        `<i class="ph ph-eye"></i>`;
+});
 
-     toggleConfirmPass.addEventListener("click", () => {
-         const isHidden = confirmPassword.type === "password";
-         confirmPassword.type = isHidden ? "text" : "password";
-         toggleConfirmPass.innerHTML = isHidden ?
-             `<i class="ph ph-eye-slash"></i>` :
-             `<i class="ph ph-eye"></i>`;
-     });
+toggleConfirmPass.addEventListener("click", () => {
+    const isHidden = confirmPassword.type === "password";
+    confirmPassword.type = isHidden ? "text" : "password";
+    toggleConfirmPass.innerHTML = isHidden ?
+        `<i class="ph ph-eye-slash"></i>` :
+        `<i class="ph ph-eye"></i>`;
+});
 
-     // === EDIT ROLE DROPDOWN ===
-     const editRoleBtn = document.getElementById("editRoleDropdownBtn");
-     const editRoleMenu = document.getElementById("editRoleDropdownMenu");
-     const editRoleValue = document.getElementById("editRoleDropdownValue");
+// === EDIT ROLE DROPDOWN ===
+const editRoleBtn = document.getElementById("editRoleDropdownBtn");
+const editRoleMenu = document.getElementById("editRoleDropdownMenu");
+const editRoleValue = document.getElementById("editRoleDropdownValue");
 
-     editRoleBtn.addEventListener("click", () => {
-         editRoleMenu.classList.toggle("hidden");
-     });
+editRoleBtn.addEventListener("click", () => {
+    editRoleMenu.classList.toggle("hidden");
+});
 
-     function selectEditRole(el, value) {
-         editRoleValue.textContent = value;
-         document.querySelectorAll("#editRoleDropdownMenu .edit-role-item").forEach(item =>
-             item.classList.remove("bg-orange-100", "font-semibold")
-         );
-         el.classList.add("bg-orange-100", "font-semibold");
-         editRoleMenu.classList.add("hidden");
-     }
+function selectEditRole(el, value) {
+    editRoleValue.textContent = value;
+    document.querySelectorAll("#editRoleDropdownMenu .edit-role-item").forEach(item =>
+        item.classList.remove("bg-orange-100", "font-semibold")
+    );
+    el.classList.add("bg-orange-100", "font-semibold");
+    editRoleMenu.classList.add("hidden");
+}
 
-     // === EDIT STATUS DROPDOWN ===
-     const editStatusBtn = document.getElementById("editStatusDropdownBtn");
-     const editStatusMenu = document.getElementById("editStatusDropdownMenu");
-     const editStatusValue = document.getElementById("editStatusDropdownValue");
+// === EDIT STATUS DROPDOWN ===
+const editStatusBtn = document.getElementById("editStatusDropdownBtn");
+const editStatusMenu = document.getElementById("editStatusDropdownMenu");
+const editStatusValue = document.getElementById("editStatusDropdownValue");
 
-     editStatusBtn.addEventListener("click", () => {
-         editStatusMenu.classList.toggle("hidden");
-     });
+editStatusBtn.addEventListener("click", () => {
+    editStatusMenu.classList.toggle("hidden");
+});
 
-     function selectEditStatus(el, value) {
-         editStatusValue.textContent = value;
-         document.querySelectorAll("#editStatusDropdownMenu .edit-status-item").forEach(item =>
-             item.classList.remove("bg-orange-100", "font-semibold")
-         );
-         el.classList.add("bg-orange-100", "font-semibold");
-         editStatusMenu.classList.add("hidden");
-     }
+function selectEditStatus(el, value) {
+    editStatusValue.textContent = value;
+    document.querySelectorAll("#editStatusDropdownMenu .edit-status-item").forEach(item =>
+        item.classList.remove("bg-orange-100", "font-semibold")
+    );
+    el.classList.add("bg-orange-100", "font-semibold");
+    editStatusMenu.classList.add("hidden");
+}
 
-     // === CLOSE DROPDOWNS WHEN CLICKED OUTSIDE ===
-     document.addEventListener("click", (e) => {
-         if (!editRoleBtn.contains(e.target) && !editRoleMenu.contains(e.target)) {
-             editRoleMenu.classList.add("hidden");
-         }
-         if (!editStatusBtn.contains(e.target) && !editStatusMenu.contains(e.target)) {
-             editStatusMenu.classList.add("hidden");
-         }
-     });
+// === CLOSE DROPDOWNS WHEN CLICKED OUTSIDE ===
+document.addEventListener("click", (e) => {
+    if (!editRoleBtn.contains(e.target) && !editRoleMenu.contains(e.target)) {
+        editRoleMenu.classList.add("hidden");
+    }
+    if (!editStatusBtn.contains(e.target) && !editStatusMenu.contains(e.target)) {
+        editStatusMenu.classList.add("hidden");
+    }
+});
 
-     // === ADD EVENT LISTENERS FOR CLOSING ===
-     [closeEditUserBtn, cancelEditUserBtn].forEach(btn =>
-         btn.addEventListener("click", closeEditUserModal)
-     );
+// === ADD EVENT LISTENERS FOR CLOSING ===
+[closeEditUserBtn, cancelEditUserBtn].forEach(btn =>
+    btn.addEventListener("click", closeEditUserModal)
+);
 
-     editUserModal.addEventListener("click", e => {
-         if (e.target === editUserModal) closeEditUserModal();
-     });
+editUserModal.addEventListener("click", e => {
+    if (e.target === editUserModal) closeEditUserModal();
+});
 
-     // === SAVE CHANGES (UPDATE USER) ===
-     updateUserBtn.addEventListener("click", () => {
-         if (currentEditingIndex === null) return;
+// === SAVE CHANGES (UPDATE USER) ===
+updateUserBtn.addEventListener("click", () => {
+    if (currentEditingIndex === null) return;
 
-         const updatedUser = {
-             ...users[currentEditingIndex],
-             name: document.getElementById("editName").value,
-             username: document.getElementById("editEmail").value,
-             role: document.getElementById("editRoleDropdownValue").textContent,
-             status: document.getElementById("editStatusDropdownValue").textContent,
-         };
+    const updatedUser = {
+        ...users[currentEditingIndex],
+        name: document.getElementById("editName").value,
+        username: document.getElementById("editEmail").value,
+        role: document.getElementById("editRoleDropdownValue").textContent,
+        status: document.getElementById("editStatusDropdownValue").textContent,
+    };
 
-         users[currentEditingIndex] = updatedUser;
-         renderTable();
-         closeEditUserModal();
+    users[currentEditingIndex] = updatedUser;
+    renderTable();
+    closeEditUserModal();
 
-         Swal.fire({
-             icon: "success",
-             title: "User updated!",
-             text: `${updatedUser.name}'s information was successfully updated.`,
-             showConfirmButton: false,
-             timer: 1500,
-         });
-     });
+    Swal.fire({
+        icon: "success",
+        title: "User updated!",
+        text: `${updatedUser.name}'s information was successfully updated.`,
+        showConfirmButton: false,
+        timer: 1500,
+    });
+});
 
-     // === HANDLE EDIT BUTTON CLICKS ===
-     userTableBody.addEventListener("click", e => {
-         const editBtn = e.target.closest(".editUserBtn");
-         if (!editBtn) return;
+// === HANDLE EDIT BUTTON CLICKS ===
+userTableBody.addEventListener("click", e => {
+    const editBtn = e.target.closest(".editUserBtn");
+    if (!editBtn) return;
 
-         const row = e.target.closest("tr");
-         const index = Array.from(userTableBody.children).indexOf(row);
-         const user = users[index];
+    const row = e.target.closest("tr");
+    const index = Array.from(userTableBody.children).indexOf(row);
+    const user = users[index];
 
-         openEditUserModal(user, index);
-     });
+    openEditUserModal(user, index);
+});
 
-     // === DELETE USER ===
-     function deleteUser(username) {
-         users = users.filter(u => u.username !== username);
-         renderTable();
-     }
+// === DELETE USER ===
+function deleteUser(username) {
+    users = users.filter(u => u.username !== username);
+    renderTable();
+}
 
-     // === INITIAL RENDER ===
-     renderTable();
+// === INITIAL RENDER ===
+renderTable();
 
 
 
-     // Example delete function
-     function deleteUser(username) {
-         console.log(`Deleting user: ${username}`);
-         // optional: show confirmation, remove row, or send request to backend
-     }
+// Example delete function
+function deleteUser(username) {
+    console.log(`Deleting user: ${username}`);
+    // optional: show confirmation, remove row, or send request to backend
+}
  </script>

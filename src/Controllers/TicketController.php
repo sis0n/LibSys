@@ -207,6 +207,8 @@ class TicketController extends Controller
     );
 
     $this->view("student/qrBorrowingTicket", [
+      "ticket" => "QR Borrowing Ticket",
+      "currentPage" => "qrBorrowingTicket",
       "transaction_id"   => $transaction['transaction_id'],
       "transaction_code" => $transaction['transaction_code'],
       "books" => $books,

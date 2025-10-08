@@ -79,6 +79,7 @@
              <thead class="bg-orange-50 text-gray-700 border border-orange-100">
                  <tr>
                      <th class="text-left px-4 py-3 font-medium">User</th>
+                     <th class="text-left px-4 py-3 font-medium">Email</th>
                      <th class="text-left px-4 py-3 font-medium">Role</th>
                      <th class="text-left px-4 py-3 font-medium">Status</th>
                      <th class="text-left px-4 py-3 font-medium">Date Registered</th>
@@ -574,7 +575,7 @@
      </div>
  </div>
 
- <script>
+<script>
 const modal = document.getElementById("importModal");
 const openBtn = document.getElementById("bulkImportBtn");
 const closeBtn = document.getElementById("closeImportModal");
@@ -585,17 +586,16 @@ function closeModal() {
     document.body.classList.remove("overflow-hidden");
 }
 
-openBtn.addEventListener("click", () => {
+if (openBtn) openBtn.addEventListener("click", () => {
     modal.classList.remove("hidden");
     document.body.classList.add("overflow-hidden");
 });
-
-closeBtn.addEventListener("click", closeModal);
-cancelBtn.addEventListener("click", closeModal);
-
-modal.addEventListener("click", e => {
+if (closeBtn) closeBtn.addEventListener("click", closeModal);
+if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+if (modal) modal.addEventListener("click", e => {
     if (e.target === modal) closeModal();
 });
+
 const addUserModal = document.getElementById("addUserModal");
 const openAddUserBtn = document.getElementById("addUserBtn");
 const closeAddUserBtn = document.getElementById("closeAddUserModal");
@@ -606,238 +606,175 @@ function closeAddUserModal() {
     document.body.classList.remove("overflow-hidden");
 }
 
-openAddUserBtn.addEventListener("click", () => {
+if (openAddUserBtn) openAddUserBtn.addEventListener("click", () => {
     addUserModal.classList.remove("hidden");
     document.body.classList.add("overflow-hidden");
 });
-
 [closeAddUserBtn, cancelAddUserBtn].forEach(btn => {
-    btn.addEventListener("click", closeAddUserModal);
+    if (btn) btn.addEventListener("click", closeAddUserModal);
 });
-
-addUserModal.addEventListener("click", e => {
+if (addUserModal) addUserModal.addEventListener("click", e => {
     if (e.target === addUserModal) closeAddUserModal();
 });
 
+function setupDropdown(buttonId, menuId, valueId, itemClass) {
+    const btn = document.getElementById(buttonId);
+    const menu = document.getElementById(menuId);
+    const valueEl = document.getElementById(valueId);
 
-// === ROLE DROPDOWN ===
-const roleBtn = document.getElementById("roleDropdownBtn");
-const roleMenu = document.getElementById("roleDropdownMenu");
-const roleValue = document.getElementById("roleDropdownValue");
+    if (!btn || !menu || !valueEl) return;
 
-roleBtn.addEventListener("click", () => {
-    roleMenu.classList.toggle("hidden");
-});
+    btn.addEventListener("click", () => menu.classList.toggle("hidden"));
 
-function selectRole(el, value) {
-    roleValue.textContent = value;
-    // Clear highlight
-    document.querySelectorAll("#roleDropdownMenu .dropdown-item")
-        .forEach(item => item.classList.remove("bg-orange-100", "font-semibold"));
-    // Highlight selected
-    el.classList.add("bg-orange-100", "font-semibold");
-    roleMenu.classList.add("hidden");
+    document.addEventListener("click", (e) => {
+        if (!btn.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.add("hidden");
+        }
+    });
+
+    function selectItem(el, val) {
+        valueEl.textContent = val;
+        document.querySelectorAll(`#${menuId} .${itemClass}`)
+            .forEach(i => i.classList.remove("bg-orange-100", "font-semibold"));
+        el.classList.add("bg-orange-100", "font-semibold");
+        menu.classList.add("hidden");
+    }
+
+    return { selectItem };
 }
 
-// === STATUS DROPDOWN ===
-const statusBtn = document.getElementById("statusDropdownBtn");
-const statusMenu = document.getElementById("statusDropdownMenu");
-const statusValue = document.getElementById("statusDropdownValue");
+const roleDropdown = setupDropdown("roleDropdownBtn", "roleDropdownMenu", "roleDropdownValue", "dropdown-item");
+const statusDropdown = setupDropdown("statusDropdownBtn", "statusDropdownMenu", "statusDropdownValue", "status-item");
+const userRoleDropdown = setupDropdown("userRoleDropdownBtn", "userRoleDropdownMenu", "userRoleDropdownValue", "user-role-item");
+const editRoleDropdown = setupDropdown("editRoleDropdownBtn", "editRoleDropdownMenu", "editRoleDropdownValue", "edit-role-item");
+const editStatusDropdown = setupDropdown("editStatusDropdownBtn", "editStatusDropdownMenu", "editStatusDropdownValue", "edit-status-item");
 
-statusBtn.addEventListener("click", () => {
-    statusMenu.classList.toggle("hidden");
-});
-
-function selectStatus(el, value) {
-    statusValue.textContent = value;
-    document.querySelectorAll("#statusDropdownMenu .status-item")
-        .forEach(item => item.classList.remove("bg-orange-100", "font-semibold"));
-    el.classList.add("bg-orange-100", "font-semibold");
-    statusMenu.classList.add("hidden");
-}
-
-// === CLICK OUTSIDE CLOSE ===
-document.addEventListener("click", (e) => {
-    if (!roleBtn.contains(e.target) && !roleMenu.contains(e.target)) {
-        roleMenu.classList.add("hidden");
-    }
-    if (!statusBtn.contains(e.target) && !statusMenu.contains(e.target)) {
-        statusMenu.classList.add("hidden");
-    }
-});
-
-// === DEFAULT HIGHLIGHT ON LOAD ===
 window.addEventListener("DOMContentLoaded", () => {
-    const defaultRole = document.querySelector("#roleDropdownMenu .dropdown-item");
-    if (defaultRole) defaultRole.classList.add("bg-orange-100", "font-semibold");
-
-    const defaultStatus = document.querySelector("#statusDropdownMenu .status-item");
-    if (defaultStatus) defaultStatus.classList.add("bg-orange-100", "font-semibold");
+    const defaults = [
+        "#roleDropdownMenu .dropdown-item",
+        "#statusDropdownMenu .status-item",
+        "#userRoleDropdownMenu .user-role-item"
+    ];
+    defaults.forEach(sel => {
+        const el = document.querySelector(sel);
+        if (el) el.classList.add("bg-orange-100", "font-semibold");
+    });
 });
-
-
-// === USER ROLE DROPDOWN ===
-const userRoleBtn = document.getElementById("userRoleDropdownBtn");
-const userRoleMenu = document.getElementById("userRoleDropdownMenu");
-const userRoleValue = document.getElementById("userRoleDropdownValue");
-
-userRoleBtn.addEventListener("click", () => userRoleMenu.classList.toggle("hidden"));
-
-function selectUserRole(el, value) {
-    userRoleValue.textContent = value;
-    document.querySelectorAll("#userRoleDropdownMenu .user-role-item")
-        .forEach(item => item.classList.remove("bg-orange-100", "font-semibold"));
-    el.classList.add("bg-orange-100", "font-semibold");
-    userRoleMenu.classList.add("hidden");
-}
-
-// === CLICK OUTSIDE CLOSE ===
-document.addEventListener("click", (e) => {
-    if (!userRoleBtn.contains(e.target) && !userRoleMenu.contains(e.target)) {
-        userRoleMenu.classList.add("hidden");
-    }
-});
-
-// === DEFAULT HIGHLIGHT ON LOAD ===
-window.addEventListener("DOMContentLoaded", () => {
-    const defaultRole = document.querySelector("#userRoleDropdownMenu .user-role-item");
-    if (defaultRole) defaultRole.classList.add("bg-orange-100", "font-semibold");
-});
-
-//  === SAMPLE DATA ===
-const users = [{
-        name: "Joshua Colmo",
-        username: "2023114-S",
-        role: "Student",
-        status: "Active",
-        joinDate: "MM/DD/YYYY",
-    },
-    {
-        name: "Librarian",
-        username: "Librarian Account",
-        role: "Librarian",
-        status: "Active",
-        joinDate: "MM/DD/YYYY",
-    },
-    {
-        name: "Admin",
-        username: "Admin Account",
-        role: "Admin",
-        status: "Active",
-        joinDate: "MM/DD/YYYY",
-    },
-];
 
 const userTableBody = document.getElementById("userTableBody");
+let users = [];
 
 function getRoleBadge(role) {
     const base = "px-2 py-1 text-xs rounded-md font-medium";
     const normalized = role.toLowerCase();
-
-    if (normalized === "student")
-        return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
-    if (normalized === "librarian")
-        return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
-    if (normalized === "admin")
-        return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
-    if (normalized === "superadmin")
-        return `<span class="bg-red-600 text-white ${base}">${role}</span>`;
-
-    return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
+    switch(normalized){
+        case "student": return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
+        case "librarian": return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
+        case "admin": return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
+        case "superadmin": return `<span class="bg-red-600 text-white ${base}">${role}</span>`;
+        default: return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
+    }
 }
 
 function getStatusBadge(status) {
     const base = "px-2 py-1 text-xs rounded-md font-medium cursor-pointer transition";
-
-    if (status.toLowerCase() === "active") {
-        return `<span class="bg-orange-500 text-white ${base}">${status}</span>`;
+    switch(status.toLowerCase()){
+        case "active": return `<span class="bg-orange-500 text-white ${base}">${status}</span>`;
+        case "inactive":
+        case "disable": return `<span class="bg-gray-300 text-gray-700 ${base}">${status}</span>`;
+        default: return `<span class="bg-gray-200 text-gray-700 ${base}">${status}</span>`;
     }
-    if (status.toLowerCase() === "inactive" || status.toLowerCase() === "inactive") {
-        return `<span class="bg-gray-300 text-gray-700 ${base}">${status}</span>`;
-    }
-    return `<span class="bg-gray-200 text-gray-700 ${base}">${status}</span>`;
 }
 
-// === RENDER USER TABLE ===
-function renderTable() {
+async function loadUsers() {
+    try {
+        const res = await fetch('userManagement/getAll');
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || "Failed to fetch users");
+
+        users = data.users
+        .filter(u => u.role.toLowerCase() !== "superadmin")
+        .map(u => ({
+            name: u.full_name,
+            username: u.username,
+            email: u.email,
+            role: u.role,
+            status: u.is_active == 1 ? "Active" : "Disable",
+            joinDate: new Date(u.created_at).toLocaleDateString()
+        }));
+
+        renderTable(users);
+    } catch(err) {
+        console.error("Fetch users error:", err);
+    }
+}
+
+function renderTable(users) {
+    if (!userTableBody) return;
     userTableBody.innerHTML = "";
 
     users.forEach((user, index) => {
         const row = document.createElement("tr");
-        row.className =
-            user.status === "Disable" ?
-            "bg-gray-100 text-gray-500" :
-            "bg-white";
+        row.className = user.status === "Disable" ? "bg-gray-100 text-gray-500" : "bg-white";
 
         row.innerHTML = `
-        <td class="px-4 py-3">
-            <p class="font-medium text-gray-800">${user.username}</p>
-            <p class="text-gray-500 text-xs">${user.name}</p>
-        </td>
-        <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
-        <td class="px-4 py-3">
-            <span class="status-badge cursor-pointer">${getStatusBadge(user.status)}</span>
-        </td>
-        <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
-        <td class="px-4 py-3">
-            <div class="flex items-center gap-2">
-                <button
-                    class="editUserBtn flex items-center gap-1 border border-orange-200 text-greynpm-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
-                    <i class="ph ph-note-pencil text-base"></i>
-                    <span>Edit</span>
-                </button>
-                <button
-                    class="flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-700 transition">
-                    <i class="ph ph-trash text-base"></i>
-                    <span>Delete</span>
-                </button>
-            </div>
+            <td class="px-4 py-3">
+                <p class="font-medium text-gray-800">${user.name}</p>
+                <p class="text-gray-500 text-xs">${user.username}</p>
+            </td>
+            <td class="px-4 py-3">
+                <p class="font-medium text-gray-800">${user.email}</p>
+            </td>
+            <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
+            <td class="px-4 py-3">
+                <span class="status-badge cursor-pointer">${getStatusBadge(user.status)}</span>
+            </td>
+            <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
+                        <i class="ph ph-note-pencil text-base"></i><span>Edit</span>
+                    </button>
+                    <button class="deleteUserBtn flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-700 transition">
+                        <i class="ph ph-trash text-base"></i><span>Delete</span>
+                    </button>
+                </div>
+            </td>
+        `;
 
-        </td>
-    `;
-
-        // === TOGGLE STATUS ===
         const statusEl = row.querySelector(".status-badge");
-        statusEl.addEventListener("click", () => {
-            if (user.role.toLowerCase() === "superadmin") {
-                alert("Superadmin status cannot be changed!");
-                return;
-            }
-            user.status = user.status === "Active" ? "Disable" : "Active";
-            renderTable();
-        });
+        if (statusEl) {
+            statusEl.addEventListener("click", () => {
+                if (user.role.toLowerCase() === "superadmin") {
+                    alert("Superadmin status cannot be changed!");
+                }
+            });
+        }
 
         userTableBody.appendChild(row);
     });
 }
 
-// === EDIT USER MODAL LOGIC ===
 const editUserModal = document.getElementById("editUserModal");
 const closeEditUserBtn = document.getElementById("closeEditUserModal");
 const cancelEditUserBtn = document.getElementById("cancelEditUser");
-const updateUserBtn = document.querySelector("#editUserModal button.bg-orange-500");
 let currentEditingIndex = null;
 
-// === CLOSE MODAL ===
 function closeEditUserModal() {
+    if (!editUserModal) return;
     editUserModal.classList.add("hidden");
     document.body.classList.remove("overflow-hidden");
     currentEditingIndex = null;
 }
 
-// === OPEN MODAL ===
 function openEditUserModal(user, index) {
+    if (!editUserModal || !user) return;
     currentEditingIndex = index;
-
-    // Fill modal fields
     document.getElementById("editName").value = user.name;
-    document.getElementById("editEmail").value = user.username;
-
-    // Set dropdown values dynamically
+    document.getElementById("editEmail").value = user.email;
     document.getElementById("editRoleDropdownValue").textContent = user.role;
     document.getElementById("editStatusDropdownValue").textContent = user.status;
 
-    // Update modal title dynamically
     const modalTitle = document.querySelector("#editUserTitle span");
     if (modalTitle) modalTitle.textContent = user.name;
 
@@ -845,103 +782,24 @@ function openEditUserModal(user, index) {
     document.body.classList.add("overflow-hidden");
 }
 
-// === CHANGE PASSWORD TOGGLE ===
-const togglePassword = document.getElementById("togglePassword");
-const passwordFields = document.getElementById("passwordFields");
-
-togglePassword.addEventListener("change", () => {
-    passwordFields.classList.toggle("hidden", !togglePassword.checked);
+[closeEditUserBtn, cancelEditUserBtn].forEach(btn => {
+    if (btn) btn.addEventListener("click", closeEditUserModal);
 });
-
-// === TOGGLE SHOW/HIDE PASSWORD ===
-const toggleNewPass = document.getElementById("toggleNewPass");
-const toggleConfirmPass = document.getElementById("toggleConfirmPass");
-const editPassword = document.getElementById("editPassword");
-const confirmPassword = document.getElementById("confirmPassword");
-
-toggleNewPass.addEventListener("click", () => {
-    const isHidden = editPassword.type === "password";
-    editPassword.type = isHidden ? "text" : "password";
-    toggleNewPass.innerHTML = isHidden ?
-        `<i class="ph ph-eye-slash"></i>` :
-        `<i class="ph ph-eye"></i>`;
-});
-
-toggleConfirmPass.addEventListener("click", () => {
-    const isHidden = confirmPassword.type === "password";
-    confirmPassword.type = isHidden ? "text" : "password";
-    toggleConfirmPass.innerHTML = isHidden ?
-        `<i class="ph ph-eye-slash"></i>` :
-        `<i class="ph ph-eye"></i>`;
-});
-
-// === EDIT ROLE DROPDOWN ===
-const editRoleBtn = document.getElementById("editRoleDropdownBtn");
-const editRoleMenu = document.getElementById("editRoleDropdownMenu");
-const editRoleValue = document.getElementById("editRoleDropdownValue");
-
-editRoleBtn.addEventListener("click", () => {
-    editRoleMenu.classList.toggle("hidden");
-});
-
-function selectEditRole(el, value) {
-    editRoleValue.textContent = value;
-    document.querySelectorAll("#editRoleDropdownMenu .edit-role-item").forEach(item =>
-        item.classList.remove("bg-orange-100", "font-semibold")
-    );
-    el.classList.add("bg-orange-100", "font-semibold");
-    editRoleMenu.classList.add("hidden");
-}
-
-// === EDIT STATUS DROPDOWN ===
-const editStatusBtn = document.getElementById("editStatusDropdownBtn");
-const editStatusMenu = document.getElementById("editStatusDropdownMenu");
-const editStatusValue = document.getElementById("editStatusDropdownValue");
-
-editStatusBtn.addEventListener("click", () => {
-    editStatusMenu.classList.toggle("hidden");
-});
-
-function selectEditStatus(el, value) {
-    editStatusValue.textContent = value;
-    document.querySelectorAll("#editStatusDropdownMenu .edit-status-item").forEach(item =>
-        item.classList.remove("bg-orange-100", "font-semibold")
-    );
-    el.classList.add("bg-orange-100", "font-semibold");
-    editStatusMenu.classList.add("hidden");
-}
-
-// === CLOSE DROPDOWNS WHEN CLICKED OUTSIDE ===
-document.addEventListener("click", (e) => {
-    if (!editRoleBtn.contains(e.target) && !editRoleMenu.contains(e.target)) {
-        editRoleMenu.classList.add("hidden");
-    }
-    if (!editStatusBtn.contains(e.target) && !editStatusMenu.contains(e.target)) {
-        editStatusMenu.classList.add("hidden");
-    }
-});
-
-// === ADD EVENT LISTENERS FOR CLOSING ===
-[closeEditUserBtn, cancelEditUserBtn].forEach(btn =>
-    btn.addEventListener("click", closeEditUserModal)
-);
-
-editUserModal.addEventListener("click", e => {
+if (editUserModal) editUserModal.addEventListener("click", e => {
     if (e.target === editUserModal) closeEditUserModal();
 });
 
-// === HANDLE EDIT BUTTON CLICKS ===
-userTableBody.addEventListener("click", e => {
-    const editBtn = e.target.closest(".editUserBtn");
-    if (!editBtn) return;
+if (userTableBody) {
+    userTableBody.addEventListener("click", e => {
+        const editBtn = e.target.closest(".editUserBtn");
+        if (!editBtn) return;
 
-    const row = e.target.closest("tr");
-    const index = Array.from(userTableBody.children).indexOf(row);
-    const user = users[index];
+        const row = e.target.closest("tr");
+        const index = Array.from(userTableBody.children).indexOf(row);
+        const user = users[index];
+        openEditUserModal(user, index);
+    });
+}
 
-    openEditUserModal(user, index);
-});
-
-// === INITIAL RENDER ===
-renderTable();
- </script>
+loadUsers();
+</script>

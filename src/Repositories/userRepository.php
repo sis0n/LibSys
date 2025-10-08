@@ -71,28 +71,74 @@ class UserRepository
     }
   }
 
-
-
-  public function createUser(array $data)
+  public function createUser(array $data): bool
   {
-    $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-    $stmt = $this->db->prepare("
-        INSERT INTO users (username, password, full_name, role) 
-        VALUES (:username, :password, :full_name, :role)
-    ");
-    return $stmt->execute([
-      'username' => htmlspecialchars(trim($data['username'])),
-      'password' => $hashedPassword,
-      'full_name' => htmlspecialchars(trim($data['full_name'])),
-      'role' => in_array($data['role'], ['admin', 'librarian', 'student', 'scanner', 'superadmin']) ? $data['role'] : 'student'
-    ]);
+    $query = "INSERT INTO users (full_name, username, password, role, status)
+              VALUES (:full_name, :username, :password, :role, :status)";
+
+    $params = [
+      ':full_name' => $data['full_name'],
+      ':username' => $data['username'],
+      ':password' => password_hash($data['password'], PASSWORD_BCRYPT),
+      ':role' => $data['role'] ?? 'Student',
+      ':status' => $data['status'] ?? 'Active'
+    ];
+
+    return $this->db->execute($query, $params);
   }
 
-  public function getAllUsers()
+  public function updateUser(int $id, array $data): bool
   {
-    $stmt = $this->db->prepare("SELECT * FROM users");
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $fields = [];
+    $params = [':id' => $id];
+
+    if (isset($data['full_name'])) {
+      $fields[] = "full_name = :full_name";
+      $params[':full_name'] = $data['full_name'];
+    }
+    if (isset($data['username'])) {
+      $fields[] = "username = :username";
+      $params[':username'] = $data['username'];
+    }
+    if (isset($data['password']) && !empty($data['password'])) {
+      $fields[] = "password = :password";
+      $params[':password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+    }
+    if (isset($data['role'])) {
+      $fields[] = "role = :role";
+      $params[':role'] = $data['role'];
+    }
+    if (isset($data['status'])) {
+      $fields[] = "status = :status";
+      $params[':status'] = $data['status'];
+    }
+
+    if (empty($fields)) return false;
+
+    $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
+    return $this->db->execute($query, $params);
+  }
+
+  public function getAllUsers(): array
+  {
+    try {
+      $stmt = $this->db->query("
+        SELECT 
+          user_id,
+          username,
+          full_name,
+          email,
+          role,
+          is_active,
+          created_at
+        FROM users
+        ORDER BY user_id DESC
+      ");
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log('[UserRepository::getAllUsers] ' . $e->getMessage());
+      return [];
+    }
   }
 
   public function findByStudentNumber(string $studentNumber)
@@ -115,5 +161,19 @@ class UserRepository
     ");
     $stmt->execute(['student_number' => $studentNumber]);
     return $stmt->fetch();
+  }
+
+  public function deleteUser(int $id): bool
+  {
+    $stmt = $this->db->prepare("DELETE FROM users WHERE id = ?");
+    return $stmt->execute([$id]);
+  }
+
+  public function getUserById($id)
+  {
+    $stmt = $this->db->prepare("SELECT user_id, full_name, username, role FROM users WHERE user_id = :id");
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 }

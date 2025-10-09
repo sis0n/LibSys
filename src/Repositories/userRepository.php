@@ -71,21 +71,26 @@ class UserRepository
     }
   }
 
-  public function createUser(array $data): bool
+  public function insertUser(array $data): int
   {
-    $query = "INSERT INTO users (full_name, username, password, role, status)
-              VALUES (:full_name, :username, :password, :role, :status)";
+    $stmt = $this->db->prepare("
+    INSERT INTO users (username, password, full_name, email, role, is_active, created_at)
+    VALUES (:username, :password, :full_name, :email, :role, :is_active, :created_at)
+  ");
 
-    $params = [
-      ':full_name' => $data['full_name'],
-      ':username' => $data['username'],
-      ':password' => password_hash($data['password'], PASSWORD_BCRYPT),
-      ':role' => $data['role'] ?? 'Student',
-      ':status' => $data['status'] ?? 'Active'
-    ];
+    $stmt->execute([
+      ':username'   => $data['username'],
+      ':password'   => $data['password'],
+      ':full_name'  => $data['full_name'],
+      ':email'      => $data['email'] ?? null,
+      ':role'       => $data['role'],
+      ':is_active'  => $data['is_active'] ?? 1,
+      ':created_at' => $data['created_at'] ?? date('Y-m-d H:i:s')
+    ]);
 
-    return $this->db->execute($query, $params);
+    return (int)$this->db->lastInsertId();
   }
+
 
   public function updateUser(int $id, array $data): bool
   {

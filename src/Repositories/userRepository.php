@@ -176,4 +176,19 @@ class UserRepository
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
+
+  public function searchUsers(string $query): array
+  {
+    $query = "%" . strtolower($query) . "%";
+    $stmt = $this->db->prepare("
+        SELECT user_id, username, full_name, email, role, is_active, created_at
+        FROM users
+        WHERE LOWER(full_name) LIKE :query
+           OR LOWER(username) LIKE :query
+           OR LOWER(email) LIKE :query
+        ORDER BY user_id DESC
+    ");
+    $stmt->execute(['query' => $query]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 }

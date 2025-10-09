@@ -18,7 +18,7 @@ class UserManagementController extends Controller
   {
     // render the main user management page (HTML view)
     $this->view('superadmin/userManagement', [
-      'title' => 'User Management'
+      'title' => 'User Management',
     ]);
   }
   public function getAll()
@@ -51,5 +51,28 @@ class UserManagementController extends Controller
     }
 
     echo json_encode($user);
+  }
+
+  public function search(){
+    header('Content-Type: application/json');
+    $query = $_GET['q'] ?? '';
+    error_log("Search query: " . $query);
+
+    try{
+      if(empty($query)){
+        $users = $this->userRepo->getAllUsers();
+      } else {
+        $users = $this->userRepo->searchUsers($query);
+      }
+      echo json_encode([
+        'success' => true,
+        'users' => $users
+      ]);
+    } catch (\Exception $e){
+      echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+      ]);
+    }
   }
 }

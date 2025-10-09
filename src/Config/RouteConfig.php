@@ -155,6 +155,7 @@ class RouteConfig
         $router->get('superadmin/userManagement', 'UserManagementController@index', ['superadmin']);
         $router->get('superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
         $router->get('superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
+        $router->get('superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
         $router->post('superadmin/userManagement/add', 'UserManagementController@addUser', ['superadmin']);
         $router->post('superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
         $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);

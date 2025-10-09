@@ -1,4 +1,4 @@
- <div class="flex items-center justify-between mb-6">
+<div class="flex items-center justify-between mb-6">
      <div>
          <h2 class="text-2xl font-bold mb-4">User Management</h2>
          <p class="text-gray-700">Manage students, librarians, and system access.</p>
@@ -30,7 +30,7 @@
          <div class="flex items-center gap-2 text-sm">
              <div class="relative">
                  <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2"></i>
-                 <input type="text" placeholder="Search users..."
+                 <input type="text" id="userSearchInput" placeholder="Search users..."
                      class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm">
              </div>
              <!-- ROLE DROPDOWN -->
@@ -576,258 +576,270 @@
  </div>
 
 <script>
-const modal = document.getElementById("importModal");
-const openBtn = document.getElementById("bulkImportBtn");
-const closeBtn = document.getElementById("closeImportModal");
-const cancelBtn = document.getElementById("cancelImport");
-let selectedRole = "All Roles";
-let selectedStatus = "All Status";
+window.addEventListener("DOMContentLoaded", () => {
+    // DOM element
+    const modal = document.getElementById("importModal");
+    const openBtn = document.getElementById("bulkImportBtn");
+    const closeBtn = document.getElementById("closeImportModal");
+    const cancelBtn = document.getElementById("cancelImport");
+    const searchInput = document.getElementById("userSearchInput");
+    const userTableBody = document.getElementById("userTableBody");
+    const addUserModal = document.getElementById("addUserModal");
+    const openAddUserBtn = document.getElementById("addUserBtn");
+    const closeAddUserBtn = document.getElementById("closeAddUserModal");
+    const cancelAddUserBtn = document.getElementById("cancelAddUser");
+    const editUserModal = document.getElementById("editUserModal");
+    const closeEditUserBtn = document.getElementById("closeEditUserModal");
+    const cancelEditUserBtn = document.getElementById("cancelEditUser");
 
-function applyFilters(){
-    let filtered = users;
-    
-    if(selectedRole !== "All Roles"){
-        filtered = filtered.filter(u => u.role.toLowerCase() === selectedRole.toLocaleLowerCase());
+    // state
+    let allUsers = [];
+    let users = [];
+    let selectedRole = "All Roles";
+    let selectedStatus = "All Status";
+    let currentEditingIndex = null;
+    window.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    console.log("searchInput element:", searchInput); // dapat hindi null
+});
+
+    //filter and search
+    function applyFilters(){
+        users = [...allUsers];
+        // let filtered = users;
+        if(selectedRole !== "All Roles"){
+            users = users.filter(u => u.role.toLowerCase() === selectedRole.toLowerCase());
+        }
+        if(selectedStatus !== "All Status"){
+            users = users.filter(u => u.status.toLowerCase() === selectedStatus.toLowerCase());
+        }
+
+        renderTable(users);
     }
-    if(selectedStatus !== "All Status"){
-        filtered = filtered.filter(u => u.status.toLowerCase() === selectedStatus.toLocaleLowerCase());
+
+    async function searchUsers(query) {
+        if (!query) {
+            applyFilters();
+            return;
+        }
+
+        try {
+            console.log("Searching for:", query);
+
+            const res = await fetch(`/LibSys/public/superadmin/userManagement/search?q=${encodeURIComponent(query)}`);
+            console.log("fetched: ", res);
+
+            if(!res.ok){
+                console.log("HTTP error", res.status, res.statusText);
+                return;
+            }
+
+            const data = await res.json();
+            console.log("data received: ", data);
+
+            if (data.success) {
+                const mapped = data.users.map(u => ({
+                    name: u.full_name,
+                    username: u.username,
+                    email: u.email,
+                    role: u.role,
+                    status: u.is_active == 1 ? "Active" : "Disable",
+                    joinDate: new Date(u.created_at).toLocaleDateString()
+                }));
+                users = mapped.filter(u => 
+                    (selectedRole === "All Roles" || u.role.toLowerCase() === selectedRole.toLowerCase()) &&
+                    (selectedStatus === "All Status" || u.status.toLowerCase() === selectedStatus.toLowerCase())
+                );
+
+                renderTable(users);
+            } else {
+                console.log("search error:", data.massage);
+            }
+        } catch(err) {
+            console.error("Search error:", err);
+        }
     }
 
-    renderTable(filtered);
-}
+    if (searchInput) {
+        searchInput.addEventListener("input", e => {
+            searchUsers(e.target.value.trim());
+        });
+    }
 
-function selectRole(el, val) {
-    selectedRole = val;
-    roleDropdown.selectItem(el, val);
-    applyFilters();
-}
+    //modals
+    function closeModal(modalEl) {
+        if (!modalEl) return;
+        modalEl.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+    }
 
-function selectStatus(el, val) {
-    selectedStatus = val;
-    statusDropdown.selectItem(el, val);
-    applyFilters();
-}
+    if (openBtn) openBtn.addEventListener("click", () => {
+        modal.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+    });
+    [closeBtn, cancelBtn].forEach(btn => {
+        if (btn) btn.addEventListener("click", () => closeModal(modal));
+    });
+    if (modal) modal.addEventListener("click", e => { if (e.target === modal) closeModal(modal); });
 
-function closeModal() {
-    modal.classList.add("hidden");
-    document.body.classList.remove("overflow-hidden");
-}
+    function closeAddUserModal() { closeModal(addUserModal); }
+    if (openAddUserBtn) openAddUserBtn.addEventListener("click", () => {
+        addUserModal.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+    });
+    [closeAddUserBtn, cancelAddUserBtn].forEach(btn => { if(btn) btn.addEventListener("click", closeAddUserModal); });
+    if (addUserModal) addUserModal.addEventListener("click", e => { if(e.target === addUserModal) closeAddUserModal(); });
 
-if (openBtn) openBtn.addEventListener("click", () => {
-    modal.classList.remove("hidden");
-    document.body.classList.add("overflow-hidden");
-});
-if (closeBtn) closeBtn.addEventListener("click", closeModal);
-if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-if (modal) modal.addEventListener("click", e => {
-    if (e.target === modal) closeModal();
-});
+    function closeEditUserModal() { closeModal(editUserModal); currentEditingIndex = null; }
 
-const addUserModal = document.getElementById("addUserModal");
-const openAddUserBtn = document.getElementById("addUserBtn");
-const closeAddUserBtn = document.getElementById("closeAddUserModal");
-const cancelAddUserBtn = document.getElementById("cancelAddUser");
+    [closeEditUserBtn, cancelEditUserBtn].forEach(btn => { if(btn) btn.addEventListener("click", closeEditUserModal); });
+    if (editUserModal) editUserModal.addEventListener("click", e => { if(e.target === editUserModal) closeEditUserModal(); });
 
-function closeAddUserModal() {
-    addUserModal.classList.add("hidden");
-    document.body.classList.remove("overflow-hidden");
-}
+    //dropdown
+    function setupDropdown(buttonId, menuId, valueId, itemClass) {
+        const btn = document.getElementById(buttonId);
+        const menu = document.getElementById(menuId);
+        const valueEl = document.getElementById(valueId);
+        if (!btn || !menu || !valueEl) return;
 
-if (openAddUserBtn) openAddUserBtn.addEventListener("click", () => {
-    addUserModal.classList.remove("hidden");
-    document.body.classList.add("overflow-hidden");
-});
-[closeAddUserBtn, cancelAddUserBtn].forEach(btn => {
-    if (btn) btn.addEventListener("click", closeAddUserModal);
-});
-if (addUserModal) addUserModal.addEventListener("click", e => {
-    if (e.target === addUserModal) closeAddUserModal();
-});
+        btn.addEventListener("click", () => menu.classList.toggle("hidden"));
+        document.addEventListener("click", e => { if(!btn.contains(e.target) && !menu.contains(e.target)) menu.classList.add("hidden"); });
 
-function setupDropdown(buttonId, menuId, valueId, itemClass) {
-    const btn = document.getElementById(buttonId);
-    const menu = document.getElementById(menuId);
-    const valueEl = document.getElementById(valueId);
-
-    if (!btn || !menu || !valueEl) return;
-
-    btn.addEventListener("click", () => menu.classList.toggle("hidden"));
-
-    document.addEventListener("click", (e) => {
-        if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        function selectItem(el, val) {
+            valueEl.textContent = val;
+            document.querySelectorAll(`#${menuId} .${itemClass}`).forEach(i => i.classList.remove("bg-orange-100","font-semibold"));
+            el.classList.add("bg-orange-100","font-semibold");
             menu.classList.add("hidden");
         }
-    });
-
-    function selectItem(el, val) {
-        valueEl.textContent = val;
-        document.querySelectorAll(`#${menuId} .${itemClass}`)
-            .forEach(i => i.classList.remove("bg-orange-100", "font-semibold"));
-        el.classList.add("bg-orange-100", "font-semibold");
-        menu.classList.add("hidden");
+        return { selectItem };
     }
 
-    return { selectItem };
-}
+    const roleDropdown = setupDropdown("roleDropdownBtn","roleDropdownMenu","roleDropdownValue","dropdown-item");
+    const statusDropdown = setupDropdown("statusDropdownBtn","statusDropdownMenu","statusDropdownValue","status-item");
+    const userRoleDropdown = setupDropdown("userRoleDropdownBtn","userRoleDropdownMenu","userRoleDropdownValue","user-role-item");
+    const editRoleDropdown = setupDropdown("editRoleDropdownBtn","editRoleDropdownMenu","editRoleDropdownValue","edit-role-item");
+    const editStatusDropdown = setupDropdown("editStatusDropdownBtn","editStatusDropdownMenu","editStatusDropdownValue","edit-status-item");
 
-const roleDropdown = setupDropdown("roleDropdownBtn", "roleDropdownMenu", "roleDropdownValue", "dropdown-item");
-const statusDropdown = setupDropdown("statusDropdownBtn", "statusDropdownMenu", "statusDropdownValue", "status-item");
-const userRoleDropdown = setupDropdown("userRoleDropdownBtn", "userRoleDropdownMenu", "userRoleDropdownValue", "user-role-item");
-const editRoleDropdown = setupDropdown("editRoleDropdownBtn", "editRoleDropdownMenu", "editRoleDropdownValue", "edit-role-item");
-const editStatusDropdown = setupDropdown("editStatusDropdownBtn", "editStatusDropdownMenu", "editStatusDropdownValue", "edit-status-item");
-
-window.addEventListener("DOMContentLoaded", () => {
-    applyFilters();
     const defaults = [
         "#roleDropdownMenu .dropdown-item",
         "#statusDropdownMenu .status-item",
         "#userRoleDropdownMenu .user-role-item"
     ];
-    defaults.forEach(sel => {
-        const el = document.querySelector(sel);
-        if (el) el.classList.add("bg-orange-100", "font-semibold");
-    });
-});
+    defaults.forEach(sel => { const el = document.querySelector(sel); if(el) el.classList.add("bg-orange-100","font-semibold"); });
 
-const userTableBody = document.getElementById("userTableBody");
-let users = [];
+   //user table
+    async function loadUsers() {
+        try {
+            const res = await fetch('userManagement/getAll');
+            const data = await res.json();
+            if (!data.success) throw new Error(data.message || "Failed to fetch users");
 
-function getRoleBadge(role) {
-    const base = "px-2 py-1 text-xs rounded-md font-medium";
-    const normalized = role.toLowerCase();
-    switch(normalized){
-        case "student": return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
-        case "librarian": return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
-        case "admin": return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
-        case "superadmin": return `<span class="bg-red-600 text-white ${base}">${role}</span>`;
-        default: return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
-    }
-}
+            allUsers = data.users
+                .filter(u => u.role.toLowerCase() !== "superadmin")
+                .map(u => ({
+                    name: u.full_name,
+                    username: u.username,
+                    email: u.email,
+                    role: u.role,
+                    status: u.is_active == 1 ? "Active" : "Disable",
+                    joinDate: new Date(u.created_at).toLocaleDateString()
+                }));
 
-function getStatusBadge(status) {
-    const base = "px-2 py-1 text-xs rounded-md font-medium cursor-pointer transition";
-    switch(status.toLowerCase()){
-        case "active": return `<span class="bg-orange-500 text-white ${base}">${status}</span>`;
-        case "inactive":
-        case "disable": return `<span class="bg-gray-300 text-gray-700 ${base}">${status}</span>`;
-        default: return `<span class="bg-gray-200 text-gray-700 ${base}">${status}</span>`;
-    }
-}
-
-async function loadUsers() {
-    try {
-        const res = await fetch('userManagement/getAll');
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || "Failed to fetch users");
-
-        users = data.users
-        .filter(u => u.role.toLowerCase() !== "superadmin")
-        .map(u => ({
-            name: u.full_name,
-            username: u.username,
-            email: u.email,
-            role: u.role,
-            status: u.is_active == 1 ? "Active" : "Disable",
-            joinDate: new Date(u.created_at).toLocaleDateString()
-        }));
-
-        renderTable(users);
-    } catch(err) {
-        console.error("Fetch users error:", err);
-    }
-}
-
-function renderTable(users) {
-    if (!userTableBody) return;
-    userTableBody.innerHTML = "";
-
-    users.forEach((user, index) => {
-        const row = document.createElement("tr");
-        row.className = user.status === "Disable" ? "bg-gray-100 text-gray-500" : "bg-white";
-
-        row.innerHTML = `
-            <td class="px-4 py-3">
-                <p class="font-medium text-gray-800">${user.name}</p>
-                <p class="text-gray-500 text-xs">${user.username}</p>
-            </td>
-            <td class="px-4 py-3">
-                <p class="font-medium text-gray-800">${user.email}</p>
-            </td>
-            <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
-            <td class="px-4 py-3">
-                <span class="status-badge cursor-pointer">${getStatusBadge(user.status)}</span>
-            </td>
-            <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
-            <td class="px-4 py-3">
-                <div class="flex items-center gap-2">
-                    <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
-                        <i class="ph ph-note-pencil text-base"></i><span>Edit</span>
-                    </button>
-                    <button class="deleteUserBtn flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-700 transition">
-                        <i class="ph ph-trash text-base"></i><span>Delete</span>
-                    </button>
-                </div>
-            </td>
-        `;
-
-        const statusEl = row.querySelector(".status-badge");
-        if (statusEl) {
-            statusEl.addEventListener("click", () => {
-                if (user.role.toLowerCase() === "superadmin") {
-                    alert("Superadmin status cannot be changed!");
-                }
-            });
+            applyFilters();
+        } catch(err) {
+            console.error("Fetch users error:", err);
         }
+    }
 
-        userTableBody.appendChild(row);
-    });
-}
+    function renderTable(users) {
+        if (!userTableBody) return;
+        userTableBody.innerHTML = "";
 
-const editUserModal = document.getElementById("editUserModal");
-const closeEditUserBtn = document.getElementById("closeEditUserModal");
-const cancelEditUserBtn = document.getElementById("cancelEditUser");
-let currentEditingIndex = null;
+        users.forEach((user,index) => {
+            const row = document.createElement("tr");
+            row.className = user.status === "Disable" ? "bg-gray-100 text-gray-500" : "bg-white";
 
-function closeEditUserModal() {
-    if (!editUserModal) return;
-    editUserModal.classList.add("hidden");
-    document.body.classList.remove("overflow-hidden");
-    currentEditingIndex = null;
-}
+            row.innerHTML = `
+                <td class="px-4 py-3">
+                    <p class="font-medium text-gray-800">${user.name}</p>
+                    <p class="text-gray-500 text-xs">${user.username}</p>
+                </td>
+                <td class="px-4 py-3">
+                    <p class="font-medium text-gray-800">${user.email}</p>
+                </td>
+                <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
+                <td class="px-4 py-3">
+                    <span class="status-badge cursor-pointer">${getStatusBadge(user.status)}</span>
+                </td>
+                <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                        <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
+                            <i class="ph ph-note-pencil text-base"></i><span>Edit</span>
+                        </button>
+                        <button class="deleteUserBtn flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-700 transition">
+                            <i class="ph ph-trash text-base"></i><span>Delete</span>
+                        </button>
+                    </div>
+                </td>
+            `;
 
-function openEditUserModal(user, index) {
-    if (!editUserModal || !user) return;
-    currentEditingIndex = index;
-    document.getElementById("editName").value = user.name;
-    document.getElementById("editEmail").value = user.email;
-    document.getElementById("editRoleDropdownValue").textContent = user.role;
-    document.getElementById("editStatusDropdownValue").textContent = user.status;
+            const statusEl = row.querySelector(".status-badge");
+            if (statusEl) {
+                statusEl.addEventListener("click", () => { if(user.role.toLowerCase()==="superadmin") alert("Superadmin status cannot be changed!"); });
+            }
 
-    const modalTitle = document.querySelector("#editUserTitle span");
-    if (modalTitle) modalTitle.textContent = user.name;
+            userTableBody.appendChild(row);
+        });
+    }
 
-    editUserModal.classList.remove("hidden");
-    document.body.classList.add("overflow-hidden");
-}
+    if(userTableBody){
+        userTableBody.addEventListener("click", e => {
+            const editBtn = e.target.closest(".editUserBtn");
+            if(!editBtn) return;
+            const row = e.target.closest("tr");
+            const index = Array.from(userTableBody.children).indexOf(row);
+            const user = users[index];
+            if(!editUserModal || !user) return;
+            currentEditingIndex = index;
+            document.getElementById("editName").value = user.name;
+            document.getElementById("editEmail").value = user.email;
+            document.getElementById("editRoleDropdownValue").textContent = user.role;
+            document.getElementById("editStatusDropdownValue").textContent = user.status;
+            const modalTitle = document.querySelector("#editUserTitle span");
+            if(modalTitle) modalTitle.textContent = user.name;
+            editUserModal.classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        });
+    }
 
-[closeEditUserBtn, cancelEditUserBtn].forEach(btn => {
-    if (btn) btn.addEventListener("click", closeEditUserModal);
+    // -------------------------
+    // BADGES
+    // -------------------------
+    function getRoleBadge(role) {
+        const base = "px-2 py-1 text-xs rounded-md font-medium";
+        switch(role.toLowerCase()){
+            case "student": return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
+            case "librarian": return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
+            case "admin": return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
+            case "superadmin": return `<span class="bg-red-600 text-white ${base}">${role}</span>`;
+            default: return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
+        }
+    }
+    function getStatusBadge(status){
+        const base = "px-2 py-1 text-xs rounded-md font-medium cursor-pointer transition";
+        switch(status.toLowerCase()){
+            case "active": return `<span class="bg-orange-500 text-white ${base}">${status}</span>`;
+            case "inactive":
+            case "disable": return `<span class="bg-gray-300 text-gray-700 ${base}">${status}</span>`;
+            default: return `<span class="bg-gray-200 text-gray-700 ${base}">${status}</span>`;
+        }
+    }
+
+    // -------------------------
+    // INIT
+    // -------------------------
+    loadUsers();
 });
-if (editUserModal) editUserModal.addEventListener("click", e => {
-    if (e.target === editUserModal) closeEditUserModal();
-});
-
-if (userTableBody) {
-    userTableBody.addEventListener("click", e => {
-        const editBtn = e.target.closest(".editUserBtn");
-        if (!editBtn) return;
-
-        const row = e.target.closest("tr");
-        const index = Array.from(userTableBody.children).indexOf(row);
-        const user = users[index];
-        openEditUserModal(user, index);
-    });
-}
-
-loadUsers();
 </script>
+

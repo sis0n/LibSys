@@ -580,6 +580,33 @@ const modal = document.getElementById("importModal");
 const openBtn = document.getElementById("bulkImportBtn");
 const closeBtn = document.getElementById("closeImportModal");
 const cancelBtn = document.getElementById("cancelImport");
+let selectedRole = "All Roles";
+let selectedStatus = "All Status";
+
+function applyFilters(){
+    let filtered = users;
+    
+    if(selectedRole !== "All Roles"){
+        filtered = filtered.filter(u => u.role.toLowerCase() === selectedRole.toLocaleLowerCase());
+    }
+    if(selectedStatus !== "All Status"){
+        filtered = filtered.filter(u => u.status.toLowerCase() === selectedStatus.toLocaleLowerCase());
+    }
+
+    renderTable(filtered);
+}
+
+function selectRole(el, val) {
+    selectedRole = val;
+    roleDropdown.selectItem(el, val);
+    applyFilters();
+}
+
+function selectStatus(el, val) {
+    selectedStatus = val;
+    statusDropdown.selectItem(el, val);
+    applyFilters();
+}
 
 function closeModal() {
     modal.classList.add("hidden");
@@ -650,6 +677,7 @@ const editRoleDropdown = setupDropdown("editRoleDropdownBtn", "editRoleDropdownM
 const editStatusDropdown = setupDropdown("editStatusDropdownBtn", "editStatusDropdownMenu", "editStatusDropdownValue", "edit-status-item");
 
 window.addEventListener("DOMContentLoaded", () => {
+    applyFilters();
     const defaults = [
         "#roleDropdownMenu .dropdown-item",
         "#statusDropdownMenu .status-item",

@@ -110,16 +110,44 @@ class UserManagementController extends Controller
       if (strtolower($role) === 'student') {
         $this->studentRepo->insertStudent(
           $userId,
-          $username,   
-          'BSCS',      
-          3,           
-          'enrolled'   
+          $username,
+          'BSCS',
+          3,
+          'enrolled'
         );
       }
 
       echo json_encode(['success' => true, 'message' => 'User added successfully.']);
     } catch (\Exception $e) {
       echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+  }
+
+  public function deleteUser($id)
+  {
+    header('Content-Type: application/json');
+
+    try {
+      $deletedBy = $_SESSION['user_id'] ?? null;
+      if (!$deletedBy) {
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        return;
+      }
+
+      $userRepo = new UserRepository();
+      $studentRepo = new StudentRepository();
+
+      $deleted = $userRepo->deleteUserWithCascade((int)$id, $deletedBy, $studentRepo);
+
+      echo json_encode([
+        'success' => $deleted,
+        'message' => $deleted ? 'User deleted successfully.' : 'Failed to delete user.'
+      ]);
+    } catch (\Exception $e) {
+      echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+      ]);
     }
   }
 }

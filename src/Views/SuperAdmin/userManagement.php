@@ -753,6 +753,7 @@
                 allUsers = data.users
                     .filter(u => u.role.toLowerCase() !== "superadmin")
                     .map(u => ({
+                        user_id: u.user_id,
                         name: u.full_name,
                         username: u.username,
                         email: u.email,
@@ -765,6 +766,44 @@
             } catch (err) {
                 console.error("Fetch users error:", err);
             }
+        }
+
+        // delete user
+        if (userTableBody) {
+            userTableBody.addEventListener("click", async (e) => {
+                const btn = e.target.closest(".deleteUserBtn");
+                if (!btn) return;
+
+                const row = e.target.closest("tr");
+                const index = Array.from(userTableBody.children).indexOf(row);
+                const user = allUsers[index];
+                if (!user) return;
+
+                console.log("Deleting user:", user);
+                console.log("User ID:", user.user_id);
+
+
+                const confirmDelete = confirm(`Delete user "${user.name}" (${user.role})?`);
+                if (!confirmDelete) return;
+
+                try {
+                    console.log(`/LibSys/public/superadmin/userManagement/delete/${user.user_id}`);
+                    const res = await fetch(`/LibSys/public/superadmin/userManagement/delete/${user.user_id}`, {
+                        method: "POST"
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        alert("User deleted successfully!");
+                        await loadUsers();
+                    } else {
+                        alert("Error: " + (data.message || "Failed to delete."));
+                    }
+                } catch (err) {
+                    console.error("Delete error:", err);
+                    alert("An error occurred while deleting the user.");
+                }
+            });
         }
 
         function renderTable(users) {
@@ -853,7 +892,7 @@
                         }
 
                         try {
-                            await loadUsers(); 
+                            await loadUsers();
                         } catch (e) {
                             console.warn("loadUsers error:", e);
                         }

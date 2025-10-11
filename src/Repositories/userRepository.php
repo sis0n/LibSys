@@ -120,7 +120,7 @@ class UserRepository
 
     if (empty($fields)) return false;
 
-    $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
+    $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE user_id = :id";
     return $this->db->execute($query, $params);
   }
 
@@ -137,6 +137,7 @@ class UserRepository
           is_active,
           created_at
         FROM users
+        WHERE deleted_at IS NULL
         ORDER BY user_id DESC
       ");
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -168,12 +169,6 @@ class UserRepository
     return $stmt->fetch();
   }
 
-  public function deleteUser(int $id): bool
-  {
-    $stmt = $this->db->prepare("DELETE FROM users WHERE id = ?");
-    return $stmt->execute([$id]);
-  }
-
   public function getUserById($id)
   {
     $stmt = $this->db->prepare("SELECT user_id, full_name, username, role FROM users WHERE user_id = :id");
@@ -195,5 +190,70 @@ class UserRepository
     ");
     $stmt->execute(['query' => $query]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  public function deleteUserWithCascade(int $userId, int $deletedBy, $studentRepo): bool
+  {
+    try {
+      // kunin user info
+      $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = :id");
+      $stmt->execute([':id' => $userId]);
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!$user) {
+        throw new \Exception("User not found.");
+      }
+
+      //  kapag yung dinelete is student, imamark as deleted sa students table 
+      if ($user['role'] === 'student') {
+        $stmt = $this->db->prepare("
+        UPDATE students 
+        SET deleted_at = NOW(), deleted_by = :deleted_by 
+        WHERE user_id = :uid
+      ");
+        $stmt->execute([
+          ':deleted_by' => $deletedBy,
+          ':uid' => $userId
+        ]);
+
+        // iinsert sa deleted_students table pag student yung dinelete
+        $stmt = $this->db->prepare("
+        INSERT INTO deleted_students (student_id, user_id, student_number, course, year_level, status, deleted_by)
+        SELECT student_id, user_id, student_number, course, year_level, status, :deleted_by
+        FROM students WHERE user_id = :uid
+      ");
+        $stmt->execute([
+          ':uid' => $userId,
+          ':deleted_by' => $deletedBy
+        ]);
+      }
+
+      // imamark lang as deleted sa users table pag hindi student yung dinelete
+      $stmt = $this->db->prepare("
+      UPDATE users 
+      SET deleted_at = NOW(), deleted_by = :deleted_by 
+      WHERE user_id = :uid
+    ");
+      $stmt->execute([
+        ':deleted_by' => $deletedBy,
+        ':uid' => $userId
+      ]);
+
+      // iinsert sa deleted_users kahit student or di student yung idedelete
+      $stmt = $this->db->prepare("
+      INSERT INTO deleted_users (user_id, username, full_name, email, role, deleted_by)
+      SELECT user_id, username, full_name, email, role, :deleted_by
+      FROM users WHERE user_id = :uid
+    ");
+      $stmt->execute([
+        ':uid' => $userId,
+        ':deleted_by' => $deletedBy
+      ]);
+
+      return true;
+    } catch (PDOException $e) {
+      error_log("[UserRepository::deleteUserWithCascade] " . $e->getMessage());
+      throw $e;
+    }
   }
 }

@@ -86,17 +86,25 @@ class UserManagementController extends Controller
 
     $full_name = trim($data['full_name'] ?? '');
     $username  = trim($data['username'] ?? '');
-    $role      = trim($data['role'] ?? '');
+    $role = trim($data['role'] ?? '');
 
     if (!$full_name || !$username || !$role) {
       echo json_encode(['success' => false, 'message' => 'All fields are required.']);
       return;
     }
 
-    $defaultPassword = '12345';
-    $hashedPassword = password_hash($defaultPassword, PASSWORD_DEFAULT);
-
     try {
+      //check pag yung username ay existing na sa students
+      if(strtolower($role) === 'student'){
+        if ($this->userRepo->usernameExists($username)){
+          echo json_encode(['success' => false, 'message' => 'Username already Exist']);
+          return;
+        }
+      }
+
+      $defaultPassword = '12345';
+      $hashedPassword = password_hash($defaultPassword, PASSWORD_DEFAULT);
+
       $userId = $this->userRepo->insertUser([
         'username'   => $username,
         'password'   => $hashedPassword,

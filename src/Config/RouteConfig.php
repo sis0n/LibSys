@@ -152,7 +152,7 @@ class RouteConfig
         // SUPERADMIN USER MANAGEMENT ROUTES
         // ===============================
 
-        $router->get('superadmin/userManagement', 'UserManagementController@index', ['superadmin']);
+        // $router->get('superadmin/userManagement', 'UserManagementController@index', ['superadmin']);
         $router->get('superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
         $router->get('superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
         $router->get('superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);

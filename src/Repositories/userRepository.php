@@ -256,4 +256,11 @@ class UserRepository
       throw $e;
     }
   }
+
+  public function usernameExists(string $username): bool
+  {
+    $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE username = :username AND deleted_at IS NULL");
+    $stmt->execute([':username' => $username]);
+    return $stmt->fetchColumn() > 0;
+  }
 }

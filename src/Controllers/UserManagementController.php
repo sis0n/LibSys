@@ -85,7 +85,7 @@ class UserManagementController extends Controller
     $data = json_decode(file_get_contents("php://input"), true);
 
     $full_name = trim($data['full_name'] ?? '');
-    $username  = trim($data['username'] ?? '');
+    $username = trim($data['username'] ?? '');
     $role = trim($data['role'] ?? '');
 
     if (!$full_name || !$username || !$role) {
@@ -95,8 +95,8 @@ class UserManagementController extends Controller
 
     try {
       //check pag yung username ay existing na sa students
-      if(strtolower($role) === 'student'){
-        if ($this->userRepo->usernameExists($username)){
+      if (strtolower($role) === 'student') {
+        if ($this->userRepo->usernameExists($username)) {
           echo json_encode(['success' => false, 'message' => 'Username already Exist']);
           return;
         }
@@ -106,12 +106,12 @@ class UserManagementController extends Controller
       $hashedPassword = password_hash($defaultPassword, PASSWORD_DEFAULT);
 
       $userId = $this->userRepo->insertUser([
-        'username'   => $username,
-        'password'   => $hashedPassword,
-        'full_name'  => $full_name,
-        'email'      => null,
-        'role'       => $role,
-        'is_active'  => 1,
+        'username' => $username,
+        'password' => $hashedPassword,
+        'full_name' => $full_name,
+        'email' => null,
+        'role' => $role,
+        'is_active' => 1,
         'created_at' => date('Y-m-d H:i:s')
       ]);
 
@@ -156,6 +156,37 @@ class UserManagementController extends Controller
         'success' => false,
         'message' => $e->getMessage()
       ]);
+    }
+  }
+
+  public function toggleStatus($id)
+  {
+    header('Content-Type: application/json');
+    try {
+      $user = $this->userRepo->getUserById((int)$id);
+      if (!$user) {
+        echo json_encode(['success' => false, 'message' => 'User not found.']);
+        return;
+      }
+
+      // para maiwasan ma deact yung superadmin
+      if (strtolower($user['role']) === 'superadmin') {
+        echo json_encode(['success' => false, 'message' => 'Superadmin status cannot be changed.']);
+        return;
+      }
+
+      $this->userRepo->toggleUserStatus((int)$id);
+
+      $updatedUser = $this->userRepo->getUserById((int)$id);
+      $newStatus = $updatedUser['is_active'] ? 'Active' : 'Inactive';
+
+      echo json_encode([
+        'success' => true,
+        'message' => 'User status updated successfully.',
+        'newStatus' => $newStatus
+      ]);
+    } catch (\Exception $e) {
+      echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
   }
 }

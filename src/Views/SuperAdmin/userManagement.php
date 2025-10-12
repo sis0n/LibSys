@@ -626,7 +626,7 @@
                         username: u.username,
                         email: u.email,
                         role: u.role,
-                        status: u.is_active == 1 ? "Active" : "Disable",
+                        status: u.is_active == 1 ? "Active" : "Inactive",
                         joinDate: new Date(u.created_at).toLocaleDateString()
                     }));
                     users = mapped.filter(u =>
@@ -824,7 +824,13 @@
                 </td>
                 <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
                 <td class="px-4 py-3">
-                    <span class="status-badge cursor-pointer">${getStatusBadge(user.status)}</span>
+                    <span 
+                        class="status-badge cursor-pointer toggle-status-btn"
+                        data-id="${user.user_id}"
+                        data-status="${user.status.toLowerCase() === 'active' ? 1 : 0}"
+                    >
+                        ${getStatusBadge(user.status)}
+                    </span>
                 </td>
                 <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
                 <td class="px-4 py-3">
@@ -847,6 +853,55 @@
                 }
 
                 userTableBody.appendChild(row);
+            });
+        }
+
+        if (userTableBody) {
+            userTableBody.addEventListener("click", async (e) => {
+                const statusBtn = e.target.closest(".toggle-status-btn");
+                if (!statusBtn) return;
+
+                const row = statusBtn.closest("tr");
+                const index = Array.from(userTableBody.children).indexOf(row);
+                const user = allUsers[index];
+                if (!user) return;
+
+                if (user.role.toLowerCase() === "superadmin") {
+                    alert("Superadmin status cannot be changed!");
+                    return;
+                }
+
+                const currentStatus = statusBtn.dataset.status === "1" ? 1 : 0;
+                const confirmMsg = currentStatus === 1 ?
+                    `Deactivate ${user.name}?` :
+                    `Activate ${user.name}?`;
+
+                if (!confirm(confirmMsg)) return;
+
+                try {
+                    const res = await fetch(`/LibSys/public/superadmin/userManagement/toggleStatus/${user.user_id}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        const newStatus = currentStatus === 1 ? 0 : 1;
+                        user.status = newStatus === 1 ? "Active" : "Disable";
+                        statusBtn.dataset.status = newStatus;
+                        statusBtn.innerHTML = getStatusBadge(user.status);
+                        row.className = newStatus === 1 ? "bg-white" : "bg-gray-100 text-gray-500";
+
+                        alert(`${user.name} is now ${user.status}.`);
+                    } else {
+                        alert("Error: " + (data.message || "Failed to update status."));
+                    }
+                } catch (err) {
+                    console.error("Toggle status error:", err);
+                    alert("An error occurred while updating user status.");
+                }
             });
         }
 
@@ -948,15 +1003,12 @@
         }
 
         function getStatusBadge(status) {
-            const base = "px-2 py-1 text-xs rounded-md font-medium cursor-pointer transition";
-            switch (status.toLowerCase()) {
-                case "active":
-                    return `<span class="bg-orange-500 text-white ${base}">${status}</span>`;
-                case "inactive":
-                case "disable":
-                    return `<span class="bg-gray-300 text-gray-700 ${base}">${status}</span>`;
-                default:
-                    return `<span class="bg-gray-200 text-gray-700 ${base}">${status}</span>`;
+            const base = "px-2 py-1 text-xs rounded-md font-medium cursor-pointer transition-colors duration-200";
+
+            if (status.toLowerCase() === "active") {
+                return `<span class="bg-green-500 text-white ${base}">Active</span>`;
+            } else {
+                return `<span class="bg-gray-300 text-gray-700 ${base}">Disable</span>`;
             }
         }
 

@@ -159,6 +159,7 @@ class RouteConfig
         $router->post('superadmin/userManagement/add', 'UserManagementController@addUser');
         $router->post('superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
         $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
+        $router->post('superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
 
         return $router;
     }

@@ -4,3 +4,9 @@ transaction_id: 3
 books count: 1
 qrPath: /libsys/public/qrcodes/TICKET-68E7A6FDA08A9.png
 
+SHOW DEBUG:
+transactionCode: TICKET-68E280BF9C86F
+transaction_id: 1
+books count: 6
+qrPath: /libsys/public/qrcodes/TICKET-68E280BF9C86F.png
+

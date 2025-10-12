@@ -171,7 +171,7 @@ class UserRepository
 
   public function getUserById($id)
   {
-    $stmt = $this->db->prepare("SELECT user_id, full_name, username, role FROM users WHERE user_id = :id");
+    $stmt = $this->db->prepare("SELECT user_id, full_name, username, role, is_active FROM users WHERE user_id = :id");
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -262,5 +262,15 @@ class UserRepository
     $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE username = :username AND deleted_at IS NULL");
     $stmt->execute([':username' => $username]);
     return $stmt->fetchColumn() > 0;
+  }
+
+  public function toggleUserStatus(int $userId): bool
+  {
+    $stmt = $this->db->prepare("
+        UPDATE users 
+        SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END 
+        WHERE user_id = :id
+    ");
+    return $stmt->execute([':id' => $userId]);
   }
 }

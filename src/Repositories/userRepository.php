@@ -21,19 +21,12 @@ class UserRepository
       // try student_number
       $stmt = $this->db->prepare("
             SELECT 
-                u.user_id, 
-                u.username, 
-                u.password,
-                u.full_name, 
-                u.is_active, 
-                u.role,
-                s.student_id, 
-                s.student_number, 
-                s.year_level, 
-                s.course
+                u.user_id, u.username, u.password, u.full_name, u.is_active, u.role,
+                s.student_id, s.student_number, s.year_level, s.course
             FROM students s
             LEFT JOIN users u ON u.user_id = s.user_id
             WHERE LOWER(s.student_number) = LOWER(:identifier)
+            AND u.deleted_at IS NULL
             LIMIT 1
         ");
       $stmt->execute(['identifier' => $identifier]);
@@ -43,22 +36,15 @@ class UserRepository
         return $student;
       }
 
-      //fallback by username
+      // fallback by username
       $stmt = $this->db->prepare("
             SELECT 
-                u.user_id, 
-                u.username, 
-                u.password,
-                u.full_name, 
-                u.is_active, 
-                u.role,
-                s.student_id, 
-                s.student_number, 
-                s.year_level, 
-                s.course
+                u.user_id, u.username, u.password, u.full_name, u.is_active, u.role,
+                s.student_id, s.student_number, s.year_level, s.course
             FROM users u
             LEFT JOIN students s ON u.user_id = s.user_id
             WHERE LOWER(u.username) = LOWER(:identifier)
+            AND u.deleted_at IS NULL
             LIMIT 1
         ");
       $stmt->execute(['identifier' => $identifier]);
@@ -110,8 +96,8 @@ class UserRepository
       $params[':email'] = $data['email'];
     }
     if (isset($data['password']) && !empty($data['password'])) {
-        $fields[] = "password = :password";
-        $params[':password'] = $data['password'];
+      $fields[] = "password = :password";
+      $params[':password'] = $data['password'];
     }
     if (isset($data['role'])) {
       $fields[] = "role = :role";

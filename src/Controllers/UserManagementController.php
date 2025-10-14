@@ -221,7 +221,6 @@ class UserManagementController extends Controller
         ]);
       }
     } catch (\Exception $e) {
-      // Para sa production, mas mainam na mag-log ng error at magbigay ng generic message.
       error_log("[UserManagementController::updateUser] " . $e->getMessage());
       echo json_encode([
         'success' => false,

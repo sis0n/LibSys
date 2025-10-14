@@ -21,19 +21,12 @@ class UserRepository
       // try student_number
       $stmt = $this->db->prepare("
             SELECT 
-                u.user_id, 
-                u.username, 
-                u.password,
-                u.full_name, 
-                u.is_active, 
-                u.role,
-                s.student_id, 
-                s.student_number, 
-                s.year_level, 
-                s.course
+                u.user_id, u.username, u.password, u.full_name, u.is_active, u.role,
+                s.student_id, s.student_number, s.year_level, s.course
             FROM students s
             LEFT JOIN users u ON u.user_id = s.user_id
             WHERE LOWER(s.student_number) = LOWER(:identifier)
+            AND u.deleted_at IS NULL
             LIMIT 1
         ");
       $stmt->execute(['identifier' => $identifier]);
@@ -43,22 +36,15 @@ class UserRepository
         return $student;
       }
 
-      //fallback by username
+      // fallback by username
       $stmt = $this->db->prepare("
             SELECT 
-                u.user_id, 
-                u.username, 
-                u.password,
-                u.full_name, 
-                u.is_active, 
-                u.role,
-                s.student_id, 
-                s.student_number, 
-                s.year_level, 
-                s.course
+                u.user_id, u.username, u.password, u.full_name, u.is_active, u.role,
+                s.student_id, s.student_number, s.year_level, s.course
             FROM users u
             LEFT JOIN students s ON u.user_id = s.user_id
             WHERE LOWER(u.username) = LOWER(:identifier)
+            AND u.deleted_at IS NULL
             LIMIT 1
         ");
       $stmt->execute(['identifier' => $identifier]);
@@ -71,28 +57,92 @@ class UserRepository
     }
   }
 
-
-
-  public function createUser(array $data)
+  public function insertUser(array $data): int
   {
-    $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
     $stmt = $this->db->prepare("
-        INSERT INTO users (username, password, full_name, role) 
-        VALUES (:username, :password, :full_name, :role)
-    ");
-    return $stmt->execute([
-      'username' => htmlspecialchars(trim($data['username'])),
-      'password' => $hashedPassword,
-      'full_name' => htmlspecialchars(trim($data['full_name'])),
-      'role' => in_array($data['role'], ['admin', 'librarian', 'student', 'scanner', 'superadmin']) ? $data['role'] : 'student'
+    INSERT INTO users (username, password, full_name, email, role, is_active, created_at)
+    VALUES (:username, :password, :full_name, :email, :role, :is_active, :created_at)
+  ");
+
+    $stmt->execute([
+      ':username'   => $data['username'],
+      ':password'   => $data['password'],
+      ':full_name'  => $data['full_name'],
+      ':email'      => $data['email'] ?? null,
+      ':role'       => $data['role'],
+      ':is_active'  => $data['is_active'] ?? 1,
+      ':created_at' => $data['created_at'] ?? date('Y-m-d H:i:s')
     ]);
+
+    return (int)$this->db->lastInsertId();
   }
 
-  public function getAllUsers()
+  public function updateUser(int $id, array $data): bool
   {
-    $stmt = $this->db->prepare("SELECT * FROM users");
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $fields = [];
+    $params = [':id' => $id];
+
+    if (isset($data['full_name'])) {
+      $fields[] = "full_name = :full_name";
+      $params[':full_name'] = $data['full_name'];
+    }
+    if (isset($data['username'])) {
+      $fields[] = "username = :username";
+      $params[':username'] = $data['username'];
+    }
+
+    if (isset($data['email'])) {
+      $fields[] = "email = :email";
+      $params[':email'] = $data['email'];
+    }
+    if (isset($data['password']) && !empty($data['password'])) {
+      $fields[] = "password = :password";
+      $params[':password'] = $data['password'];
+    }
+    if (isset($data['role'])) {
+      $fields[] = "role = :role";
+      $params[':role'] = $data['role'];
+    }
+    if (isset($data['is_active'])) {
+      $fields[] = "is_active = :is_active";
+      $params[':is_active'] = $data['is_active'];
+    }
+
+    if (empty($fields)) {
+      return false;
+    }
+
+    $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE user_id = :id";
+    try {
+      $stmt = $this->db->prepare($query);
+      return $stmt->execute($params);
+    } catch (\PDOException $e) {
+      error_log("[UserRepository::updateUser] " . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function getAllUsers(): array
+  {
+    try {
+      $stmt = $this->db->query("
+        SELECT 
+          user_id,
+          username,
+          full_name,
+          email,
+          role,
+          is_active,
+          created_at
+        FROM users
+        WHERE deleted_at IS NULL
+        ORDER BY user_id DESC
+      ");
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log('[UserRepository::getAllUsers] ' . $e->getMessage());
+      return [];
+    }
   }
 
   public function findByStudentNumber(string $studentNumber)
@@ -117,38 +167,108 @@ class UserRepository
     return $stmt->fetch();
   }
 
-  // ===== Change Password Functions =====
-  public function findUserById($userId)
+  public function getUserById($id)
+  {
+    $stmt = $this->db->prepare("SELECT user_id, full_name, username, role, is_active FROM users WHERE user_id = :id");
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public function searchUsers(string $query): array
+  {
+    $query = "%" . strtolower($query) . "%";
+    $stmt = $this->db->prepare("
+        SELECT user_id, username, full_name, email, role, is_active, created_at
+        FROM users
+        WHERE LOWER(full_name) LIKE :query
+           OR LOWER(username) LIKE :query
+           OR LOWER(email) LIKE :query
+        ORDER BY user_id DESC
+    ");
+    $stmt->execute(['query' => $query]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  public function deleteUserWithCascade(int $userId, int $deletedBy, $studentRepo): bool
   {
     try {
+      // kunin user info
+      $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = :id");
+      $stmt->execute([':id' => $userId]);
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!$user) {
+        throw new \Exception("User not found.");
+      }
+
+      //  kapag yung dinelete is student, imamark as deleted sa students table 
+      if ($user['role'] === 'student') {
+        $stmt = $this->db->prepare("
+        UPDATE students 
+        SET deleted_at = NOW(), deleted_by = :deleted_by 
+        WHERE user_id = :uid
+      ");
+        $stmt->execute([
+          ':deleted_by' => $deletedBy,
+          ':uid' => $userId
+        ]);
+
+        // iinsert sa deleted_students table pag student yung dinelete
+        $stmt = $this->db->prepare("
+        INSERT INTO deleted_students (student_id, user_id, student_number, course, year_level, status, deleted_by)
+        SELECT student_id, user_id, student_number, course, year_level, status, :deleted_by
+        FROM students WHERE user_id = :uid
+      ");
+        $stmt->execute([
+          ':uid' => $userId,
+          ':deleted_by' => $deletedBy
+        ]);
+      }
+
+      // imamark lang as deleted sa users table pag hindi student yung dinelete
       $stmt = $this->db->prepare("
-            SELECT * FROM users 
-            WHERE user_id = :id 
-            LIMIT 1
-        ");
-      $stmt->bindParam(':id', $userId, \PDO::PARAM_INT);
-      $stmt->execute();
-      return $stmt->fetch(\PDO::FETCH_ASSOC);
-    } catch (\PDOException $e) {
-      error_log("[UserRepository::findUserById] " . $e->getMessage());
-      return null;
+      UPDATE users 
+      SET deleted_at = NOW(), deleted_by = :deleted_by 
+      WHERE user_id = :uid
+    ");
+      $stmt->execute([
+        ':deleted_by' => $deletedBy,
+        ':uid' => $userId
+      ]);
+
+      // iinsert sa deleted_users kahit student or di student yung idedelete
+      $stmt = $this->db->prepare("
+      INSERT INTO deleted_users (user_id, username, full_name, email, role, deleted_by)
+      SELECT user_id, username, full_name, email, role, :deleted_by
+      FROM users WHERE user_id = :uid
+    ");
+      $stmt->execute([
+        ':uid' => $userId,
+        ':deleted_by' => $deletedBy
+      ]);
+
+      return true;
+    } catch (PDOException $e) {
+      error_log("[UserRepository::deleteUserWithCascade] " . $e->getMessage());
+      throw $e;
     }
   }
 
-  public function updatePassword($userId, $hashedPassword)
+  public function usernameExists(string $username): bool
   {
-    try {
-      $stmt = $this->db->prepare("
-            UPDATE users 
-            SET password = :password 
-            WHERE user_id = :id
-        ");
-      $stmt->bindParam(':password', $hashedPassword);
-      $stmt->bindParam(':id', $userId, \PDO::PARAM_INT);
-      return $stmt->execute();
-    } catch (\PDOException $e) {
-      error_log("[UserRepository::updatePassword] " . $e->getMessage());
-      return false;
-    }
+    $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE username = :username AND deleted_at IS NULL");
+    $stmt->execute([':username' => $username]);
+    return $stmt->fetchColumn() > 0;
+  }
+
+  public function toggleUserStatus(int $userId): bool
+  {
+    $stmt = $this->db->prepare("
+        UPDATE users 
+        SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END 
+        WHERE user_id = :id
+    ");
+    return $stmt->execute([':id' => $userId]);
   }
 }

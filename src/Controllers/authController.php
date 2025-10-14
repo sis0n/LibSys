@@ -50,6 +50,11 @@ class AuthController extends Controller
 
             $user = $this->AuthRepository->attemptLogin($username, $password);
 
+            if ($user && isset($user['is_active']) && !$user['is_active']) {
+                echo "Your account has been deactivated by the administrator.";
+                return;
+            }
+
             if ($user) {
                 // redirect based on role
                 if (User::isAdmin($user)) {
@@ -107,102 +112,5 @@ class AuthController extends Controller
             "title" => "Forgot Password",
             "csrf_token" => $_SESSION['csrf_token']
         ], false);
-    }
-
-    //change password 
-    public function changePassword()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            require __DIR__ . '/../Views/errors/405.php';
-            return;
-        }
-
-        $userId = $_SESSION['user_id'] ?? null;
-        if (!$userId) {
-            http_response_code(401);
-            // require __DIR__ . '/../errors/401.php'; 
-            require __DIR__ . '/../Views/errors/401.php';
-            return;
-        }
-
-        $currentPassword = $_POST['current_password'] ?? '';
-        $newPassword     = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
-
-        // 1. Check match
-        if ($newPassword !== $confirmPassword) {
-            http_response_code(400);
-            // require __DIR__ . '/../errors/400.php'; 
-            require __DIR__ . '/../Views/errors/400.php';
-
-            return;
-        }
-
-        $userRepo = new \App\Repositories\UserRepository();
-        $user = $userRepo->findUserById($userId);
-
-        if (!$user || !password_verify($currentPassword, $user['password'])) {
-            http_response_code(403);
-            // require __DIR__ . '/../errors/403.php'; 
-            require __DIR__ . '/../Views/errors/403.php';
-
-            return;
-        }
-
-        // 2. Hash and update
-        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        $update = $userRepo->updatePassword($userId, $hashedPassword);
-
-        if ($update) {
-            echo json_encode(['status' => 'success', 'message' => 'Password successfully updated!']);
-        } else {
-            http_response_code(400);
-            // require __DIR__ . '/../errors/400.php'; 
-            require __DIR__ . '/../Views/errors/400.php';
-        }
-    }
-
-    // =========================
-    // WRAPPER METHODS PER ROLE
-    // =========================
-    public function studentChangePassword()
-    {
-        $this->roleCheck('student');
-        $this->changePassword();
-    }
-
-    public function librarianChangePassword()
-    {
-        $this->roleCheck('librarian');
-        $this->changePassword();
-    }
-
-    public function adminChangePassword()
-    {
-        $this->roleCheck('admin');
-        $this->changePassword();
-    }
-
-    public function superAdminChangePassword()
-    {
-        $this->roleCheck('superadmin');
-        $this->changePassword();
-    }
-
-    // =========================
-    // ROLE CHECK HELPER
-    // =========================
-    private function roleCheck($role)
-    {
-        $userRole = $_SESSION['role'] ?? null;
-
-        if ($userRole !== $role) {
-            http_response_code(403);
-            // require __DIR__ . '/../errors/403.php'; 
-            require __DIR__ . '/../Views/errors/403.php';
-
-            exit;
-        }
     }
 }

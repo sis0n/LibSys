@@ -113,3 +113,27 @@ CREATE TABLE activity_logs (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
+
+CREATE TABLE deleted_users (
+  user_id INT,
+  username VARCHAR(50),
+  full_name VARCHAR(100),
+  email VARCHAR(100),
+  role ENUM('superadmin','admin','librarian','student','scanner'),
+  deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  deleted_by INT,
+  FOREIGN KEY (deleted_by) REFERENCES users(user_id)
+);
+
+CREATE TABLE deleted_students (
+  student_id INT,
+  user_id INT,
+  student_number VARCHAR(20),
+  course VARCHAR(50),
+  year_level INT,
+  status ENUM('enrolled','dropped','transferred'),
+  deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  deleted_by INT,
+  FOREIGN KEY (deleted_by) REFERENCES users(user_id)
+);

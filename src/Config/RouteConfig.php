@@ -151,7 +151,18 @@ class RouteConfig
         $router->post('/change-password', 'AuthController@changePassword');
 
 
+        // ===============================
+        // SUPERADMIN USER MANAGEMENT ROUTES
+        // ===============================
 
+        // $router->get('superadmin/userManagement', 'UserManagementController@index', ['superadmin']);
+        $router->get('superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
+        $router->get('superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
+        $router->get('superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
+        $router->post('superadmin/userManagement/add', 'UserManagementController@addUser');
+        $router->post('superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
+        $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
+        $router->post('superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
 
         return $router;
     }

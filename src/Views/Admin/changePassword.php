@@ -53,7 +53,7 @@
         <!-- New Password -->
         <div>
           <label class="block text-gray-700 text-sm font-medium mb-1">
-            New Password *
+            New Password  <span class="text-red-500">*</span>
           </label>
           <div class="relative">
             <input
@@ -79,7 +79,7 @@
         <!-- Confirm Password -->
         <div>
           <label class="block text-gray-700 text-sm font-medium mb-1">
-            Confirm New Password *
+            Confirm New Password  <span class="text-red-500">*</span>
           </label>
           <div class="relative">
             <input

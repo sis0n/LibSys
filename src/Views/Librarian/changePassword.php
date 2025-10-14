@@ -53,7 +53,7 @@
         <!-- New Password -->
         <div>
           <label class="block text-gray-700 text-sm font-medium mb-1">
-            New Password *
+            New Password  <span class="text-red-500">*</span>
           </label>
           <div class="relative">
             <input
@@ -79,7 +79,7 @@
         <!-- Confirm Password -->
         <div>
           <label class="block text-gray-700 text-sm font-medium mb-1">
-            Confirm New Password *
+            Confirm New Password  <span class="text-red-500">*</span>
           </label>
           <div class="relative">
             <input
@@ -113,8 +113,8 @@
         </button>
 
         <!-- Tips Section -->
-        <div class="bg-orange-100 border border-orange-200 rounded-lg p-4 mt-6">
-          <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-5 text-orange-600 text-center md:text-left">
+        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mt-6">
+          <h2 class="text-xl font-semibold flex items-center gap-2 mb-5 text-amber-600 text-center md:text-left">
             Password Security
           </h2>
 
@@ -122,10 +122,10 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <!-- Column 1: Security Tips -->
             <div>
-              <h3 class="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2 text-orange-700 text-center sm:text-left">
+              <h3 class="text-base font-semibold mb-2 flex items-center gap-2 text-orange-700 text-center sm:text-left">
                 Security Tips
               </h3>
-              <ul class="list-disc list-inside text-amber-700 space-y-1 text-xs text-center sm:text-left">
+              <ul class="list-disc list-inside text-amber-600 space-y-1 text-xs text-center sm:text-left">
                 <li>At least 6 characters long</li>
                 <li>Mix of letters, numbers, and symbols</li>
                 <li>Avoid common words or phrases</li>
@@ -135,10 +135,10 @@
 
             <!-- Column 2: Security Reminders -->
             <div>
-              <h3 class="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2 text-orange-700 text-center sm:text-left">
+              <h3 class="text-base font-semibold mb-2 flex items-center gap-2 text-orange-700 text-center sm:text-left">
                 Security Reminders
               </h3>
-              <ul class="list-disc list-inside text-amber-700 space-y-1 text-xs text-center sm:text-left">
+              <ul class="list-disc list-inside text-amber-600 space-y-1 text-xs text-center sm:text-left">
                 <li>Never share your password</li>
                 <li>Log out from public computers</li>
                 <li>Change password if compromised</li>

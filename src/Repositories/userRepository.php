@@ -91,7 +91,6 @@ class UserRepository
     return (int)$this->db->lastInsertId();
   }
 
-
   public function updateUser(int $id, array $data): bool
   {
     $fields = [];
@@ -105,23 +104,36 @@ class UserRepository
       $fields[] = "username = :username";
       $params[':username'] = $data['username'];
     }
+
+    if (isset($data['email'])) {
+      $fields[] = "email = :email";
+      $params[':email'] = $data['email'];
+    }
     if (isset($data['password']) && !empty($data['password'])) {
-      $fields[] = "password = :password";
-      $params[':password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+        $fields[] = "password = :password";
+        $params[':password'] = $data['password'];
     }
     if (isset($data['role'])) {
       $fields[] = "role = :role";
       $params[':role'] = $data['role'];
     }
-    if (isset($data['status'])) {
-      $fields[] = "status = :status";
-      $params[':status'] = $data['status'];
+    if (isset($data['is_active'])) {
+      $fields[] = "is_active = :is_active";
+      $params[':is_active'] = $data['is_active'];
     }
 
-    if (empty($fields)) return false;
+    if (empty($fields)) {
+      return false;
+    }
 
     $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE user_id = :id";
-    return $this->db->execute($query, $params);
+    try {
+      $stmt = $this->db->prepare($query);
+      return $stmt->execute($params);
+    } catch (\PDOException $e) {
+      error_log("[UserRepository::updateUser] " . $e->getMessage());
+      return false;
+    }
   }
 
   public function getAllUsers(): array

@@ -10,3 +10,15 @@ transaction_id: 1
 books count: 6
 qrPath: /libsys/public/qrcodes/TICKET-68E280BF9C86F.png
 
+SHOW DEBUG:
+transactionCode: NULL
+transaction_id: NULL
+books count: 0
+qrPath: NULL
+
+SHOW DEBUG:
+transactionCode: NULL
+transaction_id: NULL
+books count: 0
+qrPath: NULL
+

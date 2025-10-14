@@ -189,4 +189,44 @@ class UserManagementController extends Controller
       echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
   }
+
+  public function updateUser($id)
+  {
+    header('Content-Type: application/json');
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    if (empty($data) || !isset($data['full_name']) || !isset($data['email'])) {
+      echo json_encode(['success' => false, 'message' => 'Incomplete user data provided.']);
+      return;
+    }
+
+    try {
+      if (isset($data['password']) && !empty($data['password'])) {
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+      }
+
+      unset($data['user_id']);
+
+      $updated = $this->userRepo->updateUser((int)$id, $data);
+
+      if ($updated) {
+        echo json_encode([
+          'success' => true,
+          'message' => 'User updated successfully.'
+        ]);
+      } else {
+        echo json_encode([
+          'success' => false,
+          'message' => 'Failed to update user or no changes were made.'
+        ]);
+      }
+    } catch (\Exception $e) {
+      // Para sa production, mas mainam na mag-log ng error at magbigay ng generic message.
+      error_log("[UserManagementController::updateUser] " . $e->getMessage());
+      echo json_encode([
+        'success' => false,
+        'message' => 'An internal server error occurred.'
+      ]);
+    }
+  }
 }

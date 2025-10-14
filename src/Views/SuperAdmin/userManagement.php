@@ -393,7 +393,7 @@
                                 <div class="edit-status-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditStatus(this, 'Active')">Active</div>
                                 <div class="edit-status-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                                    onclick="selectEditStatus(this, 'Disable')">Disable</div>
+                                    onclick="selectEditStatus(this, 'Inactive')">Inactive</div>
                             </div>
                         </div>
                     </div>
@@ -574,10 +574,9 @@
         </div>
     </div>
 </div>
-
 <script>
     window.addEventListener("DOMContentLoaded", () => {
-        // DOM element
+        // DOM Elements
         const modal = document.getElementById("importModal");
         const openBtn = document.getElementById("bulkImportBtn");
         const closeBtn = document.getElementById("closeImportModal");
@@ -592,28 +591,29 @@
         const closeEditUserBtn = document.getElementById("closeEditUserModal");
         const cancelEditUserBtn = document.getElementById("cancelEditUser");
 
-        // state
+        // State Variables
         let allUsers = [];
         let users = [];
         let selectedRole = "All Roles";
         let selectedStatus = "All Status";
-        let currentEditingIndex = null;
+        let currentEditingUserId = null;
 
-        //filter and search
+        // --- FILTER AND SEARCH LOGIC ---
         function applyFilters() {
-            users = [...allUsers];
+            let filtered = [...allUsers];
             if (selectedRole !== "All Roles") {
-                users = users.filter(u => u.role.toLowerCase() === selectedRole.toLowerCase());
+                filtered = filtered.filter(u => u.role.toLowerCase() === selectedRole.toLowerCase());
             }
             if (selectedStatus !== "All Status") {
-                users = users.filter(u => u.status.toLowerCase() === selectedStatus.toLowerCase());
+                filtered = filtered.filter(u => u.status.toLowerCase() === selectedStatus.toLowerCase());
             }
+            users = filtered; 
             renderTable(users);
         }
 
         async function searchUsers(query) {
             if (!query) {
-                applyFilters();
+                await loadUsers();
                 return;
             }
             try {
@@ -621,7 +621,8 @@
                 if (!res.ok) return;
                 const data = await res.json();
                 if (data.success) {
-                    const mapped = data.users.map(u => ({
+                    allUsers = data.users.map(u => ({
+                        user_id: u.user_id,
                         name: u.full_name,
                         username: u.username,
                         email: u.email,
@@ -629,36 +630,29 @@
                         status: u.is_active == 1 ? "Active" : "Inactive",
                         joinDate: new Date(u.created_at).toLocaleDateString()
                     }));
-                    users = mapped.filter(u =>
-                        (selectedRole === "All Roles" || u.role.toLowerCase() === selectedRole.toLowerCase()) &&
-                        (selectedStatus === "All Status" || u.status.toLowerCase() === selectedStatus.toLowerCase())
-                    );
-                    renderTable(users);
+                    applyFilters(); 
                 }
             } catch (err) {
                 console.error("Search error:", err);
             }
         }
-
         if (searchInput) {
             searchInput.addEventListener("input", e => searchUsers(e.target.value.trim()));
         }
 
-        //modals
+        // --- MODAL CONTROLS ---
         function closeModal(modalEl) {
-            if (!modalEl) return;
-            modalEl.classList.add("hidden");
-            document.body.classList.remove("overflow-hidden");
+            if (modalEl) {
+                modalEl.classList.add("hidden");
+                document.body.classList.remove("overflow-hidden");
+            }
         }
-
         if (openBtn) openBtn.addEventListener("click", () => {
             modal.classList.remove("hidden");
             document.body.classList.add("overflow-hidden");
         });
-        [closeBtn, cancelBtn].forEach(btn => {
-            if (btn) btn.addEventListener("click", () => closeModal(modal));
-        });
-        if (modal) modal.addEventListener("click", e => {
+        [closeBtn, cancelBtn].forEach(btn => btn?.addEventListener("click", () => closeModal(modal)));
+        modal?.addEventListener("click", e => {
             if (e.target === modal) closeModal(modal);
         });
 
@@ -669,87 +663,67 @@
             addUserModal.classList.remove("hidden");
             document.body.classList.add("overflow-hidden");
         });
-        [closeAddUserBtn, cancelAddUserBtn].forEach(btn => {
-            if (btn) btn.addEventListener("click", closeAddUserModal);
-        });
-        if (addUserModal) addUserModal.addEventListener("click", e => {
+        [closeAddUserBtn, cancelAddUserBtn].forEach(btn => btn?.addEventListener("click", closeAddUserModal));
+        addUserModal?.addEventListener("click", e => {
             if (e.target === addUserModal) closeAddUserModal();
         });
 
         function closeEditUserModal() {
             closeModal(editUserModal);
-            currentEditingIndex = null;
+            currentEditingUserId = null;
         }
-        [closeEditUserBtn, cancelEditUserBtn].forEach(btn => {
-            if (btn) btn.addEventListener("click", closeEditUserModal);
-        });
-        if (editUserModal) editUserModal.addEventListener("click", e => {
+        [closeEditUserBtn, cancelEditUserBtn].forEach(btn => btn?.addEventListener("click", closeEditUserModal));
+        editUserModal?.addEventListener("click", e => {
             if (e.target === editUserModal) closeEditUserModal();
         });
 
-        //dropdown
-        function setupDropdown(buttonId, menuId, valueId, itemClass) {
+        // --- DROPDOWN LOGIC ---
+        function setupDropdownToggle(buttonId, menuId) {
             const btn = document.getElementById(buttonId);
             const menu = document.getElementById(menuId);
-            const valueEl = document.getElementById(valueId);
-            if (!btn || !menu || !valueEl) return;
-
-            btn.addEventListener("click", () => menu.classList.toggle("hidden"));
-            document.addEventListener("click", e => {
-                if (!btn.contains(e.target) && !menu.contains(e.target)) menu.classList.add("hidden");
-            });
-
-            function selectItem(el, val) {
-                valueEl.textContent = val;
-                document.querySelectorAll(`#${menuId} .${itemClass}`).forEach(i => i.classList.remove("bg-orange-100", "font-semibold"));
-                el.classList.add("bg-orange-100", "font-semibold");
-                menu.classList.add("hidden");
-            }
-            return {
-                selectItem
-            };
-        }
-
-        const roleDropdown = setupDropdown("roleDropdownBtn", "roleDropdownMenu", "roleDropdownValue", "dropdown-item");
-        const statusDropdown = setupDropdown("statusDropdownBtn", "statusDropdownMenu", "statusDropdownValue", "status-item");
-        const userRoleDropdown = setupDropdown("userRoleDropdownBtn", "userRoleDropdownMenu", "userRoleDropdownValue", "user-role-item");
-        const editRoleDropdown = setupDropdown("editRoleDropdownBtn", "editRoleDropdownMenu", "editRoleDropdownValue", "edit-role-item");
-        const editStatusDropdown = setupDropdown("editStatusDropdownBtn", "editStatusDropdownMenu", "editStatusDropdownValue", "edit-status-item");
-
-        function setupDropdownItems(menuId, itemClass, dropdownObj, stateVarName) {
-            document.querySelectorAll(`#${menuId} .${itemClass}`).forEach(item => {
-                item.addEventListener("click", function() {
-                    dropdownObj.selectItem(this, this.textContent);
-                    if (stateVarName === "role") selectedRole = this.textContent;
-                    if (stateVarName === "status") selectedStatus = this.textContent;
-                    applyFilters();
-                });
+            if (!btn || !menu) return;
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                menu.classList.toggle("hidden");
             });
         }
 
-        setupDropdownItems("roleDropdownMenu", "dropdown-item", roleDropdown, "role");
-        setupDropdownItems("statusDropdownMenu", "status-item", statusDropdown, "status");
-        setupDropdownItems("userRoleDropdownMenu", "user-role-item", userRoleDropdown); // add modal
-        setupDropdownItems("editRoleDropdownMenu", "edit-role-item", editRoleDropdown); // edit modal
-        setupDropdownItems("editStatusDropdownMenu", "edit-status-item", editStatusDropdown); // edit modal
+        setupDropdownToggle("roleDropdownBtn", "roleDropdownMenu");
+        setupDropdownToggle("statusDropdownBtn", "statusDropdownMenu");
+        setupDropdownToggle("userRoleDropdownBtn", "userRoleDropdownMenu");
+        setupDropdownToggle("editRoleDropdownBtn", "editRoleDropdownMenu");
+        setupDropdownToggle("editStatusDropdownBtn", "editStatusDropdownMenu");
 
-        const defaults = [
-            "#roleDropdownMenu .dropdown-item",
-            "#statusDropdownMenu .status-item",
-            "#userRoleDropdownMenu .user-role-item"
-        ];
-        defaults.forEach(sel => {
-            const el = document.querySelector(sel);
-            if (el) el.classList.add("bg-orange-100", "font-semibold");
+        document.addEventListener("click", () => {
+            document.querySelectorAll('.absolute.mt-1').forEach(menu => menu.classList.add('hidden'));
         });
 
-        //user table
+        window.selectRole = (el, val) => {
+            document.getElementById('roleDropdownValue').textContent = val;
+            selectedRole = val;
+            applyFilters();
+        };
+        window.selectStatus = (el, val) => {
+            document.getElementById('statusDropdownValue').textContent = val;
+            selectedStatus = val;
+            applyFilters();
+        };
+        window.selectUserRole = (el, val) => {
+            document.getElementById('userRoleDropdownValue').textContent = val;
+        };
+        window.selectEditRole = (el, val) => {
+            document.getElementById('editRoleDropdownValue').textContent = val;
+        };
+        window.selectEditStatus = (el, val) => {
+            document.getElementById('editStatusDropdownValue').textContent = val;
+        };
+
+        // --- DATA FETCHING AND RENDERING ---
         async function loadUsers() {
             try {
                 const res = await fetch('userManagement/getAll');
                 const data = await res.json();
                 if (!data.success) throw new Error(data.message || "Failed to fetch users");
-
                 allUsers = data.users
                     .filter(u => u.role.toLowerCase() !== "superadmin")
                     .map(u => ({
@@ -758,156 +732,37 @@
                         username: u.username,
                         email: u.email,
                         role: u.role,
-                        status: u.is_active == 1 ? "Active" : "Disable",
+                        status: u.is_active == 1 ? "Active" : "Inactive",
                         joinDate: new Date(u.created_at).toLocaleDateString()
                     }));
-
                 applyFilters();
             } catch (err) {
                 console.error("Fetch users error:", err);
             }
         }
 
-        // delete user
-        if (userTableBody) {
-            userTableBody.addEventListener("click", async (e) => {
-                const btn = e.target.closest(".deleteUserBtn");
-                if (!btn) return;
-
-                const row = e.target.closest("tr");
-                const index = Array.from(userTableBody.children).indexOf(row);
-                const user = allUsers[index];
-                if (!user) return;
-
-                console.log("Deleting user:", user);
-                console.log("User ID:", user.user_id);
-
-
-                const confirmDelete = confirm(`Delete user "${user.name}" (${user.role})?`);
-                if (!confirmDelete) return;
-
-                try {
-                    console.log(`/LibSys/public/superadmin/userManagement/delete/${user.user_id}`);
-                    const res = await fetch(`/LibSys/public/superadmin/userManagement/delete/${user.user_id}`, {
-                        method: "POST"
-                    });
-                    const data = await res.json();
-
-                    if (data.success) {
-                        alert("User deleted successfully!");
-                        await loadUsers();
-                    } else {
-                        alert("Error: " + (data.message || "Failed to delete."));
-                    }
-                } catch (err) {
-                    console.error("Delete error:", err);
-                    alert("An error occurred while deleting the user.");
-                }
-            });
-        }
-
-        function renderTable(users) {
+        function renderTable(usersToRender) {
             if (!userTableBody) return;
             userTableBody.innerHTML = "";
-
-            users.forEach((user, index) => {
+            usersToRender.forEach((user) => {
                 const row = document.createElement("tr");
-                row.className = user.status === "Disable" ? "bg-gray-100 text-gray-500" : "bg-white";
-
+                row.className = user.status === "Inactive" ? "bg-gray-100 text-gray-500" : "bg-white";
                 row.innerHTML = `
-                <td class="px-4 py-3">
-                    <p class="font-medium text-gray-800">${user.name}</p>
-                    <p class="text-gray-500 text-xs">${user.username}</p>
-                </td>
-                <td class="px-4 py-3">
-                    <p class="font-medium text-gray-800">${user.email}</p>
-                </td>
-                <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
-                <td class="px-4 py-3">
-                    <span 
-                        class="status-badge cursor-pointer toggle-status-btn"
-                        data-id="${user.user_id}"
-                        data-status="${user.status.toLowerCase() === 'active' ? 1 : 0}"
-                    >
-                        ${getStatusBadge(user.status)}
-                    </span>
-                </td>
-                <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
-                <td class="px-4 py-3">
-                    <div class="flex items-center gap-2">
-                        <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
-                            <i class="ph ph-note-pencil text-base"></i><span>Edit</span>
-                        </button>
-                        <button class="deleteUserBtn flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-700 transition">
-                            <i class="ph ph-trash text-base"></i><span>Delete</span>
-                        </button>
-                    </div>
-                </td>
-            `;
-
-                const statusEl = row.querySelector(".status-badge");
-                if (statusEl) {
-                    statusEl.addEventListener("click", () => {
-                        if (user.role.toLowerCase() === "superadmin") alert("Superadmin status cannot be changed!");
-                    });
-                }
-
+                    <td class="px-4 py-3"><p class="font-medium text-gray-800">${user.name}</p><p class="text-gray-500 text-xs">${user.username}</p></td>
+                    <td class="px-4 py-3">${user.email || 'N/A'}</td>
+                    <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
+                    <td class="px-4 py-3"><span class="status-badge cursor-pointer toggle-status-btn">${getStatusBadge(user.status)}</span></td>
+                    <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
+                    <td class="px-4 py-3"><div class="flex items-center gap-2">
+                        <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition"><i class="ph ph-note-pencil text-base"></i><span>Edit</span></button>
+                        <button class="deleteUserBtn flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-700 transition"><i class="ph ph-trash text-base"></i><span>Delete</span></button>
+                    </div></td>`;
                 userTableBody.appendChild(row);
             });
         }
 
-        if (userTableBody) {
-            userTableBody.addEventListener("click", async (e) => {
-                const statusBtn = e.target.closest(".toggle-status-btn");
-                if (!statusBtn) return;
-
-                const row = statusBtn.closest("tr");
-                const index = Array.from(userTableBody.children).indexOf(row);
-                const user = allUsers[index];
-                if (!user) return;
-
-                if (user.role.toLowerCase() === "superadmin") {
-                    alert("Superadmin status cannot be changed!");
-                    return;
-                }
-
-                const currentStatus = statusBtn.dataset.status === "1" ? 1 : 0;
-                const confirmMsg = currentStatus === 1 ?
-                    `Deactivate ${user.name}?` :
-                    `Activate ${user.name}?`;
-
-                if (!confirm(confirmMsg)) return;
-
-                try {
-                    const res = await fetch(`/LibSys/public/superadmin/userManagement/toggleStatus/${user.user_id}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    });
-                    const data = await res.json();
-
-                    if (data.success) {
-                        const newStatus = currentStatus === 1 ? 0 : 1;
-                        user.status = newStatus === 1 ? "Active" : "Disable";
-                        statusBtn.dataset.status = newStatus;
-                        statusBtn.innerHTML = getStatusBadge(user.status);
-                        row.className = newStatus === 1 ? "bg-white" : "bg-gray-100 text-gray-500";
-
-                        alert(`${user.name} is now ${user.status}.`);
-                    } else {
-                        alert("Error: " + (data.message || "Failed to update status."));
-                    }
-                } catch (err) {
-                    console.error("Toggle status error:", err);
-                    alert("An error occurred while updating user status.");
-                }
-            });
-        }
-
-        // add user
+        // --- ACTIONS (ADD, EDIT, DELETE, TOGGLE) ---
         const confirmAddUserBtn = document.getElementById("confirmAddUser");
-
         if (confirmAddUserBtn) {
             confirmAddUserBtn.addEventListener("click", async () => {
                 const nameInput = addUserModal.querySelector('input[placeholder="Enter full name"]');
@@ -915,12 +770,7 @@
                 const full_name = nameInput.value.trim();
                 const username = usernameInput.value.trim();
                 const role = document.getElementById("userRoleDropdownValue").textContent.trim();
-
-                if (!full_name || !username || role === "Select Role") {
-                    alert("Please fill in all required fields.");
-                    return;
-                }
-
+                if (!full_name || !username || role === "Select Role") return alert("Please fill in all required fields.");
                 try {
                     const res = await fetch("/LibSys/public/superadmin/userManagement/add", {
                         method: "POST",
@@ -933,56 +783,135 @@
                             role
                         })
                     });
-
                     const data = await res.json();
-                    console.log("Server response:", data);
-
                     if (data.success) {
                         alert("User added successfully!");
-
-                        try {
-                            closeAddUserModal();
-                        } catch (e) {
-                            console.warn("closeAddUserModal error:", e);
-                        }
-
-                        try {
-                            await loadUsers();
-                        } catch (e) {
-                            console.warn("loadUsers error:", e);
-                        }
-
-                        nameInput.value = "";
-                        usernameInput.value = "";
-                        document.getElementById("userRoleDropdownValue").textContent = "Select Role";
+                        closeAddUserModal();
+                        await loadUsers();
                     } else {
                         alert("Error: " + data.message);
                     }
                 } catch (err) {
-                    console.error("Add user fetch error:", err);
+                    console.error("Add user error:", err);
                     alert("An error occurred while adding the user.");
                 }
             });
         }
 
-
         if (userTableBody) {
-            userTableBody.addEventListener("click", e => {
-                const editBtn = e.target.closest(".editUserBtn");
-                if (!editBtn) return;
+            userTableBody.addEventListener("click", async (e) => {
                 const row = e.target.closest("tr");
+                if (!row) return;
                 const index = Array.from(userTableBody.children).indexOf(row);
                 const user = users[index];
-                if (!editUserModal || !user) return;
-                currentEditingIndex = index;
-                document.getElementById("editName").value = user.name;
-                document.getElementById("editEmail").value = user.email;
-                document.getElementById("editRoleDropdownValue").textContent = user.role;
-                document.getElementById("editStatusDropdownValue").textContent = user.status;
-                const modalTitle = document.querySelector("#editUserTitle span");
-                if (modalTitle) modalTitle.textContent = user.name;
-                editUserModal.classList.remove("hidden");
-                document.body.classList.add("overflow-hidden");
+                if (!user) return;
+
+                if (e.target.closest(".editUserBtn")) {
+                    currentEditingUserId = user.user_id;
+                    document.getElementById("editName").value = user.name;
+                    document.getElementById("editEmail").value = user.email;
+                    document.getElementById("editRoleDropdownValue").textContent = user.role;
+                    document.getElementById("editStatusDropdownValue").textContent = user.status;
+                    document.querySelector("#editUserTitle span").textContent = user.name;
+                    editUserModal.classList.remove("hidden");
+                    document.body.classList.add("overflow-hidden");
+                }
+
+                if (e.target.closest(".deleteUserBtn")) {
+                    if (!confirm(`Delete user "${user.name}" (${user.role})?`)) return;
+                    try {
+                        const res = await fetch(`/LibSys/public/superadmin/userManagement/delete/${user.user_id}`, {
+                            method: "POST"
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            alert("User deleted successfully!");
+                            await loadUsers();
+                        } else {
+                            alert("Error: " + (data.message || "Failed to delete."));
+                        }
+                    } catch (err) {
+                        console.error("Delete error:", err);
+                        alert("An error occurred while deleting the user.");
+                    }
+                }
+
+                if (e.target.closest(".toggle-status-btn")) {
+                    if (user.role.toLowerCase() === 'superadmin') return alert("Superadmin status cannot be changed!");
+                    const confirmMsg = user.status === 'Active' ? `Deactivate ${user.name}?` : `Activate ${user.name}?`;
+                    if (!confirm(confirmMsg)) return;
+                    try {
+                        const res = await fetch(`/LibSys/public/superadmin/userManagement/toggleStatus/${user.user_id}`, {
+                            method: "POST"
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            alert(`${user.name} is now ${data.newStatus}.`);
+                            await loadUsers();
+                        } else {
+                            alert("Error: " + (data.message || "Failed to update status."));
+                        }
+                    } catch (err) {
+                        console.error("Toggle status error:", err);
+                        alert("An error occurred while updating user status.");
+                    }
+                }
+            });
+        }
+
+        const saveEditBtn = document.getElementById("saveEditUser");
+        if (saveEditBtn) {
+            saveEditBtn.addEventListener("click", async () => {
+                if (!currentEditingUserId) return;
+                const payload = {
+                    full_name: document.getElementById("editName").value.trim(),
+                    email: document.getElementById("editEmail").value.trim(),
+                    role: document.getElementById("editRoleDropdownValue").textContent.trim(),
+                    is_active: document.getElementById("editStatusDropdownValue").textContent.trim().toLowerCase() === 'active' ? 1 : 0
+                };
+                if (!payload.full_name || !payload.email) return alert("Full Name and Email are required.");
+
+                const changePasswordCheckbox = document.getElementById("togglePassword");
+                if (changePasswordCheckbox.checked) {
+                    const newPassword = document.getElementById("editPassword").value;
+                    const confirmPassword = document.getElementById("confirmPassword").value;
+                    if (newPassword.length < 8) return alert("Password must be at least 8 characters long.");
+                    if (newPassword !== confirmPassword) return alert("Passwords do not match.");
+                    payload.password = newPassword;
+                }
+
+                try {
+                    const res = await fetch(`/LibSys/public/superadmin/userManagement/update/${currentEditingUserId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        alert("User updated successfully!");
+                        closeEditUserModal();
+                        await loadUsers();
+                    } else {
+                        alert("Error: " + (data.message || "Failed to update user."));
+                    }
+                } catch (err) {
+                    console.error("Update user error:", err);
+                    alert("An error occurred while updating the user.");
+                } finally {
+                    changePasswordCheckbox.checked = false;
+                    document.getElementById('passwordFields').classList.add('hidden');
+                    document.getElementById('editPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                }
+            });
+        }
+
+        const togglePasswordCheckbox = document.getElementById('togglePassword');
+        if (togglePasswordCheckbox) {
+            togglePasswordCheckbox.addEventListener('change', () => {
+                document.getElementById('passwordFields').classList.toggle('hidden', !togglePasswordCheckbox.checked);
             });
         }
 
@@ -1003,16 +932,10 @@
         }
 
         function getStatusBadge(status) {
-            const base = "px-2 py-1 text-xs rounded-md font-medium cursor-pointer transition-colors duration-200";
-
-            if (status.toLowerCase() === "active") {
-                return `<span class="bg-green-500 text-white ${base}">Active</span>`;
-            } else {
-                return `<span class="bg-gray-300 text-gray-700 ${base}">Disable</span>`;
-            }
+            const base = "px-2 py-1 text-xs rounded-md font-medium";
+            return status.toLowerCase() === "active" ? `<span class="bg-green-500 text-white ${base}">Active</span>` : `<span class="bg-gray-300 text-gray-700 ${base}">Inactive</span>`;
         }
 
-        //init
         loadUsers();
     });
 </script>

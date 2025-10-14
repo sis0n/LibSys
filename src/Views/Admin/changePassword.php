@@ -40,13 +40,11 @@
               class="w-full bg-orange-50 border border-orange-300 rounded-md px-3 py-2 text-sm 
                      placeholder:text-orange-500 placeholder:text-sm 
                      focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none 
-                     hover:border-orange-400 transition-colors duration-200 pr-10"
-            >
+                     hover:border-orange-400 transition-colors duration-200 pr-10">
             <button
               type="button"
               onclick="togglePassword('current_password', this)"
-              class="absolute right-3 top-2.5 text-gray-500 hover:text-orange-500 transition-colors duration-200"
-            >
+              class="absolute right-3 top-2.5 text-gray-500 hover:text-orange-500 transition-colors duration-200">
               <i class="ph ph-eye"></i>
             </button>
           </div>
@@ -67,14 +65,12 @@
               class="w-full bg-orange-50 border border-orange-300 rounded-md px-3 py-2 text-sm 
                      placeholder:text-orange-500 placeholder:text-sm 
                      focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none 
-                     hover:border-orange-400 transition-colors duration-200 pr-10"
-            >
+                     hover:border-orange-400 transition-colors duration-200 pr-10">
             <button
               type="button"
               onclick="togglePassword('new_password', this)"
               class="absolute right-3 top-2.5 text-gray-500 hover:text-orange-500 
-                     transition-colors duration-300 ease-in-out"
-            >
+                     transition-colors duration-300 ease-in-out">
               <i class="ph ph-eye text-sm"></i>
             </button>
           </div>
@@ -95,14 +91,12 @@
               class="w-full bg-orange-50 border border-orange-300 rounded-md px-3 py-2 text-sm 
                      placeholder:text-orange-500 placeholder:text-sm 
                      focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none 
-                     hover:border-orange-400 transition-colors duration-200 pr-10"
-            >
+                     hover:border-orange-400 transition-colors duration-200 pr-10">
             <button
               type="button"
               onclick="togglePassword('confirm_password', this)"
               class="absolute right-3 top-2.5 text-gray-500 hover:text-orange-500 
-                     transition-colors duration-300 ease-in-out"
-            >
+                     transition-colors duration-300 ease-in-out">
               <i class="ph ph-eye text-sm"></i>
             </button>
           </div>
@@ -131,7 +125,7 @@
               <h3 class="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2 text-orange-700 text-center sm:text-left">
                 Security Tips
               </h3>
-              <ul class="list-disc list-inside text-orange-600 space-y-1 text-xs text-center sm:text-left">
+              <ul class="list-disc list-inside text-amber-700 space-y-1 text-xs text-center sm:text-left">
                 <li>At least 6 characters long</li>
                 <li>Mix of letters, numbers, and symbols</li>
                 <li>Avoid common words or phrases</li>
@@ -144,7 +138,7 @@
               <h3 class="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2 text-orange-700 text-center sm:text-left">
                 Security Reminders
               </h3>
-              <ul class="list-disc list-inside text-orange-600 space-y-1 text-xs text-center sm:text-left">
+              <ul class="list-disc list-inside text-amber-700 space-y-1 text-xs text-center sm:text-left">
                 <li>Never share your password</li>
                 <li>Log out from public computers</li>
                 <li>Change password if compromised</li>
@@ -281,4 +275,3 @@
     }
   });
 </script>
-

@@ -8,7 +8,7 @@ class Controller
      *
      * @param string $view  View file path (relative to Views folder, without .php)
      * @param array  $data  Data to extract into the view
-     * @param bool   $withLayout Include header/footer (default: true)
+     * @param void   $withLayout Include header/footer (default: true)
      */
     public function view(string $view, array $data = [], bool $withLayout = true): void
     {

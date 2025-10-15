@@ -1,3 +1,23 @@
+    <?php
+
+    if (isset($_SESSION['user_id'])) {
+        switch ($_SESSION['role']) {
+            case 'superadmin':
+                header('Location: /LibSys/public/superadmin/dashboard');
+                break;
+            case 'admin':
+                header('Location: /LibSys/public/admin/dashboard');
+                break;
+            case 'librarian':
+                header('Location: /LibSys/public/librarian/dashboard');
+                break;
+            default:
+                header('Location: /LibSys/public/student/dashboard');
+        }
+        exit;
+    }
+    ?>
+
     <!DOCTYPE html>
     <html lang="en">
 
@@ -486,7 +506,10 @@
 
                 // Reset pagination to handle filtered results
                 currentPage = 1;
-                window.scrollTo({ top: 0, behavior: "smooth" });
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
             }
         </script>
 

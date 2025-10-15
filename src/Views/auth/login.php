@@ -15,13 +15,19 @@
 
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-green-50 font-sans">
     <div class="w-full max-w-md p-6">
-        <div class="bg-white shadow-lg rounded-xl p-8">
-            <!-- Logo -->
-            <div class="flex justify-center">
+
+        <div class="bg-white shadow-lg rounded-xl p-8 pt-12 relative">
+
+            <a href="/libsys/public/landingPage"
+                class="absolute top-4 left-4 text-sm font-medium text-gray-600 hover:text-orange-600 transition inline-flex items-center gap-1">
+                <i class="ph ph-arrow-left text-lg"></i>
+                Back to Library
+            </a>
+
+            <div class="flex justify-center mt-2">
                 <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Library Logo" class=" w-32">
             </div>
 
-            <!-- Title -->
             <h2 class="text-2xl font-semibold text-center text-gray-800">
                 Library Online Software
             </h2>
@@ -29,7 +35,6 @@
                 Sign in to access your dashboard
             </p>
 
-            <!-- Login Form -->
             <form method="POST" action="/libsys/public/login" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="<?= $csrf_token ?? '' ?>">
                 <div>
@@ -53,7 +58,7 @@
                 </div>
 
                 <?php if(!empty($error)): ?>
-                    <p class="text-red-600 text-sm"><?= htmlspecialchars($error) ?></p>
+                <p class="text-red-600 text-sm"><?= htmlspecialchars($error) ?></p>
                 <?php endif; ?>
 
                 <button type="submit"
@@ -62,7 +67,6 @@
                 </button>
             </form>
 
-            <!-- Extra Links -->
             <div class="mt-3 text-center space-y-2">
                 <a href="/libsys/public/forgotPassword" class="text-sm text-orange-600 hover:underline">
                     Forgot Password?

@@ -133,51 +133,51 @@
                     </span>
                 </div>
             </div>
-            
+
             <!-- BOOK CARD DISPLAY -->
             <div id="bookGrid"
                 class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 place-items-center">
                 <?php if (!empty($books)): ?>
-                <?php $initialBooks = array_slice($books, 0, 30); ?>
-                <?php foreach ($initialBooks as $index => $book): ?>
-                <div class="book-card relative bg-white border border-orange-100 rounded-2xl overflow-hidden shadow-sm group transform transition duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer max-w-[230px] w-full flex flex-col"
-                    data-book='<?= htmlspecialchars(json_encode($book), ENT_QUOTES, 'UTF-8') ?>'>
+                    <?php $initialBooks = array_slice($books, 0, 30); ?>
+                    <?php foreach ($initialBooks as $index => $book): ?>
+                        <div class="book-card relative bg-white border border-orange-100 rounded-2xl overflow-hidden shadow-sm group transform transition duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer max-w-[230px] w-full flex flex-col"
+                            data-book='<?= htmlspecialchars(json_encode($book), ENT_QUOTES, 'UTF-8') ?>'>
 
-                    <div
-                        class="w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden flex-shrink-0">
-                        <?php if (!empty($book['image'])): ?>
-                        <img src="<?= htmlspecialchars($book['image']) ?>" alt="<?= htmlspecialchars($book['title']) ?>"
-                            class="h-full w-auto object-contain group-hover:scale-105 transition duration-300">
-                        <?php else: ?>
-                        <i class="ph ph-book-open text-gray-400 text-5xl"></i>
-                        <?php endif; ?>
-                    </div>
+                            <div
+                                class="w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden flex-shrink-0">
+                                <?php if (!empty($book['image'])): ?>
+                                    <img src="<?= htmlspecialchars($book['image']) ?>" alt="<?= htmlspecialchars($book['title']) ?>"
+                                        class="h-full w-auto object-contain group-hover:scale-105 transition duration-300">
+                                <?php else: ?>
+                                    <i class="ph ph-book-open text-gray-400 text-5xl"></i>
+                                <?php endif; ?>
+                            </div>
 
-                    <span class="absolute top-2 left-2 px-3 py-1 text-xs font-medium rounded-full text-white shadow-sm
+                            <span class="absolute top-2 left-2 px-3 py-1 text-xs font-medium rounded-full text-white shadow-sm
                     <?= strtolower($book['availability']) === 'available' ? 'bg-orange-500' : 'bg-red-500' ?>">
-                        <?= htmlspecialchars(ucfirst($book['availability'])) ?>
-                    </span>
+                                <?= htmlspecialchars(ucfirst($book['availability'])) ?>
+                            </span>
 
-                    <div
-                        class="p-3 bg-white group-hover:bg-gray-100 transition-colors duration-300 flex flex-col flex-grow">
+                            <div
+                                class="p-3 bg-white group-hover:bg-gray-100 transition-colors duration-300 flex flex-col flex-grow">
 
-                        <h4
-                            class="text-sm font-semibold text-gray-700 group-hover:text-orange-600 line-clamp-2 min-h-[2.5rem]">
-                            <?= htmlspecialchars($book['title']) ?>
-                        </h4>
+                                <h4
+                                    class="text-sm font-semibold text-gray-700 group-hover:text-orange-600 line-clamp-2 min-h-[2.5rem]">
+                                    <?= htmlspecialchars($book['title']) ?>
+                                </h4>
 
-                        <p class="text-xs text-gray-500 truncate mt-0.5">
-                            by <?= htmlspecialchars($book['author'] ?: 'Unknown Author') ?>
-                        </p>
+                                <p class="text-xs text-gray-500 truncate mt-0.5">
+                                    by <?= htmlspecialchars($book['author'] ?: 'Unknown Author') ?>
+                                </p>
 
-                        <p class="text-[11px] font-medium text-orange-600 mt-1 truncate flex-grow">
-                            <?= htmlspecialchars($book['subject'] ?? '') ?>
-                        </p>
-                    </div>
-                </div>
-                <?php endforeach; ?>
+                                <p class="text-[11px] font-medium text-orange-600 mt-1 truncate flex-grow">
+                                    <?= htmlspecialchars($book['subject'] ?? '') ?>
+                                </p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 <?php else: ?>
-                <p class="text-center text-gray-500 py-10 col-span-full">No books available right now.</p>
+                    <p class="text-center text-gray-500 py-10 col-span-full">No books available right now.</p>
                 <?php endif; ?>
             </div>
 
@@ -257,104 +257,105 @@
         </div>
 
         <script>
-        // --- Data and Pagination Setup ---
-        // Ensure $books array is available from PHP
-        const allBooks = <?php echo json_encode($books); ?>;
-        const booksPerPage = 30;
-        let currentPage = 1; // 1st batch already loaded by PHP
-        const bookGrid = document.getElementById('bookGrid');
-        const loadingIndicator = document.getElementById('loadingIndicator');
+            // --- Data and Pagination Setup ---
+            // Ensure $books array is available from PHP
+            const allBooks = <?php echo json_encode($books); ?>;
+            const booksPerPage = 30;
+            const bookGrid = document.getElementById('bookGrid');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            let currentPage = 1; // 1st batch already loaded by PHP
+            let displayedBooks = allBooks;
 
-        // --- Modal Elements ---
-        const modal = document.getElementById("bookModal");
-        const modalContent = document.getElementById("bookModalContent");
-        const closeModalBtn = document.getElementById("closeModal");
-        const modalImg = document.getElementById("modalImg");
-        const modalIcon = document.getElementById("modalIcon");
-        const modalTitle = document.getElementById("modalTitle");
-        const modalAuthor = document.getElementById("modalAuthor");
-        const modalCallNumber = document.getElementById("modalCallNumber");
-        const modalAccessionNumber = document.getElementById("modalAccessionNumber");
-        const modalIsbn = document.getElementById("modalIsbn");
-        const modalSubject = document.getElementById("modalSubject");
-        const modalDescription = document.getElementById("modalDescription");
-        const modalPlace = document.getElementById("modalPlace");
-        const modalPublisher = document.getElementById("modalPublisher");
-        const modalYear = document.getElementById("modalYear");
-        const modalEdition = document.getElementById("modalEdition");
-        const modalSupplementary = document.getElementById("modalSupplementary");
-        const modalStatus = document.getElementById("modalStatus");
+            // --- Modal Elements ---
+            const modal = document.getElementById("bookModal");
+            const modalContent = document.getElementById("bookModalContent");
+            const closeModalBtn = document.getElementById("closeModal");
+            const modalImg = document.getElementById("modalImg");
+            const modalIcon = document.getElementById("modalIcon");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalAuthor = document.getElementById("modalAuthor");
+            const modalCallNumber = document.getElementById("modalCallNumber");
+            const modalAccessionNumber = document.getElementById("modalAccessionNumber");
+            const modalIsbn = document.getElementById("modalIsbn");
+            const modalSubject = document.getElementById("modalSubject");
+            const modalDescription = document.getElementById("modalDescription");
+            const modalPlace = document.getElementById("modalPlace");
+            const modalPublisher = document.getElementById("modalPublisher");
+            const modalYear = document.getElementById("modalYear");
+            const modalEdition = document.getElementById("modalEdition");
+            const modalSupplementary = document.getElementById("modalSupplementary");
+            const modalStatus = document.getElementById("modalStatus");
 
-        // --- Utility Functions ---
+            // --- Utility Functions ---
 
-        function openModal(book) {
-            // Set book data (assuming the book object passed has keys matching the modal IDs/needs)
-            // Set cover image or icon
-            if (book.image) { // Changed from book.cover to book.image to match PHP code
-                modalImg.src = book.image;
-                modalImg.classList.remove("hidden");
-                modalIcon.classList.add("hidden");
-                document.getElementById("modalCoverContainer").classList.remove("bg-white/20");
-            } else {
-                modalImg.classList.add("hidden");
-                modalIcon.classList.remove("hidden");
-                document.getElementById("modalCoverContainer").classList.add("bg-white/20");
+            function openModal(book) {
+                // Set book data (assuming the book object passed has keys matching the modal IDs/needs)
+                // Set cover image or icon
+                if (book.image) { // Changed from book.cover to book.image to match PHP code
+                    modalImg.src = book.image;
+                    modalImg.classList.remove("hidden");
+                    modalIcon.classList.add("hidden");
+                    document.getElementById("modalCoverContainer").classList.remove("bg-white/20");
+                } else {
+                    modalImg.classList.add("hidden");
+                    modalIcon.classList.remove("hidden");
+                    document.getElementById("modalCoverContainer").classList.add("bg-white/20");
+                }
+
+                modalTitle.textContent = book.title;
+                modalAuthor.textContent = "by " + (book.author || "Unknown");
+                modalCallNumber.textContent = book.call_number || "N/A";
+                modalAccessionNumber.textContent = book.accession_number || "";
+                modalIsbn.textContent = book.book_isbn || "";
+                modalSubject.textContent = book.subject || "";
+                modalPlace.textContent = book.book_place || "";
+                modalPublisher.textContent = book.book_publisher || "";
+                modalYear.textContent = book.year || "";
+                modalEdition.textContent = book.book_edition || "";
+                modalSupplementary.textContent = book.book_supplementary || "";
+                modalDescription.textContent = book.description || "No description available.";
+
+                // Status styling
+                modalStatus.textContent = (book.availability || "").toUpperCase();
+                if ((book.availability || "").toUpperCase() === "AVAILABLE") {
+                    modalStatus.classList.add("text-green-600");
+                    modalStatus.classList.remove("text-orange-600");
+                } else {
+                    modalStatus.classList.add("text-orange-600");
+                    modalStatus.classList.remove("text-green-600");
+                }
+
+                // Show Modal
+                modal.classList.remove("hidden", "opacity-100");
+                modal.classList.add("opacity-0");
+                modalContent.classList.remove("scale-100");
+                modalContent.classList.add("scale-95");
+                requestAnimationFrame(() => {
+                    modal.classList.remove("opacity-0");
+                    modal.classList.add("opacity-100");
+                    modalContent.classList.remove("scale-95");
+                    modalContent.classList.add("scale-100");
+                });
             }
 
-            modalTitle.textContent = book.title;
-            modalAuthor.textContent = "by " + (book.author || "Unknown");
-            modalCallNumber.textContent = book.call_number || "N/A";
-            modalAccessionNumber.textContent = book.accession_number || "";
-            modalIsbn.textContent = book.book_isbn || "";
-            modalSubject.textContent = book.subject || "";
-            modalPlace.textContent = book.book_place || "";
-            modalPublisher.textContent = book.book_publisher || "";
-            modalYear.textContent = book.year || "";
-            modalEdition.textContent = book.book_edition || "";
-            modalSupplementary.textContent = book.book_supplementary || "";
-            modalDescription.textContent = book.description || "No description available.";
-
-            // Status styling
-            modalStatus.textContent = (book.availability || "").toUpperCase();
-            if ((book.availability || "").toUpperCase() === "AVAILABLE") {
-                modalStatus.classList.add("text-green-600");
-                modalStatus.classList.remove("text-orange-600");
-            } else {
-                modalStatus.classList.add("text-orange-600");
-                modalStatus.classList.remove("text-green-600");
+            function closeModal() {
+                modal.classList.remove("opacity-100");
+                modal.classList.add("opacity-0");
+                modalContent.classList.remove("scale-100");
+                modalContent.classList.add("scale-95");
+                setTimeout(() => modal.classList.add("hidden"), 300);
             }
 
-            // Show Modal
-            modal.classList.remove("hidden", "opacity-100");
-            modal.classList.add("opacity-0");
-            modalContent.classList.remove("scale-100");
-            modalContent.classList.add("scale-95");
-            requestAnimationFrame(() => {
-                modal.classList.remove("opacity-0");
-                modal.classList.add("opacity-100");
-                modalContent.classList.remove("scale-95");
-                modalContent.classList.add("scale-100");
-            });
-        }
+            // Function to create a book card for the infinite scroll
+            function createBookCard(book) {
+                const div = document.createElement('div');
+                // IMPORTANT: Add 'book-card' class and data-book attribute for the click listener
+                div.className =
+                    "book-card relative bg-white border border-orange-100 rounded-2xl overflow-hidden shadow-sm group transform transition duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer max-w-[230px] w-full";
 
-        function closeModal() {
-            modal.classList.remove("opacity-100");
-            modal.classList.add("opacity-0");
-            modalContent.classList.remove("scale-100");
-            modalContent.classList.add("scale-95");
-            setTimeout(() => modal.classList.add("hidden"), 300);
-        }
+                div.setAttribute('data-book', JSON.stringify(book));
 
-        // Function to create a book card for the infinite scroll
-        function createBookCard(book) {
-            const div = document.createElement('div');
-            // IMPORTANT: Add 'book-card' class and data-book attribute for the click listener
-            div.className =
-                "book-card relative bg-white border border-orange-100 rounded-2xl overflow-hidden shadow-sm group transform transition duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer max-w-[230px] w-full";
-
-            div.setAttribute('data-book', JSON.stringify(book));
-
-            div.innerHTML = `
+                div.innerHTML = `
             <div class="w-full aspect-[2/3] bg-gray-50 flex items-center justify-center overflow-hidden">
                 ${book.image 
                     ? `<img src="${book.image}" alt="${book.title}" class="h-full w-auto object-contain group-hover:scale-105 transition duration-300">` 
@@ -369,98 +370,124 @@
                 <p class="text-[11px] font-medium text-orange-600 mt-1 truncate">${book.subject || ''}</p>
             </div>
         `;
-            return div;
-        }
-
-        function loadNextPage() {
-            const start = currentPage * booksPerPage;
-            const end = start + booksPerPage;
-            const nextBooks = allBooks.slice(start, end);
-            if (nextBooks.length === 0) return;
-            loadingIndicator.classList.remove('hidden');
-
-            setTimeout(() => {
-                nextBooks.forEach(book => bookGrid.appendChild(createBookCard(book)));
-                currentPage++;
-                loadingIndicator.classList.add('hidden');
-            }, 500);
-        }
-
-        // --- Event Listeners ---
-
-        // 1. Modal Open Listener (Delegated to the grid)
-        bookGrid.addEventListener("click", e => {
-            const card = e.target.closest(".book-card");
-            if (!card) return;
-
-            // This line attempts to parse data-book from the clicked card
-            try {
-                const book = JSON.parse(card.dataset.book);
-                openModal(book);
-            } catch (error) {
-                console.error("Error parsing book data from card:", error);
+                return div;
             }
-        });
 
-        // 2. Modal Close Listeners
-        closeModalBtn.addEventListener("click", closeModal);
-        modal.addEventListener("click", e => {
-            if (e.target === modal) closeModal();
-        });
-        document.addEventListener("keydown", e => {
-            if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
-        });
+            function loadNextPage() {
+                const start = currentPage * booksPerPage;
+                const end = start + booksPerPage;
+                const nextBooks = displayedBooks.slice(start, end);
+                if (nextBooks.length === 0) return;
+                loadingIndicator.classList.remove('hidden');
 
-        // 3. Infinite Scroll Listener
-        window.addEventListener('scroll', () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
-                loadNextPage();
+                setTimeout(() => {
+                    nextBooks.forEach(book => bookGrid.appendChild(createBookCard(book)));
+                    currentPage++;
+                    loadingIndicator.classList.add('hidden');
+                }, 500);
             }
-        });
 
-        // 4. Dropdown Logic (Place inside DOMContentLoaded if you want to use the dropdown logic)
-        // NOTE: Since your previous code had the dropdown logic in DOMContentLoaded, 
-        // I'm assuming you want to keep that structure. You had two script blocks, 
-        // which is confusing. I've moved the dropdown functions *outside* // the main logic block but kept them working.
+            // --- Event Listeners ---
 
-        // Dropdown functions (kept as is)
-        function setupDropdownToggle(buttonId, menuId) {
-            const btn = document.getElementById(buttonId);
-            const menu = document.getElementById(menuId);
-            const caret = btn.querySelector(".ph-caret-down");
+            // 1. Modal Open Listener (Delegated to the grid)
+            bookGrid.addEventListener("click", e => {
+                const card = e.target.closest(".book-card");
+                if (!card) return;
 
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                document.querySelectorAll(".absolute.mt-2").forEach((m) => {
-                    if (m !== menu) m.classList.add("hidden");
+                // This line attempts to parse data-book from the clicked card
+                try {
+                    const book = JSON.parse(card.dataset.book);
+                    openModal(book);
+                } catch (error) {
+                    console.error("Error parsing book data from card:", error);
+                }
+            });
+
+            // 2. Modal Close Listeners
+            closeModalBtn.addEventListener("click", closeModal);
+            modal.addEventListener("click", e => {
+                if (e.target === modal) closeModal();
+            });
+            document.addEventListener("keydown", e => {
+                if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
+            });
+
+            window.addEventListener('scroll', () => {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
+                    loadNextPage();
+                }
+            });
+
+            // Dropdown functions (kept as is)
+            function setupDropdownToggle(buttonId, menuId) {
+                const btn = document.getElementById(buttonId);
+                const menu = document.getElementById(menuId);
+                const caret = btn.querySelector(".ph-caret-down");
+
+                btn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll(".absolute.mt-2").forEach((m) => {
+                        if (m !== menu) m.classList.add("hidden");
+                    });
+                    const isHidden = menu.classList.toggle("hidden");
+                    caret.style.transform = isHidden ? "rotate(0deg)" : "rotate(180deg)";
                 });
-                const isHidden = menu.classList.toggle("hidden");
-                caret.style.transform = isHidden ? "rotate(0deg)" : "rotate(180deg)";
-            });
-        }
+            }
 
-        setupDropdownToggle("statusDropdownBtn", "statusDropdownMenu");
+            setupDropdownToggle("statusDropdownBtn", "statusDropdownMenu");
 
-        // Close dropdown when clicking outside
-        document.addEventListener("click", () => {
-            document.querySelectorAll(".absolute.mt-2").forEach(menu => menu.classList.add("hidden"));
-            document.querySelectorAll(".ph-caret-down").forEach(icon => icon.style.transform = "rotate(0deg)");
-        });
-
-        // Highlight and select logic
-        function selectStatus(el, val) {
-            document.getElementById("statusDropdownValue").textContent = val;
-            document.getElementById("statusDropdownMenu").classList.add("hidden");
-            document.querySelector("#statusDropdownBtn .ph-caret-down").style.transform = "rotate(0deg)";
-
-            // Remove highlight from all options
-            document.querySelectorAll(".status-item").forEach(btn => {
-                btn.classList.remove("bg-orange-100", "text-orange-700", "font-medium");
+            // Close dropdown when clicking outside
+            document.addEventListener("click", () => {
+                document.querySelectorAll(".absolute.mt-2").forEach(menu => menu.classList.add("hidden"));
+                document.querySelectorAll(".ph-caret-down").forEach(icon => icon.style.transform = "rotate(0deg)");
             });
 
-            // Highlight selected
-            el.classList.add("bg-orange-100", "text-orange-700", "font-medium");
-        }
+            // Highlight and select logic
+            function selectStatus(el, val) {
+                document.getElementById("statusDropdownValue").textContent = val;
+                document.getElementById("statusDropdownMenu").classList.add("hidden");
+                document.querySelector("#statusDropdownBtn .ph-caret-down").style.transform = "rotate(0deg)";
+
+                // Remove highlight from all options
+                document.querySelectorAll(".status-item").forEach(btn => {
+                    btn.classList.remove("bg-orange-100", "text-orange-700", "font-medium");
+                });
+
+                // Highlight selected
+                el.classList.add("bg-orange-100", "text-orange-700", "font-medium");
+                filterBooksByStatus(val);
+            }
+
+            function filterBooksByStatus(status) {
+                // Get the book grid container
+                const bookGrid = document.getElementById("bookGrid");
+                bookGrid.innerHTML = ""; // Clear all current cards
+
+                // Filter logic
+                let filteredBooks = [];
+                if (status === "All Status") {
+                    filteredBooks = allBooks;
+                } else {
+                    filteredBooks = allBooks.filter(b =>
+                        b.availability.toLowerCase() === status.toLowerCase()
+                    );
+                }
+
+                displayedBooks = filteredBooks;
+
+                // Display filtered books
+                if (filteredBooks.length > 0) {
+                    filteredBooks.slice(0, 30).forEach(book => {
+                        bookGrid.appendChild(createBookCard(book));
+                    });
+                } else {
+                    bookGrid.innerHTML = `<p class="text-center text-gray-500 py-10 col-span-full">No books found with status "${status}".</p>`;
+                }
+
+                // Reset pagination to handle filtered results
+                currentPage = 1;
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
         </script>
 
     </body>

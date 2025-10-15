@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Views\partials;
+
 use App\Views\Students;
 
 $currentPage = $currentPage ?? ''; // galing sa Controller
@@ -27,7 +29,12 @@ switch ($role) {
 
 ?>
 
-<aside class="w-64 bg-orange-50 border-r border-orange-200 flex flex-col sticky top-0 h-screen">
+<aside id="sidebar"
+    class="fixed lg:static left-0 top-0 h-screen w-64 bg-orange-50 border-r border-orange-200 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 overflow-y-auto">
+    <!-- <div id="sidebarOverlay"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-30 lg:hidden transition-opacity duration-300"></div> -->
+
+
     <!-- Logo -->
     <a href="/LibSys/public/<?= $roleFolder ?>/dashboard"
         class="flex items-center gap-4 px-6 py-4 border-b border-orange-200 cursor-pointer">
@@ -36,7 +43,7 @@ switch ($role) {
             Library Online Software
         </span>
     </a>
-    <div  class="flex-1 overflow-y-auto space-y-2 
+    <div class="flex-1 overflow-y-auto space-y-2 overflow-y-auto scroll-smooth
                [scrollbar-width:none] 
                [&::-webkit-scrollbar]:w-0 
                hover:[scrollbar-width:thin] 
@@ -52,8 +59,8 @@ switch ($role) {
             <!-- Dashboard -->
             <a href="/libsys/public/student/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'dashboard')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-house text-2xl"></i>
                 <span class="text-base">Dashboard</span>
             </a>
@@ -61,8 +68,8 @@ switch ($role) {
             <!-- Book Catalog -->
             <a href="/libsys/public/student/bookCatalog" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'bookCatalog')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-book text-2xl"></i>
                 <span class="text-base">Book Catalog</span>
             </a>
@@ -70,8 +77,8 @@ switch ($role) {
             <!-- Equipment Catalog -->
             <a href="/libsys/public/student/equipmentCatalog" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'equipmentCatalog')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-desktop-tower text-2xl"></i>
                 <span class="text-base">Equipment Catalog</span>
             </a>
@@ -79,8 +86,8 @@ switch ($role) {
             <!-- My Cart -->
             <a href="/libsys/public/student/myCart" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'myCart')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-shopping-cart-simple text-2xl"></i>
                 <span class="text-base">My Cart</span>
             </a>
@@ -88,8 +95,8 @@ switch ($role) {
             <!-- QR Borrow Ticket -->
             <a href="/libsys/public/student/qrBorrowingTicket" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'qrBorrowingTicket')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-qr-code text-2xl"></i>
                 <span class="text-base">QR Borrow Ticket</span>
             </a>
@@ -97,8 +104,8 @@ switch ($role) {
             <!-- My Attendance -->
             <a href="/libsys/public/student/myAttendance" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'myAttendance')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-user-check text-2xl"></i>
                 <span class="text-base">My Attendance</span>
             </a>
@@ -106,8 +113,8 @@ switch ($role) {
             <!-- My Borrowing History -->
             <a href="/libsys/public/student/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'borrowingHistory')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-clock-counter-clockwise text-2xl"></i>
                 <span class="text-base">My Borrowing History</span>
             </a>
@@ -116,8 +123,8 @@ switch ($role) {
             <!-- Change Password -->
             <a href="/libsys/public/student/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'changePassword')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-key text-2xl"></i>
                 <span class="text-base">Change Password</span>
             </a>
@@ -237,8 +244,8 @@ switch ($role) {
             <!-- Change Password -->
             <a href="/libsys/public/superadmin/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'changePassword')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-key text-2xl"></i>
                 <span class="text-base">Change Password</span>
             </a>
@@ -358,8 +365,8 @@ switch ($role) {
             <!-- Change Password -->
             <a href="/libsys/public/admin/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'changePassword')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-key text-2xl"></i>
                 <span class="text-base">Change Password</span>
             </a>
@@ -479,8 +486,8 @@ switch ($role) {
             <!-- Change Password -->
             <a href="/libsys/public/librarian/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'changePassword')
-               ? 'bg-green-600 text-white font-medium'
-               : 'hover:bg-orange-100 text-orange-900' ?>">
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-key text-2xl"></i>
                 <span class="text-base">Change Password</span>
             </a>

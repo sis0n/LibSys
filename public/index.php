@@ -16,7 +16,7 @@ $basePath = '/libsys/public/';
 $uri = substr($uri, strlen($basePath));
 
 // default route
-$uri = $uri === '' ? 'login' : $uri;
+$uri = $uri === '' ? 'landingPage' : $uri;
 
 // http method
 $method = $_SERVER['REQUEST_METHOD'];

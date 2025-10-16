@@ -13,6 +13,14 @@ class RouteConfig
 
         /**
          * ========================
+         * Landing Page Routes
+         * ========================
+         */
+        $router->get('landingPage', 'GuestController@guestDisplay');
+        $router->get('guest/fetchBooks', 'GuestController@fetchGuestBooks');
+
+        /**
+         * ========================
          * auth routes
          * ========================
          */

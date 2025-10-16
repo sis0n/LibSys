@@ -161,6 +161,9 @@ ALTER TABLE students ADD COLUMN deleted_at TIMESTAMP NULL;
 ALTER TABLE users ADD COLUMN deleted_by INT NULL;
 ALTER TABLE students ADD COLUMN deleted_by INT NULL;
 
+ALTER TABLE users ADD COLUMN updated_at DATETIME NULL;
+
+
 
 
 

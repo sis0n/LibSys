@@ -76,7 +76,7 @@
 
         const form = e.target;
         const formData = new FormData(form);
-        
+
         try {
             const response = await fetch(form.action, {
                 method: "POST",
@@ -94,22 +94,22 @@
                         rgba(0,0,0,0.3)
                         backdrop-filter: blur(6px)
                     `,
-                                    timer: 2000,
-                                    didOpen: () => {
-                                        const progressBar = Swal.getHtmlContainer().querySelector(
-                                            "#progress-bar");
-                                        let width = 100;
-                                        timerInterval = setInterval(() => {
-                                            width -= 100 / 20; // 2s / 100ms = 20 intervals
-                                            if (progressBar) {
-                                                progressBar.style.width = width + "%";
-                                            }
-                                        }, 100);
-                                    },
-                                    willClose: () => {
-                                        clearInterval(timerInterval);
-                                    },
-                                    html: `
+                    timer: 2000,
+                    didOpen: () => {
+                        const progressBar = Swal.getHtmlContainer().querySelector(
+                            "#progress-bar");
+                        let width = 100;
+                        timerInterval = setInterval(() => {
+                            width -= 100 / 20; // 2s / 100ms = 20 intervals
+                            if (progressBar) {
+                                progressBar.style.width = width + "%";
+                            }
+                        }, 100);
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval);
+                    },
+                    html: `
                         <div class="w-[400px] bg-red-50 border-2 border-red-300 rounded-2xl p-8 shadow-lg text-center animate-fade-in">
                             <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
                                 <i class="ph ph-x-circle text-red-600 text-3xl"></i>

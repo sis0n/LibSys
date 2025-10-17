@@ -26,55 +26,132 @@ class AuthController extends Controller
         ], false);
     }
 
+    // public function login()
+    // {
+    //     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    //         header("Location: /libsys/public/login");
+    //         exit;
+    //     }
+
+    //     // CSRF Check
+    //     if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    //         die('Invalid CSRF token.');
+    //     }
+    //     session_regenerate_id(true);
+
+    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    //         $username = htmlspecialchars(trim($_POST['username'] ?? ''));
+    //         $password   = $_POST['password'] ?? '';
+
+    //         if (empty($username) || empty($password)) {
+    //             echo "Username and password are required.";
+    //             return;
+    //         }
+
+    //         $user = $this->AuthRepository->attemptLogin($username, $password);
+
+    //         if ($user && isset($user['is_active']) && !$user['is_active']) {
+    //             echo "Your account has been deactivated by the administrator.";
+    //             return;
+    //         }
+
+    //         if ($user) {
+    //             // redirect based on role
+    //             if (User::isAdmin($user)) {
+    //                 header("Location: /libsys/public/admin/dashboard");
+    //             } elseif (User::isLibrarian($user)) {
+    //                 header("Location: /libsys/public/librarian/dashboard");
+    //             } elseif (User::isStudent($user)) {
+    //                 header("Location: /libsys/public/student/dashboard");
+    //             } elseif (User::isSuperadmin($user)) {
+    //                 header("Location: /libsys/public/superadmin/dashboard");
+    //             } elseif (User::isScanner($user)) {
+    //                 header("Location: /libsys/public/scanner/attendance");
+    //             } else {
+    //                 http_response_code(404);
+    //                 $this->view("errors/404");
+    //             }
+    //             exit;
+    //         } else {
+    //             echo "Invalid login credentials.";
+    //         }
+    //     }
+    // }
+
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /libsys/public/login");
-            exit;
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid request method.'
+            ]);
+            return;
         }
+
+        header('Content-Type: application/json');
 
         // CSRF Check
         if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-            die('Invalid CSRF token.');
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid CSRF token.'
+            ]);
+            return;
         }
+
         session_regenerate_id(true);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = htmlspecialchars(trim($_POST['username'] ?? ''));
-            $password   = $_POST['password'] ?? '';
+        $username = htmlspecialchars(trim($_POST['username'] ?? ''));
+        $password = $_POST['password'] ?? '';
 
-            if (empty($username) || empty($password)) {
-                echo "Username and password are required.";
-                return;
-            }
+        if (empty($username) || empty($password)) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Username and password are required.'
+            ]);
+            return;
+        }
 
-            $user = $this->AuthRepository->attemptLogin($username, $password);
+        $user = $this->AuthRepository->attemptLogin($username, $password);
 
-            if ($user && isset($user['is_active']) && !$user['is_active']) {
-                echo "Your account has been deactivated by the administrator.";
-                return;
-            }
+        if ($user && isset($user['is_active']) && !$user['is_active']) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Your account has been deactivated by the administrator.'
+            ]);
+            return;
+        }
 
-            if ($user) {
-                // redirect based on role
-                if (User::isAdmin($user)) {
-                    header("Location: /libsys/public/admin/dashboard");
-                } elseif (User::isLibrarian($user)) {
-                    header("Location: /libsys/public/librarian/dashboard");
-                } elseif (User::isStudent($user)) {
-                    header("Location: /libsys/public/student/dashboard");
-                } elseif (User::isSuperadmin($user)) {
-                    header("Location: /libsys/public/superadmin/dashboard");
-                } elseif (User::isScanner($user)) {
-                    header("Location: /libsys/public/scanner/attendance");
-                } else {
-                    http_response_code(404);
-                    $this->view("errors/404");
-                }
-                exit;
+        if ($user) {
+            if (User::isAdmin($user)) {
+                $redirect = '/libsys/public/admin/dashboard';
+            } elseif (User::isLibrarian($user)) {
+                $redirect = '/libsys/public/librarian/dashboard';
+            } elseif (User::isStudent($user)) {
+                $redirect = '/libsys/public/student/dashboard';
+            } elseif (User::isSuperadmin($user)) {
+                $redirect = '/libsys/public/superadmin/dashboard';
+            } elseif (User::isScanner($user)) {
+                $redirect = '/libsys/public/scanner/attendance';
             } else {
-                echo "Invalid login credentials.";
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Role not recognized.'
+                ]);
+                return;
             }
+
+            echo json_encode([
+                'status' => 'success',
+                'redirect' => $redirect
+            ]);
+            return;
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid username or password.'
+            ]);
+            return;
         }
     }
 

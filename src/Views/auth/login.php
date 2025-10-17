@@ -76,13 +76,7 @@
 
         const form = e.target;
         const formData = new FormData(form);
-
-        Swal.fire({
-            title: 'Signing in...',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
-
+        
         try {
             const response = await fetch(form.action, {
                 method: "POST",
@@ -97,36 +91,36 @@
                     position: "center",
                     showConfirmButton: false,
                     backdrop: `
-        rgba(0,0,0,0.3)
-        backdrop-filter: blur(6px)
-    `,
-                    timer: 2000,
-                    didOpen: () => {
-                        const progressBar = Swal.getHtmlContainer().querySelector(
-                            "#progress-bar");
-                        let width = 100;
-                        timerInterval = setInterval(() => {
-                            width -= 100 / 20; // 2s / 100ms = 20 intervals
-                            if (progressBar) {
-                                progressBar.style.width = width + "%";
-                            }
-                        }, 100);
-                    },
-                    willClose: () => {
-                        clearInterval(timerInterval);
-                    },
-                    html: `
-        <div class="w-[400px] bg-red-50 border-2 border-red-300 rounded-2xl p-8 shadow-lg text-center animate-fade-in">
-            <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
-                <i class="ph ph-x-circle text-red-600 text-3xl"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-red-700">Login Failed</h3>
-            <p class="text-base text-red-600 mt-1">Invalid username or password. Please try again.</p>
-            <div class="w-full bg-red-100 h-2 rounded mt-4 overflow-hidden">
-                <div id="progress-bar" class="bg-red-500 h-2 w-full transition-all"></div>
-            </div>
-        </div>
-    `,
+                        rgba(0,0,0,0.3)
+                        backdrop-filter: blur(6px)
+                    `,
+                                    timer: 2000,
+                                    didOpen: () => {
+                                        const progressBar = Swal.getHtmlContainer().querySelector(
+                                            "#progress-bar");
+                                        let width = 100;
+                                        timerInterval = setInterval(() => {
+                                            width -= 100 / 20; // 2s / 100ms = 20 intervals
+                                            if (progressBar) {
+                                                progressBar.style.width = width + "%";
+                                            }
+                                        }, 100);
+                                    },
+                                    willClose: () => {
+                                        clearInterval(timerInterval);
+                                    },
+                                    html: `
+                        <div class="w-[400px] bg-red-50 border-2 border-red-300 rounded-2xl p-8 shadow-lg text-center animate-fade-in">
+                            <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
+                                <i class="ph ph-x-circle text-red-600 text-3xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-red-700">Login Failed</h3>
+                            <p class="text-base text-red-600 mt-1">Invalid username or password. Please try again.</p>
+                            <div class="w-full bg-red-100 h-2 rounded mt-4 overflow-hidden">
+                                <div id="progress-bar" class="bg-red-500 h-2 w-full transition-all"></div>
+                            </div>
+                        </div>
+                `,
                     customClass: {
                         popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
                     }

@@ -30,10 +30,7 @@ switch ($role) {
 ?>
 
 <aside id="sidebar"
-    class="fixed lg:static left-0 top-0 h-screen w-64 bg-orange-50 border-r border-orange-200 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 overflow-y-auto">
-    <!-- <div id="sidebarOverlay"
-        class="fixed inset-0 bg-black bg-opacity-50 hidden z-30 lg:hidden transition-opacity duration-300"></div> -->
-
+    class="sticky top-0 self-start h-screen w-64 bg-orange-50 border-r border-orange-200 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 overflow-hidden">
 
     <!-- Logo -->
     <a href="/LibSys/public/<?= $roleFolder ?>/dashboard"

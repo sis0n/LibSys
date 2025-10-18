@@ -695,64 +695,73 @@
         setupDropdownToggle("editStatusDropdownBtn", "editStatusDropdownMenu");
 
         document.addEventListener("click", () => {
-            document.querySelectorAll('.absolute.mt-1').forEach(menu => menu.classList.add('hidden'));
+            document.querySelectorAll(".absolute.mt-1, .absolute.mt-1.w-full, .absolute.w-full").forEach(menu => menu.classList.add("hidden"));
         });
 
-        // --- Utility function to highlight active option ---
         function setActiveOption(containerId, selectedElement) {
-            // tanggalin muna highlight sa lahat ng dropdowns
-            document.querySelectorAll('.bg-orange-50.font-semibold.text-orange-700').forEach(item => {
-                item.classList.remove('bg-orange-50', 'font-semibold', 'text-orange-700');
-            });
+            // remove highlight only inside this container
+            const items = document.querySelectorAll(
+                `#${containerId} .dropdown-item, #${containerId} .role-item, #${containerId} .status-item`
+            );
+            items.forEach(item => item.classList.remove("bg-orange-50", "font-semibold", "text-orange-700"));
 
-            // apply highlight sa napiling option lang
-            selectedElement.classList.add('bg-orange-50', 'font-semibold', 'text-orange-700');
+            // add highlight to the selected element (if exists)
+            if (selectedElement && selectedElement.classList) {
+                selectedElement.classList.add("bg-orange-50", "font-semibold", "text-orange-700");
+            }
         }
 
-        // --- ROLE ---
         window.selectRole = (el, val) => {
-            document.getElementById('roleDropdownValue').textContent = val;
-            selectedRole = val;
-            setActiveOption('roleDropdownMenu', el);
-            applyFilters();
+            const valueEl = document.getElementById("roleDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("roleDropdownMenu", el);
+            if (typeof applyFilters === "function") applyFilters();
         };
 
-        // --- STATUS ---
         window.selectStatus = (el, val) => {
-            document.getElementById('statusDropdownValue').textContent = val;
-            selectedStatus = val;
-            setActiveOption('statusDropdownMenu', el);
-            applyFilters();
+            const valueEl = document.getElementById("statusDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("statusDropdownMenu", el);
+            if (typeof applyFilters === "function") applyFilters();
         };
 
-        // --- USER ROLE ---
         window.selectUserRole = (el, val) => {
-            document.getElementById('userRoleDropdownValue').textContent = val;
-            setActiveOption('userRoleDropdownMenu', el);
+            const valueEl = document.getElementById("userRoleDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("userRoleDropdownMenu", el);
         };
 
-        // --- EDIT ROLE ---
         window.selectEditRole = (el, val) => {
-            document.getElementById('editRoleDropdownValue').textContent = val;
-            setActiveOption('editRoleDropdownMenu', el);
+            const valueEl = document.getElementById("editRoleDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("editRoleDropdownMenu", el);
         };
 
-        // --- EDIT STATUS ---
         window.selectEditStatus = (el, val) => {
-            document.getElementById('editStatusDropdownValue').textContent = val;
-            setActiveOption('editStatusDropdownMenu', el);
+            const valueEl = document.getElementById("editStatusDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("editStatusDropdownMenu", el);
         };
 
-        // --- DEFAULT ACTIVE OPTIONS (on load) ---
         window.addEventListener("DOMContentLoaded", () => {
-            const allRoles = document.querySelector("#roleDropdownMenu li:first-child");
-            const allStatus = document.querySelector("#statusDropdownMenu li:first-child");
-
-            if (allRoles) {
-                allRoles.classList.add("bg-orange-50", "font-semibold", "text-orange-700");
+            const allRolesFirst = document.querySelector("#roleDropdownMenu .dropdown-item, #roleDropdownMenu .role-item");
+            if (allRolesFirst) {
+                setActiveOption("roleDropdownMenu", allRolesFirst);
+                const roleVal = allRolesFirst.textContent?.trim();
+                if (roleVal) {
+                    const roleValueEl = document.getElementById("roleDropdownValue");
+                    if (roleValueEl) roleValueEl.textContent = roleVal;
+                }
             }
-            if (allStatus) {
-                allStatus.classList.add("bg-orange-50", "font-semibold", "text-orange-700");
+
+            const allStatusFirst = document.querySelector("#statusDropdownMenu .status-item, #statusDropdownMenu .dropdown-item");
+            if (allStatusFirst) {
+                setActiveOption("statusDropdownMenu", allStatusFirst);
+                const statusVal = allStatusFirst.textContent?.trim();
+                if (statusVal) {
+                    const statusValueEl = document.getElementById("statusDropdownValue");
+                    if (statusValueEl) statusValueEl.textContent = statusVal;
+                }
             }
         });
 

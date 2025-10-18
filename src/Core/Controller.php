@@ -29,7 +29,7 @@ class Controller
         if ($withLayout) {
             echo '<body class="bg-gray-50 font-sans min-h-screen flex">'; // full screen height
             echo '<div class="flex min-h-screen w-full">';
-
+            
             // Sidebar
             if (file_exists($sidebar)) {
                 include $sidebar;

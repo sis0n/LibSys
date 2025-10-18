@@ -90,8 +90,15 @@ class BookController extends Controller
 
     $books = $this->bookRepo->getPaginatedFiltered($limit, $offset, $search, $category, $status);
 
+    $totalCount = $this->bookRepo->countPaginatedFiltered($search, $category, $status);
+
+    $response = [
+      'books' => $books,
+      'totalCount' => $totalCount
+    ];
+
     header('Content-Type: application/json');
-    echo json_encode($books);
+    echo json_encode($response);
   }
 
   public function getAvailableCount()
@@ -100,4 +107,5 @@ class BookController extends Controller
     header('Content-Type: application/json');
     echo json_encode(['available' => $count]);
   }
+  
 }

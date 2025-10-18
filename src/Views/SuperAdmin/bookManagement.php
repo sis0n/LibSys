@@ -203,9 +203,9 @@
         </div>
         <!-- SEARCHBAR -->
         <div class="flex items-center text-sm">
-            <div class="relative w-[300px]">
+            <div class="relative w-[330px]">
                 <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                <input type="text" id="userSearchInput" placeholder="Search users..."
+                <input type="text" id="userSearchInput" placeholder="Search by title, author, ISBN, Accession #..."
                     class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-full focus:ring-1 focus:ring-orange-300">
             </div>
 
@@ -388,126 +388,135 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    // ==========================
-    // ELEMENT REFERENCES
-    // ==========================
-    const importModal = document.getElementById("importModal");
-    const bulkImportBtn = document.getElementById("bulkImportBtn");
-    const closeImportModal = document.getElementById("closeImportModal");
-    const cancelImport = document.getElementById("cancelImport");
+    document.addEventListener("DOMContentLoaded", () => {
+        // ==========================
+        // ELEMENT REFERENCES
+        // ==========================
+        const importModal = document.getElementById("importModal");
+        const bulkImportBtn = document.getElementById("bulkImportBtn");
+        const closeImportModal = document.getElementById("closeImportModal");
+        const cancelImport = document.getElementById("cancelImport");
 
-    const addBookModal = document.getElementById("addBookModal");
-    const openAddBookBtn = document.getElementById("openAddBookBtn");
-    const closeAddBookModal = document.getElementById("closeAddBookModal");
-    const cancelAddBook = document.getElementById("cancelAddBook");
+        const addBookModal = document.getElementById("addBookModal");
+        const openAddBookBtn = document.getElementById("openAddBookBtn");
+        const closeAddBookModal = document.getElementById("closeAddBookModal");
+        const cancelAddBook = document.getElementById("cancelAddBook");
 
-    const editBookModal = document.getElementById("editBookModal");
-    const closeEditBookModal = document.getElementById("closeEditBookModal");
-    const cancelEditBook = document.getElementById("cancelEditBook");
-    const editBookForm = document.getElementById("editBookForm");
+        const editBookModal = document.getElementById("editBookModal");
+        const closeEditBookModal = document.getElementById("closeEditBookModal");
+        const cancelEditBook = document.getElementById("cancelEditBook");
+        const editBookForm = document.getElementById("editBookForm");
 
-    // ==========================
-    // UNIVERSAL MODAL HELPERS
-    // ==========================
-    function openModal(modal) {
-        modal.classList.remove("hidden");
-        document.body.classList.add("overflow-hidden");
-    }
+        // ==========================
+        // UNIVERSAL MODAL HELPERS
+        // ==========================
+        function openModal(modal) {
+            modal.classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        }
 
-    function closeModal(modal) {
-        modal.classList.add("hidden");
-        document.body.classList.remove("overflow-hidden");
-    }
+        function closeModal(modal) {
+            modal.classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
 
-    // ==========================
-    // BULK IMPORT
-    // ==========================
-    bulkImportBtn?.addEventListener("click", () => openModal(importModal));
-    closeImportModal?.addEventListener("click", () => closeModal(importModal));
-    cancelImport?.addEventListener("click", () => closeModal(importModal));
-    importModal?.addEventListener("click", e => {
-        if (e.target === importModal) closeModal(importModal);
-    });
-
-    // ==========================
-    // ADD BOOK
-    // ==========================
-    openAddBookBtn?.addEventListener("click", () => openModal(addBookModal));
-    closeAddBookModal?.addEventListener("click", () => closeModal(addBookModal));
-    cancelAddBook?.addEventListener("click", () => closeModal(addBookModal));
-    addBookModal?.addEventListener("click", e => {
-        if (e.target === addBookModal) closeModal(addBookModal);
-    });
-
-    // ==========================
-    // EDIT BOOK
-    // ==========================
-    closeEditBookModal?.addEventListener("click", () => closeModal(editBookModal));
-    cancelEditBook?.addEventListener("click", () => closeModal(editBookModal));
-
-    // ==========================
-    // DROPDOWN LOGIC
-    // ==========================
-    function setupDropdown(btnId, menuId) {
-        const btn = document.getElementById(btnId);
-        const menu = document.getElementById(menuId);
-        if (!btn || !menu) return;
-
-        btn.addEventListener("click", e => {
-            e.stopPropagation();
-            menu.classList.toggle("hidden");
+        // ==========================
+        // BULK IMPORT
+        // ==========================
+        bulkImportBtn?.addEventListener("click", () => openModal(importModal));
+        closeImportModal?.addEventListener("click", () => closeModal(importModal));
+        cancelImport?.addEventListener("click", () => closeModal(importModal));
+        importModal?.addEventListener("click", e => {
+            if (e.target === importModal) closeModal(importModal);
         });
 
-        document.addEventListener("click", () => menu.classList.add("hidden"));
-    }
+        // ==========================
+        // ADD BOOK
+        // ==========================
+        openAddBookBtn?.addEventListener("click", () => openModal(addBookModal));
+        closeAddBookModal?.addEventListener("click", () => closeModal(addBookModal));
+        cancelAddBook?.addEventListener("click", () => closeModal(addBookModal));
+        addBookModal?.addEventListener("click", e => {
+            if (e.target === addBookModal) closeModal(addBookModal);
+        });
 
-    // Initialize both dropdowns
-    setupDropdown("statusDropdownBtn", "statusDropdownMenu");
-    setupDropdown("sortDropdownBtn", "sortDropdownMenu");
+        // ==========================
+        // EDIT BOOK
+        // ==========================
+        closeEditBookModal?.addEventListener("click", () => closeModal(editBookModal));
+        cancelEditBook?.addEventListener("click", () => closeModal(editBookModal));
 
-    // ==========================
-    // SAMPLE BOOK DATA
-    // ==========================
-    let books = [{
-            title: "Book Title",
-            author: "By: Author",
-            accessionnumber: "1714",
-            callnumber: "A 536 M4661 1908",
-            ibsn: "1561343455",
-            year: 2004,
-            status: "available"
-        },
-        {
-            title: "asfddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-            author: "By: asfdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-            accessionnumber: "1714",
-            callnumber: "A 536 M4661 1908",
-            ibsn: "1561343455",
-            year: 2004,
-            status: "available"
-        },
-        {
-            title: "Sobrang haba na title nigga nigga nigga nigga ",
-            author: "NIgga and other nigga who wrote this nigga book! ",
-            accessionnumber: "222-222-222-22",
-            callnumber: "999999",
-            ibsn: "321321321321",
-            year: 2010,
-            status: "borrowed"
-        },
-    ];
+        // ==========================
+        // DROPDOWN LOGIC
+        // ==========================
+        function setupDropdown(btnId, menuId) {
+            const btn = document.getElementById(btnId);
+            const menu = document.getElementById(menuId);
+            if (!btn || !menu) return;
 
-    let editingIndex = null;
+            btn.addEventListener("click", e => {
+                e.stopPropagation();
+                menu.classList.toggle("hidden");
+            });
 
-    // ==========================
-    // RENDER FUNCTION
-    // ==========================
-    const renderBooks = () => {
-        const tbody = document.getElementById("bookTableBody");
-        tbody.innerHTML = "";
-        if (books.length === 0) {
-            tbody.innerHTML = `
+            document.addEventListener("click", () => menu.classList.add("hidden"));
+        }
+
+        // Initialize both dropdowns
+        setupDropdown("statusDropdownBtn", "statusDropdownMenu");
+        setupDropdown("sortDropdownBtn", "sortDropdownMenu");
+
+        // ==========================
+        // SAMPLE BOOK DATA
+        // ==========================
+        let books = [{
+                title: "Book Title",
+                author: "By: Author",
+                accessionnumber: "1714",
+                callnumber: "A 536 M4661 1908",
+                ibsn: "1561343455",
+                year: 2004,
+                status: "available"
+            },
+            {
+                title: "asfddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+                author: "By: asfdddddddddd ddddddddddddddd ddddddddddddddddddddddd dddddddddddddddddddddddd ddddddddddddddd",
+                accessionnumber: "1714",
+                callnumber: "A 536 M4661 1908",
+                ibsn: "1561343455",
+                year: 2004,
+                status: "available"
+            },
+            {
+                title: "Book Title",
+                author: "By: Author",
+                accessionnumber: "1714",
+                callnumber: "A 536 M4661 1908",
+                ibsn: "1561343455",
+                year: 2004,
+                status: "available"
+            },
+            {
+                title: "Book Title",
+                author: "By: Author",
+                accessionnumber: "1714",
+                callnumber: "A 536 M4661 1908",
+                ibsn: "1561343455",
+                year: 2004,
+                status: "available"
+            },
+        ];
+
+        let editingIndex = null;
+
+        // ==========================
+        // RENDER FUNCTION
+        // ==========================
+        const renderBooks = () => {
+            const tbody = document.getElementById("bookTableBody");
+            tbody.innerHTML = "";
+            if (books.length === 0) {
+                tbody.innerHTML = `
                 <tr>
                     <td colspan="6" class="py-10 text-center">
                         <div class="flex flex-col items-center justify-center text-gray-500">
@@ -518,20 +527,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     </td>
                 </tr>
             `;
-            document.getElementById("bookCount").textContent = 0;
-            document.getElementById("bookTotal").textContent = 0;
-            return;
-        }
+                document.getElementById("bookCount").textContent = 0;
+                document.getElementById("bookTotal").textContent = 0;
+                return;
+            }
 
-        books.forEach((book, index) => {
-            const statusColor =
-                book.status === "available" ?
-                "bg-green-600" :
-                book.status === "borrowed" ?
-                "bg-orange-500" :
-                "bg-gray-600";
+            books.forEach((book, index) => {
+                const statusColor =
+                    book.status === "available" ?
+                    "bg-green-600" :
+                    book.status === "borrowed" ?
+                    "bg-orange-500" :
+                    "bg-gray-600";
 
-            tbody.innerHTML += `
+                tbody.innerHTML += `
                 <tr>
                     <td class="py-3 px-4">
                         <div class="max-w-[240px] ">
@@ -559,44 +568,44 @@ document.addEventListener("DOMContentLoaded", () => {
                     </td>
                 </tr>`;
 
+            });
+
+            document.getElementById("bookCount").textContent = books.length;
+            document.getElementById("bookTotal").textContent = books.length;
+        };
+
+        // ==========================
+        // EDIT FUNCTION
+        // ==========================
+        window.editBook = index => {
+            const book = books[index];
+            editingIndex = index;
+
+            document.getElementById("edit_accession_number").value = book.accessionnumber || "";
+            document.getElementById("edit_call_number").value = book.callnumber || "";
+            document.getElementById("edit_title").value = book.title || "";
+            document.getElementById("edit_author").value = book.author || "";
+            document.getElementById("edit_book_isbn").value = book.ibsn || "";
+            document.getElementById("edit_year").value = book.year || "";
+
+
+            openModal(editBookModal);
+        };
+
+        editBookForm?.addEventListener("submit", e => {
+            e.preventDefault();
+            if (editingIndex === null) return;
+
+            books[editingIndex].title = document.getElementById("edit_title").value.trim();
+            books[editingIndex].author = document.getElementById("edit_author").value.trim();
+            books[editingIndex].year = document.getElementById("edit_year").value.trim();
+            closeModal(editBookModal);
+            renderBooks();
         });
 
-        document.getElementById("bookCount").textContent = books.length;
-        document.getElementById("bookTotal").textContent = books.length;
-    };
-
-    // ==========================
-    // EDIT FUNCTION
-    // ==========================
-    window.editBook = index => {
-        const book = books[index];
-        editingIndex = index;
-
-        document.getElementById("edit_accession_number").value = book.accessionnumber || "";
-        document.getElementById("edit_call_number").value = book.callnumber || "";
-        document.getElementById("edit_title").value = book.title || "";
-        document.getElementById("edit_author").value = book.author || "";
-        document.getElementById("edit_book_isbn").value = book.ibsn || "";
-        document.getElementById("edit_year").value = book.year || "";
-
-
-        openModal(editBookModal);
-    };
-
-    editBookForm?.addEventListener("submit", e => {
-        e.preventDefault();
-        if (editingIndex === null) return;
-
-        books[editingIndex].title = document.getElementById("edit_title").value.trim();
-        books[editingIndex].author = document.getElementById("edit_author").value.trim();
-        books[editingIndex].year = document.getElementById("edit_year").value.trim();
-        closeModal(editBookModal);
+        // ==========================
+        // INIT
+        // ==========================
         renderBooks();
     });
-
-    // ==========================
-    // INIT
-    // ==========================
-    renderBooks();
-});
 </script>

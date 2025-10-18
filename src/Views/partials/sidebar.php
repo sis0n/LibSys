@@ -29,8 +29,12 @@ switch ($role) {
 
 ?>
 
-<aside id="sidebar"
-    class="sticky top-0 self-start h-screen w-64 bg-orange-50 border-r border-orange-200 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 overflow-hidden">
+<aside id="sidebar" class="fixed lg:sticky lg:top-0 left-0 top-0 h-screen w-64 
+       bg-orange-50 border-r border-orange-200 flex flex-col 
+       transform -translate-x-full lg:translate-x-0 
+       transition-transform duration-300 ease-in-out 
+       z-40 overflow-hidden hover:overflow-y-auto">
+
 
     <!-- Logo -->
     <a href="/LibSys/public/<?= $roleFolder ?>/dashboard"
@@ -40,14 +44,15 @@ switch ($role) {
             Library Online Software
         </span>
     </a>
-    <div class="flex-1 overflow-y-auto space-y-2 overflow-y-auto scroll-smooth
-               [scrollbar-width:none] 
-               [&::-webkit-scrollbar]:w-0 
-               hover:[scrollbar-width:thin] 
-               hover:[scrollbar-color:#d4d4d4_transparent] 
-               hover:[&::-webkit-scrollbar]:w-2 
-               hover:[&::-webkit-scrollbar-thumb]:bg-gray-300 
-               hover:[&::-webkit-scrollbar-thumb]:rounded">
+    <div class="flex-1 space-y-2 overflow-hidden hover:overflow-y-auto scroll-smooth
+            [scrollbar-width:none] 
+            [&::-webkit-scrollbar]:w-0 
+            hover:[scrollbar-width:thin] 
+            hover:[scrollbar-color:#d4d4d4_transparent] 
+            hover:[&::-webkit-scrollbar]:w-2 
+            hover:[&::-webkit-scrollbar-thumb]:bg-gray-300 
+            hover:[&::-webkit-scrollbar-thumb]:rounded">
+
 
         <!-- Student Sidebar -->
         <!-- Navigation -->
@@ -490,7 +495,6 @@ switch ($role) {
             </a>
         </nav>
     </div>
-
 </aside>
 <?php endif; ?>
 </aside>

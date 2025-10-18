@@ -1768,6 +1768,13 @@
       }
     }
   }
+  .hover\:overflow-y-auto {
+    &:hover {
+      @media (hover: hover) {
+        overflow-y: auto;
+      }
+    }
+  }
   .hover\:border-\[var\(--color-ring\)\]\/60 {
     &:hover {
       @media (hover: hover) {
@@ -2221,6 +2228,21 @@
   .lg\:static {
     @media (width >= 64rem) {
       position: static;
+    }
+  }
+  .lg\:sticky {
+    @media (width >= 64rem) {
+      position: sticky;
+    }
+  }
+  .lg\:top-0 {
+    @media (width >= 64rem) {
+      top: calc(var(--spacing) * 0);
+    }
+  }
+  .lg\:ml-64 {
+    @media (width >= 64rem) {
+      margin-left: calc(var(--spacing) * 64);
     }
   }
   .lg\:hidden {

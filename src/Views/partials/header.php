@@ -46,7 +46,7 @@ switch ($role) {
         </div>
 
         <!-- Logout -->
-        <form method="POST" action="/LibSys/public/logout">
+        <form method="POST" action="/LibSys/public/logout" id="logoutForm">
             <button type="submit" class="p-2 rounded hover:bg-gray-100">
                 <i class="ph ph-sign-out"></i>
             </button>
@@ -59,6 +59,23 @@ switch ($role) {
     document.addEventListener("DOMContentLoaded", () => {
         const sidebar = document.getElementById("sidebar");
         const btn = document.getElementById("hamburgerBtn");
+        const logoutForm = document.getElementById("logoutForm");
+
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', (event) => {
+                event.preventDefault(); 
+                try {
+                    console.log("Logout form submitted, removing saved page from sessionStorage."); // Debug
+                    sessionStorage.removeItem('bookCatalogPage'); 
+                } catch (e) {
+                    console.error("Could not remove item from sessionStorage during logout:", e);
+                }
+                console.log("Proceeding with form submission..."); //debugg=
+                logoutForm.submit(); 
+            });
+        } else {
+            console.warn("Logout form with id='logoutForm' not found. Could not attach sessionStorage clear event.");
+        }
 
         function toggleSidebar(forceClose = false) {
             const isHidden = sidebar.classList.contains("-translate-x-full");

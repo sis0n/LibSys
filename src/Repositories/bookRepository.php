@@ -162,4 +162,37 @@ class BookRepository
     $stmt = $this->db->query("SELECT COUNT(*) FROM books WHERE availability = 'available'");
     return (int) $stmt->fetchColumn();
   }
+
+  public function countPaginatedFiltered(
+    string $search = '',
+    string $category = '',
+    string $status = ''
+  ): int {
+    $query = "SELECT COUNT(*) FROM books WHERE 1=1";
+    $params = [];
+
+    if ($search !== '') {
+      $query .= " AND (title LIKE ? OR author LIKE ? OR book_isbn LIKE ? OR accession_number LIKE ?)";
+      $searchTerm = "%$search%";
+      $params[] = $searchTerm;
+      $params[] = $searchTerm;
+      $params[] = $searchTerm;
+      $params[] = $searchTerm;
+    }
+
+    if ($category !== '' && $category !== 'All Categories') {
+      $query .= " AND subject = ?";
+      $params[] = $category;
+    }
+
+    if ($status !== '' && $status !== 'All Status') {
+      $query .= " AND availability = ?";
+      $params[] = strtolower($status);
+    }
+
+    $stmt = $this->db->prepare($query);
+    $stmt->execute($params);
+
+    return (int) $stmt->fetchColumn();
+  }
 }

@@ -698,25 +698,64 @@
             document.querySelectorAll('.absolute.mt-1').forEach(menu => menu.classList.add('hidden'));
         });
 
+        // --- Utility function to highlight active option ---
+        function setActiveOption(containerId, selectedElement) {
+            // alisin lang highlight sa loob ng mismong dropdown container
+            const items = document.querySelectorAll(`#${containerId} li`);
+            items.forEach(item => item.classList.remove('bg-orange-50', 'font-semibold', 'text-orange-700'));
+
+            // apply highlight sa napiling option lang
+            selectedElement.classList.add('bg-orange-50', 'font-semibold', 'text-orange-700');
+        }
+
+        // --- ROLE ---
         window.selectRole = (el, val) => {
             document.getElementById('roleDropdownValue').textContent = val;
             selectedRole = val;
+            setActiveOption('roleDropdownMenu', el);
             applyFilters();
         };
+
+        // --- STATUS ---
         window.selectStatus = (el, val) => {
             document.getElementById('statusDropdownValue').textContent = val;
             selectedStatus = val;
+            setActiveOption('statusDropdownMenu', el);
             applyFilters();
         };
+
+        // --- USER ROLE ---
         window.selectUserRole = (el, val) => {
             document.getElementById('userRoleDropdownValue').textContent = val;
+            setActiveOption('userRoleDropdownMenu', el);
         };
+
+        // --- EDIT ROLE ---
         window.selectEditRole = (el, val) => {
             document.getElementById('editRoleDropdownValue').textContent = val;
+            setActiveOption('editRoleDropdownMenu', el);
         };
+
+        // --- EDIT STATUS ---
         window.selectEditStatus = (el, val) => {
             document.getElementById('editStatusDropdownValue').textContent = val;
+            setActiveOption('editStatusDropdownMenu', el);
         };
+
+        // --- DEFAULT ACTIVE OPTIONS (on load) ---
+        window.addEventListener("DOMContentLoaded", () => {
+            const allRoles = document.querySelector("#roleDropdownMenu li:first-child");
+            const allStatus = document.querySelector("#statusDropdownMenu li:first-child");
+
+            // Default highlight
+            if (allRoles) {
+                allRoles.classList.add("bg-orange-50", "font-semibold", "text-orange-700");
+            }
+            if (allStatus) {
+                allStatus.classList.add("bg-orange-50", "font-semibold", "text-orange-700");
+            }
+        });
+
 
         // --- DATA FETCHING AND RENDERING ---
         async function loadUsers() {

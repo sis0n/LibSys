@@ -107,7 +107,7 @@
                             class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
                     </div>
 
-                     <!-- ISBN -->
+                    <!-- ISBN -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             ISBN <span class="text-red-500">*</span>
@@ -194,19 +194,46 @@
         </div>
     </div>
 </div>
-
+<!-- TABLE BODY -->
 <div class="bg-[var(--color-card)] border border-orange-200 rounded-xl shadow-sm p-6 mt-6">
     <div class="flex items-center justify-between mb-4">
         <div>
             <h3 class="text-lg font-semibold text-gray-800">Book Management</h3>
             <p class="text-sm text-gray-600">Registered Books in the system</p>
         </div>
-        <!-- Filters -->
+        <!-- SEARCHBAR -->
         <div class="flex items-center text-sm">
-            <div class="relative">
-                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <div class="relative w-[300px]">
+                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
                 <input type="text" id="userSearchInput" placeholder="Search users..."
-                    class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm">
+                    class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-full focus:ring-1 focus:ring-orange-300">
+            </div>
+
+            <!-- FILTERING -->
+            <div class="relative inline-block text-left ml-3">
+                <button id="sortDropdownBtn"
+                    class="border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between gap-2 w-44 hover:bg-orange-50 transition">
+                    <span id="sortDropdownValue">Relevance</span>
+                    <i class="ph ph-caret-down text-xs"></i>
+                </button>
+
+                <div id="sortDropdownMenu"
+                    class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
+                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectSort(this, 'Relevance')">Relevance</div>
+                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectSort(this, 'Title (ascending)')">Title (ascending)</div>
+                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectSort(this, 'Title (descending)')">Title (descending)</div>
+                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectSort(this, 'Author (ascending)')">Author (ascending)</div>
+                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectSort(this, 'Author (descending)')">Author (descending)</div>
+                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectSort(this, 'Year (oldest)')">Year (oldest)</div>
+                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectSort(this, 'Year (newest)')">Year (newest)</div>
+                </div>
             </div>
             <!-- STATUS DROPDOWN -->
             <div class="relative inline-block text-left ml-3">
@@ -234,10 +261,11 @@
         <table class="min-w-full text-sm text-gray-700">
             <thead class="bg-orange-100 text-left text-gray-800">
                 <tr>
-                    <th class="py-3 px-4 font-medium">Book Details</th>
+                    <th class="py-3 px-4 font-medium">Book Title</th>
+                    <th class="py-3 px-4 font-medium">Author</th>
+                    <th class="py-3 px-4 font-medium">Accession Number</th>
                     <th class="py-3 px-4 font-medium">Call Number</th>
-                    <th class="py-3 px-4 font-medium">ISBN</th>
-                    <th class="py-3 px-4 font-medium">Year</th>
+                    <th class="py-3 px-4 font-medium">IBSN</th>
                     <th class="py-3 px-4 font-medium">Status</th>
                     <th class="py-3 px-4 font-medium text-center">Actions</th>
                 </tr>
@@ -267,31 +295,36 @@
         <!-- FORM -->
         <form id="editBookForm" class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Accession Number <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Accession Number <span
+                        class="text-red-500">*</span></label>
                 <input type="text" id="edit_accession_number" required
                     class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Call Number <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Call Number <span
+                        class="text-red-500">*</span></label>
                 <input type="text" id="edit_call_number" required
                     class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Title <span
+                        class="text-red-500">*</span></label>
                 <input type="text" id="edit_title" required
                     class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Author <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Author <span
+                        class="text-red-500">*</span></label>
                 <input type="text" id="edit_author" required
                     class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">ISBN <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">ISBN <span
+                        class="text-red-500">*</span></label>
                 <input type="text" id="edit_book_isbn"
                     class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
             </div>
@@ -299,9 +332,9 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Place of Publication</label>
                 <input type="text" id="edit_book_place"
-                class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Publisher</label>
                 <input type="text" id="edit_book_publisher"
@@ -381,6 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.classList.remove("hidden");
         document.body.classList.add("overflow-hidden");
     }
+
     function closeModal(modal) {
         modal.classList.add("hidden");
         document.body.classList.remove("overflow-hidden");
@@ -419,20 +453,49 @@ document.addEventListener("DOMContentLoaded", () => {
         const btn = document.getElementById(btnId);
         const menu = document.getElementById(menuId);
         if (!btn || !menu) return;
+
         btn.addEventListener("click", e => {
             e.stopPropagation();
             menu.classList.toggle("hidden");
         });
+
         document.addEventListener("click", () => menu.classList.add("hidden"));
     }
+
+    // Initialize both dropdowns
     setupDropdown("statusDropdownBtn", "statusDropdownMenu");
+    setupDropdown("sortDropdownBtn", "sortDropdownMenu");
 
     // ==========================
     // SAMPLE BOOK DATA
     // ==========================
-    let books = [
-        { title: "Book Title", author: "By: Author", accessionnumber: "111-111-111-11", callnumber: "123123", ibsn: "123123123123", year: 2004, status: "available" },
-        { title: "Book 2", author: "Another Author", accessionnumber: "222-222-222-22", callnumber: "999999", ibsn: "321321321321", year: 2010, status: "borrowed" },
+    let books = [{
+            title: "Book Title",
+            author: "By: Author",
+            accessionnumber: "1714",
+            callnumber: "A 536 M4661 1908",
+            ibsn: "1561343455",
+            year: 2004,
+            status: "available"
+        },
+        {
+            title: "asfddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            author: "By: asfdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            accessionnumber: "1714",
+            callnumber: "A 536 M4661 1908",
+            ibsn: "1561343455",
+            year: 2004,
+            status: "available"
+        },
+        {
+            title: "Sobrang haba na title nigga nigga nigga nigga ",
+            author: "NIgga and other nigga who wrote this nigga book! ",
+            accessionnumber: "222-222-222-22",
+            callnumber: "999999",
+            ibsn: "321321321321",
+            year: 2010,
+            status: "borrowed"
+        },
     ];
 
     let editingIndex = null;
@@ -462,24 +525,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         books.forEach((book, index) => {
             const statusColor =
-                book.status === "available"
-                    ? "bg-green-600"
-                    : book.status === "borrowed"
-                    ? "bg-orange-500"
-                    : "bg-gray-600";
+                book.status === "available" ?
+                "bg-green-600" :
+                book.status === "borrowed" ?
+                "bg-orange-500" :
+                "bg-gray-600";
 
             tbody.innerHTML += `
                 <tr>
                     <td class="py-3 px-4">
-                        <div>
-                            <p class="font-medium text-gray-800">${book.title || 'N/A'}</p>
-                            <p class="text-sm text-gray-600">by ${book.author || 'N/A'}</p>
-                            <p class="text-xs text-gray-400">Accession number: ${book.accessionnumber || 'N/A'}</p>
+                        <div class="max-w-[240px] ">
+                            <p class="font-medium text-gray-800 whitespace-normal break-words"">${book.title || 'N/A'}</p>
                         </div>
                     </td>
+                    <td class="py-3 px-4 truncate max-w-[240px] whitespace-normal break-words"">${book.author || 'N/A'}</td>
+                    <td class="py-3 px-4">${book.accessionnumber || 'N/A'}</td>
                     <td class="py-3 px-4">${book.callnumber || 'N/A'}</td>
                     <td class="py-3 px-4">${book.ibsn || 'N/A'}</td>
-                    <td class="py-3 px-4">${book.year || 'N/A'}</td>
                     <td class="py-3 px-4">
                         <span class="text-white text-xs px-3 py-1 rounded-full ${statusColor}">
                             ${book.status || 'N/A'}
@@ -496,6 +558,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </button>
                     </td>
                 </tr>`;
+
         });
 
         document.getElementById("bookCount").textContent = books.length;

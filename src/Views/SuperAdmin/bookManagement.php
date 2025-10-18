@@ -69,17 +69,8 @@
                     </button>
                 </div>
 
-               <!-- FORM -->
+                <!-- FORM -->
                 <form id="addBookForm" class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
-                    <!-- Book ID -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Book ID <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" id="book_id" required
-                            class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
-                    </div>
-
                     <!-- Accession Number -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -113,6 +104,15 @@
                             Author <span class="text-red-500">*</span>
                         </label>
                         <input type="text" id="author" required
+                            class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+                    </div>
+
+                     <!-- ISBN -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            ISBN <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="book_isbn"
                             class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
                     </div>
 
@@ -152,24 +152,6 @@
                             class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
                     </div>
 
-                    <!-- Description -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Description
-                        </label>
-                        <textarea id="description" rows="3"
-                            class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition"></textarea>
-                    </div>
-
-                    <!-- ISBN -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            ISBN
-                        </label>
-                        <input type="text" id="book_isbn"
-                            class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
-                    </div>
-
                     <!-- Supplementary -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -187,16 +169,25 @@
                         <input type="text" id="subject"
                             class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
                     </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Description
+                        </label>
+                        <textarea id="description" rows="3"
+                            class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition"></textarea>
+                    </div>
                 </form>
                 <!-- Footer Buttons -->
                 <div class="flex justify-end gap-3 p-6 border-t border-[var(--color-border)] flex-shrink-0">
-                    <button type="button" id="cancelAddBook"
-                        class="border border-[var(--color-border)] px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition">
-                        Cancel
-                    </button>
                     <button type="submit" form="addBookForm"
-                        class="px-5 py-2 bg-[var(--color-ring)] text-white font-medium rounded-md hover:opacity-90 transition">
+                        class="flex-1 bg-orange-600 text-white font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-700 transition">
                         Add Book
+                    </button>
+                    <button type="button" id="cancelAddBook"
+                        class="border border-orange-200 text-gray-800 font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-50 transition">
+                        Cancel
                     </button>
                 </div>
             </div>
@@ -256,192 +247,195 @@
     </div>
 </div>
 
+<!-- EDIT BOOK MODAL -->
+<div id="editBookModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
+    <!-- Modal Card -->
+    <div
+        class="bg-[var(--color-card)] rounded-xl shadow-lg border border-[var(--color-border)] w-full max-w-md h-[85vh] flex flex-col animate-fadeIn">
+
+        <!-- Header -->
+        <div class="flex justify-between items-start p-6 border-b border-[var(--color-border)] flex-shrink-0">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900">Edit Book Details</h2>
+                <p class="text-sm text-gray-500 mt-1">Modify book information below.</p>
+            </div>
+            <button id="closeEditBookModal" class="text-gray-500 hover:text-red-700 transition">
+                <i class="ph ph-x text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- FORM -->
+        <form id="editBookForm" class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Accession Number <span class="text-red-500">*</span></label>
+                <input type="text" id="edit_accession_number" required
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Call Number <span class="text-red-500">*</span></label>
+                <input type="text" id="edit_call_number" required
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-red-500">*</span></label>
+                <input type="text" id="edit_title" required
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Author <span class="text-red-500">*</span></label>
+                <input type="text" id="edit_author" required
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">ISBN <span class="text-red-500">*</span></label>
+                <input type="text" id="edit_book_isbn"
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Place of Publication</label>
+                <input type="text" id="edit_book_place"
+                class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Publisher</label>
+                <input type="text" id="edit_book_publisher"
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Year Published</label>
+                <input type="number" id="edit_year" min="0"
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Edition</label>
+                <input type="text" id="edit_book_edition"
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Supplementary Info</label>
+                <input type="text" id="edit_book_supplementary"
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <input type="text" id="edit_subject"
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea id="edit_description" rows="3"
+                    class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition"></textarea>
+            </div>
+        </form>
+
+        <!-- Footer Buttons -->
+        <div class="flex justify-end gap-3 p-6 border-t border-[var(--color-border)] flex-shrink-0">
+            <button type="submit" form="editBookForm"
+                class="flex-1 bg-orange-600 text-white font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-700 transition">
+                Save Changes
+            </button>
+            <button type="button" id="cancelEditBook"
+                class="border border-orange-200 text-gray-800 font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-50 transition">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     // ==========================
-    // DOM ELEMENTS
+    // ELEMENT REFERENCES
     // ==========================
-    // BULK MODAL
-    const modal = document.getElementById("importModal");
-    const openBtn = document.getElementById("bulkImportBtn");
-    const closeBtn = document.getElementById("closeImportModal");
-    const cancelBtn = document.getElementById("cancelImport");
+    const importModal = document.getElementById("importModal");
+    const bulkImportBtn = document.getElementById("bulkImportBtn");
+    const closeImportModal = document.getElementById("closeImportModal");
+    const cancelImport = document.getElementById("cancelImport");
 
-    // ADD BOOK MODAL
     const addBookModal = document.getElementById("addBookModal");
     const openAddBookBtn = document.getElementById("openAddBookBtn");
-    const closeAddBookBtn = document.getElementById("closeAddBookModal");
-    const cancelAddBookBtn = document.getElementById("cancelAddBook");
-    const addBookForm = document.getElementById("addBookForm");
+    const closeAddBookModal = document.getElementById("closeAddBookModal");
+    const cancelAddBook = document.getElementById("cancelAddBook");
 
-    // EDIT BOOK MODAL
     const editBookModal = document.getElementById("editBookModal");
-    const closeEditBookBtn = document.getElementById("closeEditBookBtn");
-    const cancelEditBookBtn = document.getElementById("cancelEditBookBtn");
-
-    let currentEditingBookId = null;
-
+    const closeEditBookModal = document.getElementById("closeEditBookModal");
+    const cancelEditBook = document.getElementById("cancelEditBook");
+    const editBookForm = document.getElementById("editBookForm");
 
     // ==========================
-    // MODAL CONTROLS
+    // UNIVERSAL MODAL HELPERS
     // ==========================
-    function closeModal(modalEl) {
-        if (modalEl) {
-            modalEl.classList.add("hidden");
-            document.body.classList.remove("overflow-hidden");
-        }
+    function openModal(modal) {
+        modal.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+    }
+    function closeModal(modal) {
+        modal.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
     }
 
-    // BULK MODAL CONTROLS
-    if (openBtn)
-        openBtn.addEventListener("click", () => {
-            modal.classList.remove("hidden");
-            document.body.classList.add("overflow-hidden");
-        });
-
-    [closeBtn, cancelBtn].forEach((btn) =>
-        btn?.addEventListener("click", () => closeModal(modal))
-    );
-
-    modal?.addEventListener("click", (e) => {
-        if (e.target === modal) closeModal(modal);
+    // ==========================
+    // BULK IMPORT
+    // ==========================
+    bulkImportBtn?.addEventListener("click", () => openModal(importModal));
+    closeImportModal?.addEventListener("click", () => closeModal(importModal));
+    cancelImport?.addEventListener("click", () => closeModal(importModal));
+    importModal?.addEventListener("click", e => {
+        if (e.target === importModal) closeModal(importModal);
     });
 
-    // ADD BOOK CONTROLS
-    function closeAddBookModal() {
-        closeModal(addBookModal);
-    }
-
-    if (openAddBookBtn)
-        openAddBookBtn.addEventListener("click", () => {
-            addBookModal.classList.remove("hidden");
-            document.body.classList.add("overflow-hidden");
-        });
-
-    [closeAddBookBtn, cancelAddBookBtn].forEach((btn) =>
-        btn?.addEventListener("click", closeAddBookModal)
-    );
-
-    addBookModal?.addEventListener("click", (e) => {
-        if (e.target === addBookModal) closeAddBookModal();
+    // ==========================
+    // ADD BOOK
+    // ==========================
+    openAddBookBtn?.addEventListener("click", () => openModal(addBookModal));
+    closeAddBookModal?.addEventListener("click", () => closeModal(addBookModal));
+    cancelAddBook?.addEventListener("click", () => closeModal(addBookModal));
+    addBookModal?.addEventListener("click", e => {
+        if (e.target === addBookModal) closeModal(addBookModal);
     });
 
-    // EDIT BOOK CONTROLS
-    function closeEditBookModal() {
-        closeModal(editBookModal);
-        currentEditingBookId = null;
-    }
-
-    [closeEditBookBtn, cancelEditBookBtn].forEach((btn) =>
-        btn?.addEventListener("click", closeEditBookModal)
-    );
-
-    editBookModal?.addEventListener("click", (e) => {
-        if (e.target === editBookModal) closeEditBookModal();
-    });
-
+    // ==========================
+    // EDIT BOOK
+    // ==========================
+    closeEditBookModal?.addEventListener("click", () => closeModal(editBookModal));
+    cancelEditBook?.addEventListener("click", () => closeModal(editBookModal));
 
     // ==========================
     // DROPDOWN LOGIC
     // ==========================
-    function setupDropdownToggle(buttonId, menuId) {
-        const btn = document.getElementById(buttonId);
+    function setupDropdown(btnId, menuId) {
+        const btn = document.getElementById(btnId);
         const menu = document.getElementById(menuId);
         if (!btn || !menu) return;
-
-        btn.addEventListener("click", (e) => {
+        btn.addEventListener("click", e => {
             e.stopPropagation();
             menu.classList.toggle("hidden");
         });
+        document.addEventListener("click", () => menu.classList.add("hidden"));
     }
-
-    setupDropdownToggle("statusDropdownBtn", "statusDropdownMenu");
-    setupDropdownToggle("editStatusDropdownBtn", "editStatusDropdownMenu");
-
-    // Close dropdown when clicking outside
-    document.addEventListener("click", () => {
-        document.querySelectorAll(".absolute.mt-1, .absolute.w-full").forEach((menu) =>
-            menu.classList.add("hidden")
-        );
-    });
-
-    // Highlight active option
-    function setActiveOption(containerId, selectedElement) {
-        const items = document.querySelectorAll(`#${containerId} .status-item`);
-        items.forEach((item) =>
-            item.classList.remove("bg-orange-50", "font-semibold", "text-orange-700")
-        );
-
-        if (selectedElement && selectedElement.classList) {
-            selectedElement.classList.add(
-                "bg-orange-50",
-                "font-semibold",
-                "text-orange-700"
-            );
-        }
-    }
-
-    // STATUS
-    window.selectStatus = (el, val) => {
-        const valueEl = document.getElementById("statusDropdownValue");
-        if (valueEl) valueEl.textContent = val;
-        setActiveOption("statusDropdownMenu", el);
-        if (typeof applyFilters === "function") applyFilters();
-    };
-
-    // EDIT STATUS
-    window.selectEditStatus = (el, val) => {
-        const valueEl = document.getElementById("editStatusDropdownValue");
-        if (valueEl) valueEl.textContent = val;
-        setActiveOption("editStatusDropdownMenu", el);
-    };
-
-    // DEFAULT ACTIVE STATUS
-    const firstStatus = document.querySelector(
-        "#statusDropdownMenu .status-item:first-child"
-    );
-    if (firstStatus) {
-        setActiveOption("statusDropdownMenu", firstStatus);
-        const textVal = firstStatus.textContent?.trim();
-        const displayEl = document.getElementById("statusDropdownValue");
-        if (displayEl) displayEl.textContent = textVal;
-    }
-
+    setupDropdown("statusDropdownBtn", "statusDropdownMenu");
 
     // ==========================
     // SAMPLE BOOK DATA
     // ==========================
     let books = [
-        {
-            title: "Book Title",
-            author: "By: Author",
-            accessionnumber: "111-111-111-11",
-            callnumber: "",
-            ibsn: "123123123123",
-            year: 2004,
-            status: "available"
-        },
-        {
-            title: "Book Title",
-            author: "By: Author",
-            accessionnumber: "111-111-111-11",
-            callnumber: "123123",
-            ibsn: "",
-            year: 2004,
-            status: "undefined"
-        },
-        {
-            title: "Book Title",
-            author: "By: Author",
-            accessionnumber: "111-111-111-11",
-            callnumber: "123123",
-            ibsn: "123123123123",
-            year: "",
-            status: "borrowed"
-        }
+        { title: "Book Title", author: "By: Author", accessionnumber: "111-111-111-11", callnumber: "123123", ibsn: "123123123123", year: 2004, status: "available" },
+        { title: "Book 2", author: "Another Author", accessionnumber: "222-222-222-22", callnumber: "999999", ibsn: "321321321321", year: 2010, status: "borrowed" },
     ];
 
+    let editingIndex = null;
 
     // ==========================
     // RENDER FUNCTION
@@ -449,6 +443,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const renderBooks = () => {
         const tbody = document.getElementById("bookTableBody");
         tbody.innerHTML = "";
+        if (books.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="py-10 text-center">
+                        <div class="flex flex-col items-center justify-center text-gray-500">
+                            <i class="ph ph-books text-5xl mb-3"></i>
+                            <p class="font-medium text-gray-700">No books found</p>
+                            <p class="text-sm text-gray-500">There are no books available in the library record.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            document.getElementById("bookCount").textContent = 0;
+            document.getElementById("bookTotal").textContent = 0;
+            return;
+        }
 
         books.forEach((book, index) => {
             const statusColor =
@@ -458,10 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? "bg-orange-500"
                     : "bg-gray-600";
 
-            const statusText =
-                book.status.charAt(0).toUpperCase() + book.status.slice(1);
-
-            const row = `
+            tbody.innerHTML += `
                 <tr>
                     <td class="py-3 px-4">
                         <div>
@@ -475,7 +482,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td class="py-3 px-4">${book.year || 'N/A'}</td>
                     <td class="py-3 px-4">
                         <span class="text-white text-xs px-3 py-1 rounded-full ${statusColor}">
-                            ${statusText}
+                            ${book.status || 'N/A'}
                         </span>
                     </td>
                     <td class="py-3 px-4 text-center space-x-2">
@@ -488,46 +495,44 @@ document.addEventListener("DOMContentLoaded", () => {
                             <i class='ph ph-trash'></i>
                         </button>
                     </td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
+                </tr>`;
         });
 
         document.getElementById("bookCount").textContent = books.length;
         document.getElementById("bookTotal").textContent = books.length;
     };
 
+    // ==========================
+    // EDIT FUNCTION
+    // ==========================
+    window.editBook = index => {
+        const book = books[index];
+        editingIndex = index;
 
-    // ==========================
-    // ADD BOOK FUNCTIONALITY
-    // ==========================
-    addBookForm?.addEventListener("submit", (e) => {
+        document.getElementById("edit_accession_number").value = book.accessionnumber || "";
+        document.getElementById("edit_call_number").value = book.callnumber || "";
+        document.getElementById("edit_title").value = book.title || "";
+        document.getElementById("edit_author").value = book.author || "";
+        document.getElementById("edit_book_isbn").value = book.ibsn || "";
+        document.getElementById("edit_year").value = book.year || "";
+
+
+        openModal(editBookModal);
+    };
+
+    editBookForm?.addEventListener("submit", e => {
         e.preventDefault();
+        if (editingIndex === null) return;
 
-        const newBook = {
-            title: document.getElementById("bookTitle").value.trim() || "Untitled",
-            author: document.getElementById("bookAuthor").value.trim() || "Unknown",
-            ibsn: document.getElementById("bookISBN").value.trim(),
-            category: document.getElementById("bookCategory").value.trim() || "N/A",
-            location: document.getElementById("bookLocation").value.trim() || "N/A",
-            copies: document.getElementById("bookCopies").value.trim() || 1,
-            description:
-                document.getElementById("bookDescription").value.trim() ||
-                "No description provided",
-            year: new Date().getFullYear(),
-            accessionnumber: Math.floor(Math.random() * 999999999),
-            status: "available",
-        };
-
-        books.push(newBook);
+        books[editingIndex].title = document.getElementById("edit_title").value.trim();
+        books[editingIndex].author = document.getElementById("edit_author").value.trim();
+        books[editingIndex].year = document.getElementById("edit_year").value.trim();
+        closeModal(editBookModal);
         renderBooks();
-        closeAddBookModal();
-        addBookForm.reset();
     });
 
-
     // ==========================
-    // INITIAL RENDER
+    // INIT
     // ==========================
     renderBooks();
 });

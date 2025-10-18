@@ -700,9 +700,10 @@
 
         // --- Utility function to highlight active option ---
         function setActiveOption(containerId, selectedElement) {
-            // alisin lang highlight sa loob ng mismong dropdown container
-            const items = document.querySelectorAll(`#${containerId} li`);
-            items.forEach(item => item.classList.remove('bg-orange-50', 'font-semibold', 'text-orange-700'));
+            // tanggalin muna highlight sa lahat ng dropdowns
+            document.querySelectorAll('.bg-orange-50.font-semibold.text-orange-700').forEach(item => {
+                item.classList.remove('bg-orange-50', 'font-semibold', 'text-orange-700');
+            });
 
             // apply highlight sa napiling option lang
             selectedElement.classList.add('bg-orange-50', 'font-semibold', 'text-orange-700');
@@ -747,7 +748,6 @@
             const allRoles = document.querySelector("#roleDropdownMenu li:first-child");
             const allStatus = document.querySelector("#statusDropdownMenu li:first-child");
 
-            // Default highlight
             if (allRoles) {
                 allRoles.classList.add("bg-orange-50", "font-semibold", "text-orange-700");
             }

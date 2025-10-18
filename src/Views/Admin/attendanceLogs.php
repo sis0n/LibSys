@@ -9,20 +9,19 @@ date_default_timezone_set('Asia/Manila');
 
 $formattedLogs = [];
 foreach ($logs as $log) {
-  $logTime = new DateTime($log['timestamp']); // gamit yung actual timestamp
-  $formattedLogs[] = [
-    'date' => $logTime->format("Y-m-d"),
-    'day' => $logTime->format("l"),
-    'studentName' => $log['full_name'],
-    'studentNumber' => $log['student_number'],
-    'time' => $logTime->format("H:i:s"),
-    'status' => "Present"
-  ];
+    $logTime = new DateTime($log['timestamp']);
+    $formattedLogs[] = [
+        'date' => $logTime->format("Y-m-d"),
+        'day' => $logTime->format("l"),
+        'studentName' => $log['full_name'],
+        'studentNumber' => $log['student_number'],
+        'time' => $logTime->format("H:i:s"),
+        'status' => "Present"
+    ];
 }
 ?>
 
 
-<!-- Header -->
 <div class="flex items-center justify-between mb-6">
     <div>
         <h2 class="text-2xl font-bold flex items-center gap-2">
@@ -39,14 +38,12 @@ foreach ($logs as $log) {
     </button>
 </div>
 
-<!-- Total Visitors Card -->
 <div class="bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-sm mb-6">
     <div class="p-4 border-b border-[var(--color-border)]">
         <h3 class="text-md font-medium">Total Visitors</h3>
         <p class="text-sm text-[var(--color-gray-500)]">View visitor statistics by time period</p>
     </div>
     <div class="p-4">
-        <!-- Tabs -->
         <div
             class="flex items-center border border-[var(--color-border)]  bg-[color:var(--color-muted)] p-1 justify-center mb-4 rounded-full">
             <button
@@ -64,7 +61,6 @@ foreach ($logs as $log) {
             </button>
         </div>
 
-        <!-- Visitor Count -->
         <div class="flex flex-col items-center justify-center p-6 rounded-lg border border-[var(--color-border)]">
             <span id="visitor-label" class="text-sm flex items-center gap-1 text-[var(--color-primary)]">
                 This Week
@@ -74,193 +70,340 @@ foreach ($logs as $log) {
         </div>
     </div>
 
-    <!-- Eto sa paglipat lang sa tabs, ikaw na mag ayos sa Controller di ko kasi sure kung need to sa attendanceController.php -->
     <script>
-    const buttons = document.querySelectorAll('.period-btn');
-    const label = document.getElementById('visitor-label');
-    const count = document.getElementById('visitor-count');
+        const buttons = document.querySelectorAll('.period-btn');
+        const label = document.getElementById('visitor-label');
+        const count = document.getElementById('visitor-count');
 
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const period = btn.dataset.period;
-            const visitorCount = btn.dataset.count;
-
-            // Update UI
-            label.textContent = `This ${period}`;
-            count.textContent = visitorCount;
-
-            // Active button style
-            buttons.forEach(b => b.classList.remove('bg-[var(--color-popover)]', 'font-medium'));
-            btn.classList.add('bg-[var(--color-popover)]', 'font-medium');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const period = btn.dataset.period;
+                const visitorCount = btn.dataset.count;
+                label.textContent = `This ${period}`;
+                count.textContent = visitorCount;
+                buttons.forEach(b => b.classList.remove('bg-[var(--color-popover)]', 'font-medium'));
+                btn.classList.add('bg-[var(--color-popover)]', 'font-medium');
+            });
         });
-    });
     </script>
 </div>
 
-<!-- Filter Logs -->
-<div class="border border-[var(--color-border)] bg-[var(--color-card)] rounded-xl p-4 mb-6 shadow-sm">
-    <div class="flex items-center gap-2 mb-3">
-        <h3 class="font-medium text-gray-800">Filter Logs</h3>
-    </div>
+<div class="bg-[var(--color-card)] border border-orange-200 rounded-xl shadow-sm p-6 mt-6">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-800">Attendance Records</h3>
+            <p class="text-sm text-gray-600">Browse student check-in history</p>
+        </div>
 
-    <!-- Search and Dropdown -->
-    <div class="flex items-center gap-3">
-        <!-- Search -->
-        <input type="text" id="attendanceSearch" placeholder="Search by student name or ID..."
-            class="flex-1 border border-orange-100 rounded-lg p-2 bg-orange-50 focus:ring-2 focus:ring-orange-400 outline-none text-sm text-orange-900 font-medium" />
-        <div class="relative inline-block w-48">
+        <div class="flex items-center gap-2 text-sm">
 
-            <!-- Trigger Button -->
-            <button id="dropdownButton" class="w-full flex justify-between items-center rounded-md border border-orange-300 bg-orange-50 
-        px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-400">
-                <span id="dropdownValue">Today</span>
-                <i class="ph ph-caret-down"></i>
-            </button>
+            <div class="relative">
+                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="attendanceSearchInput" placeholder="Search by student..."
+                    class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-48">
+            </div>
 
-            <!-- Dropdown Options -->
-            <div id="dropdownMenu"
-                class="absolute z-10 mt-1 w-full hidden rounded-md bg-white shadow-lg border border-orange-200">
-                <div class="py-1">
-                    <div class="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-orange-100 rounded-t-md"
-                        onclick="selectOption('Today')">Today</div>
-                    <div class="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-orange-100"
-                        onclick="selectOption('Yesterday')">Yesterday</div>
-                    <div class="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-orange-100 rounded-b-md"
-                        onclick="selectOption('All dates')">All dates</div>
+            <div class="relative">
+                <input type="date" id="datePickerInput"
+                    class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-36">
+            </div>
+
+            <div class="relative inline-block text-left">
+                <button id="courseFilterBtn"
+                    class="border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between gap-2 w-36 hover:bg-orange-50 transition">
+                    <span id="courseFilterValue">All Courses</span>
+                    <i class="ph ph-caret-down text-xs"></i>
+                </button>
+                <div id="courseFilterMenu"
+                    class="filter-dropdown-menu absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
+                    <div classclass="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Courses">All Courses</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSIT">BSIT</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSCS">BSCS</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSEMC">BSEMC</div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Sa style lang to dahil bawal malagyan ng tailwind yung option, kaya custom nalang option natin, nag provide lang sariling gawang option-->
-        <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const dropdownBtn = document.getElementById("dropdownButton");
-            const dropdownMenu = document.getElementById("dropdownMenu");
-            const dropdownValue = document.getElementById("dropdownValue");
-            const logsContainer = document.querySelector(".space-y-3");
-            const searchInput = document.getElementById('attendanceSearch');
-
-            let currentPeriod = 'Today';
-
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value.trim();
-                fetchLogs(currentPeriod, query);
-            });
-
-
-            dropdownBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                dropdownMenu.classList.toggle("hidden");
-            });
-
-            window.selectOption = function(value) {
-                currentPeriod = value;
-                dropdownValue.textContent = value;
-                dropdownMenu.classList.add("hidden");
-                fetchLogs(currentPeriod, searchInput.value.trim());
-            };
-
-            document.addEventListener("click", () => {
-                dropdownMenu.classList.add("hidden");
-            });
-
-            function fetchLogs(period, search = '') {
-                const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
-                url.searchParams.append('period', period);
-                if (search) url.searchParams.append('search', search);
-
-                fetch(url)
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log(data);
-                        logsContainer.innerHTML = '';
-                        if (data.length === 0) {
-                            logsContainer.innerHTML = `
-                            <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-                                <i class="ph ph-clipboard text-6xl"></i>
-                                <p class="text-sm font-medium">No attendance records</p>
-                                <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
-                            </div>
-                            `;
-                            return; 
-                        }
-                        data.forEach(log => {
-                            logsContainer.innerHTML += `
-                <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
-                  <div class="flex items-center gap-3">
-                    <div class="text-center text-sm">
-                      <p class="font-semibold">${log.date}</p>
-                      <p class="text-gray-500 text-xs">${log.day}</p>
-                    </div>
-                    <div>
-                      <p class="font-medium text-gray-800">
-                        ${log.studentName}
-                        <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">
-                          ${log.studentNumber}
-                        </span>
-                      </p>
-                      <p class="text-gray-500 text-xs">Check-in: ${log.time}</p>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <p class="text-green-600 font-medium text-sm">${log.status}</p>
-                    <p class="text-gray-500 text-xs">Library attendance</p>
-                  </div>
-                </div>
-                `;
-                        });
-                    });
-            }
-            fetchLogs('Today');
-        });
-        </script>
-
-
+    <div class="overflow-x-auto rounded-lg border border-orange-200">
+        <table class="w-full text-sm border-collapse">
+            <thead class="bg-orange-50 text-gray-700 border border-orange-100">
+                <tr>
+                    <th class="text-left px-4 py-3 font-medium">Student</th>
+                    <th class="text-left px-4 py-3 font-medium">Date</th>
+                    <th class="text-left px-4 py-3 font-medium">First Check-in</th>
+                    <th class="text-left px-4 py-3 font-medium">Total Check-ins</th>
+                    <th class="text-left px-4 py-3 font-medium">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceTableBody" class="divide-y divide-orange-100">
+                <tr id="noRecordsRow" class="bg-white hidden">
+                    <td colspan="5" class="text-center text-gray-500 py-10">
+                        <i class="ph ph-clipboard text-4xl block mb-2"></i>
+                        No attendance records found.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Attendance Records -->
-<div class="border border-orange-200 bg-[var(--color-card)] rounded-xl p-4 shadow-sm">
-    <h3 class="font-semibold text-gray-800 mb-1">Attendance Records</h3>
-
-    <?php if (!empty($formattedLogs) && is_array($formattedLogs)): ?>
-    <p class="text-gray-500 text-sm mb-4">Showing records</p>
-    <div class="space-y-3">
-        <?php foreach ($formattedLogs as $log): ?>
-        <div class="flex justify-between items-center border border-orange-200 rounded-lg p-3 hover:bg-orange-50">
-            <div class="flex items-center gap-3">
-                <!-- Date -->
-                <div class="text-center text-sm">
-                    <p class="font-semibold"><?= htmlspecialchars($log['date']) ?></p>
-                    <p class="text-gray-500 text-xs"><?= htmlspecialchars($log['day']) ?></p>
-                </div>
-
-                <!-- Student Info -->
-                <div>
-                    <p class="font-medium text-gray-800">
-                        <?= htmlspecialchars($log['studentName']) ?>
-                        <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-lg">
-                            <?= htmlspecialchars($log['studentNumber']) ?>
-                        </span>
-                    </p>
-                    <p class="text-gray-500 text-xs">Check-in: <?= htmlspecialchars($log['time']) ?></p>
-                </div>
-            </div>
-
-            <!-- Status -->
-            <div class="text-right">
-                <p class="text-green-600 font-medium text-sm"><?= htmlspecialchars($log['status']) ?></p>
-                <p class="text-gray-500 text-xs">Library attendance</p>
-            </div>
-        </div>
-        <?php endforeach; ?>
-    </div>
-    <?php else: ?>
+<div id="viewCheckinsModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
     <div
-        class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-        <i class="ph ph-clipboard text-6xl"></i>
-        <p class="text-sm font-medium">No attendance records</p>
-        <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
+        class="bg-[var(--color-card)] rounded-xl shadow-lg border border-[var(--color-border)] w-full max-w-sm p-4 animate-fadeIn">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h2 id="checkinsModalTitle" class="text-lg font-semibold">Viewing Check-ins</h2>
+                <p id="checkinsModalSubtitle" class="text-sm text-gray-600 mt-1">Student / Date</p>
+            </div>
+            <button id="closeCheckinsModal" class="text-gray-500 hover:text-red-700 transition">
+                <i class="ph ph-x text-2xl"></i> </button>
+        </div>
+
+        <div class="max-h-60 overflow-y-auto space-y-2" id="checkinsList">
+        </div>
+
+        <div class="text-right mt-4">
+            <button id="closeCheckinsModalBtn"
+                class="mt-2 border border-[var(--color-border)] px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition text-sm font-medium">
+                Close
+            </button>
+        </div>
     </div>
-    <?php endif; ?>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("attendanceSearchInput");
+        const dateInput = document.getElementById("datePickerInput");
+        const courseBtn = document.getElementById("courseFilterBtn");
+        const courseMenu = document.getElementById("courseFilterMenu");
+        const courseValueSpan = document.getElementById("courseFilterValue");
+        const tableBody = document.getElementById("attendanceTableBody");
+        const noRecordsRow = document.getElementById("noRecordsRow");
+
+        const checkinsModal = document.getElementById("viewCheckinsModal");
+        const closeCheckinsBtn1 = document.getElementById("closeCheckinsModal");
+        const closeCheckinsBtn2 = document.getElementById("closeCheckinsModalBtn");
+        const checkinsModalTitle = document.getElementById("checkinsModalTitle");
+        const checkinsModalSubtitle = document.getElementById("checkinsModalSubtitle");
+        const checkinsList = document.getElementById("checkinsList");
+
+        let currentSearch = "";
+        let currentDate = "";
+        let currentCourse = "All Courses";
+
+        const timezone = "Asia/Manila";
+
+        function getPhDate(date = new Date()) {
+            return new Date(date.toLocaleString("en-US", {
+                timeZone: timezone
+            }));
+        }
+
+        function formatDate(date) {
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        const todayDateObj = getPhDate();
+        const yesterdayDateObj = getPhDate(new Date()); // Gumawa ng bagong instance para 'di magulo
+        yesterdayDateObj.setDate(yesterdayDateObj.getDate() - 1);
+
+        const todayStr = formatDate(todayDateObj);
+        const yesterdayStr = formatDate(yesterdayDateObj);
+
+        currentDate = todayStr;
+        dateInput.value = currentDate;
+
+
+        function setupDropdown(btn, menu, valueSpan, stateKey) {
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                menu.classList.toggle("hidden");
+            });
+
+            menu.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const value = item.getAttribute('data-value');
+                    valueSpan.textContent = value;
+                    menu.classList.add('hidden');
+
+                    if (stateKey === 'course') currentCourse = value;
+
+                    fetchLogs(); 
+                });
+            });
+        }
+        setupDropdown(courseBtn, courseMenu, courseValueSpan, 'course');
+
+        document.addEventListener("click", () => {
+            courseMenu.classList.add("hidden");
+        });
+
+        searchInput.addEventListener("input", () => {
+            currentSearch = searchInput.value.trim();
+            fetchLogs();
+        });
+
+        dateInput.addEventListener("change", () => {
+            currentDate = dateInput.value; 
+            fetchLogs();
+        });
+
+        function fetchLogs() {
+
+            let periodToSend = 'All dates';
+            let dateToFilter = currentDate; 
+
+            if (currentDate === todayStr) {
+                periodToSend = 'Today';
+                dateToFilter = null; 
+            } else if (currentDate === yesterdayStr) {
+                periodToSend = 'Yesterday';
+                dateToFilter = null; 
+            }
+
+            const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
+
+            url.searchParams.append('period', periodToSend); 
+            url.searchParams.append('search', currentSearch);
+            if (currentCourse !== "All Courses") {
+                url.searchParams.append('course', currentCourse);
+            }
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+
+                    let filteredData = data;
+                    if (dateToFilter) {
+                        filteredData = data.filter(log => log.date === dateToFilter);
+                    }
+
+                    tableBody.innerHTML = ''; 
+
+                    if (filteredData.length === 0) {
+                        tableBody.appendChild(noRecordsRow);
+                        noRecordsRow.classList.remove('hidden');
+                        return;
+                    }
+
+                    noRecordsRow.classList.add('hidden');
+
+                    const groupedLogs = groupLogs(filteredData);
+
+                    groupedLogs.forEach(log => {
+                        const row = document.createElement('tr');
+                        row.className = 'bg-white';
+                        row.innerHTML = `
+                        <td class="px-4 py-3">
+                            <p class="font-medium text-gray-800">${log.studentName}</p>
+                            <p class="text-gray-500 text-xs">${log.studentNumber}</p>
+                        </td>
+                        <td class="px-4 py-3 text-gray-700">${log.date}</td>
+                        <td class="px-4 py-3 text-gray-700">${log.firstCheckIn}</td>
+                        <td class="px-4 py-3 text-gray-700">
+                            <span class="bg-orange-100 text-orange-700 text-xs font-medium px-2 py-0.5 rounded-full">
+                                ${log.totalCheckIns}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <button class="viewCheckinsBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition" 
+                                data-student-name="${log.studentName}" 
+                                data-date="${log.date}"
+                                data-checkins='${JSON.stringify(log.allCheckIns)}'>
+                                <i class="ph ph-eye text-base"></i>
+                                <span>View All</span>
+                            </button>
+                        </td>
+                    `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(err => {
+                    console.error("Failed to fetch logs:", err);
+                    tableBody.innerHTML = '';
+                    tableBody.appendChild(noRecordsRow);
+                    noRecordsRow.classList.remove('hidden');
+                    noRecordsRow.querySelector('td').textContent = 'Error loading data. Please try again.';
+                });
+        }
+
+        function formatTo12Hour(dateStr, timeStr) {
+            try {
+                const dateTime = new Date(`${dateStr}T${timeStr}`);
+                return dateTime.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            } catch (e) {
+                console.warn("Could not format time:", timeStr);
+                return timeStr;
+            }
+        }
+
+        function groupLogs(logs) {
+            const studentMap = {};
+            logs.forEach(log => {
+                const key = `${log.studentNumber}-${log.date}`;
+                const checkInTime = formatTo12Hour(log.date, log.time);
+
+                if (!studentMap[key]) {
+                    studentMap[key] = {
+                        studentName: log.studentName,
+                        studentNumber: log.studentNumber,
+                        date: log.date,
+                        firstCheckIn: checkInTime,
+                        totalCheckIns: 1,
+                        allCheckIns: [checkInTime]
+                    };
+                } else {
+                    studentMap[key].totalCheckIns++;
+                    studentMap[key].allCheckIns.push(checkInTime);
+                }
+            });
+            return Object.values(studentMap);
+        }
+
+        function closeCheckinsModal() {
+            checkinsModal.classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
+
+        [closeCheckinsBtn1, closeCheckinsBtn2].forEach(btn => btn?.addEventListener("click", closeCheckinsModal));
+        checkinsModal?.addEventListener("click", e => {
+            if (e.target === checkinsModal) closeCheckinsModal();
+        });
+
+        tableBody.addEventListener("click", (e) => {
+            const viewBtn = e.target.closest(".viewCheckinsBtn");
+            if (viewBtn) {
+                const studentName = viewBtn.dataset.studentName;
+                const date = viewBtn.dataset.date;
+                const checkins = JSON.parse(viewBtn.dataset.checkins);
+
+                checkinsModalTitle.textContent = `Check-ins for: ${studentName}`;
+                checkinsModalSubtitle.textContent = `Date: ${date}`;
+                checkinsList.innerHTML = '';
+
+                checkins.forEach((time, index) => {
+                checkinsList.innerHTML += `
+                    <div class="flex justify-between items-center bg-orange-50 border border-orange-200 px-3 py-2 rounded-lg">
+                        <p class="font-medium text-gray-800 text-sm">Check-in #${index + 1}</p>
+                        <span class="text-sm font-semibold text-orange-700">${time}</span>
+                    </div>
+                    `;
+                });
+                checkinsModal.classList.remove("hidden");
+                document.body.classList.add("overflow-hidden");
+            }
+        });
+
+        fetchLogs(); 
+    });
+</script>

@@ -52,8 +52,6 @@ class RouteConfig
          */
         // Librarian Sidebar Page Navigation Display
         $router->get('librarian/dashboard', 'SidebarController@librarianDashboard', ['librarian']);
-        $router->get('librarian/userManagement', 'SidebarController@librarianUserManagement', ['librarian']);
-        $router->get('librarian/features', 'SidebarController@librarianFeatures', ['librarian']);
         $router->get('librarian/bookManagement', 'SidebarController@librarianBookManagement', ['librarian']);
         $router->get('librarian/equipmentManagement', 'SidebarController@librarianEquipmentManagement', ['librarian']);
         $router->get('librarian/qrScanner', 'SidebarController@librarianQrScanner', ['librarian']);
@@ -67,8 +65,6 @@ class RouteConfig
 
         // Admin Sidebar Page Navigation Display
         $router->get('admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
-        $router->get('admin/userManagement', 'SidebarController@adminUserManagement', ['admin']);
-        $router->get('admin/features', 'SidebarController@adminFeatures', ['admin']);
         $router->get('admin/bookManagement', 'SidebarController@adminBookManagement', ['admin']);
         $router->get('admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['admin']);
         $router->get('admin/qrScanner', 'SidebarController@adminQrScanner', ['admin']);
@@ -83,7 +79,6 @@ class RouteConfig
         // Super Admin Sidebar Page Navigation Display
         $router->get('superadmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
         $router->get('superadmin/userManagement', 'SidebarController@userManagement', ['superadmin']);
-        $router->get('superadmin/features', 'SidebarController@features', ['superadmin']);
         $router->get('superadmin/bookManagement', 'SidebarController@bookManagement', ['superadmin']);
         $router->get('superadmin/equipmentManagement', 'SidebarController@equipmentManagement', ['superadmin']);
         $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);

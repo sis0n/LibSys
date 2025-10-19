@@ -695,28 +695,75 @@
         setupDropdownToggle("editStatusDropdownBtn", "editStatusDropdownMenu");
 
         document.addEventListener("click", () => {
-            document.querySelectorAll('.absolute.mt-1').forEach(menu => menu.classList.add('hidden'));
+            document.querySelectorAll(".absolute.mt-1, .absolute.mt-1.w-full, .absolute.w-full").forEach(menu => menu.classList.add("hidden"));
         });
 
+        function setActiveOption(containerId, selectedElement) {
+            // remove highlight only inside this container
+            const items = document.querySelectorAll(
+                `#${containerId} .dropdown-item, #${containerId} .role-item, #${containerId} .status-item`
+            );
+            items.forEach(item => item.classList.remove("bg-orange-50", "font-semibold", "text-orange-700"));
+
+            // add highlight to the selected element (if exists)
+            if (selectedElement && selectedElement.classList) {
+                selectedElement.classList.add("bg-orange-50", "font-semibold", "text-orange-700");
+            }
+        }
+
         window.selectRole = (el, val) => {
-            document.getElementById('roleDropdownValue').textContent = val;
-            selectedRole = val;
-            applyFilters();
+            const valueEl = document.getElementById("roleDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("roleDropdownMenu", el);
+            if (typeof applyFilters === "function") applyFilters();
         };
+
         window.selectStatus = (el, val) => {
-            document.getElementById('statusDropdownValue').textContent = val;
-            selectedStatus = val;
-            applyFilters();
+            const valueEl = document.getElementById("statusDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("statusDropdownMenu", el);
+            if (typeof applyFilters === "function") applyFilters();
         };
+
         window.selectUserRole = (el, val) => {
-            document.getElementById('userRoleDropdownValue').textContent = val;
+            const valueEl = document.getElementById("userRoleDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("userRoleDropdownMenu", el);
         };
+
         window.selectEditRole = (el, val) => {
-            document.getElementById('editRoleDropdownValue').textContent = val;
+            const valueEl = document.getElementById("editRoleDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("editRoleDropdownMenu", el);
         };
+
         window.selectEditStatus = (el, val) => {
-            document.getElementById('editStatusDropdownValue').textContent = val;
+            const valueEl = document.getElementById("editStatusDropdownValue");
+            if (valueEl) valueEl.textContent = val;
+            setActiveOption("editStatusDropdownMenu", el);
         };
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const allRolesFirst = document.querySelector("#roleDropdownMenu .dropdown-item, #roleDropdownMenu .role-item");
+            if (allRolesFirst) {
+                setActiveOption("roleDropdownMenu", allRolesFirst);
+                const roleVal = allRolesFirst.textContent?.trim();
+                if (roleVal) {
+                    const roleValueEl = document.getElementById("roleDropdownValue");
+                    if (roleValueEl) roleValueEl.textContent = roleVal;
+                }
+            }
+
+            const allStatusFirst = document.querySelector("#statusDropdownMenu .status-item, #statusDropdownMenu .dropdown-item");
+            if (allStatusFirst) {
+                setActiveOption("statusDropdownMenu", allStatusFirst);
+                const statusVal = allStatusFirst.textContent?.trim();
+                if (statusVal) {
+                    const statusValueEl = document.getElementById("statusDropdownValue");
+                    if (statusValueEl) statusValueEl.textContent = statusVal;
+                }
+            }
+        });
 
         // --- DATA FETCHING AND RENDERING ---
         async function loadUsers() {

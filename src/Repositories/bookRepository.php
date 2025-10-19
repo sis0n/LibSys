@@ -122,7 +122,8 @@ class BookRepository
     int $offset,
     string $search = '',
     string $category = '',
-    string $status = ''
+    string $status = '',
+    string $sort = 'default'
   ): array {
     $limit = max(1, min($limit, 100));
     $offset = max(0, $offset);
@@ -144,17 +145,34 @@ class BookRepository
       $params[] = $category;
     }
 
-    if ($status !== '' && $status !== 'All Status') {
+    if ($status !== '' && strtolower($status) !== 'all status') {
       $query .= " AND availability = ?";
       $params[] = strtolower($status);
     }
 
-    $query .= " ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+    $orderBy = "ORDER BY created_at DESC";
+    switch ($sort) {
+      case 'title_asc':
+        $orderBy = "ORDER BY title ASC";
+        break;
+      case 'title_desc':
+        $orderBy = "ORDER BY title DESC";
+        break;
+      case 'year_asc':
+        $orderBy = "ORDER BY year ASC, title ASC";
+        break;
+      case 'year_desc':
+        $orderBy = "ORDER BY year DESC, title ASC";
+        break;
+    }
+
+    $query .= " " . $orderBy . " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
 
     $stmt = $this->db->prepare($query);
+
     $stmt->execute($params);
 
-    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC); // Fetch results
   }
 
   public function countAvailableBooks(): int

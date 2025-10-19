@@ -82,13 +82,21 @@ class BookController extends Controller
 
   public function fetch()
   {
-    $search = $_GET['search'] ?? '';
-    $offset = (int)($_GET['offset'] ?? 0);
-    $limit  = (int)($_GET['limit'] ?? 30);
-    $category = $_GET['category'] ?? '';
+    $search   = $_GET['search'] ?? '';
+    $offset   = (int)($_GET['offset'] ?? 0);
+    $limit    = (int)($_GET['limit'] ?? 30);
+    $category = $_GET['category'] ?? ''; 
     $status   = $_GET['status'] ?? '';
+    $sort     = $_GET['sort'] ?? 'default'; 
 
-    $books = $this->bookRepo->getPaginatedFiltered($limit, $offset, $search, $category, $status);
+    $books = $this->bookRepo->getPaginatedFiltered(
+      $limit,
+      $offset,
+      $search,
+      $category,
+      $status,
+      $sort 
+    );
 
     $totalCount = $this->bookRepo->countPaginatedFiltered($search, $category, $status);
 
@@ -107,5 +115,4 @@ class BookController extends Controller
     header('Content-Type: application/json');
     echo json_encode(['available' => $count]);
   }
-  
 }

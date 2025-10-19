@@ -205,7 +205,7 @@
         <div class="flex items-center text-sm">
             <div class="relative w-[330px]">
                 <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                <input type="text" id="userSearchInput" placeholder="Search by title, author, ISBN, Accession #..."
+                <input type="text" id="userSearchInput" placeholder="Search"
                     class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-full focus:ring-1 focus:ring-orange-300">
             </div>
 

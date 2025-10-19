@@ -271,4 +271,22 @@ class UserRepository
     ");
     return $stmt->execute([':id' => $userId]);
   }
+
+  public function updatePassword(int $userId, string $hashedPassword): bool
+  {
+    try{
+      $stmt = $this->db->prepare("
+        UPDATE users
+        SET password = :password, updated_at = NOW()
+        WHERE user_id = :user_id AND deleted_at IS NULL
+      ");
+      return $stmt->execute([
+        ':password' => $hashedPassword,
+        ':user_id' => $userId
+      ]);
+    } catch (\PDOException $e) {
+      error_log("[UserRepository::updatePassword]" . $e->getMessage());
+      return false;
+    }
+  }
 }

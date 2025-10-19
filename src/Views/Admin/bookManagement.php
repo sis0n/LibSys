@@ -213,33 +213,36 @@
             <div class="relative inline-block text-left ml-3">
                 <button id="sortDropdownBtn"
                     class="border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between gap-2 w-44 hover:bg-orange-50 transition">
-                    <span id="sortDropdownValue">Relevance</span>
+                    <span class="flex items-center gap-2 text-gray-700">
+                        <i class="ph ph-sort-ascending text-gray-500"></i>
+                        <span id="sortDropdownValue">Default Order</span>
+                    </span>
                     <i class="ph ph-caret-down text-xs"></i>
                 </button>
 
                 <div id="sortDropdownMenu"
                     class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Relevance')">Relevance</div>
+                        onclick="selectSort(this, 'Default Order')">Default Order</div>
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Title (ascending)')">Title (ascending)</div>
+                        onclick="selectSort(this, 'Title (ascending)')">Title (A-Z)</div>
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Title (descending)')">Title (descending)</div>
-                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Author (ascending)')">Author (ascending)</div>
-                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Author (descending)')">Author (descending)</div>
-                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Year (oldest)')">Year (oldest)</div>
+                        onclick="selectSort(this, 'Title (descending)')">Title (Z-A)</div>
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
                         onclick="selectSort(this, 'Year (newest)')">Year (newest)</div>
+                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectSort(this, 'Year (oldest)')">Year (oldest)</div>
+
                 </div>
             </div>
             <!-- STATUS DROPDOWN -->
             <div class="relative inline-block text-left ml-3">
                 <button id="statusDropdownBtn"
                     class="border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between gap-2 w-36 hover:bg-orange-50 transition">
-                    <span id="statusDropdownValue">All Status</span>
+                    <span>
+                        <i class="ph ph-check-circle text-gray-500"></i>
+                        <span id="statusDropdownValue">All Status</span>
+                    </span>
                     <i class="ph ph-caret-down text-xs"></i>
                 </button>
                 <div id="statusDropdownMenu"
@@ -388,135 +391,135 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // ==========================
-        // ELEMENT REFERENCES
-        // ==========================
-        const importModal = document.getElementById("importModal");
-        const bulkImportBtn = document.getElementById("bulkImportBtn");
-        const closeImportModal = document.getElementById("closeImportModal");
-        const cancelImport = document.getElementById("cancelImport");
+document.addEventListener("DOMContentLoaded", () => {
+    // ==========================
+    // ELEMENT REFERENCES
+    // ==========================
+    const importModal = document.getElementById("importModal");
+    const bulkImportBtn = document.getElementById("bulkImportBtn");
+    const closeImportModal = document.getElementById("closeImportModal");
+    const cancelImport = document.getElementById("cancelImport");
 
-        const addBookModal = document.getElementById("addBookModal");
-        const openAddBookBtn = document.getElementById("openAddBookBtn");
-        const closeAddBookModal = document.getElementById("closeAddBookModal");
-        const cancelAddBook = document.getElementById("cancelAddBook");
+    const addBookModal = document.getElementById("addBookModal");
+    const openAddBookBtn = document.getElementById("openAddBookBtn");
+    const closeAddBookModal = document.getElementById("closeAddBookModal");
+    const cancelAddBook = document.getElementById("cancelAddBook");
 
-        const editBookModal = document.getElementById("editBookModal");
-        const closeEditBookModal = document.getElementById("closeEditBookModal");
-        const cancelEditBook = document.getElementById("cancelEditBook");
-        const editBookForm = document.getElementById("editBookForm");
+    const editBookModal = document.getElementById("editBookModal");
+    const closeEditBookModal = document.getElementById("closeEditBookModal");
+    const cancelEditBook = document.getElementById("cancelEditBook");
+    const editBookForm = document.getElementById("editBookForm");
 
-        // ==========================
-        // UNIVERSAL MODAL HELPERS
-        // ==========================
-        function openModal(modal) {
-            modal.classList.remove("hidden");
-            document.body.classList.add("overflow-hidden");
-        }
+    // ==========================
+    // UNIVERSAL MODAL HELPERS
+    // ==========================
+    function openModal(modal) {
+        modal.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+    }
 
-        function closeModal(modal) {
-            modal.classList.add("hidden");
-            document.body.classList.remove("overflow-hidden");
-        }
+    function closeModal(modal) {
+        modal.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+    }
 
-        // ==========================
-        // BULK IMPORT
-        // ==========================
-        bulkImportBtn?.addEventListener("click", () => openModal(importModal));
-        closeImportModal?.addEventListener("click", () => closeModal(importModal));
-        cancelImport?.addEventListener("click", () => closeModal(importModal));
-        importModal?.addEventListener("click", e => {
-            if (e.target === importModal) closeModal(importModal);
+    // ==========================
+    // BULK IMPORT
+    // ==========================
+    bulkImportBtn?.addEventListener("click", () => openModal(importModal));
+    closeImportModal?.addEventListener("click", () => closeModal(importModal));
+    cancelImport?.addEventListener("click", () => closeModal(importModal));
+    importModal?.addEventListener("click", e => {
+        if (e.target === importModal) closeModal(importModal);
+    });
+
+    // ==========================
+    // ADD BOOK
+    // ==========================
+    openAddBookBtn?.addEventListener("click", () => openModal(addBookModal));
+    closeAddBookModal?.addEventListener("click", () => closeModal(addBookModal));
+    cancelAddBook?.addEventListener("click", () => closeModal(addBookModal));
+    addBookModal?.addEventListener("click", e => {
+        if (e.target === addBookModal) closeModal(addBookModal);
+    });
+
+    // ==========================
+    // EDIT BOOK
+    // ==========================
+    closeEditBookModal?.addEventListener("click", () => closeModal(editBookModal));
+    cancelEditBook?.addEventListener("click", () => closeModal(editBookModal));
+
+    // ==========================
+    // DROPDOWN LOGIC
+    // ==========================
+    function setupDropdown(btnId, menuId) {
+        const btn = document.getElementById(btnId);
+        const menu = document.getElementById(menuId);
+        if (!btn || !menu) return;
+
+        btn.addEventListener("click", e => {
+            e.stopPropagation();
+            menu.classList.toggle("hidden");
         });
 
-        // ==========================
-        // ADD BOOK
-        // ==========================
-        openAddBookBtn?.addEventListener("click", () => openModal(addBookModal));
-        closeAddBookModal?.addEventListener("click", () => closeModal(addBookModal));
-        cancelAddBook?.addEventListener("click", () => closeModal(addBookModal));
-        addBookModal?.addEventListener("click", e => {
-            if (e.target === addBookModal) closeModal(addBookModal);
-        });
+        document.addEventListener("click", () => menu.classList.add("hidden"));
+    }
 
-        // ==========================
-        // EDIT BOOK
-        // ==========================
-        closeEditBookModal?.addEventListener("click", () => closeModal(editBookModal));
-        cancelEditBook?.addEventListener("click", () => closeModal(editBookModal));
+    // Initialize both dropdowns
+    setupDropdown("statusDropdownBtn", "statusDropdownMenu");
+    setupDropdown("sortDropdownBtn", "sortDropdownMenu");
 
-        // ==========================
-        // DROPDOWN LOGIC
-        // ==========================
-        function setupDropdown(btnId, menuId) {
-            const btn = document.getElementById(btnId);
-            const menu = document.getElementById(menuId);
-            if (!btn || !menu) return;
+    // ==========================
+    // SAMPLE BOOK DATA
+    // ==========================
+    let books = [{
+            title: "Book Title",
+            author: "By: Author",
+            accessionnumber: "1714",
+            callnumber: "A 536 M4661 1908",
+            ibsn: "1561343455",
+            year: 2004,
+            status: "available"
+        },
+        {
+            title: "asfddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            author: "By: asfdddddddddd ddddddddddddddd ddddddddddddddddddddddd dddddddddddddddddddddddd ddddddddddddddd",
+            accessionnumber: "1714",
+            callnumber: "A 536 M4661 1908",
+            ibsn: "1561343455",
+            year: 2004,
+            status: "available"
+        },
+        {
+            title: "Book Title",
+            author: "By: Author",
+            accessionnumber: "1714",
+            callnumber: "A 536 M4661 1908",
+            ibsn: "1561343455",
+            year: 2004,
+            status: "available"
+        },
+        {
+            title: "Book Title",
+            author: "By: Author",
+            accessionnumber: "1714",
+            callnumber: "A 536 M4661 1908",
+            ibsn: "1561343455",
+            year: 2004,
+            status: "available"
+        },
+    ];
 
-            btn.addEventListener("click", e => {
-                e.stopPropagation();
-                menu.classList.toggle("hidden");
-            });
+    let editingIndex = null;
 
-            document.addEventListener("click", () => menu.classList.add("hidden"));
-        }
-
-        // Initialize both dropdowns
-        setupDropdown("statusDropdownBtn", "statusDropdownMenu");
-        setupDropdown("sortDropdownBtn", "sortDropdownMenu");
-
-        // ==========================
-        // SAMPLE BOOK DATA
-        // ==========================
-        let books = [{
-                title: "Book Title",
-                author: "By: Author",
-                accessionnumber: "1714",
-                callnumber: "A 536 M4661 1908",
-                ibsn: "1561343455",
-                year: 2004,
-                status: "available"
-            },
-            {
-                title: "asfddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-                author: "By: asfdddddddddd ddddddddddddddd ddddddddddddddddddddddd dddddddddddddddddddddddd ddddddddddddddd",
-                accessionnumber: "1714",
-                callnumber: "A 536 M4661 1908",
-                ibsn: "1561343455",
-                year: 2004,
-                status: "available"
-            },
-            {
-                title: "Book Title",
-                author: "By: Author",
-                accessionnumber: "1714",
-                callnumber: "A 536 M4661 1908",
-                ibsn: "1561343455",
-                year: 2004,
-                status: "available"
-            },
-            {
-                title: "Book Title",
-                author: "By: Author",
-                accessionnumber: "1714",
-                callnumber: "A 536 M4661 1908",
-                ibsn: "1561343455",
-                year: 2004,
-                status: "available"
-            },
-        ];
-
-        let editingIndex = null;
-
-        // ==========================
-        // RENDER FUNCTION
-        // ==========================
-        const renderBooks = () => {
-            const tbody = document.getElementById("bookTableBody");
-            tbody.innerHTML = "";
-            if (books.length === 0) {
-                tbody.innerHTML = `
+    // ==========================
+    // RENDER FUNCTION
+    // ==========================
+    const renderBooks = () => {
+        const tbody = document.getElementById("bookTableBody");
+        tbody.innerHTML = "";
+        if (books.length === 0) {
+            tbody.innerHTML = `
                 <tr>
                     <td colspan="6" class="py-10 text-center">
                         <div class="flex flex-col items-center justify-center text-gray-500">
@@ -527,20 +530,20 @@
                     </td>
                 </tr>
             `;
-                document.getElementById("bookCount").textContent = 0;
-                document.getElementById("bookTotal").textContent = 0;
-                return;
-            }
+            document.getElementById("bookCount").textContent = 0;
+            document.getElementById("bookTotal").textContent = 0;
+            return;
+        }
 
-            books.forEach((book, index) => {
-                const statusColor =
-                    book.status === "available" ?
-                    "bg-green-600" :
-                    book.status === "borrowed" ?
-                    "bg-orange-500" :
-                    "bg-gray-600";
+        books.forEach((book, index) => {
+            const statusColor =
+                book.status === "available" ?
+                "bg-green-600" :
+                book.status === "borrowed" ?
+                "bg-orange-500" :
+                "bg-gray-600";
 
-                tbody.innerHTML += `
+            tbody.innerHTML += `
                 <tr>
                     <td class="py-3 px-4">
                         <div class="max-w-[240px] ">
@@ -568,44 +571,44 @@
                     </td>
                 </tr>`;
 
-            });
-
-            document.getElementById("bookCount").textContent = books.length;
-            document.getElementById("bookTotal").textContent = books.length;
-        };
-
-        // ==========================
-        // EDIT FUNCTION
-        // ==========================
-        window.editBook = index => {
-            const book = books[index];
-            editingIndex = index;
-
-            document.getElementById("edit_accession_number").value = book.accessionnumber || "";
-            document.getElementById("edit_call_number").value = book.callnumber || "";
-            document.getElementById("edit_title").value = book.title || "";
-            document.getElementById("edit_author").value = book.author || "";
-            document.getElementById("edit_book_isbn").value = book.ibsn || "";
-            document.getElementById("edit_year").value = book.year || "";
-
-
-            openModal(editBookModal);
-        };
-
-        editBookForm?.addEventListener("submit", e => {
-            e.preventDefault();
-            if (editingIndex === null) return;
-
-            books[editingIndex].title = document.getElementById("edit_title").value.trim();
-            books[editingIndex].author = document.getElementById("edit_author").value.trim();
-            books[editingIndex].year = document.getElementById("edit_year").value.trim();
-            closeModal(editBookModal);
-            renderBooks();
         });
 
-        // ==========================
-        // INIT
-        // ==========================
+        document.getElementById("bookCount").textContent = books.length;
+        document.getElementById("bookTotal").textContent = books.length;
+    };
+
+    // ==========================
+    // EDIT FUNCTION
+    // ==========================
+    window.editBook = index => {
+        const book = books[index];
+        editingIndex = index;
+
+        document.getElementById("edit_accession_number").value = book.accessionnumber || "";
+        document.getElementById("edit_call_number").value = book.callnumber || "";
+        document.getElementById("edit_title").value = book.title || "";
+        document.getElementById("edit_author").value = book.author || "";
+        document.getElementById("edit_book_isbn").value = book.ibsn || "";
+        document.getElementById("edit_year").value = book.year || "";
+
+
+        openModal(editBookModal);
+    };
+
+    editBookForm?.addEventListener("submit", e => {
+        e.preventDefault();
+        if (editingIndex === null) return;
+
+        books[editingIndex].title = document.getElementById("edit_title").value.trim();
+        books[editingIndex].author = document.getElementById("edit_author").value.trim();
+        books[editingIndex].year = document.getElementById("edit_year").value.trim();
+        closeModal(editBookModal);
         renderBooks();
     });
+
+    // ==========================
+    // INIT
+    // ==========================
+    renderBooks();
+});
 </script>

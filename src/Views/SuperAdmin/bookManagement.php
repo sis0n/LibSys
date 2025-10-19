@@ -213,22 +213,18 @@
             <div class="relative inline-block text-left ml-3">
                 <button id="sortDropdownBtn"
                     class="border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between gap-2 w-44 hover:bg-orange-50 transition">
-                    <span id="sortDropdownValue">Relevance</span>
+                    <span id="sortDropdownValue">Default Order</span>
                     <i class="ph ph-caret-down text-xs"></i>
                 </button>
 
                 <div id="sortDropdownMenu"
                     class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Relevance')">Relevance</div>
+                        onclick="selectSort(this, 'Default Order')">Default Order</div>
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Title (ascending)')">Title (ascending)</div>
+                        onclick="selectSort(this, 'Title (ascending)')">Title (A-Z)</div>
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Title (descending)')">Title (descending)</div>
-                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Author (ascending)')">Author (ascending)</div>
-                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Author (descending)')">Author (descending)</div>
+                        onclick="selectSort(this, 'Title (descending)')">Title (Z-A)</div>
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
                         onclick="selectSort(this, 'Year (oldest)')">Year (oldest)</div>
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"

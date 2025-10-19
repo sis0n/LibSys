@@ -556,7 +556,7 @@
                             ${book.status || 'N/A'}
                         </span>
                     </td>
-                    <td class="py-3 px-4 text-center space-x-2">
+                    <td class="py-3 px-4 text-center">
                         <button onclick="editBook(${index})"
                             class="border border-orange-300 text-orange-700 px-2 py-1 rounded hover:bg-orange-100">
                             <i class='ph ph-pencil'></i>

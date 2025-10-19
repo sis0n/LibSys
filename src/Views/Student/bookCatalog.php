@@ -473,66 +473,73 @@
                     return;
                 }
                 paginationControls.style.display = "flex";
-                paginationList.innerHTML = '';
+                paginationList.innerHTML = "";
+
                 const createPageLink = (type, text, pageNum, isDisabled = false, isActive = false) => {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.href = '#';
-                    a.setAttribute('data-page', String(pageNum));
-                    let baseClasses = `flex items-center justify-center px-3 h-8 leading-tight transition-colors duration-200`;
-                    if (type === 'prev' || type === 'next') {
+                    const li = document.createElement("li");
+                    const a = document.createElement("a");
+                    a.href = "#";
+                    a.setAttribute("data-page", String(pageNum));
+
+                    let baseClasses = `flex items-center justify-center min-w-[32px] h-9 text-sm font-medium transition-all duration-200`;
+
+                    if (type === "prev" || type === "next") {
                         a.innerHTML = text;
-                        baseClasses += ` ml-0 rounded-l-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700`;
-                        if (type === 'next') baseClasses = baseClasses.replace('rounded-l-lg', 'rounded-r-lg');
-                    } else if (type === 'ellipsis') {
+                        baseClasses += ` text-gray-700 hover:text-orange-600 px-3`;
+                        if (isDisabled)
+                            baseClasses += ` opacity-50 cursor-not-allowed pointer-events-none`;
+                    } else if (type === "ellipsis") {
                         a.textContent = text;
-                        baseClasses += ` border border-gray-300 bg-white text-gray-500 cursor-default`;
+                        baseClasses += ` text-gray-400 cursor-default px-2`;
                     } else {
                         a.textContent = text;
-                        baseClasses += ` border border-gray-300`;
-                        if (isActive) baseClasses += ` z-10 text-orange-600 border-orange-300 bg-orange-100 hover:bg-orange-200 hover:text-orange-700 font-semibold`;
-                        else baseClasses += ` bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700`;
+                        if (isActive) {
+                            baseClasses += ` text-white bg-orange-600 rounded-full shadow-sm px-3`;
+                        } else {
+                            baseClasses += ` text-gray-700 hover:text-orange-600 hover:bg-orange-100 rounded-full px-3`;
+                        }
                     }
+
                     a.className = baseClasses;
-                    if (isDisabled) {
-                        a.className += ` text-gray-400 bg-gray-100 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400`;
-                        a.setAttribute('tabindex', '-1');
-                        a.dataset.page = '...';
-                    } else if (type === 'ellipsis') {
-                        a.setAttribute('tabindex', '-1');
-                        a.dataset.page = '...';
-                    }
                     li.appendChild(a);
                     paginationList.appendChild(li);
                 };
-                createPageLink('prev', `<i class="ph ph-caret-left pointer-events-none"></i>`, page - 1, page === 1);
+
+                paginationControls.className = `
+                    flex items-center justify-center bg-white border border-gray-200 
+                        rounded-full shadow-md px-4 py-2 mt-6 w-fit mx-auto gap-3
+                    `;
+
+                createPageLink("prev", `<i class="flex ph ph-caret-left text-lg gap-2s"></i> Previous`, page - 1, page === 1);
+
                 const window = 2;
                 let pagesToShow = new Set([1, totalPages, page]);
                 for (let i = 1; i <= window; i++) {
                     if (page - i > 0) pagesToShow.add(page - i);
                     if (page + i <= totalPages) pagesToShow.add(page + i);
                 }
-                let sortedPages = [...pagesToShow].filter(p => p > 0 && p <= totalPages).sort((a, b) => a - b);
+
+                const sortedPages = [...pagesToShow].sort((a, b) => a - b);
                 let lastPage = 0;
                 for (const p of sortedPages) {
-                    if (p > lastPage + 1) createPageLink('ellipsis', '...', '...', true);
-                    createPageLink('number', p, p, false, p === page);
+                    if (p > lastPage + 1) createPageLink("ellipsis", "…", "...", true);
+                    createPageLink("number", p, p, false, p === page);
                     lastPage = p;
                 }
-                if (lastPage < totalPages - 1) createPageLink('ellipsis', '...', '...', true);
-                if (lastPage < totalPages && !sortedPages.includes(totalPages)) createPageLink('number', totalPages, totalPages, false, false);
-                createPageLink('next', `<i class="ph ph-caret-right pointer-events-none"></i>`, page + 1, page === totalPages);
+
+                createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg gap-2"></i>`, page + 1, page === totalPages);
             }
-            paginationList.addEventListener('click', (e) => {
+
+            paginationList.addEventListener("click", (e) => {
                 e.preventDefault();
-                if (isLoading) return;
-                const target = e.target.closest('a[data-page]');
+                const target = e.target.closest("a[data-page]");
                 if (!target) return;
                 const pageStr = target.dataset.page;
-                if (pageStr === '...') return;
+                if (pageStr === "...") return;
                 const page = parseInt(pageStr, 10);
                 if (!isNaN(page) && page !== currentPage) loadBooks(page);
             });
+
 
             async function loadAvailableCount() {
                 try {

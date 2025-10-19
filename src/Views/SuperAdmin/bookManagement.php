@@ -229,9 +229,10 @@
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
                         onclick="selectSort(this, 'Title (descending)')">Title (Z-A)</div>
                     <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
-                        onclick="selectSort(this, 'Year (oldest)')">Year (oldest)</div>
-                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
                         onclick="selectSort(this, 'Year (newest)')">Year (newest)</div>
+                    <div class="sort-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectSort(this, 'Year (oldest)')">Year (oldest)</div>
+
                 </div>
             </div>
             <!-- STATUS DROPDOWN -->

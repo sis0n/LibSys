@@ -11,12 +11,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const openAddBookBtn = document.getElementById("openAddBookBtn");
     const closeAddBookModal = document.getElementById("closeAddBookModal");
     const cancelAddBook = document.getElementById("cancelAddBook");
+    const input = document.getElementById('book_image');
+    const uploadText = document.getElementById('uploadText');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
 
     const editBookModal = document.getElementById("editBookModal");
     const closeEditBookModal = document.getElementById("closeEditBookModal");
     const cancelEditBook = document.getElementById("cancelEditBook");
     const editBookForm = document.getElementById("editBookForm");
+    const editInput = document.getElementById('edit_book_image');
+    const editUploadText = document.getElementById('editUploadText');
+    const editPreviewContainer = document.getElementById('editPreviewContainer');
+    const editPreviewImage = document.getElementById('editPreviewImage')
 
+    
+
+                    
     // ==========================
     // UNIVERSAL MODAL HELPERS
     // ==========================
@@ -48,6 +59,28 @@ document.addEventListener("DOMContentLoaded", () => {
     cancelAddBook?.addEventListener("click", () => closeModal(addBookModal));
     addBookModal?.addEventListener("click", e => {
         if (e.target === addBookModal) closeModal(addBookModal);
+    });
+
+    input.addEventListener('change', (e) => {
+        const file = e.target.files[0]; // Always only 1 file
+        if (file) {
+            // Reset any previous preview (ensures only one)
+            previewImage.src = "";
+            uploadText.textContent = 'Image Selected';
+            previewContainer.classList.remove('hidden');
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                previewImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            // Reset to default state
+            uploadText.textContent = 'Upload Image';
+            previewContainer.classList.add('hidden');
+            previewImage.src = '';
+        }
     });
 
     // ==========================
@@ -212,6 +245,28 @@ document.addEventListener("DOMContentLoaded", () => {
         closeModal(editBookModal);
         renderBooks();
     });
+    
+    editInput.addEventListener('change', (e) => {
+        const file = e.target.files[0]; 
+        if (file) {
+            editPreviewImage.src = "";
+            editUploadText.textContent = 'Image Selected';
+            editPreviewContainer.classList.remove('hidden');
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                editPreviewImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            // Reset to default state
+            editUploadText.textContent = 'Upload Image';
+            editPreviewContainer.classList.add('hidden');
+            editPreviewImage.src = '';
+        }
+    });
+
 
     // ==========================
     // INIT

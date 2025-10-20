@@ -178,6 +178,27 @@
                         <textarea id="description" rows="3"
                             class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition"></textarea>
                     </div>
+
+                    <!-- Cover -->
+                    <div class="flex flex-col">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Book Image</label>
+
+                        <label for="book_image"
+                            class="cursor-pointer flex items-center justify-center gap-2 w-full text-orange-700 border border-orange-200 rounded-md px-3 py-2 text-sm font-medium hover:bg-orange-100 transition">
+                            <i class="ph ph-image-square text-lg"></i>
+                            <span id="uploadText">Upload Image</span>
+                        </label>
+
+                        <input type="file" id="book_image" accept="image/*" class="hidden">
+
+                        <!-- Preview -->
+                        <div id="previewContainer" class="mt-2 hidden">
+                            <img id="previewImage"
+                                class="w-32 h-48 object-cover rounded-lg border border-orange-200 shadow-sm" />
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-1">Recommended image size: 400×600 (2:3 ratio)</p>
+                    </div>
                 </form>
                 <!-- Footer Buttons -->
                 <div class="flex justify-end gap-3 p-6 border-t border-[var(--color-border)] flex-shrink-0">
@@ -373,6 +394,25 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea id="edit_description" rows="3"
                     class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition"></textarea>
+            </div>
+            <div class="flex flex-col">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Book Image</label>
+
+                <label for="edit_book_image"
+                    class="cursor-pointer flex items-center justify-center gap-2 w-full text-orange-700 border border-orange-200 rounded-md px-3 py-2 text-sm font-medium hover:bg-orange-100 transition">
+                    <i class="ph ph-image-square text-lg"></i>
+                    <span id="editUploadText">Upload Image</span>
+                </label>
+
+                <input type="file" id="edit_book_image" accept="image/*" class="hidden">
+
+                <!-- Preview -->
+                <div id="editPreviewContainer" class="mt-2 hidden">
+                    <img id="editPreviewImage"
+                        class="w-32 h-48 object-cover rounded-lg border border-orange-200 shadow-sm" />
+                </div>
+
+                <p class="text-xs text-gray-500 mt-1">Recommended image size: 400×600 (2:3 ratio)</p>
             </div>
         </form>
 

@@ -390,4 +390,4 @@
     </div>
 </div>
 
-<script src="/libsys/public/js/Librarian/bookManagement.js" defer></script>>
+<script src="/libsys/public/js/Librarian/bookManagement.js" defer></script>

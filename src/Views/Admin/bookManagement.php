@@ -178,7 +178,6 @@
                         <textarea id="description" rows="3"
                             class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition"></textarea>
                     </div>
-
                     <!-- Cover -->
                     <div class="flex flex-col">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Book Image</label>
@@ -197,7 +196,8 @@
                                 class="w-32 h-48 object-cover rounded-lg border border-orange-200 shadow-sm" />
                         </div>
 
-                        <p class="text-xs text-gray-500 mt-1">Recommended image size: 400×600 (2:3 ratio)</p>
+                        <p class="text-xs text-gray-500 mt-1">Supported file types: JPG, PNG, or PDF only. <br>
+                            Recommended image size: 400×600 (2:3 ratio) </p>
                     </div>
                 </form>
                 <!-- Footer Buttons -->
@@ -289,7 +289,7 @@
                     <th class="py-3 px-4 font-medium">Author</th>
                     <th class="py-3 px-4 font-medium">Accession Number</th>
                     <th class="py-3 px-4 font-medium">Call Number</th>
-                    <th class="py-3 px-4 font-medium">IBSN</th>
+                    <th class="py-3 px-4 font-medium">ISBN</th>
                     <th class="py-3 px-4 font-medium">Status</th>
                     <th class="py-3 px-4 font-medium text-center">Actions</th>
                 </tr>
@@ -395,6 +395,8 @@
                 <textarea id="edit_description" rows="3"
                     class="w-full bg-[var(--color-input)] border border-[var(--color-border)] rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--color-ring)] outline-none transition"></textarea>
             </div>
+
+            <!-- Image Upload -->
             <div class="flex flex-col">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Book Image</label>
 
@@ -458,9 +460,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const editPreviewContainer = document.getElementById('editPreviewContainer');
     const editPreviewImage = document.getElementById('editPreviewImage')
 
-    
 
-                    
+
+
     // ==========================
     // UNIVERSAL MODAL HELPERS
     // ==========================
@@ -495,22 +497,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     input.addEventListener('change', (e) => {
-        const file = e.target.files[0]; // Always only 1 file
-        if (file) {
-            // Reset any previous preview (ensures only one)
-            previewImage.src = "";
-            uploadText.textContent = 'Image Selected';
-            previewContainer.classList.remove('hidden');
+        const file = e.target.files[0];
+        if (!file) return;
 
-            // Create preview
+        const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Invalid file type! Please upload only JPG, PNG, or PDF files.');
+            input.value = '';
+            uploadText.textContent = 'Upload Image';
+            previewContainer.classList.add('hidden');
+            previewImage.src = '';
+            return;
+        }
+        uploadText.textContent = 'File Selected';
+        if (file.type.startsWith('image/')) {
+            previewContainer.classList.remove('hidden');
             const reader = new FileReader();
-            reader.onload = (event) => {
-                previewImage.src = event.target.result;
-            };
+            reader.onload = (event) => (previewImage.src = event.target.result);
             reader.readAsDataURL(file);
         } else {
-            // Reset to default state
-            uploadText.textContent = 'Upload Image';
             previewContainer.classList.add('hidden');
             previewImage.src = '';
         }
@@ -678,23 +683,30 @@ document.addEventListener("DOMContentLoaded", () => {
         closeModal(editBookModal);
         renderBooks();
     });
-    
-    editInput.addEventListener('change', (e) => {
-        const file = e.target.files[0]; 
-        if (file) {
-            editPreviewImage.src = "";
-            editUploadText.textContent = 'Image Selected';
-            editPreviewContainer.classList.remove('hidden');
 
-            // Create preview
+    editInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert('Invalid file type! Please upload only JPG, PNG, or PDF files.');
+            editInput.value = ''; 
+            editUploadText.textContent = 'Upload Image';
+            editPreviewContainer.classList.add('hidden');
+            editPreviewImage.src = '';
+            return;
+        }
+
+        editUploadText.textContent = 'File Selected';
+
+        if (file.type.startsWith('image/')) {
+            editPreviewContainer.classList.remove('hidden');
             const reader = new FileReader();
-            reader.onload = (event) => {
-                editPreviewImage.src = event.target.result;
-            };
+            reader.onload = (event) => (editPreviewImage.src = event.target.result);
             reader.readAsDataURL(file);
         } else {
-            // Reset to default state
-            editUploadText.textContent = 'Upload Image';
             editPreviewContainer.classList.add('hidden');
             editPreviewImage.src = '';
         }
@@ -706,5 +718,4 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================
     renderBooks();
 });
-
 </script>

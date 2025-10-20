@@ -3,16 +3,19 @@
 namespace App\Controllers;
 
 use App\Repositories\AuthRepository;
+use App\Repositories\UserRepository;
 use App\Core\Controller;
 use App\Models\User;
 
 class AuthController extends Controller
 {
     private $AuthRepository;
+    private $UserRepository;
 
     public function __construct()
     {
         $this->AuthRepository = new AuthRepository();
+        $this->UserRepository = new UserRepository();
     }
 
     public function showLogin()
@@ -175,10 +178,7 @@ class AuthController extends Controller
         header("Location: /libsys/public/login");
     }
 
-
-
     // forgot password
-
     public function forgotPassword()
     {
         session_start();
@@ -189,5 +189,85 @@ class AuthController extends Controller
             "title" => "Forgot Password",
             "csrf_token" => $_SESSION['csrf_token']
         ], false);
+    }
+
+    public function changePassword()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid request method.'
+            ]);
+            exit;
+        }
+
+        if (empty($_SESSION['user_id'])) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'You must be logged in to change your password.'
+            ]);
+            exit;
+        }
+
+        $userId = $_SESSION['user_id'];
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'All password fields are required.'
+            ]);
+            exit;
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'New passwords do not match.'
+            ]);
+            exit;
+        }
+
+        // get user record
+        $user = $this->UserRepository->getUserById($userId);
+
+        if (!$user) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'User not found.'
+            ]);
+            exit;
+        }
+
+        // fetch the full user record (para may password hash)
+        $userRepo = new UserRepository();
+        $userData = $userRepo->findByIdentifier($user['username']);
+
+        if (!$userData || !password_verify($currentPassword, $userData['password'])) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Current password is incorrect.'
+            ]);
+            exit;
+        }
+
+        // update password 
+        $changed = $this->AuthRepository->changePassword($userId, $newPassword);
+
+        if ($changed) {
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Your password has been successfully updated.'
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Something went wrong while changing your password.'
+            ]);
+        }
     }
 }

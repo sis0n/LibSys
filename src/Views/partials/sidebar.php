@@ -154,15 +154,6 @@ switch ($role) {
                 <span>User Management</span>
             </a>
 
-            <!-- Features -->
-            <a href="/LibSys/public/superadmin/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'features'
-                    ? 'bg-green-600 text-white font-medium'
-                    : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-gear-six text-2xl"></i>
-                <span>Features</span>
-            </a>
-
             <!-- Book Management -->
             <a href="/LibSys/public/superadmin/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'bookManagement'
@@ -266,24 +257,6 @@ switch ($role) {
                 <span>Dashboard</span>
             </a>
 
-            <!-- User Management -->
-            <a href="/LibSys/public/admin/userManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'userManagement'
-                    ? 'bg-green-600 text-white font-medium'
-                    : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-users-three text-2xl"></i>
-                <span>User Management</span>
-            </a>
-
-            <!-- Features -->
-            <a href="/LibSys/public/admin/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'features'
-                    ? 'bg-green-600 text-white font-medium'
-                    : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-gear-six text-2xl"></i>
-                <span>Features</span>
-            </a>
-
             <!-- Book Management -->
             <a href="/LibSys/public/admin/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
                 <?= $currentPage === 'bookManagement'
@@ -385,24 +358,6 @@ switch ($role) {
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-house text-2xl"></i>
                 <span>Dashboard</span>
-            </a>
-
-            <!-- User Management -->
-            <a href="/LibSys/public/librarian/userManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'userManagement'
-                    ? 'bg-green-600 text-white font-medium'
-                    : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-users-three text-2xl"></i>
-                <span>User Management</span>
-            </a>
-
-            <!-- Features -->
-            <a href="/LibSys/public/librarian/features" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'features'
-                    ? 'bg-green-600 text-white font-medium'
-                    : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-gear-six text-2xl"></i>
-                <span>Features</span>
             </a>
 
             <!-- Book Management -->

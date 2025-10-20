@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Core\Database;
 
-class BookRepository
+class BookCatalogRepository
 {
   private $db;
 

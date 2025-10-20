@@ -147,8 +147,8 @@ class RouteConfig
 
 
 
-        $router->get('student/bookCatalog/availableCount', 'BookController@getAvailableCount', ['student']);
-        $router->get('student/bookCatalog/fetch', 'BookController@fetch', ['student']);
+        $router->get('student/bookCatalog/availableCount', 'BookCatalogController@getAvailableCount', ['student']);
+        $router->get('student/bookCatalog/fetch', 'BookCatalogController@fetch', ['student']);
 
         //change password
         $router->post('/change-password', 'AuthController@changePassword');

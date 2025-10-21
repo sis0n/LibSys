@@ -1,4 +1,4 @@
-<body class="min-h-screen p-6 bg-gray-50">
+<div class="min-h-screen p-6">
     <div class="mb-6">
         <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
             <i class="ph ph-user-circle text-gray-700"></i> My Profile
@@ -35,6 +35,7 @@
                     <p class="font-medium text-gray-800">sarah.chen@university.edu</p>
                 </div>
             </div>
+
             <div class="flex items-center gap-3">
                 <i class="ph ph-calendar-blank text-xl text-gray-600"></i>
                 <div>
@@ -60,4 +61,4 @@
             </button>
         </div>
     </div>
-</body>
+</div>

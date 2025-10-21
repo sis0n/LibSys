@@ -164,6 +164,41 @@ ALTER TABLE students ADD COLUMN deleted_by INT NULL;
 ALTER TABLE users ADD COLUMN updated_at DATETIME NULL;
 
 
+CREATE TABLE `deleted_books` (
+  `deleted_book_id` int(11) NOT NULL AUTO_INCREMENT,
+  `book_id` int(11) NOT NULL,
+  `accession_number` varchar(50) NOT NULL,
+  `call_number` varchar(50) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `author` varchar(255) DEFAULT NULL,
+  `book_place` varchar(150) DEFAULT NULL,
+  `book_publisher` varchar(150) DEFAULT NULL,
+  `year` year(4) DEFAULT NULL,
+  `book_edition` varchar(50) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `book_isbn` varchar(50) DEFAULT NULL,
+  `book_supplementary` varchar(255) DEFAULT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `availability` enum('available','borrowed') DEFAULT 'available',
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `cover` varchar(255) DEFAULT NULL,
+  `deleted_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`deleted_book_id`),
+  KEY `idx_original_book_id` (`book_id`),
+  KEY `idx_deleted_accession` (`accession_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE `books`
+  ADD COLUMN `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP AFTER `cover`,
+  ADD COLUMN `updated_by` INT(11) NULL DEFAULT NULL AFTER `updated_at`,
+  ADD COLUMN `deleted_at` TIMESTAMP NULL DEFAULT NULL AFTER `updated_by`,
+  ADD COLUMN `deleted_by` INT(11) NULL DEFAULT NULL AFTER `deleted_at`;
+  
+ALTER TABLE `deleted_books`
+ADD COLUMN `deleted_by` INT(11) NULL DEFAULT NULL AFTER `deleted_at`;
+
+
 
 
 

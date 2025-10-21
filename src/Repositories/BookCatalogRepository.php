@@ -15,14 +15,14 @@ class BookCatalogRepository
 
   public function getAllBooks()
   {
-    $stmt = $this->db->prepare("SELECT * FROM books ORDER BY created_at DESC");
+    $stmt = $this->db->prepare("SELECT * FROM books WHERE deleted_at IS NULL ORDER BY created_at DESC");
     $stmt->execute();
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
 
   public function getBookById($id)
   {
-    $stmt = $this->db->prepare("SELECT * FROM books WHERE book_id = ?");
+    $stmt = $this->db->prepare("SELECT * FROM books WHERE book_id = ? AND deleted_at IS NULL");
     $stmt->execute([$id]);
     return $stmt->fetch(\PDO::FETCH_ASSOC);
   }
@@ -85,7 +85,7 @@ class BookCatalogRepository
 
   public function updateAvailability($id, $status)
   {
-    $stmt = $this->db->prepare("UPDATE books SET availability = ? WHERE book_id = ?");
+    $stmt = $this->db->prepare("UPDATE books SET availability = ? WHERE book_id = ? AND deleted_at IS NULL");
     return $stmt->execute([$status, $id]);
   }
 
@@ -95,6 +95,7 @@ class BookCatalogRepository
     $stmt = $this->db->prepare("
             SELECT * FROM books 
             WHERE title LIKE ? OR author LIKE ? OR accession_number LIKE ? OR subject LIKE ? OR book_isbn LIKE ?
+            AND deleted_at IS NULL
         ");
     $stmt->execute([$search, $search, $search, $search, $search]);
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -102,7 +103,7 @@ class BookCatalogRepository
 
   public function filterBooks($filters = [])
   {
-    $query = "SELECT * FROM books WHERE 1=1";
+    $query = "SELECT * FROM books WHERE 1=1 AND deleted_at IS NULL";
     $place_holder = [];
 
     foreach ($filters as $column => $value) {
@@ -128,7 +129,7 @@ class BookCatalogRepository
     $limit = max(1, min($limit, 100));
     $offset = max(0, $offset);
 
-    $query = "SELECT * FROM books WHERE 1=1";
+    $query = "SELECT * FROM books WHERE 1=1 AND deleted_at IS NULL";
     $params = [];
 
     if ($search !== '') {
@@ -167,17 +168,15 @@ class BookCatalogRepository
     }
 
     $query .= " " . $orderBy . " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
-
     $stmt = $this->db->prepare($query);
-
     $stmt->execute($params);
 
-    return $stmt->fetchAll(\PDO::FETCH_ASSOC); // Fetch results
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC); 
   }
 
   public function countAvailableBooks(): int
   {
-    $stmt = $this->db->query("SELECT COUNT(*) FROM books WHERE availability = 'available'");
+    $stmt = $this->db->query("SELECT COUNT(*) FROM books WHERE availability = 'available' AND deleted_at IS NULL");
     return (int) $stmt->fetchColumn();
   }
 
@@ -186,7 +185,7 @@ class BookCatalogRepository
     string $category = '',
     string $status = ''
   ): int {
-    $query = "SELECT COUNT(*) FROM books WHERE 1=1";
+    $query = "SELECT COUNT(*) FROM books WHERE 1=1 AND deleted_at IS NULL";
     $params = [];
 
     if ($search !== '') {

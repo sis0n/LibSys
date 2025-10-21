@@ -4,12 +4,10 @@ namespace App\Controllers;
 
 use App\Repositories\BookManagementRepository;
 use App\Core\Controller;
-use App\Core\Session; // Siguraduhin na meron kang Session helper
 
 class BookManagementController extends Controller
 {
     private $bookRepo;
-    private $currentUserId;
 
     public function __construct()
     {
@@ -75,7 +73,7 @@ class BookManagementController extends Controller
             else { return $this->json(['success' => false, 'message' => 'Error uploading file.'], 500); }
         }
         try {
-            $success = $this->bookRepo->createBook($data);
+            $success = $this->bookRepo->createBook($data); 
             if ($success) { $this->json(['success' => true, 'message' => 'Book added successfully!']); }
             else { $this->json(['success' => false, 'message' => 'Database error.'], 500); }
         } catch (\Exception $e) {
@@ -90,17 +88,23 @@ class BookManagementController extends Controller
         if (empty($data['title']) || empty($data['author']) || empty($data['accession_number']) || empty($data['call_number'])) {
             return $this->json(['success' => false, 'message' => 'Required fields are missing.'], 400);
         }
+        
+        $currentUserId = $_SESSION['user_id'] ?? null;
+        if ($currentUserId === null) {
+            return $this->json(['success' => false, 'message' => 'Authentication required.'], 401);
+        }
+        
         if (isset($_FILES['book_image']) && $_FILES['book_image']['error'] == 0) {
              $imagePath = $this->handleImageUpload($_FILES['book_image']);
              if ($imagePath) { $data['cover'] = $imagePath; }
              else { return $this->json(['success' => false, 'message' => 'Error uploading new file.'], 500); }
         }
+        
         try {
             $book = $this->bookRepo->findBookById($id);
             if ($book && isset($book['availability'])) { $data['availability'] = $book['availability']; }
             
-            // IPASA ANG USER ID
-            $success = $this->bookRepo->updateBook($id, $data, $this->currentUserId); 
+            $success = $this->bookRepo->updateBook($id, $data, $currentUserId); 
             
             if ($success) { $this->json(['success' => true, 'message' => 'Book updated successfully!']); }
             else { $this->json(['success' => false, 'message' => 'Failed to update or no changes made.'], 500); }
@@ -109,8 +113,20 @@ class BookManagementController extends Controller
 
     public function destroy($id)
     {
+         // $this->auth(['superadmin']);
+         $deletedByUserId = $_SESSION['user_id'] ?? null;
+         if ($deletedByUserId === null) {
+            return $this->json(['success' => false, 'message' => 'Authentication required.'], 401);
+         }
+         
          try {
-            $success = $this->bookRepo->deleteBook($id, $this->currentUserId); 
+            $book = $this->bookRepo->findBookById($id);
+            if ($book && !empty($book['cover'])) {
+               $filePath = str_replace("/libsys/public/", "", $book['cover']); 
+               if (file_exists($filePath)) { unlink($filePath); }
+            }
+             
+            $success = $this->bookRepo->deleteBook($id, $deletedByUserId); 
             
             if ($success) {
                 $this->json(['success' => true, 'message' => 'Book deleted successfully!']);

@@ -194,6 +194,9 @@ ALTER TABLE `books`
   ADD COLUMN `updated_by` INT(11) NULL DEFAULT NULL AFTER `updated_at`,
   ADD COLUMN `deleted_at` TIMESTAMP NULL DEFAULT NULL AFTER `updated_by`,
   ADD COLUMN `deleted_by` INT(11) NULL DEFAULT NULL AFTER `deleted_at`;
+  
+ALTER TABLE `deleted_books`
+ADD COLUMN `deleted_by` INT(11) NULL DEFAULT NULL AFTER `deleted_at`;
 
 
 

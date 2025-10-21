@@ -27,7 +27,12 @@ class BookManagementRepository
         if ($search !== '') {
             $query .= " AND (title LIKE ? OR author LIKE ? OR book_isbn LIKE ? OR accession_number LIKE ? OR call_number LIKE ? OR subject LIKE ?)";
             $searchTerm = "%$search%";
-            $params[] = $searchTerm; $params[] = $searchTerm; $params[] = $searchTerm; $params[] = $searchTerm; $params[] = $searchTerm; $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
         }
 
         if ($status !== '' && strtolower($status) !== 'all status') {
@@ -35,12 +40,20 @@ class BookManagementRepository
             $params[] = strtolower($status);
         }
 
-        $orderBy = "ORDER BY created_at DESC"; 
+        $orderBy = "ORDER BY created_at DESC";
         switch ($sort) {
-            case 'title_asc': $orderBy = "ORDER BY title ASC"; break;
-            case 'title_desc': $orderBy = "ORDER BY title DESC"; break;
-            case 'year_asc': $orderBy = "ORDER BY year ASC, title ASC"; break;
-            case 'year_desc': $orderBy = "ORDER BY year DESC, title ASC"; break;
+            case 'title_asc':
+                $orderBy = "ORDER BY title ASC";
+                break;
+            case 'title_desc':
+                $orderBy = "ORDER BY title DESC";
+                break;
+            case 'year_asc':
+                $orderBy = "ORDER BY year ASC, title ASC";
+                break;
+            case 'year_desc':
+                $orderBy = "ORDER BY year DESC, title ASC";
+                break;
         }
 
         $query .= " " . $orderBy . " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
@@ -52,13 +65,18 @@ class BookManagementRepository
 
     public function countPaginatedBooks(string $search, string $status): int
     {
-        $query = $this->countQuery; 
+        $query = $this->countQuery;
         $params = [];
 
         if ($search !== '') {
             $query .= " AND (title LIKE ? OR author LIKE ? OR book_isbn LIKE ? OR accession_number LIKE ? OR call_number LIKE ? OR subject LIKE ?)";
             $searchTerm = "%$search%";
-            $params[] = $searchTerm; $params[] = $searchTerm; $params[] = $searchTerm; $params[] = $searchTerm; $params[] = $searchTerm; $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
         }
         if ($status !== '' && strtolower($status) !== 'all status') {
             $query .= " AND availability = ?";
@@ -96,8 +114,13 @@ class BookManagementRepository
             ':subject' => $data['subject'] ?? null,
             ':availability' => 'available'
         ];
-        if (!empty($data['cover'])) { $columns .= ", cover"; $placeholders .= ", :cover"; $params[':cover'] = $data['cover']; }
-        $columns .= ")"; $placeholders .= ")";
+        if (!empty($data['cover'])) {
+            $columns .= ", cover";
+            $placeholders .= ", :cover";
+            $params[':cover'] = $data['cover'];
+        }
+        $columns .= ")";
+        $placeholders .= ")";
         $stmt = $this->db->prepare("INSERT INTO books $columns VALUES $placeholders");
         return $stmt->execute($params);
     }
@@ -118,27 +141,84 @@ class BookManagementRepository
                 $params[":$field"] = ($field === 'year' && empty($data[$field])) ? null : $data[$field];
             }
         }
-        
-        if (empty($sqlParts)) return true; 
+
+        if (empty($sqlParts)) return true;
 
         $sqlParts[] = "updated_by = :updated_by";
 
         $sql = "UPDATE books SET " . implode(", ", $sqlParts) . " WHERE book_id = :book_id";
-        
+
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($params);
     }
 
     public function deleteBook($id, $deleted_by_user_id)
     {
-        $stmt = $this->db->prepare("
-            UPDATE books 
-            SET 
-                deleted_at = CURRENT_TIMESTAMP, 
-                deleted_by = ?
-            WHERE 
-                book_id = ?
-        ");
-        return $stmt->execute([$deleted_by_user_id, $id]);
+        $this->db->beginTransaction();
+
+        try {
+            $book = $this->findBookById($id);
+            if (!$book) {
+                throw new \Exception("Book not found with ID: $id");
+            }
+
+            $stmtUpdate = $this->db->prepare("
+                UPDATE books 
+                SET 
+                    deleted_at = CURRENT_TIMESTAMP, 
+                    deleted_by = ?
+                WHERE 
+                    book_id = ?
+            ");
+            $stmtUpdate->execute([$deleted_by_user_id, $id]);
+
+            $stmtGetTime = $this->db->prepare("SELECT deleted_at FROM books WHERE book_id = ?");
+            $stmtGetTime->execute([$id]);
+            $deletedTimestamp = $stmtGetTime->fetchColumn();
+
+
+            $stmtInsert = $this->db->prepare("
+                INSERT INTO deleted_books 
+                (book_id, accession_number, call_number, title, author, book_place, 
+                 book_publisher, year, book_edition, description, book_isbn, 
+                 book_supplementary, subject, created_at, availability, quantity, cover, 
+                 deleted_at, deleted_by)
+                VALUES 
+                (:book_id, :accession_number, :call_number, :title, :author, :book_place, 
+                 :book_publisher, :year, :book_edition, :description, :book_isbn, 
+                 :book_supplementary, :subject, :created_at, :availability, :quantity, :cover,
+                 :deleted_at, :deleted_by)
+            ");
+
+            $stmtInsert->execute([
+                ':book_id' => $book['book_id'],
+                ':accession_number' => $book['accession_number'],
+                ':call_number' => $book['call_number'],
+                ':title' => $book['title'],
+                ':author' => $book['author'],
+                ':book_place' => $book['book_place'],
+                ':book_publisher' => $book['book_publisher'],
+                ':year' => $book['year'],
+                ':book_edition' => $book['book_edition'],
+                ':description' => $book['description'],
+                ':book_isbn' => $book['book_isbn'],
+                ':book_supplementary' => $book['book_supplementary'],
+                ':subject' => $book['subject'],
+                ':created_at' => $book['created_at'],
+                ':availability' => $book['availability'],
+                ':quantity' => $book['quantity'],
+                ':cover' => $book['cover'],
+                ':deleted_at' => $deletedTimestamp, 
+                ':deleted_by' => $deleted_by_user_id
+            ]);
+
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            // 6. Kung may error, i-rollback
+            $this->db->rollBack();
+            error_log("Soft delete failed: " . $e->getMessage());
+            return false;
+        }
     }
 }

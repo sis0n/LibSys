@@ -167,6 +167,11 @@ class RouteConfig
         $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
         $router->post('superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
 
+        $router->get('superadmin/books/fetch', 'BookManagementController@fetch', ['superadmin']);
+        $router->get('superadmin/books/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
+        $router->post('superadmin/books/store', 'BookManagementController@store', ['superadmin']);
+        $router->post('superadmin/books/update/{id}', 'BookManagementController@update', ['superadmin']);
+        $router->post('superadmin/books/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
         return $router;
     }
 }

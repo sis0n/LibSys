@@ -71,6 +71,13 @@ class SidebarController extends Controller
             "currentPage" => "changePassword"
         ]);
     }
+        public function studentMyProfile()
+    {
+        $this->view("student/myProfile", [
+            "title" => "My Profile",
+            "currentPage" => "myProfile"
+        ]);
+    }
 
     // Super Admin Display Caller 
 
@@ -87,14 +94,6 @@ class SidebarController extends Controller
         $this->view("superadmin/userManagement", [
             "title"=> "User Management",
             "currentPage" => "userManagement"
-        ]);
-    }
-
-    public function features()
-    {
-        $this->view("superadmin/features", [
-            "title"=> "Features",
-            "currentPage" => "features"
         ]);
     }
 
@@ -177,6 +176,13 @@ class SidebarController extends Controller
             "currentPage" => "changePassword"
         ]);
     }
+     public function superadminMyProfile()
+    {
+        $this->view("superadmin/myProfile", [
+            "title" => "My Profile",
+            "currentPage" => "myProfile"
+        ]);
+    }
     
     // Admin Display Caller
 
@@ -185,22 +191,6 @@ class SidebarController extends Controller
         $this->view("admin/dashboard", [
             "title" => "Admin Dashboard",
             "currentPage" => "dashboard"
-        ]);
-    }
-
-    public function adminUserManagement()
-    {
-        $this->view("admin/userManagement", [
-            "title"=> "Admin User Management",
-            "currentPage" => "userManagement"
-        ]);
-    }
-
-    public function adminFeatures()
-    {
-        $this->view("admin/features", [
-            "title"=> "Admin Features",
-            "currentPage" => "features"
         ]);
     }
 
@@ -283,6 +273,14 @@ class SidebarController extends Controller
         ]);
     }
 
+     public function adminMyProfile()
+    {
+        $this->view("admin/myProfile", [
+            "title" => "My Profile",
+            "currentPage" => "myProfile"
+        ]);
+    }
+
     // Librarian Display Caller
     
     public function librarianDashboard()
@@ -290,22 +288,6 @@ class SidebarController extends Controller
         $this->view("librarian/dashboard", [
             "title" => "Librarian Dashboard",
             "currentPage" => "dashboard"
-        ]);
-    }
-
-    public function librarianUserManagement()
-    {
-        $this->view("librarian/userManagement", [
-            "title"=> "Librarian User Management",
-            "currentPage" => "userManagement"
-        ]);
-    }
-
-    public function librarianFeatures()
-    {
-        $this->view("librarian/features", [
-            "title"=> "Librarian Features",
-            "currentPage" => "features"
         ]);
     }
 
@@ -386,6 +368,14 @@ class SidebarController extends Controller
         $this->view("librarian/changePassword", [
             "title" => "Librarian Change Password",
             "currentPage" => "changePassword"
+        ]);
+    }
+
+    public function librarianMyProfile()
+    {
+        $this->view("librarian/myProfile", [
+            "title" => "My Profile",
+            "currentPage" => "myProfile"
         ]);
     }
     

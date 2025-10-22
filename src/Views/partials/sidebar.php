@@ -130,6 +130,15 @@ switch ($role) {
                 <i class="ph ph-key text-2xl"></i>
                 <span class="text-base">Change Password</span>
             </a>
+
+            <!-- My Profile -->
+            <a href="/libsys/public/student/myProfile" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'myProfile')
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-user-gear text-2xl"></i>
+                <span class="text-base">My Profile</span>
+            </a>
         </nav>
 
         <!-- Super Admin Sidebar  -->
@@ -234,6 +243,7 @@ switch ($role) {
                 <i class="ph ph-cloud-arrow-up text-2xl"></i>
                 <span>Backup & Restore</span>
             </a>
+
             <!-- Change Password -->
             <a href="/libsys/public/superadmin/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'changePassword')
@@ -241,6 +251,15 @@ switch ($role) {
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-key text-2xl"></i>
                 <span class="text-base">Change Password</span>
+            </a>
+
+             <!-- My Profile -->
+            <a href="/libsys/public/superadmin/myProfile" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'myProfile')
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-user-gear text-2xl"></i>
+                <span class="text-base">My Profile</span>
             </a>
         </nav>
 
@@ -337,6 +356,7 @@ switch ($role) {
                 <i class="ph ph-cloud-arrow-up text-2xl"></i>
                 <span>Backup & Restore</span>
             </a>
+
             <!-- Change Password -->
             <a href="/libsys/public/admin/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'changePassword')
@@ -344,6 +364,15 @@ switch ($role) {
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-key text-2xl"></i>
                 <span class="text-base">Change Password</span>
+            </a>
+
+             <!-- My Profile -->
+            <a href="/libsys/public/admin/myProfile" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'myProfile')
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-user-gear text-2xl"></i>
+                <span class="text-base">My Profile</span>
             </a>
         </nav>
 
@@ -440,6 +469,7 @@ switch ($role) {
                 <i class="ph ph-cloud-arrow-up text-2xl"></i>
                 <span>Backup & Restore</span>
             </a>
+
             <!-- Change Password -->
             <a href="/libsys/public/librarian/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
            <?= ($currentPage === 'changePassword')
@@ -447,6 +477,15 @@ switch ($role) {
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-key text-2xl"></i>
                 <span class="text-base">Change Password</span>
+            </a>
+
+             <!-- My Profile -->
+            <a href="/libsys/public/librarian/myProfile" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'myProfile')
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-user-gear text-2xl"></i>
+                <span class="text-base">My Profile</span>
             </a>
         </nav>
     </div>

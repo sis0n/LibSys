@@ -112,8 +112,15 @@
 
                 <div class="flex items-center gap-3">
                     <div>
-                        <p class="text-sm text-gray-500">Year & Section</p>
-                        <p class="font-medium text-gray-800">3-A</p>
+                        <p class="text-sm text-gray-500">Year</p>
+                        <p class="font-medium text-gray-800">3</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div>
+                        <p class="text-sm text-gray-500">Section</p>
+                        <p class="font-medium text-gray-800">A</p>
                     </div>
                 </div>
 

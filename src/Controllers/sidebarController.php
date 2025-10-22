@@ -145,11 +145,11 @@ class SidebarController extends Controller
         ]);
     }
 
-    public function overdueAlert()
+    public function returning()
     {
-        $this->view("superadmin/overdueAlert", [
-            "title"=> "Overdue Alert",
-            "currentPage" => "overdueAlert"
+        $this->view("superadmin/returning", [
+            "title"=> "Returning",
+            "currentPage" => "returning"
         ]);
     }
 
@@ -250,11 +250,11 @@ class SidebarController extends Controller
         ]);
     }
 
-    public function adminOverdueAlert()
+    public function adminReturning()
     {
-        $this->view("admin/overdueAlert", [
-            "title"=> "Admin Overdue Alert",
-            "currentPage" => "overdueAlert"
+        $this->view("admin/returning", [
+            "title"=> "Admin Returning",
+            "currentPage" => "returning"
         ]);
     }
 

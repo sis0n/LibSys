@@ -17,14 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewRegForm = document.getElementById('viewRegForm');
 
     // ==========================================================
-    // ID Card Elements
-    // ==========================================================   
-    const idCardUpload = document.getElementById('idCardUpload');
-    const viewIDCard = document.getElementById('viewIDCard');
-
-
-
-    // ==========================================================
     // Profile Picture Upload and Crop
     // ==========================================================
     // Handle upload
@@ -110,23 +102,5 @@ document.addEventListener('DOMContentLoaded', () => {
         const fileURL = URL.createObjectURL(file);
         viewRegForm.href = fileURL;
         viewRegForm.classList.remove('hidden');
-    });
-
-    // ==========================================================   
-    // ID Card Upload and Preview
-    // =========================================================
-    idCardUpload.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (!file.type.startsWith('image/')) {
-            alert('Please upload a valid image file (JPG, PNG).');
-            idCardUpload.value = '';
-            return;
-        }
-
-        const fileURL = URL.createObjectURL(file);
-        viewIDCard.href = fileURL;
-        viewIDCard.classList.remove('hidden');
     });
 });

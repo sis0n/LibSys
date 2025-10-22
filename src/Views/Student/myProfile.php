@@ -1,15 +1,16 @@
 <div class="min-h-screen ">
     <div class="mb-6">
         <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
-            <i class="ph ph-user-circle text-gray-700"></i> My Profile
+            My Profile
         </h2>
         <p class="text-gray-700">Manage your account information and view your activity</p>
     </div>
 
-    <div class="bg-white p-6 min-w-lg mx-auto rounded-lg shadow-md border border-gray-200">
-        <h3 class="text-lg font-semibold mb-2">Profile Information</h3>
-        <p class="text-gray-600 mb-6">Your personal details</p>
-
+    <div class="bg-white px-6 py-4 max-w-max mx-auto rounded-lg shadow-md border border-gray-200">
+        <h3 class="text-lg font-semibold mb-2">
+            <i class="ph ph-user-circle"></i>
+            Profile Information
+        </h3>
         <div class="flex flex-col items-center mb-6">
             <div
                 class="w-32 h-32 rounded-full bg-emerald-500 flex items-center justify-center text-white text-4xl font-bold mb-3 overflow-hidden">
@@ -20,7 +21,7 @@
             <p class="text-xl font-semibold text-gray-800">STUDENT NAME</p>
             <span
                 class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1 mt-1 mb-3">
-                <i class="ph ph-identification-badge text-sm"></i> Student
+                2023####-S
             </span>
 
             <!-- Upload Button -->
@@ -59,8 +60,10 @@
 
         <!-- Basic Information -->
         <section class="mt-6 border-t border-gray-200 pt-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">Basic Information</h3>
-
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">
+                <i class="ph ph-identification-card"></i>
+                Basic Information
+            </h3>
             <div class="flex flex-wrap ml-9 items-start gap-x-10 gap-y-6">
                 <div class="min-w-[200px]">
                     <p class="text-sm text-gray-500">Last Name</p>
@@ -86,36 +89,42 @@
 
         <!-- Contact -->
         <section class="mt-6 border-t border-gray-200 pt-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">Student Details</h3>
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">
+                <i class="ph ph-student"></i>
+                Student Details
+            </h3>
 
 
-            <div class="flex flex-wrap ml-9 items-start gap-x-10 gap-y-6">
-                <div class="flex items-center gap-3 min-w-[200px]">
-                    <i class="ph ph-identification-card text-xl text-gray-600"></i>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 ml-9">
+                <div class="flex items-center gap-3">
                     <div>
                         <p class="text-sm text-gray-500">User ID</p>
                         <p class="font-medium text-gray-800">2023####-S</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 min-w-[200px]">
-                    <i class="ph ph-student text-xl text-gray-600"></i>
+                <div class="flex items-center gap-3">
                     <div>
-                        <p class="text-sm text-gray-500">Course Year & Section</p>
-                        <p class="font-medium text-gray-800">BSCS 3-A</p>
+                        <p class="text-sm text-gray-500">Course</p>
+                        <p class="font-medium text-gray-800">BSCS</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 min-w-[250px]">
-                    <i class="ph ph-envelope-simple text-xl text-gray-600"></i>
+                <div class="flex items-center gap-3">
+                    <div>
+                        <p class="text-sm text-gray-500">Year & Section</p>
+                        <p class="font-medium text-gray-800">3-A</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
                     <div>
                         <p class="text-sm text-gray-500">Email</p>
-                        <p class="font-medium text-gray-800">student.@university.edu</p>
+                        <p class="font-medium text-gray-800">student@university.edu</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 min-w-[250px]">
-                    <i class="ph ph-phone text-xl text-gray-600"></i>
+                <div class="flex items-center gap-3">
                     <div>
                         <p class="text-sm text-gray-500">Contact</p>
                         <p class="font-medium text-gray-800">09063559010</p>
@@ -156,43 +165,7 @@
                         </a>
                     </div>
                 </div>
-
-                <!-- Student ID Card -->
-                <div
-                    class="bg-orange-50/50 border border-orange-200/80 rounded-lg p-3 flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <i class="ph ph-identification-card text-2xl text-green-500"></i>
-                        <div>
-                            <p class="font-medium text-gray-800">Student ID Card</p>
-                            <p class="text-sm text-gray-500">
-                                Please upload a valid school ID (JPG, PNG, or JPEG).
-                            </p>
-                        </div>
-                    </div> 
-                    <div class="flex items-center gap-2 text-orange-600">
-                        <input type="file" id="idCardUpload" accept="image/png, image/jpeg" class="hidden" />
-                        <button onclick="document.getElementById('idCardUpload').click()"
-                            class="px-4 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-100 transition">
-                            Upload
-                        </button>
-                        <a id="viewIDCard" href="#" target="_blank"
-                            class="px-4 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-100 transition hidden">
-                            View
-                        </a>
-                    </div>
-                </div>
         </section>
-
-        <div class="border-t border-gray-200 pt-6 space-y-3">
-            <button
-                class="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition text-gray-700 font-medium">
-                <i class="ph ph-pencil-simple text-lg"></i> Edit Profile
-            </button>
-            <button
-                class="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition text-gray-700 font-medium">
-                <i class="ph ph-key text-lg"></i> Change Password
-            </button>
-        </div>
     </div>
 </div>
 

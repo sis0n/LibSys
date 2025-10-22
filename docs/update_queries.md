@@ -198,6 +198,19 @@ ALTER TABLE `books`
 ALTER TABLE `deleted_books`
 ADD COLUMN `deleted_by` INT(11) NULL DEFAULT NULL AFTER `deleted_at`;
 
+ALTER TABLE users
+ADD COLUMN first_name VARCHAR(100) NULL AFTER full_name,
+ADD COLUMN middle_name VARCHAR(100) NULL AFTER first_name,
+ADD COLUMN last_name VARCHAR(100) NULL AFTER middle_name,
+ADD COLUMN profile_picture VARCHAR(255) NULL AFTER email;
+
+UPDATE users
+SET 
+    first_name = SUBSTRING_INDEX(full_name, ' ', 1),
+    last_name = SUBSTRING_INDEX(full_name, ' ', -1)
+WHERE 
+    full_name IS NOT NULL;
+
 
 
 

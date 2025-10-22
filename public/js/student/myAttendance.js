@@ -1,79 +1,129 @@
-function initializeMyAttendance(attendanceData) {
-  const tabs = document.querySelectorAll(".att-tab");
-  const contents = document.querySelectorAll(".tab-content");
-
-  if (!tabs.length || !contents.length) {
-    console.error("MyAttendance: Tab or content elements not found.");
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof allAttendanceLogs === 'undefined') {
+    console.error("myAttendance.js Error: Global variable 'allAttendanceLogs' not found.");
+    const errorDiv = document.getElementById('attendance-error');
+    if (errorDiv) {
+      errorDiv.textContent = "Could not initialize attendance data.";
+      errorDiv.classList.remove('hidden');
+    }
     return;
   }
 
-  function renderContent(tabName, container) {
-    const data = attendanceData[tabName] || [];
-    container.innerHTML = ""; 
+  const dateInput = document.getElementById('attendanceDate');
+  const methodSelect = document.getElementById('attendanceMethod');
+  const tableBody = document.getElementById('attendanceTableBody');
+  const loadingRow = document.getElementById('tableLoadingRow');
+  const noRecordsRow = document.getElementById('tableNoRecordsRow');
+  const errorDiv = document.getElementById('attendance-error');
 
-    if (data.length === 0) {
-      container.innerHTML = `
-            <div class="no-records flex flex-col items-center justify-center py-10 text-center border border-dashed border-[var(--color-border)] rounded-lg">
-                <i class="ph ph-clipboard text-6xl"></i>
-                <p class="text-sm font-medium">No attendance records</p>
-                <p class="text-xs text-[var(--color-gray-500)]">No visits found for the selected time period.</p>
-            </div>
-            `;
+  function formatDate(dateString) {
+    try {
+      const localDate = new Date(dateString.replace(/-/g, '/'));
+      if (isNaN(localDate)) return "Invalid Date";
+      return localDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    } catch (e) {
+      console.error("Error formatting date:", dateString, e);
+      return "Err Date";
+    }
+  }
+
+  function formatDay(dateString) {
+    try {
+      const localDate = new Date(dateString.replace(/-/g, '/'));
+      if (isNaN(localDate)) return "";
+      return localDate.toLocaleDateString('en-US', { weekday: 'long' });
+    } catch (e) {
+      console.error("Error formatting day:", dateString, e);
+      return "";
+    }
+  }
+
+  function formatTime(dateString) {
+    try {
+      const localDate = new Date(dateString.replace(/-/g, '/'));
+      if (isNaN(localDate)) return "";
+      return localDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    } catch (e) {
+      console.error("Error formatting time:", dateString, e);
+      return "";
+    }
+  }
+
+  function renderTable() {
+    if (!tableBody || !loadingRow || !noRecordsRow || !dateInput || !methodSelect) {
+      console.error("myAttendance.js Error: Required elements not found.");
       return;
     }
 
-    const fragment = document.createDocumentFragment(); 
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "record p-4 mb-2 bg-[var(--color-orange-50)] rounded-lg flex justify-between";
-      div.innerHTML = `
-                <div>
-                    <div class="flex items-center gap-2">
-                        <i class="ph ph-calendar-check"></i>
-                        <p class="font-medium">${item.date}</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i class="ph ph-clock"></i>
-                        <p>Check-in: ${item.time}</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <span class="text-sm font-medium text-green-600">${item.status}</span><br>
-                    <span class="text-xs text-gray-500">Status</span>
-                </div>
-            `;
-      fragment.appendChild(div);
-    });
-    container.appendChild(fragment);
-  }
+    const selectedDate = dateInput.value;
+    const selectedMethod = methodSelect.value;
 
-  const activeTab = document.querySelector(".att-tab[data-active='true']");
-  if (activeTab) {
-    const activeContent = document.querySelector(`[data-content="${activeTab.dataset.tab}"]`);
-    if (activeContent) {
-      renderContent(activeTab.dataset.tab, activeContent);
-    } else {
-      console.error("MyAttendance Error: Active content not found for tab:", activeTab.dataset.tab);
-    }
-  } else {
-    console.warn("MyAttendance Warning: No active tab found.");
-  }
+    tableBody.querySelectorAll("tr:not([data-placeholder])").forEach(row => row.remove());
+    loadingRow.classList.add('hidden');
+    noRecordsRow.classList.add('hidden');
+    if (errorDiv) errorDiv.classList.add('hidden');
 
-
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(btn => btn.dataset.active = "false");
-      tab.dataset.active = "true";
-
-      contents.forEach(c => c.classList.add("hidden"));
-      const target = document.querySelector(`[data-content="${tab.dataset.tab}"]`);
-
-      if (target) { 
-        target.classList.remove("hidden");
-        renderContent(tab.dataset.tab, target);
-      } else {
-        console.error("MyAttendance Error: Target content not found for tab:", tab.dataset.tab);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
+      console.error("Invalid date format selected:", selectedDate);
+      if (noRecordsRow) noRecordsRow.classList.remove('hidden');
+      if (errorDiv) {
+        errorDiv.textContent = "Invalid date selected.";
+        errorDiv.classList.remove('hidden');
       }
+      return;
+    }
+
+    let filteredLogs = allAttendanceLogs.filter(log => {
+      return typeof log.timestamp === 'string' && log.timestamp.startsWith(selectedDate);
     });
-  });
-}
+
+    if (selectedMethod !== 'all') {
+      filteredLogs = filteredLogs.filter(log => {
+        return typeof log.method === 'string' && log.method.toLowerCase() === selectedMethod.toLowerCase();
+      });
+    }
+
+
+    if (filteredLogs.length === 0) {
+      noRecordsRow.classList.remove('hidden');
+      const noRecordsCell = noRecordsRow.querySelector('td');
+      if (noRecordsCell) noRecordsCell.innerHTML = `
+                 <i class="ph ph-clipboard text-4xl block mb-2"></i>
+                 No attendance records found for the selected criteria.
+             `;
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    filteredLogs.forEach(log => {
+      const row = document.createElement("tr");
+      row.className = "hover:bg-orange-50 transition-colors";
+      row.innerHTML = `
+                <td class="px-4 py-3 text-gray-700">${formatDate(log.timestamp)}</td>
+                <td class="px-4 py-3 text-gray-600">${formatDay(log.timestamp)}</td>
+                <td class="px-4 py-3 text-gray-800 font-medium">${formatTime(log.timestamp)}</td>
+                <td class="px-4 py-3 text-gray-600 capitalize">${log.method || 'N/A'}</td>
+            `;
+      fragment.appendChild(row);
+    });
+    tableBody.appendChild(fragment);
+  }
+
+  if (errorDiv && errorDiv.textContent.trim() && !errorDiv.classList.contains('hidden')) {
+    if (loadingRow) loadingRow.classList.add('hidden');
+  } else if (dateInput && methodSelect) {
+
+    renderTable();
+
+    dateInput.addEventListener('change', renderTable);
+    methodSelect.addEventListener('change', renderTable);
+  } else {
+    console.error("myAttendance.js Error: Date input or Method select element not found.");
+    if (loadingRow) loadingRow.classList.add('hidden');
+    if (errorDiv) {
+      errorDiv.textContent = "Could not find the date or method selector.";
+      errorDiv.classList.remove('hidden');
+    }
+  }
+});
+

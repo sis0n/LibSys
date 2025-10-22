@@ -62,6 +62,8 @@ class RouteConfig
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
         $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
         $router->get('librarian/changePassword', 'SidebarController@librarianChangePassword', ['librarian']);
+        $router->get('librarian/myProfile', 'SidebarController@librarianMyProfile', ['librarian']);
+
 
         // Admin Sidebar Page Navigation Display
         $router->get('admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
@@ -75,6 +77,8 @@ class RouteConfig
         $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
         $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
         $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['admin']);
+        $router->get('admin/myProfile', 'SidebarController@adminMyProfile', ['admin']);
+
 
         // Super Admin Sidebar Page Navigation Display
         $router->get('superadmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
@@ -89,6 +93,8 @@ class RouteConfig
         $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
         $router->get('superadmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
+        $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
+
 
         // Student Sidebar Page Navigation Display
         $router->get('student/dashboard', 'SidebarController@studentDashboard', ['student']);
@@ -100,6 +106,8 @@ class RouteConfig
         $router->get('student/borrowingHistory', 'SidebarController@studentBorrowingHistory', ['student']);
         $router->get('student/attendance/get', 'AttendanceController@getMyAttendance', ['student']);
         $router->get('student/changePassword', 'SidebarController@studentChangePassword', ['student']);
+        $router->get('student/myProfile', 'SidebarController@studentMyProfile', ['student']);
+
 
 
         /**

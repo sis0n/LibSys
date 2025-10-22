@@ -155,8 +155,8 @@ class RouteConfig
 
 
 
-        $router->get('student/bookCatalog/availableCount', 'BookController@getAvailableCount', ['student']);
-        $router->get('student/bookCatalog/fetch', 'BookController@fetch', ['student']);
+        $router->get('student/bookCatalog/availableCount', 'BookCatalogController@getAvailableCount', ['student']);
+        $router->get('student/bookCatalog/fetch', 'BookCatalogController@fetch', ['student']);
 
         //change password
         $router->post('/change-password', 'AuthController@changePassword');
@@ -174,6 +174,24 @@ class RouteConfig
         $router->post('superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
         $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
         $router->post('superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
+       
+        $router->get('superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
+        $router->get('superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
+        $router->post('superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
+        $router->post('superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
+        $router->post('superadmin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
+
+        $router->get('admin/booksmanagement/fetch', 'BookManagementController@fetch', ['admin']);
+        $router->get('admin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['admin']);
+        $router->post('admin/booksmanagement/store', 'BookManagementController@store', ['admin']);
+        $router->post('admin/booksmanagement/update/{id}', 'BookManagementController@update', ['admin']);
+        $router->post('admin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['admin']);
+
+        $router->get('librarian/booksmanagement/fetch', 'BookManagementController@fetch', ['librarian']);
+        $router->get('librarian/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['librarian']);
+        $router->post('librarian/booksmanagement/store', 'BookManagementController@store', ['librarian']);
+        $router->post('librarian/booksmanagement/update/{id}', 'BookManagementController@update', ['librarian']);
+        $router->post('librarian/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['librarian']);
 
         return $router;
     }

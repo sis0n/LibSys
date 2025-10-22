@@ -2,17 +2,17 @@
 
 namespace App\Controllers;
 
-use App\Repositories\BookRepository;
 use App\Core\Controller;
+use App\Repositories\BookCatalogRepository;
 use PDO;
 
-class BookController extends Controller
+class BookCatalogController extends Controller
 {
   private $bookRepo;
 
   public function __construct()
   {
-    $this->bookRepo = new BookRepository();
+    $this->bookRepo = new BookCatalogRepository();
   }
 
   public function index()

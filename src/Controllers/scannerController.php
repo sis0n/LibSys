@@ -28,169 +28,109 @@ class ScannerController extends Controller
     public function attendance()
     {
         header('Content-Type: application/json');
-        $qrValue  = $_POST['qrCodeValue'] ?? null;
-        if ($qrValue) {
-            $qrValue = strtoupper(trim($qrValue));  //force uppercase
-        }
+        try {
+            $qrValue  = $_POST['qrCodeValue'] ?? null;
+            if ($qrValue) {
+                $qrValue = strtoupper(trim($qrValue));
+            }
 
-        if (!$qrValue) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "No student number provided."
-                // echo "No student number provided.";
-            ]); 
-             return;
-        }
+            if (!$qrValue) {
+                throw new \Exception("No student number provided.");
+            }
 
-        $user = $this->userRepo->findByStudentNumber($qrValue);
-        // var_dump($user);
-        // exit;
+            $user = $this->userRepo->findByStudentNumber($qrValue);
+            if (!$user) {
+                throw new \Exception("Student not found in records.");
+            }
 
+            $manila = new \DateTimeZone('Asia/Manila');
+            $now = new \DateTime('now', $manila);
+            $timestamp = $now->format('Y-m-d H:i:s');
 
-        if (!$user) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Student not found in records."
-                // echo "User not found.";
-                // echo "<a href='/libsys/public/scanner/attendance'>back to scan</a>";
-            ]);
-            return;
-        }
+            $attendance = new Attendance(
+                (int)$user['user_id'],
+                $user['student_number'],
+                $user['first_name'],
+                $user['middle_name'],
+                $user['last_name'],
+                $user['year_level'],
+                $user['course'],
+                'qr',
+                $timestamp
+            );
 
-        $manila = new \DateTimeZone('Asia/Manila');
-        $now = new \DateTime('now', $manila); // current manila time
+            $success = $this->attendanceRepo->logBoth($attendance);
+            if (!$success) {
+                throw new \Exception("Failed to log attendance. (Repository Error)");
+            }
 
-        // check if yung user nag log na ng attendance today, burahin na lang yung comment sa demo day.
-
-        // $today = (new \DateTime('now', new \DateTimeZone('Asia/Manila')))->format('Y-m-d');
-        // $existing = $this->attendanceRepo->getByUserAndDate((int)$user['user_id'], $today);
-
-        // if ($existing) {
-        //     echo "Attendance already logged today for " . htmlspecialchars($user['full_name']);
-        //     return;
-        // }
-
-
-        $attendance = new Attendance(
-            (int)$user['user_id'],
-            $user['student_number'],
-            $user['full_name'],
-            $user['year_level'],
-            $user['course'],
-            'qr',
-            $now->format('Y-m-d H:i:s')
-        );
-
-        // save db
-        $success = $this->attendanceRepo->logBoth($attendance);
-
-        if ($success) {
-            //     echo "<div style='border:1px solid #ccc; padding:10px; text-align:center;'>
-            //         <h3>Attendance Logged </h3>
-            //         <p><strong>Name:</strong> " . htmlspecialchars($user['full_name']) . "</p>
-            //         <p><strong>Student Number:</strong> " . htmlspecialchars($user['student_number']) . "</p>
-            //         <p><strong>Time:</strong> " . $now->format('g:i A') . "</p>
-            //       </div>
-            //       <br>
-            //       <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
-            // } else {
-            //     echo "Failed to log attendance.";
-            // }
+            $fullName = implode(' ', array_filter([$user['first_name'], $user['middle_name'], $user['last_name']]));
 
             echo json_encode([
                 "status" => "success",
-                "full_name" => $user['full_name'],
+                "full_name" => $fullName,
                 "student_number" => $user['student_number'],
-                "time" => $now->format('g:i A'),
-                "message" => "Attendance logged successfully"
+                "time" => $now->format('g:i A')
             ]);
-        }
-              else {
+        } catch (\Exception $e) {
             echo json_encode([
                 "status" => "error",
-                "message" => "Failed to log attendance."
+                "message" => $e->getMessage()
             ]);
-        } 
+        }
     }
 
     public function manual()
     {
-        $studentNumber = $_POST['studentNumber'] ?? null;
-        $studentName = $_POST['studentName'] ?? null;
-        if ($studentNumber) {
-            $studentNumber = strtoupper(trim($studentNumber)); //force uppercase rin
-        }
+        header('Content-Type: application/json');
+        try {
+            $studentNumber = $_POST['studentNumber'] ?? null;
+            if ($studentNumber) {
+                $studentNumber = strtoupper(trim($studentNumber));
+            }
 
-        // comment ko muna yung name ni rerequired kasi.
-        // if (!$studentNumber || !$studentName) {
-        //     echo "Student number and name are required.";
-        //     return;
-        // }
+            if (!$studentNumber) {
+                throw new \Exception("No student number provided.");
+            }
 
-        //check lang kung existing yung user
-        $user = $this->userRepo->findByStudentNumber($studentNumber);
-        error_log("[ScannerController] Manual Lookup result for {$studentNumber}: " . print_r($user, true));
+            $user = $this->userRepo->findByStudentNumber($studentNumber);
+            if (!$user) {
+                throw new \Exception("Student not found in records.");
+            }
 
-        if (!$user) {
+            $now = new \DateTime('now', new \DateTimeZone('Asia/Manila'));
+            $timestamp = $now->format('Y-m-d H:i:s');
+
+            $attendance = new \App\Models\Attendance(
+                (int)$user['user_id'],
+                $user['student_number'],
+                $user['first_name'],
+                $user['middle_name'],
+                $user['last_name'],
+                $user['year_level'],
+                $user['course'],
+                'manual',
+                $timestamp
+            );
+
+            $success = $this->attendanceRepo->logBoth($attendance);
+            if (!$success) {
+                throw new \Exception("Failed to log attendance. (Repository Error)");
+            }
+
+            $fullName = implode(' ', array_filter([$user['first_name'], $user['middle_name'], $user['last_name']]));
+
+            echo json_encode([
+                "status" => "success",
+                "full_name" => $fullName,
+                "student_number" => $user['student_number'],
+                "time" => $now->format('g:i A')
+            ]);
+        } catch (\Exception $e) {
             echo json_encode([
                 "status" => "error",
-                "message" => "Student not found in records."
+                "message" => $e->getMessage()
             ]);
-            // echo "Student not found in records.";
-            // echo "<br><a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
-            return;
         }
-
-        if (!$user) {
-            $user = [
-                'user_id' => 0,
-                'student_number' => $studentNumber,
-                'full_name' => $studentName,
-                'year_level' => 'N/A',
-                'course' => 'N/A'
-            ];
-        }
-
-        // timezone manila
-        $now = new \DateTime('now', new \DateTimeZone('Asia/Manila'));
-
-        $attendance = new \App\Models\Attendance(
-            (int)$user['user_id'],
-            $user['student_number'],
-            $user['full_name'],
-            $user['year_level'],
-            $user['course'],
-            'manual',
-            $now->format('Y-m-d H:i:s')
-        );
-
-        $success = $this->attendanceRepo->logBoth($attendance);
-
-
-        if ($success) {
-        //     echo "<div style='border:1px solid #ccc; padding:10px; text-align:center;'>
-        //         <h3>Attendance Logged</h3>
-        //         <p><strong>Name:</strong> " . htmlspecialchars($user['full_name']) . "</p>
-        //         <p><strong>Student Number:</strong> " . htmlspecialchars($user['student_number']) . "</p>
-        //         <p><strong>Time:</strong> " . $now->format('g:i A') . "</p>
-        //       </div>
-        //       <br>
-        //       <a href='/libsys/public/scanner/attendance'>Back to Scan</a>";
-        // } else {
-        //     echo "Failed to log attendance.";
-        // }
-            echo json_encode([
-            "status" => "success",
-            "full_name" => $user['full_name'],
-            "student_number" => $user['student_number'],
-            "time" => $now->format('g:i A'),
-            "message" => "Attendance logged successfully"
-        ]);
-        } else {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Failed to log attendance."
-            ]);
-        }   
     }
 }

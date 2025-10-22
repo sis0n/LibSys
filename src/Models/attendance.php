@@ -6,16 +6,20 @@ class Attendance
 {
     private int $user_id;
     private string $student_number;
-    private string $full_name;
+    private string $first_name;
+    private ?string $middle_name;
+    private string $last_name;
     private string $year_level;
     private string $course;
-    private string $source;     // qr o manual
+    private string $source;      
     private string $timestamp;
 
     public function __construct(
         int $user_id,
         string $student_number,
-        string $full_name,
+        string $first_name,
+        ?string $middle_name,
+        string $last_name,
         string $year_level,
         string $course,
         string $source,
@@ -23,7 +27,9 @@ class Attendance
     ) {
         $this->user_id = $user_id;
         $this->student_number = $student_number;
-        $this->full_name = $full_name;
+        $this->first_name = $first_name;
+        $this->middle_name = $middle_name;
+        $this->last_name = $last_name;
         $this->year_level = $year_level;
         $this->course = $course;
         $this->source = $source;
@@ -40,9 +46,19 @@ class Attendance
         return $this->student_number;
     }
 
-    public function getFullName(): string
+    public function getFirstName(): string
     {
-        return $this->full_name;
+        return $this->first_name;
+    }
+
+    public function getMiddleName(): ?string
+    {
+        return $this->middle_name;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->last_name;
     }
 
     public function getYearLevel(): string
@@ -64,9 +80,9 @@ class Attendance
     {
         return $this->timestamp;
     }
+
     public function getCreatedAt(): string
     {
         return $this->timestamp;
     }
-
 }

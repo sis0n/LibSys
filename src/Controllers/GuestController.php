@@ -3,20 +3,20 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Repositories\BookRepository;
+use App\Repositories\BookCatalogRepository;
 
 class GuestController extends Controller
 {
-    private $bookRepository;
+    private $bookCatalogRepository;
 
     public function __construct()
     {
-        $this->bookRepository = new BookRepository();
+        $this->bookCatalogRepository = new BookCatalogRepository();
     }
 
     public function guestDisplay()
     {
-        $books = $this->bookRepository->getAllBooks();
+        $books = $this->bookCatalogRepository->getAllBooks();
 
         $this->view("Guest/landingPage", [
             "title" => "LOSUCC",
@@ -32,7 +32,7 @@ class GuestController extends Controller
         $category = $_GET['category'] ?? '';
         $status   = $_GET['status'] ?? '';
 
-        $books = $this->bookRepository->getPaginatedFiltered($limit, $offset, $search, $category, $status);
+        $books = $this->bookCatalogRepository->getPaginatedFiltered($limit, $offset, $search, $category, $status);
 
         header('Content-Type: application/json');
         echo json_encode($books);

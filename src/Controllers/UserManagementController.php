@@ -23,35 +23,28 @@ class UserManagementController extends Controller
       'title' => 'User Management',
     ]);
   }
+
   public function getAll()
   {
     header('Content-Type: application/json');
-
     try {
       $users = $this->userRepo->getAllUsers();
-
-      echo json_encode([
-        'success' => true,
-        'users' => $users
-      ]);
+      echo json_encode(['success' => true, 'users' => $users]);
     } catch (\Exception $e) {
-      echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage()
-      ]);
+      echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     exit;
   }
 
   public function getUserById($id)
   {
+    header('Content-Type: application/json');
     $user = $this->userRepo->getUserById($id);
     if (!$user) {
       http_response_code(404);
       echo json_encode(['error' => 'User not found']);
       return;
     }
-
     echo json_encode($user);
   }
 
@@ -67,15 +60,9 @@ class UserManagementController extends Controller
       } else {
         $users = $this->userRepo->searchUsers($query);
       }
-      echo json_encode([
-        'success' => true,
-        'users' => $users
-      ]);
+      echo json_encode(['success' => true, 'users' => $users]);
     } catch (\Exception $e) {
-      echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage()
-      ]);
+      echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
   }
 
@@ -84,43 +71,46 @@ class UserManagementController extends Controller
     header('Content-Type: application/json');
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $full_name = trim($data['full_name'] ?? '');
+    $first_name = trim($data['first_name'] ?? '');
+    $middle_name = trim($data['middle_name'] ?? null); 
+    $last_name = trim($data['last_name'] ?? '');
     $username = trim($data['username'] ?? '');
     $role = trim($data['role'] ?? '');
 
-    if (!$full_name || !$username || !$role) {
-      echo json_encode(['success' => false, 'message' => 'All fields are required.']);
+    if (!$first_name || !$last_name || !$username || !$role) {
+      echo json_encode(['success' => false, 'message' => 'First Name, Last Name, Username, and Role are required.']);
       return;
     }
 
     try {
-      //check pag yung username ay existing na sa students
-      if (strtolower($role) === 'student') {
-        if ($this->userRepo->usernameExists($username)) {
-          echo json_encode(['success' => false, 'message' => 'Username already Exist']);
-          return;
-        }
+      if ($this->userRepo->usernameExists($username)) {
+        echo json_encode(['success' => false, 'message' => 'Username already exists']);
+        return;
       }
 
       $defaultPassword = '12345';
       $hashedPassword = password_hash($defaultPassword, PASSWORD_DEFAULT);
 
-      $userId = $this->userRepo->insertUser([
+      $userData = [
         'username' => $username,
         'password' => $hashedPassword,
-        'full_name' => $full_name,
+        'first_name' => $first_name,
+        'middle_name' => $middle_name,
+        'last_name' => $last_name,
         'email' => null,
         'role' => $role,
         'is_active' => 1,
         'created_at' => date('Y-m-d H:i:s')
-      ]);
+      ];
+
+      $userId = $this->userRepo->insertUser($userData);
 
       if (strtolower($role) === 'student') {
         $this->studentRepo->insertStudent(
           $userId,
-          $username,
-          'BSCS',
-          3,
+          $username, 
+          $data['course'] ?? 'N/A',
+          $data['year_level'] ?? 1,
           'enrolled'
         );
       }
@@ -142,10 +132,7 @@ class UserManagementController extends Controller
         return;
       }
 
-      $userRepo = new UserRepository();
-      $studentRepo = new StudentRepository();
-
-      $deleted = $userRepo->deleteUserWithCascade((int)$id, $deletedBy, $studentRepo);
+      $deleted = $this->userRepo->deleteUserWithCascade((int)$id, $deletedBy, $this->studentRepo);
 
       echo json_encode([
         'success' => $deleted,
@@ -169,7 +156,6 @@ class UserManagementController extends Controller
         return;
       }
 
-      // para maiwasan ma deact yung superadmin
       if (strtolower($user['role']) === 'superadmin') {
         echo json_encode(['success' => false, 'message' => 'Superadmin status cannot be changed.']);
         return;
@@ -195,7 +181,7 @@ class UserManagementController extends Controller
     header('Content-Type: application/json');
     $data = json_decode(file_get_contents("php://input"), true);
 
-    if (empty($data) || !isset($data['full_name']) || !isset($data['email'])) {
+    if (empty($data)) {
       echo json_encode(['success' => false, 'message' => 'Incomplete user data provided.']);
       return;
     }
@@ -205,7 +191,7 @@ class UserManagementController extends Controller
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
       }
 
-      unset($data['user_id']);
+      unset($data['user_id']); 
 
       $updated = $this->userRepo->updateUser((int)$id, $data);
 

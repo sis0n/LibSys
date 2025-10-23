@@ -93,6 +93,7 @@
     </div>
 </div>
 
+<!-- Import Modal -->
 <div id="importModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
     <div
         class="bg-[var(--color-card)] rounded-xl shadow-lg border border-[var(--color-border)] w-full max-w-md p-6 animate-fadeIn">
@@ -124,6 +125,7 @@
     </div>
 </div>
 
+<!-- Add User Modal (INAYOS NA) -->
 <div id="addUserModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
     <div
         class="rounded-xl overflow-hidden shadow-lg border border-[var(--color-border)] bg-[var(--color-card)] w-full max-w-lg animate-fadeIn">
@@ -146,41 +148,54 @@
             <div class="space-y-4 mb-6">
                 <h3 class="font-medium text-[var(--color-ring)]">Basic Information</h3>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name <span
+                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span
                                 class="text-red-500">*</span></label>
-                        <input type="text" placeholder="Enter full name"
+                        <input type="text" id="addFirstName" placeholder="Juan"
                             class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
                     </div>
-
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Username <span
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
+                        <input type="text" id="addMiddleName" placeholder="Ponce"
+                            class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span
                                 class="text-red-500">*</span></label>
-                        <input type="text" placeholder="username"
+                        <input type="text" id="addLastName" placeholder="Dela Cruz"
                             class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
                     </div>
                 </div>
 
-                <div class="relative w-full">
-                    <label class="block text-sm text-gray-700 mb-1">Role</label>
-                    <button id="userRoleDropdownBtn"
-                        class="w-full border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between hover:bg-orange-50 transition">
-                        <span id="userRoleDropdownValue">Select Role</span>
-                        <i class="ph ph-caret-down text-xs"></i>
-                    </button>
-                    <div id="userRoleDropdownMenu"
-                        class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
-                        <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                            onclick="selectUserRole(this, 'Student')">Student</div>
-                        <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                            onclick="selectUserRole(this, 'Librarian')">Librarian</div>
-                        <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                            onclick="selectUserRole(this, 'Admin')">Admin</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Username <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" id="addUsername" placeholder="username"
+                            class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
+                    </div>
+                    <div class="relative w-full">
+                        <label class="block text-sm text-gray-700 mb-1">Role</label>
+                        <button id="userRoleDropdownBtn"
+                            class="w-full border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between hover:bg-orange-50 transition">
+                            <span id="userRoleDropdownValue">Select Role</span>
+                            <i class="ph ph-caret-down text-xs"></i>
+                        </button>
+                        <div id="userRoleDropdownMenu"
+                            class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
+                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                onclick="selectUserRole(this, 'Student')">Student</div>
+                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                onclick="selectUserRole(this, 'Librarian')">Librarian</div>
+                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                onclick="selectUserRole(this, 'Admin')">Admin</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Permissions Section (TINANGGAL ANG hidden CLASS) -->
             <div>
                 <h3 class="font-medium text-[var(--color-ring)] mb-2 flex items-center gap-2">
                     <i class="ph ph-shield-check text-[var(--color-ring)]"></i> Permissions
@@ -204,7 +219,6 @@
                                 archives</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Inventory
                         </h4>
@@ -219,7 +233,6 @@
                                 items</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Borrowing
                             System</h4>
@@ -232,7 +245,6 @@
                                 history</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Reports
                         </h4>
@@ -243,7 +255,6 @@
                                 report</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">User
                             Management</h4>
@@ -260,7 +271,6 @@
                                 roles</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">System
                             Settings</h4>
@@ -277,6 +287,8 @@
                     </div>
                 </div>
             </div>
+
+
             <div class="flex justify-end gap-2 mt-6">
                 <button id="confirmAddUser"
                     class="flex-1 bg-orange-600 text-white font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-700 transition">
@@ -292,6 +304,7 @@
     </div>
 </div>
 
+<!-- Edit User Modal (INAYOS NA) -->
 <div id="editUserModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
     <div
         class="rounded-xl overflow-hidden shadow-lg border border-[var(--color-border)] bg-[var(--color-card)] w-full max-w-lg animate-fadeIn">
@@ -315,16 +328,30 @@
             <div class="space-y-4 mb-6">
                 <h3 class="font-medium text-orange-600">Basic Information</h3>
 
-                <div class="grid grid-cols-2 gap-4">
-
+                <div class="grid grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm text-gray-700 mb-1 font-medium">Full Name <span
+                        <label class="block text-sm text-gray-700 mb-1 font-medium">First Name <span
                                 class="text-red-500">*</span></label>
-                        <input id="editName" type="text"
+                        <input id="editFirstName" type="text"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
-                            placeholder="Enter full name">
+                            placeholder="Juan">
                     </div>
+                    <div>
+                        <label class="block text-sm text-gray-700 mb-1 font-medium">Middle Name</label>
+                        <input id="editMiddleName" type="text"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
+                            placeholder="Ponce">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-700 mb-1 font-medium">Last Name <span
+                                class="text-red-500">*</span></label>
+                        <input id="editLastName" type="text"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
+                            placeholder="Dela Cruz">
+                    </div>
+                </div>
 
+                <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm text-gray-700 mb-1 font-medium">Email <span
                                 class="text-red-500">*</span></label>
@@ -332,7 +359,16 @@
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
                             placeholder="user@university.edu">
                     </div>
+                    <div>
+                        <label class="block text-sm text-gray-700 mb-1 font-medium">Username</label>
+                        <input id="editUsername" type="text"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
+                            placeholder="username">
+                    </div>
+                </div>
 
+
+                <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm text-gray-700 mb-1 font-medium">Role</label>
                         <div class="relative w-full">
@@ -352,7 +388,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div>
                         <label class="block text-sm text-gray-700 mb-1 font-medium">Status</label>
                         <div class="relative w-full">
@@ -370,7 +405,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -424,6 +458,7 @@
                 </div>
             </div>
 
+            <!-- Permissions Section (TINANGGAL ANG hidden CLASS) -->
             <div>
                 <h3 class="font-medium text-[var(--color-ring)] mb-2 flex items-center gap-2">
                     <i class="ph ph-shield-check text-[var(--color-ring)]"></i> Permissions
@@ -433,7 +468,7 @@
                 </p>
 
                 <div class="grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto rounded-xl p-2">
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                   <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Archives
                         </h4>
                         <div class="space-y-1 text-sm text-gray-700">
@@ -447,7 +482,6 @@
                                 archives</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Inventory
                         </h4>
@@ -462,7 +496,6 @@
                                 items</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Borrowing
                             System</h4>
@@ -475,7 +508,6 @@
                                 history</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Reports
                         </h4>
@@ -486,7 +518,6 @@
                                 report</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">User
                             Management</h4>
@@ -503,7 +534,6 @@
                                 roles</label>
                         </div>
                     </div>
-
                     <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">System
                             Settings</h4>
@@ -520,6 +550,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="flex justify-end gap-3 mt-6">
                 <button id="saveEditUser"
                     class="flex-1 bg-orange-600 text-white font-medium text-sm px-6 py-2.5 rounded-md hover:bg-orange-700 transition">
@@ -535,3 +566,4 @@
 </div>
 
 <script src="/libsys/public/js/superadmin/userManagement.js" defer></script>
+

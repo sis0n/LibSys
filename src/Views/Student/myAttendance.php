@@ -1,60 +1,21 @@
 <?php
-if (!isset($_SESSION['user_id'])) {
-  header("Location: /libsys/public/login");
-  exit;
-}
-
 date_default_timezone_set('Asia/Manila');
 
 use App\Repositories\AttendanceRepository;
 
 $attendanceRepo = new AttendanceRepository();
-$userId = $_SESSION['user_id']; 
+$userId = $_SESSION['user_id'];
+$allLogs = [];
+$fetchError = null;
 
-$allLogs = $attendanceRepo->getByUserId($userId);
-
-$attendanceJS = [
-  'day' => [],
-  'week' => [],
-  'month' => [],
-  'year' => []
-];
-
-$now = new DateTime(); 
-$today = new DateTime('today');
-
-$firstOfMonth = new DateTime('first day of this month 00:00:00');
-$firstOfYear = new DateTime('first day of January this year 23:59:59');
-
-$startOfWeek = (clone $today)->modify('monday this week 00:00:00');
-$endOfWeek = (clone $today)->modify('sunday this week 23:59:59');
-
-foreach ($allLogs as $log) {
-  $logTime = new DateTime($log['timestamp']);
-  $entry = [
-    'date' => $logTime->format('D, M d, Y'),
-    'time' => $logTime->format('g:i A'),
-    'status' => 'Checked In'
-  ];
-
-  $logDate = $logTime->format('Y-m-d');
-
-  if ($logDate === $today->format('Y-m-d')) {
-    $attendanceJS['day'][] = $entry;
-  }
-
-  if ($logTime >= $startOfWeek && $logTime <= $endOfWeek) {
-    $attendanceJS['week'][] = $entry;
-  }
-
-  if ($logTime >= $firstOfMonth) {
-    $attendanceJS['month'][] = $entry;
-  }
-
-  if ($logTime >= $firstOfYear) {
-    $attendanceJS['year'][] = $entry;
-  }
+try {
+  $allLogs = $attendanceRepo->getByUserId($userId);
+} catch (\Exception $e) {
+  error_log("Error fetching attendance logs for user {$userId}: " . $e->getMessage());
+  $fetchError = "Could not load attendance data due to a server error.";
 }
+
+$attendanceJSData = json_encode($allLogs, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 ?>
 
@@ -64,79 +25,67 @@ foreach ($allLogs as $log) {
     <p class="text-gray-700">Track your library visits and check-in times.</p>
   </div>
 
-  <section
-    class="bg-[var(--color-card)] shadow-md rounded-lg border border-[var(--color-border)] border-t-4 border-t-[var(--color-primary)] p-6 mb-6">
+  <section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
       <div>
         <h4 class="text-base font-semibold text-gray-800">Attendance History</h4>
-        <p class="text-sm text-[var(--color-gray-600)]">View your library check-ins by time period</p>
+        <p class="text-sm text-gray-600">View your library check-ins by date</p>
       </div>
-    </div>
-    <div class="w-full mb-4">
-      <div class="flex items-center w-full rounded-full bg-[var(--color-orange-50)] p-1">
-        <button class="att-tab flex-1 px-4 py-2 text-sm font-medium text-center rounded-full transition
-                       text-[var(--color-gray-600)] hover:text-[var(--color-orange-600)]
-                       data-[active=true]:bg-white data-[active=true]:border-2 data-[active=true]:border-[var(--color-orange-500)]
-                       data-[active=true]:text-[var(--color-orange-600)] data-[active=true]:shadow-sm" data-tab="day"
-          data-active="true">
-          Day
-        </button>
-        <button class="att-tab flex-1 px-4 py-2 text-sm font-medium text-center rounded-full transition
-                       text-[var(--color-gray-600)] hover:text-[var(--color-orange-600)]
-                       data-[active=true]:bg-white data-[active=true]:border-2 data-[active=true]:border-[var(--color-orange-500)]
-                       data-[active=true]:text-[var(--color-orange-600)] data-[active=true]:shadow-sm" data-tab="week"
-          data-active="false">
-          Week
-        </button>
-        <button class="att-tab flex-1 px-4 py-2 text-sm font-medium text-center rounded-full transition
-                       text-[var(--color-gray-600)] hover:text-[var(--color-orange-600)]
-                       data-[active=true]:bg-white data-[active=true]:border-2 data-[active=true]:border-[var(--color-orange-500)]
-                       data-[active=true]:text-[var(--color-orange-600)] data-[active=true]:shadow-sm" data-tab="month"
-          data-active="false">
-          Month
-        </button>
-        <button class="att-tab flex-1 px-4 py-2 text-sm font-medium text-center rounded-full transition
-                       text-[var(--color-gray-600)] hover:text-[var(--color-orange-600)]
-                       data-[active=true]:bg-white data-[active=true]:border-2 data-[active=true]:border-[var(--color-orange-500)]
-                       data-[active=true]:text-[var(--color-orange-600)] data-[active=true]:shadow-sm" data-tab="year"
-          data-active="false">
-          Year
-        </button>
+      <div class="flex items-center gap-4 text-sm">
+        <div class="flex items-center gap-2">
+          <label for="attendanceDate" class="text-sm font-medium text-gray-700 whitespace-nowrap">Select Date:</label>
+          <input type="date" id="attendanceDate" name="attendanceDate"
+            value="<?= date('Y-m-d') ?>"
+            class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-40 focus:ring-1 focus:ring-orange-400 align-middle">
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="attendanceMethod" class="text-sm font-medium text-gray-700 whitespace-nowrap">Select Method:</label>
+          <select id="attendanceMethod" name="attendanceMethod"
+            class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-40 focus:ring-1 focus:ring-orange-400 appearance-none pr-8 bg-no-repeat bg-right bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22%239ca3af%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M8%2010l-4-4h8l-4%204z%22%2F%3E%3C%2Fsvg%3E')]">
+            <option value="all">All Methods</option>
+            <option value="qr">QR Code</option>
+            <option value="manual">Manual</option>
+          </select>
+        </div>
       </div>
     </div>
 
-    <div id="tab-contents">
-      <div class="tab-content" data-content="day"></div>
-      <div class="tab-content hidden" data-content="week"></div>
-      <div class="tab-content hidden" data-content="month"></div>
-      <div class="tab-content hidden" data-content="year"></div>
-      <div id="attendance-error" class="text-red-600 text-center hidden p-4"></div>
+    <div class="overflow-x-auto rounded-lg border border-orange-200 mt-4">
+      <table class="w-full text-sm border-collapse">
+        <thead class="bg-orange-50 text-gray-700 border-b border-orange-200">
+          <tr>
+            <th class="text-left px-4 py-3 font-medium">Date</th>
+            <th class="text-left px-4 py-3 font-medium">Day</th>
+            <th class="text-left px-4 py-3 font-medium">Check-in Time</th>
+            <th class="text-left px-4 py-3 font-medium">Method</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceTableBody" class="divide-y divide-orange-100 bg-white">
+          <tr data-placeholder="true" id="tableLoadingRow">
+            <td colspan="4" class="text-center text-gray-500 py-10">
+              <i class="ph ph-spinner animate-spin text-2xl"></i> Loading...
+            </td>
+          </tr>
+          <tr data-placeholder="true" id="tableNoRecordsRow" class="hidden">
+            <td colspan="4" class="text-center text-gray-500 py-10">
+              <i class="ph ph-clipboard text-4xl block mb-2"></i>
+              No attendance records found for the selected criteria.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="attendance-error" class="text-red-600 text-center <?= $fetchError ? '' : 'hidden' ?> p-4 mt-4 bg-red-50 border border-red-200 rounded-lg">
+      <?= $fetchError ?? '' ?>
     </div>
 
   </section>
 
-  <script src="/libsys/public/js/student/myAttendance.js" defer></script>
-
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        const phpAttendanceData = <?php echo json_encode($attendanceJS, JSON_THROW_ON_ERROR); ?>;
-
-        if (typeof initializeMyAttendance === 'function') {
-          initializeMyAttendance(phpAttendanceData);
-        } else {
-          throw new Error("Initialization function 'initializeMyAttendance' not found. Check if myAttendance.js loaded correctly.");
-        }
-      } catch (error) { 
-        console.error("MyAttendance Init Error:", error.message, error);
-        const errorDiv = document.getElementById('attendance-error');
-        if (errorDiv) {
-          errorDiv.textContent = "Could not load attendance data. Please refresh.";
-          errorDiv.classList.remove('hidden');
-          document.querySelectorAll('#tab-contents .tab-content').forEach(el => el.style.display = 'none');
-        }
-      }
-    });
+    const allAttendanceLogs = <?= $attendanceJSData ?>;
   </script>
+
+  <script src="/libsys/public/js/student/myAttendance.js" defer></script>
 
 </body>

@@ -18,11 +18,15 @@ window.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  let allUsers = [];
-  let users = [];
+  let allUsers = []; 
+  let users = []; 
   let selectedRole = "All Roles";
   let selectedStatus = "All Status";
   let currentEditingUserId = null;
+
+  function buildFullName(firstName, middleName, lastName) {
+    return [firstName, middleName, lastName].filter(Boolean).join(' ');
+  }
 
   function applyFilters() {
     let filtered = [...allUsers];
@@ -53,7 +57,10 @@ window.addEventListener("DOMContentLoaded", () => {
           .filter(u => u.role.toLowerCase() !== "superadmin")
           .map(u => ({
             user_id: u.user_id,
-            name: u.full_name,
+            first_name: u.first_name,
+            middle_name: u.middle_name,
+            last_name: u.last_name,
+            name: buildFullName(u.first_name, u.middle_name, u.last_name), 
             username: u.username,
             email: u.email,
             role: u.role,
@@ -93,12 +100,27 @@ window.addEventListener("DOMContentLoaded", () => {
   [closeBtn, cancelBtn].forEach(btn => btn?.addEventListener("click", () => closeModal(modal)));
   modal?.addEventListener("click", e => { if (e.target === modal) closeModal(modal); });
 
-  function closeAddUserModal() { closeModal(addUserModal); }
+  function closeAddUserModal() {
+    closeModal(addUserModal);
+    document.getElementById("addFirstName").value = "";
+    document.getElementById("addMiddleName").value = "";
+    document.getElementById("addLastName").value = "";
+    document.getElementById("addUsername").value = "";
+    document.getElementById("userRoleDropdownValue").textContent = "Select Role";
+  }
   if (openAddUserBtn) openAddUserBtn.addEventListener("click", () => { addUserModal.classList.remove("hidden"); document.body.classList.add("overflow-hidden"); });
   [closeAddUserBtn, cancelAddUserBtn].forEach(btn => btn?.addEventListener("click", closeAddUserModal));
   addUserModal?.addEventListener("click", e => { if (e.target === addUserModal) closeAddUserModal(); });
 
-  function closeEditUserModal() { closeModal(editUserModal); currentEditingUserId = null; }
+  function closeEditUserModal() {
+    closeModal(editUserModal);
+    currentEditingUserId = null;
+    const changePasswordCheckbox = document.getElementById("togglePassword");
+    if (changePasswordCheckbox) changePasswordCheckbox.checked = false;
+    document.getElementById('passwordFields').classList.add('hidden');
+    document.getElementById('editPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+  }
   [closeEditUserBtn, cancelEditUserBtn].forEach(btn => btn?.addEventListener("click", closeEditUserModal));
   editUserModal?.addEventListener("click", e => { if (e.target === editUserModal) closeEditUserModal(); });
 
@@ -124,7 +146,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function setActiveOption(containerId, selectedElement) {
     const items = document.querySelectorAll(
-      `#${containerId} .dropdown-item, #${containerId} .role-item, #${containerId} .status-item`
+      `#${containerId} .dropdown-item, #${containerId} .role-item, #${containerId} .status-item, #${containerId} .user-role-item, #${containerId} .edit-role-item, #${containerId} .edit-status-item`
     );
     items.forEach(item => item.classList.remove("bg-orange-50", "font-semibold", "text-orange-700"));
 
@@ -137,7 +159,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const valueEl = document.getElementById("roleDropdownValue");
     if (valueEl) valueEl.textContent = val;
     setActiveOption("roleDropdownMenu", el);
-    selectedRole = val; // State update for filtering
+    selectedRole = val;
     if (typeof applyFilters === "function") applyFilters();
   };
 
@@ -145,7 +167,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const valueEl = document.getElementById("statusDropdownValue");
     if (valueEl) valueEl.textContent = val;
     setActiveOption("statusDropdownMenu", el);
-    selectedStatus = val; // State update for filtering
+    selectedStatus = val;
     if (typeof applyFilters === "function") applyFilters();
   };
 
@@ -167,26 +189,25 @@ window.addEventListener("DOMContentLoaded", () => {
     setActiveOption("editStatusDropdownMenu", el);
   };
 
-  // Set defaults on load
-  const allRolesFirst = document.querySelector("#roleDropdownMenu .dropdown-item, #roleDropdownMenu .role-item");
+  const allRolesFirst = document.querySelector("#roleDropdownMenu .dropdown-item");
   if (allRolesFirst) {
     setActiveOption("roleDropdownMenu", allRolesFirst);
     const roleVal = allRolesFirst.textContent?.trim();
     if (roleVal) {
       const roleValueEl = document.getElementById("roleDropdownValue");
       if (roleValueEl) roleValueEl.textContent = roleVal;
-      selectedRole = roleVal; // Set initial state
+      selectedRole = roleVal;
     }
   }
 
-  const allStatusFirst = document.querySelector("#statusDropdownMenu .status-item, #statusDropdownMenu .dropdown-item");
+  const allStatusFirst = document.querySelector("#statusDropdownMenu .status-item");
   if (allStatusFirst) {
     setActiveOption("statusDropdownMenu", allStatusFirst);
     const statusVal = allStatusFirst.textContent?.trim();
     if (statusVal) {
       const statusValueEl = document.getElementById("statusDropdownValue");
       if (statusValueEl) statusValueEl.textContent = statusVal;
-      selectedStatus = statusVal; // Set initial state
+      selectedStatus = statusVal;
     }
   }
 
@@ -194,14 +215,18 @@ window.addEventListener("DOMContentLoaded", () => {
   async function loadUsers() {
     if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading users...</td></tr>`;
     try {
-      const res = await fetch('userManagement/getAll');
+      const res = await fetch('/LibSys/public/superadmin/userManagement/getAll');
       const data = await res.json();
       if (!data.success) throw new Error(data.message || "Failed to fetch users");
+
       allUsers = data.users
         .filter(u => u.role.toLowerCase() !== "superadmin")
         .map(u => ({
           user_id: u.user_id,
-          name: u.full_name,
+          first_name: u.first_name,
+          middle_name: u.middle_name,
+          last_name: u.last_name,
+          name: buildFullName(u.first_name, u.middle_name, u.last_name), 
           username: u.username,
           email: u.email,
           role: u.role,
@@ -226,7 +251,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     usersToRender.forEach((user) => {
       const row = document.createElement("tr");
-      row.className = user.status === "Inactive" ? "bg-gray-100 text-gray-500" : "bg-white";
+      row.className = user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white";
       row.innerHTML = `
                 <td class="px-4 py-3"><p class="font-medium text-gray-800">${user.name}</p><p class="text-gray-500 text-xs">${user.username}</p></td>
                 <td class="px-4 py-3">${user.email || 'N/A'}</td>
@@ -244,22 +269,25 @@ window.addEventListener("DOMContentLoaded", () => {
   const confirmAddUserBtn = document.getElementById("confirmAddUser");
   if (confirmAddUserBtn) {
     confirmAddUserBtn.addEventListener("click", async () => {
-      const nameInput = addUserModal.querySelector('input[placeholder="Enter full name"]');
-      const usernameInput = addUserModal.querySelector('input[placeholder="username"]');
-      const full_name = nameInput.value.trim();
-      const username = usernameInput.value.trim();
+      const first_name = document.getElementById("addFirstName").value.trim();
+      const middle_name = document.getElementById("addMiddleName").value.trim();
+      const last_name = document.getElementById("addLastName").value.trim();
+      const username = document.getElementById("addUsername").value.trim();
       const role = document.getElementById("userRoleDropdownValue").textContent.trim();
-      if (!full_name || !username || role === "Select Role") return alert("Please fill in all required fields.");
+
+      if (!first_name || !last_name || !username || role === "Select Role") {
+        return alert("Please fill in all required fields (First Name, Last Name, Username, Role).");
+      }
       try {
         const res = await fetch("/LibSys/public/superadmin/userManagement/add", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            full_name,
-            username,
-            role
+            first_name: first_name,
+            middle_name: middle_name || null,
+            last_name: last_name,
+            username: username,
+            role: role
           })
         });
         const data = await res.json();
@@ -280,20 +308,22 @@ window.addEventListener("DOMContentLoaded", () => {
   if (userTableBody) {
     userTableBody.addEventListener("click", async (e) => {
       const row = e.target.closest("tr");
-      if (!row || row.dataset.placeholder) return; // Check for placeholder
+      if (!row || row.dataset.placeholder) return;
 
-      // Find index ignoring placeholder
       const validRows = Array.from(userTableBody.querySelectorAll("tr:not([data-placeholder='true'])"));
       const index = validRows.indexOf(row);
-      if (index < 0) return; // Not a valid data row
+      if (index < 0) return;
 
       const user = users[index];
       if (!user) return;
 
       if (e.target.closest(".editUserBtn")) {
         currentEditingUserId = user.user_id;
-        document.getElementById("editName").value = user.name;
-        document.getElementById("editEmail").value = user.email;
+        document.getElementById("editFirstName").value = user.first_name || '';
+        document.getElementById("editMiddleName").value = user.middle_name || '';
+        document.getElementById("editLastName").value = user.last_name || '';
+        document.getElementById("editUsername").value = user.username || '';
+        document.getElementById("editEmail").value = user.email || '';
         document.getElementById("editRoleDropdownValue").textContent = user.role;
         document.getElementById("editStatusDropdownValue").textContent = user.status;
         document.querySelector("#editUserTitle span").textContent = user.name;
@@ -348,12 +378,18 @@ window.addEventListener("DOMContentLoaded", () => {
     saveEditBtn.addEventListener("click", async () => {
       if (!currentEditingUserId) return;
       const payload = {
-        full_name: document.getElementById("editName").value.trim(),
+        first_name: document.getElementById("editFirstName").value.trim(),
+        middle_name: document.getElementById("editMiddleName").value.trim() || null,
+        last_name: document.getElementById("editLastName").value.trim(),
+        username: document.getElementById("editUsername").value.trim(),
         email: document.getElementById("editEmail").value.trim(),
         role: document.getElementById("editRoleDropdownValue").textContent.trim(),
         is_active: document.getElementById("editStatusDropdownValue").textContent.trim().toLowerCase() === 'active' ? 1 : 0
       };
-      if (!payload.full_name || !payload.email) return alert("Full Name and Email are required.");
+
+      if (!payload.first_name || !payload.last_name || !payload.email || !payload.username) {
+        return alert("First Name, Last Name, Username, and Email are required.");
+      }
 
       const changePasswordCheckbox = document.getElementById("togglePassword");
       if (changePasswordCheckbox.checked) {
@@ -367,9 +403,7 @@ window.addEventListener("DOMContentLoaded", () => {
       try {
         const res = await fetch(`/LibSys/public/superadmin/userManagement/update/${currentEditingUserId}`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -384,10 +418,7 @@ window.addEventListener("DOMContentLoaded", () => {
         console.error("Update user error:", err);
         alert("An error occurred while updating the user.");
       } finally {
-        if (changePasswordCheckbox) changePasswordCheckbox.checked = false;
-        document.getElementById('passwordFields').classList.add('hidden');
-        document.getElementById('editPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
+        closeEditUserModal(); 
       }
     });
   }
@@ -399,7 +430,20 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Attach listeners to eye icons in Edit Modal
+  function togglePassword(fieldId, button) {
+    const input = document.getElementById(fieldId);
+    const icon = button.querySelector('i');
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove('ph-eye');
+      icon.classList.add('ph-eye-slash');
+    } else {
+      input.type = "password";
+      icon.classList.remove('ph-eye-slash');
+      icon.classList.add('ph-eye');
+    }
+  }
+
   const toggleNewPass = document.getElementById('toggleNewPass');
   if (toggleNewPass) toggleNewPass.addEventListener('click', () => togglePassword('editPassword', toggleNewPass));
 

@@ -38,7 +38,16 @@ switch ($role) {
 
     <div class="flex items-center gap-4">
         <!-- Profile -->
-        <div class="flex justify-end items-center gap-2">
+        <div class="flex items-center gap-3">
+            <!-- Circle Avatar -->
+            <div
+                class="w-9 h-9 rounded-full bg-orange-100 border border-orange-300 flex items-center justify-center text-orange-600 text-lg font-semibold">
+                <i class="ph ph-user"></i>
+                <!-- OR: If you have an image -->
+                <!-- <img src="/path/to/profile.jpg" alt="Profile" class="w-9 h-9 rounded-full object-cover"> -->
+            </div>
+
+            <!-- User Info -->
             <div class="leading-tight">
                 <p class="text-sm font-medium text-gray-700"><?= htmlspecialchars($fullname) ?></p>
                 <p class="text-xs text-gray-500"><?= htmlspecialchars($username) ?></p>
@@ -56,63 +65,64 @@ switch ($role) {
 
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const sidebar = document.getElementById("sidebar");
-        const btn = document.getElementById("hamburgerBtn");
-        const logoutForm = document.getElementById("logoutForm");
+document.addEventListener("DOMContentLoaded", () => {
+    const sidebar = document.getElementById("sidebar");
+    const btn = document.getElementById("hamburgerBtn");
+    const logoutForm = document.getElementById("logoutForm");
 
-        if (logoutForm) {
-            logoutForm.addEventListener('submit', (event) => {
-                event.preventDefault(); 
-                try {
-                    console.log("Logout form submitted, removing saved page from sessionStorage."); // Debug
-                    sessionStorage.removeItem('bookCatalogPage'); 
-                } catch (e) {
-                    console.error("Could not remove item from sessionStorage during logout:", e);
-                }
-                console.log("Proceeding with form submission..."); //debugg=
-                logoutForm.submit(); 
-            });
+    if (logoutForm) {
+        logoutForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            try {
+                console.log("Logout form submitted, removing saved page from sessionStorage."); // Debug
+                sessionStorage.removeItem('bookCatalogPage');
+            } catch (e) {
+                console.error("Could not remove item from sessionStorage during logout:", e);
+            }
+            console.log("Proceeding with form submission..."); //debugg=
+            logoutForm.submit();
+        });
+    } else {
+        console.warn(
+        "Logout form with id='logoutForm' not found. Could not attach sessionStorage clear event.");
+    }
+
+    function toggleSidebar(forceClose = false) {
+        const isHidden = sidebar.classList.contains("-translate-x-full");
+        const body = document.body;
+
+        if (forceClose) {
+            sidebar.classList.add("-translate-x-full");
+            sidebar.classList.remove("translate-x-0");
+            body.classList.remove("overflow-hidden");
         } else {
-            console.warn("Logout form with id='logoutForm' not found. Could not attach sessionStorage clear event.");
+            sidebar.classList.toggle("-translate-x-full", !isHidden);
+            sidebar.classList.toggle("translate-x-0", isHidden);
+            body.classList.toggle("overflow-hidden", isHidden); // disables scroll when open
         }
+    }
 
-        function toggleSidebar(forceClose = false) {
-            const isHidden = sidebar.classList.contains("-translate-x-full");
-            const body = document.body;
-
-            if (forceClose) {
-                sidebar.classList.add("-translate-x-full");
-                sidebar.classList.remove("translate-x-0");
-                body.classList.remove("overflow-hidden");
-            } else {
-                sidebar.classList.toggle("-translate-x-full", !isHidden);
-                sidebar.classList.toggle("translate-x-0", isHidden);
-                body.classList.toggle("overflow-hidden", isHidden); // disables scroll when open
-            }
-        }
-
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            toggleSidebar();
-        });
-
-        document.addEventListener("click", (e) => {
-            const isMobile = window.innerWidth < 1024;
-            const clickedInsideSidebar = sidebar.contains(e.target);
-            const clickedButton = btn.contains(e.target);
-
-            if (isMobile && !clickedInsideSidebar && !clickedButton) {
-                toggleSidebar(true);
-            }
-        });
-
-        window.addEventListener("resize", () => {
-            if (window.innerWidth >= 1024) {
-                sidebar.classList.remove("-translate-x-full");
-                sidebar.classList.add("translate-x-0");
-                document.body.classList.remove("overflow-hidden");
-            }
-        });
+    btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleSidebar();
     });
+
+    document.addEventListener("click", (e) => {
+        const isMobile = window.innerWidth < 1024;
+        const clickedInsideSidebar = sidebar.contains(e.target);
+        const clickedButton = btn.contains(e.target);
+
+        if (isMobile && !clickedInsideSidebar && !clickedButton) {
+            toggleSidebar(true);
+        }
+    });
+
+    window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1024) {
+            sidebar.classList.remove("-translate-x-full");
+            sidebar.classList.add("translate-x-0");
+            document.body.classList.remove("overflow-hidden");
+        }
+    });
+});
 </script>

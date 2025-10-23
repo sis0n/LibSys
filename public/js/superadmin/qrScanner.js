@@ -25,13 +25,30 @@ function renderScanResult(data) {
     }
 
     const itemsHtml = data.items.map((item, index) => `
-        <li class="mb-1">
-            <p class="font-medium">${index + 1}. ${item.title}</p>
-            <p class="text-sm text-gray-600 ml-4">by ${item.author}</p>
+        <li class="mb-3 flex items-start gap-3">
+            <span class="text-sm font-semibold text-gray-700 w-6 text-right">
+                ${index + 1}.
+            </span>
+            <div class="flex-1">
+                <p class="font-medium text-gray-800 leading-snug">${item.title}</p>
+                <p class="text-sm text-gray-700">${item.author}</p>
+                
+                <div class="mt-2 flex flex-wrap gap-2">
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-xs font-medium">
+                        Accession No: ${item.accessionNumber}
+                    </span>
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-xs font-medium">
+                        Call No: ${item.callNumber}
+                    </span>
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-xs font-medium">
+                        IBSN: ${item.ibsn}
+                    </span>
+                </div>
+            </div>
         </li>
     `).join('');
 
-   scanResultCard.innerHTML = `
+    scanResultCard.innerHTML = `
         <div class="flex flex-col flex-grow">
             <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
             <p class="text-gray-500 mb-6">Review ticket details and process transaction</p>
@@ -48,7 +65,10 @@ function renderScanResult(data) {
                     </div>
                     <div>
                         <p class="font-semibold text-gray-800">${data.student.name}</p>
-                        <p class="text-sm text-gray-600">Student ID: ${data.student.id}</p>
+                        <p class="text-sm text-gray-600">Student ID:
+                        <span class="font-medium text-gray-700">
+                        ${data.student.id}</p>
+                        </span>
                     </div>
                 </div>
 
@@ -129,46 +149,45 @@ const sampleTicketData = {
     student: {
         name: "Student Name",
         id: "Student Number",
-        course:"BSCS",
-        yearsection:"3-A"
+        course: "BSCS",
+        yearsection: "3-A"
     },
     ticket: {
         id: "TICKET-NUMBER",
         generated: "MM/DD/YYYY, 12:00 PM/AM",
     },
-    items: [
-        {
-            title: "BOOK TITLE",
-            author: "Author Name"
-        }
-    ]
+    items: [{
+        title: "Children with disabilities : towards the realization of their right to education",
+        author: "by Aguiling-Pangalanan, Elizabeth & Barredo, Joel Mark & Luthra, Abhay & et al.",
+        accessionNumber: "4442",
+        callNumber: "K 639 A282 2018 c.2",
+        ibsn: "9.78971E+12"
+    }]
 };
 
 // Sample dynamic data for transaction history (this would come from your backend)
-const sampleTransactionHistoryData = [
-    {
-        studentName: "STUDENT NAME",
-        studentId: "20230114-S",
-        itemsBorrowed: "Book(s) 2, Item(s) 1",
-        status: "Borrowed",
-        borrowedDateTime: "2025-08-01 10:30:00",
-        returnedDateTime: "Not yet returned"
-    },{
-        studentName: "STUDENT NAME",
-        studentId: "STUDENT NUMBER",
-        itemsBorrowed: "Book Title | 1 Computer",
-        status: "Returned",
-        borrowedDateTime: "2025-08-01 10:30:00",
-        returnedDateTime: "2025-08-01 10:30:00"
-    },{
-        studentName: "STUDENT NAME",
-        studentId: "STUDENT NUMBER",
-        itemsBorrowed: "Book Title | 1 Computer",
-        status: "Undefined",
-        borrowedDateTime: "2025-08-01 10:30:00",
-        returnedDateTime: "2025-08-01 10:30:00"
-    },
-];
+const sampleTransactionHistoryData = [{
+    studentName: "STUDENT NAME",
+    studentId: "20230114-S",
+    itemsBorrowed: "Children with disabilities : towards the realization of their right to education",
+    status: "Borrowed",
+    borrowedDateTime: "2025-08-01 10:30:00",
+    returnedDateTime: "Not yet returned"
+}, {
+    studentName: "STUDENT NAME",
+    studentId: "STUDENT NUMBER",
+    itemsBorrowed: "Book Title",
+    status: "Returned",
+    borrowedDateTime: "2025-08-01 10:30:00",
+    returnedDateTime: "2025-08-01 10:30:00"
+}, {
+    studentName: "STUDENT NAME",
+    studentId: "STUDENT NUMBER",
+    itemsBorrowed: "Computer",
+    status: "Undefined",
+    borrowedDateTime: "2025-08-01 10:30:00",
+    returnedDateTime: "2025-08-01 10:30:00"
+}, ];
 
 simulateScanBtn.addEventListener('click', function() {
     renderScanResult(sampleTicketData);

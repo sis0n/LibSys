@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let cropper;
 
     // ==========================================================
-    // Registration Form Elements
+    // Registration Form Elements (also used for profile)
     // ==========================================================
     const regFormUpload = document.getElementById('regFormUpload');
     const viewRegForm = document.getElementById('viewRegForm');
@@ -71,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
             height: 200,
         });
 
-        // Create circular mask
         const circleCanvas = document.createElement('canvas');
         circleCanvas.width = 200;
         circleCanvas.height = 200;
@@ -90,6 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
         cropModal.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
         cropper.destroy();
+
+        saveBtn.classList.remove('hidden');
+        removeBtn.classList.remove('hidden');
     });
 
     // ==========================================================
@@ -114,18 +116,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     removeBtn.addEventListener('click', () => {
-        if (confirm('Remove uploaded registration form?')) {
+        if (confirm('Remove changes?')) {
             regFormUpload.value = '';
             viewRegForm.classList.add('hidden');
+            viewRegForm.href = '#';
+            uploadBtn.classList.remove('hidden');
+
+            profilePreview.src = '';
+            profilePreview.classList.add('hidden');
+            uploadInput.value = '';
+            profilePreview.previousElementSibling.style.display = 'block';
+
             saveBtn.classList.add('hidden');
             removeBtn.classList.add('hidden');
-            uploadBtn.classList.remove('hidden');
-            viewRegForm.href = '#';
         }
     });
 
     saveBtn.addEventListener('click', () => {
-        // pang test lang ng id
-        alert('Registration form saved successfully!');
+        alert('Saved changes successfully!');
     });
 });

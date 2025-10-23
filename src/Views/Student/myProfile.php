@@ -168,7 +168,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 text-orange-600">
+                    <div class="flex items-center gap-2 text-green-600">
                         <input type="file" id="regFormUpload" accept="application/pdf" class="hidden" />
                         <button id="uploadBtn" onclick="document.getElementById('regFormUpload').click()"
                             class="px-4 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-100 transition">
@@ -178,18 +178,21 @@
                             class="px-4 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-100 transition hidden">
                             View
                         </a>
-                        <button id="saveRegForm"
-                            class="px-4 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-green-50 text-green-700 transition hidden">
-                            Save
-                        </button>
-                        <button id="removeRegForm"
-                            class="px-4 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-red-50 text-red-600 transition hidden">
-                            Remove
-                        </button>
                     </div>
                 </div>
             </div>
         </section>
+        <div class="flex justify-end gap-2 mt-3">
+            <button id="saveRegForm"
+                class="px-4 py-1.5 text-sm rounded-md border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 active:scale-95 transition-all duration-200 hidden shadow-sm">
+                Save
+            </button>
+            <button id="removeRegForm"
+                class="px-4 py-1.5 text-sm rounded-md border border-red-600 bg-red-50 text-red-700 hover:bg-red-100 active:scale-95 transition-all duration-200 hidden shadow-sm">
+                Remove
+            </button>
+        </div>
+
     </div>
 </div>
 

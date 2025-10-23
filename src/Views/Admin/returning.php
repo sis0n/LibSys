@@ -79,7 +79,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200/80">
-                    
+
                 </tbody>
             </table>
         </div>
@@ -106,11 +106,11 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200/80">
-                    
+
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<script src="/libsys/public/js/superadmin/returning.js"></script>  
+<script src="/libsys/public/js/superadmin/returning.js"></script>

@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const overdueBooksTableBody = document.querySelector('.overdue-books-table tbody');
 
     function renderBooksNearDueTable(data) {
-        booksNearDueTableBody.innerHTML = ''; // Clear existing rows
+        booksNearDueTableBody.innerHTML = '';
         if (data.length === 0) {
             booksNearDueTableBody.innerHTML = `
             <tr>

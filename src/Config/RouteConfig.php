@@ -174,7 +174,8 @@ class RouteConfig
         $router->post('superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
         $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
         $router->post('superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
-       
+        $router->post('superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
+
         $router->get('superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
         $router->get('superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
         $router->post('superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
@@ -192,6 +193,10 @@ class RouteConfig
         $router->post('librarian/booksmanagement/store', 'BookManagementController@store', ['librarian']);
         $router->post('librarian/booksmanagement/update/{id}', 'BookManagementController@update', ['librarian']);
         $router->post('librarian/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['librarian']);
+
+        //student profile routes
+        $router->get('student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
+        $router->post('student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
 
         return $router;
     }

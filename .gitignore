@@ -39,3 +39,6 @@ Thumbs.db
 
 # PHPUnit cache
 .phpunit.result.cache
+
+# uploads
+/public/uploads/

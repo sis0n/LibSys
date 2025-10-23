@@ -19,7 +19,7 @@ $attendanceJSData = json_encode($allLogs, JSON_THROW_ON_ERROR | JSON_HEX_TAG | J
 
 ?>
 
-<body class="min-h-screen p-6 bg-gray-50">
+<div class="min-h-screen p-6 bg-gray-50">
   <div class="mb-6">
     <h2 class="text-2xl font-bold mb-4 text-gray-800">My Attendance</h2>
     <p class="text-gray-700">Track your library visits and check-in times.</p>
@@ -88,4 +88,4 @@ $attendanceJSData = json_encode($allLogs, JSON_THROW_ON_ERROR | JSON_HEX_TAG | J
 
   <script src="/libsys/public/js/student/myAttendance.js" defer></script>
 
-</body>
+</div>

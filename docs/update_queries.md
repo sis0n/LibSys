@@ -211,6 +211,15 @@ SET
 WHERE 
     full_name IS NOT NULL;
 
+UPDATE books
+SET accession_number = CONCAT('0000', accession_number)
+WHERE accession_number IS NOT NULL 
+AND accession_number NOT LIKE '0000%';
+
+
+ALTER TABLE users
+DROP COLUMN full_name;
+
 
 
 

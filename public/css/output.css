@@ -193,7 +193,6 @@
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
-    --container-2xs: 18rem;
     --container-sm: 24rem;
     --container-md: 28rem;
     --container-lg: 32rem;
@@ -1123,6 +1122,9 @@
   .border-green-300 {
     border-color: var(--color-green-300);
   }
+  .border-green-600 {
+    border-color: var(--color-green-600);
+  }
   .border-orange-100 {
     border-color: var(--color-orange-100);
   }
@@ -1146,6 +1148,9 @@
   }
   .border-red-300 {
     border-color: var(--color-red-300);
+  }
+  .border-red-600 {
+    border-color: var(--color-red-600);
   }
   .border-t-\[var\(--color-green-500\)\] {
     border-top-color: var(--color-green-500);
@@ -2038,6 +2043,13 @@
       }
     }
   }
+  .hover\:bg-green-100 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-green-100);
+      }
+    }
+  }
   .hover\:bg-green-700 {
     &:hover {
       @media (hover: hover) {
@@ -2084,6 +2096,13 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-orange-700);
+      }
+    }
+  }
+  .hover\:bg-red-100 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-red-100);
       }
     }
   }
@@ -2255,6 +2274,14 @@
   .focus-visible\:ring-\[var\(--color-ring\)\] {
     &:focus-visible {
       --tw-ring-color: var(--color-ring);
+    }
+  }
+  .active\:scale-95 {
+    &:active {
+      --tw-scale-x: 95%;
+      --tw-scale-y: 95%;
+      --tw-scale-z: 95%;
+      scale: var(--tw-scale-x) var(--tw-scale-y);
     }
   }
   .disabled\:pointer-events-none {

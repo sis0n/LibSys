@@ -19,73 +19,80 @@ $attendanceJSData = json_encode($allLogs, JSON_THROW_ON_ERROR | JSON_HEX_TAG | J
 
 ?>
 
-<div class="min-h-screen p-6 bg-gray-50">
-  <div class="mb-6">
-    <h2 class="text-2xl font-bold mb-4 text-gray-800">My Attendance</h2>
-    <p class="text-gray-700">Track your library visits and check-in times.</p>
-  </div>
+<div class="min-h-screen p-6">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">My Attendance</h2>
+        <p class="text-gray-700">Track your library visits and check-in times.</p>
+    </div>
 
-  <section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-      <div>
-        <h4 class="text-base font-semibold text-gray-800">Attendance History</h4>
-        <p class="text-sm text-gray-600">View your library check-ins by date</p>
-      </div>
-      <div class="flex items-center gap-4 text-sm">
-        <div class="flex items-center gap-2">
-          <label for="attendanceDate" class="text-sm font-medium text-gray-700 whitespace-nowrap">Select Date:</label>
-          <input type="date" id="attendanceDate" name="attendanceDate"
-            value="<?= date('Y-m-d') ?>"
-            class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-40 focus:ring-1 focus:ring-orange-400 align-middle">
+    <section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <div>
+                <h4 class="text-base font-semibold text-gray-800">Attendance History</h4>
+                <p class="text-sm text-gray-600">View your library check-ins by date</p>
+            </div>
+            <div class="flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-2">
+                    <label for="attendanceDate" class="text-sm font-medium text-gray-700 whitespace-nowrap">Select
+                        Date:</label>
+                    <input type="date" id="attendanceDate" name="attendanceDate" value="<?= date('Y-m-d') ?>"
+                        class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-40 focus:ring-1 focus:ring-orange-400 align-middle">
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="attendanceMethod" class="text-sm font-medium text-gray-700 whitespace-nowrap">Select
+                        Method:</label>
+                    <div class="relative w-40">
+                        <select id="attendanceMethod" name="attendanceMethod"
+                            class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 pr-8 outline-none transition text-sm text-gray-700 w-full focus:ring-1 focus:ring-orange-400 appearance-none">
+                            <option value="all">All Methods</option>
+                            <option value="qr">QR Code</option>
+                            <option value="manual">Manual</option>
+                        </select>
+                        <i
+                            class="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                    </div>
+
+                </div>
+            </div>
         </div>
-        <div class="flex items-center gap-2">
-          <label for="attendanceMethod" class="text-sm font-medium text-gray-700 whitespace-nowrap">Select Method:</label>
-          <select id="attendanceMethod" name="attendanceMethod"
-            class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-40 focus:ring-1 focus:ring-orange-400 appearance-none pr-8 bg-no-repeat bg-right bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22%239ca3af%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M8%2010l-4-4h8l-4%204z%22%2F%3E%3C%2Fsvg%3E')]">
-            <option value="all">All Methods</option>
-            <option value="qr">QR Code</option>
-            <option value="manual">Manual</option>
-          </select>
+
+        <div class="overflow-x-auto rounded-lg border border-orange-200 mt-4">
+            <table class="w-full text-sm border-collapse">
+                <thead class="bg-orange-50 text-gray-700 border-b border-orange-200">
+                    <tr>
+                        <th class="text-left px-4 py-3 font-medium">Date</th>
+                        <th class="text-left px-4 py-3 font-medium">Day</th>
+                        <th class="text-left px-4 py-3 font-medium">Check-in Time</th>
+                        <th class="text-left px-4 py-3 font-medium">Method</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTableBody" class="divide-y divide-orange-100 bg-white">
+                    <tr data-placeholder="true" id="tableLoadingRow">
+                        <td colspan="4" class="text-center text-gray-500 py-10">
+                            <i class="ph ph-spinner animate-spin text-2xl"></i> Loading...
+                        </td>
+                    </tr>
+                    <tr data-placeholder="true" id="tableNoRecordsRow" class="hidden">
+                        <td colspan="4" class="text-center text-gray-500 py-10">
+                            <i class="ph ph-clipboard text-4xl block mb-2"></i>
+                            No attendance records found for the selected criteria.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-      </div>
-    </div>
 
-    <div class="overflow-x-auto rounded-lg border border-orange-200 mt-4">
-      <table class="w-full text-sm border-collapse">
-        <thead class="bg-orange-50 text-gray-700 border-b border-orange-200">
-          <tr>
-            <th class="text-left px-4 py-3 font-medium">Date</th>
-            <th class="text-left px-4 py-3 font-medium">Day</th>
-            <th class="text-left px-4 py-3 font-medium">Check-in Time</th>
-            <th class="text-left px-4 py-3 font-medium">Method</th>
-          </tr>
-        </thead>
-        <tbody id="attendanceTableBody" class="divide-y divide-orange-100 bg-white">
-          <tr data-placeholder="true" id="tableLoadingRow">
-            <td colspan="4" class="text-center text-gray-500 py-10">
-              <i class="ph ph-spinner animate-spin text-2xl"></i> Loading...
-            </td>
-          </tr>
-          <tr data-placeholder="true" id="tableNoRecordsRow" class="hidden">
-            <td colspan="4" class="text-center text-gray-500 py-10">
-              <i class="ph ph-clipboard text-4xl block mb-2"></i>
-              No attendance records found for the selected criteria.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        <div id="attendance-error"
+            class="text-red-600 text-center <?= $fetchError ? '' : 'hidden' ?> p-4 mt-4 bg-red-50 border border-red-200 rounded-lg">
+            <?= $fetchError ?? '' ?>
+        </div>
 
-    <div id="attendance-error" class="text-red-600 text-center <?= $fetchError ? '' : 'hidden' ?> p-4 mt-4 bg-red-50 border border-red-200 rounded-lg">
-      <?= $fetchError ?? '' ?>
-    </div>
+    </section>
 
-  </section>
-
-  <script>
+    <script>
     const allAttendanceLogs = <?= $attendanceJSData ?>;
-  </script>
+    </script>
 
-  <script src="/libsys/public/js/student/myAttendance.js" defer></script>
+    <script src="/libsys/public/js/student/myAttendance.js" defer></script>
 
 </div>

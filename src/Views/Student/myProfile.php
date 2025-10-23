@@ -25,11 +25,18 @@
             </span>
 
             <!-- Upload Button -->
-            <label for="uploadProfile" class="cursor-pointer text-sm text-orange-600 font-medium hover:underline">
+            <label for="uploadProfile" class="cursor-pointer text-sm text-green-600 font-medium hover:underline">
                 Upload Image
             </label>
             <input id="uploadProfile" type="file" accept="image/*" class="hidden" required>
+
+            <p class="text-xs text-gray-500 mt-1 inline-flex items-center gap-1">
+                <i class="ph ph-info text-gray-400 text-sm relative"></i>
+                Only images below 1 MB are accepted.
+            </p>
+
         </div>
+
 
         <!-- Edit Modal -->
         <div id="cropModal" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50">
@@ -160,9 +167,10 @@
                             </p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 text-orange-600">
+
+                    <div class="flex items-center gap-2 text-green-600">
                         <input type="file" id="regFormUpload" accept="application/pdf" class="hidden" />
-                        <button onclick="document.getElementById('regFormUpload').click()"
+                        <button id="uploadBtn" onclick="document.getElementById('regFormUpload').click()"
                             class="px-4 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-100 transition">
                             Upload
                         </button>
@@ -172,7 +180,19 @@
                         </a>
                     </div>
                 </div>
+            </div>
         </section>
+        <div class="flex justify-end gap-2 mt-3">
+            <button id="saveRegForm"
+                class="px-4 py-1.5 text-sm rounded-md border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 active:scale-95 transition-all duration-200 hidden shadow-sm">
+                Save
+            </button>
+            <button id="removeRegForm"
+                class="px-4 py-1.5 text-sm rounded-md border border-red-600 bg-red-50 text-red-700 hover:bg-red-100 active:scale-95 transition-all duration-200 hidden shadow-sm">
+                Remove
+            </button>
+        </div>
+
     </div>
 </div>
 

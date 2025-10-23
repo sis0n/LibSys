@@ -217,6 +217,10 @@ WHERE accession_number IS NOT NULL
 AND accession_number NOT LIKE '0000%';
 
 
+ALTER TABLE users
+DROP COLUMN full_name;
+
+
 
 
 

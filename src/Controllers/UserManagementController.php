@@ -72,7 +72,7 @@ class UserManagementController extends Controller
     $data = json_decode(file_get_contents("php://input"), true);
 
     $first_name = trim($data['first_name'] ?? '');
-    $middle_name = trim($data['middle_name'] ?? null); 
+    $middle_name = trim($data['middle_name'] ?? null);
     $last_name = trim($data['last_name'] ?? '');
     $username = trim($data['username'] ?? '');
     $role = trim($data['role'] ?? '');
@@ -108,7 +108,7 @@ class UserManagementController extends Controller
       if (strtolower($role) === 'student') {
         $this->studentRepo->insertStudent(
           $userId,
-          $username, 
+          $username,
           $data['course'] ?? 'N/A',
           $data['year_level'] ?? 1,
           'enrolled'
@@ -191,7 +191,7 @@ class UserManagementController extends Controller
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
       }
 
-      unset($data['user_id']); 
+      unset($data['user_id']);
 
       $updated = $this->userRepo->updateUser((int)$id, $data);
 
@@ -212,6 +212,23 @@ class UserManagementController extends Controller
         'success' => false,
         'message' => 'An internal server error occurred.'
       ]);
+    }
+  }
+
+  public function allowEdit($id)
+  {
+    header('Content-Type: application/json');
+    try {
+      $studentRepo = new \App\Repositories\StudentProfileRepository();
+      $updated = $studentRepo->setEditAccess((int)$id, true);
+      echo json_encode([
+        'success' => $updated,
+        'message' => $updated
+          ? 'Student can now edit their profile again.'
+          : 'Failed to grant edit access.'
+      ]);
+    } catch (\Exception $e) {
+      echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
   }
 }

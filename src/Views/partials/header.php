@@ -2,8 +2,8 @@
 $role = $_SESSION['role'] ?? 'guest';
 $fullname = $_SESSION['fullname'] ?? 'Guest User';
 $username = $_SESSION['username'] ?? '0000';
+$profilePic = $_SESSION['profile_picture'] ?? null;
 
-// Role title
 switch ($role) {
     case 'admin':
         $roleTitle = 'Admin Access Module';
@@ -24,37 +24,33 @@ switch ($role) {
 ?>
 <header class="sticky top-0 z-10 bg-white border-b border-orange-200 px-6 py-2 flex justify-between items-center">
     <div class="flex items-center gap-3">
-        <!-- Hamburger (visible only on small screens) -->
         <button id="hamburgerBtn"
             class="lg:hidden flex items-center justify-center text-orange-700 hover:bg-orange-50 rounded-md h-9 w-9">
             <i class="ph ph-list text-2xl"></i>
         </button>
 
-        <!-- Dynamic Page Title -->
         <h1 class="text-lg font-semibold text-gray-800 leading-none">
             <?= $roleTitle ?>
         </h1>
     </div>
 
     <div class="flex items-center gap-4">
-        <!-- Profile -->
         <div class="flex items-center gap-3">
-            <!-- Circle Avatar -->
-            <div
-                class="w-9 h-9 rounded-full bg-orange-100 border border-orange-300 flex items-center justify-center text-orange-600 text-lg font-semibold">
-                <i class="ph ph-user"></i>
-                <!-- OR: If you have an image -->
-                <!-- <img src="/path/to/profile.jpg" alt="Profile" class="w-9 h-9 rounded-full object-cover"> -->
+
+            <div id="headerAvatarContainer" class="w-9 h-9 rounded-full bg-orange-100 border border-orange-300 flex items-center justify-center text-orange-600 text-lg font-semibold overflow-hidden">
+                <?php if ($profilePic): ?>
+                    <img id="headerProfilePic" src="<?= htmlspecialchars($profilePic) ?>" alt="Profile" class="w-full h-full object-cover">
+                <?php else: ?>
+                    <i id="headerProfileIcon" class="ph ph-user"></i>
+                <?php endif; ?>
             </div>
 
-            <!-- User Info -->
             <div class="leading-tight">
-                <p class="text-sm font-medium text-gray-700"><?= htmlspecialchars($fullname) ?></p>
-                <p class="text-xs text-gray-500"><?= htmlspecialchars($username) ?></p>
+                <p id="headerFullname" class="text-sm font-medium text-gray-700"><?= htmlspecialchars($fullname) ?></p>
+                <p id="headerUsername" class="text-xs text-gray-500"><?= htmlspecialchars($username) ?></p>
             </div>
         </div>
 
-        <!-- Logout -->
         <form method="POST" action="/LibSys/public/logout" id="logoutForm">
             <button type="submit" class="p-2 rounded hover:bg-gray-100">
                 <i class="ph ph-sign-out"></i>
@@ -65,64 +61,65 @@ switch ($role) {
 
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    const sidebar = document.getElementById("sidebar");
-    const btn = document.getElementById("hamburgerBtn");
-    const logoutForm = document.getElementById("logoutForm");
+    document.addEventListener("DOMContentLoaded", () => {
+        const sidebar = document.getElementById("sidebar");
+        const btn = document.getElementById("hamburgerBtn");
+        const logoutForm = document.getElementById("logoutForm");
 
-    if (logoutForm) {
-        logoutForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            try {
-                console.log("Logout form submitted, removing saved page from sessionStorage."); // Debug
-                sessionStorage.removeItem('bookCatalogPage');
-            } catch (e) {
-                console.error("Could not remove item from sessionStorage during logout:", e);
-            }
-            console.log("Proceeding with form submission..."); //debugg=
-            logoutForm.submit();
-        });
-    } else {
-        console.warn(
-        "Logout form with id='logoutForm' not found. Could not attach sessionStorage clear event.");
-    }
-
-    function toggleSidebar(forceClose = false) {
-        const isHidden = sidebar.classList.contains("-translate-x-full");
-        const body = document.body;
-
-        if (forceClose) {
-            sidebar.classList.add("-translate-x-full");
-            sidebar.classList.remove("translate-x-0");
-            body.classList.remove("overflow-hidden");
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                try {
+                    sessionStorage.removeItem('bookCatalogPage');
+                    sessionStorage.removeItem('bookManagementPage');
+                    sessionStorage.removeItem('bookManagementPage'); 
+                } catch (e) {
+                    console.error("Could not remove item from sessionStorage during logout:", e);
+                }
+                logoutForm.submit();
+            });
         } else {
-            sidebar.classList.toggle("-translate-x-full", !isHidden);
-            sidebar.classList.toggle("translate-x-0", isHidden);
-            body.classList.toggle("overflow-hidden", isHidden); // disables scroll when open
+            console.warn("Logout form with id='logoutForm' not found.");
         }
-    }
 
-    btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        toggleSidebar();
-    });
+        if (btn && sidebar) { 
+            function toggleSidebar(forceClose = false) {
+                const isHidden = sidebar.classList.contains("-translate-x-full");
+                const body = document.body;
 
-    document.addEventListener("click", (e) => {
-        const isMobile = window.innerWidth < 1024;
-        const clickedInsideSidebar = sidebar.contains(e.target);
-        const clickedButton = btn.contains(e.target);
+                if (forceClose) {
+                    sidebar.classList.add("-translate-x-full");
+                    sidebar.classList.remove("translate-x-0");
+                    body.classList.remove("overflow-hidden");
+                } else {
+                    sidebar.classList.toggle("-translate-x-full", !isHidden);
+                    sidebar.classList.toggle("translate-x-0", isHidden);
+                    body.classList.toggle("overflow-hidden", isHidden);
+                }
+            }
 
-        if (isMobile && !clickedInsideSidebar && !clickedButton) {
-            toggleSidebar(true);
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                toggleSidebar();
+            });
+
+            document.addEventListener("click", (e) => {
+                const isMobile = window.innerWidth < 1024;
+                const clickedInsideSidebar = sidebar.contains(e.target);
+                const clickedButton = btn.contains(e.target);
+
+                if (isMobile && !clickedInsideSidebar && !clickedButton) {
+                    toggleSidebar(true);
+                }
+            });
+
+            window.addEventListener("resize", () => {
+                if (window.innerWidth >= 1024) {
+                    sidebar.classList.remove("-translate-x-full");
+                    sidebar.classList.add("translate-x-0");
+                    document.body.classList.remove("overflow-hidden");
+                }
+            });
         }
     });
-
-    window.addEventListener("resize", () => {
-        if (window.innerWidth >= 1024) {
-            sidebar.classList.remove("-translate-x-full");
-            sidebar.classList.add("translate-x-0");
-            document.body.classList.remove("overflow-hidden");
-        }
-    });
-});
 </script>

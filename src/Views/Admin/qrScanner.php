@@ -64,44 +64,78 @@
     </div>
 </div>
 
-<div class="bg-white p-6 rounded-lg shadow-md mt-8">
-    <h2 class="text-xl font-semibold mb-2">Transaction History</h2>
-    <p class="text-gray-500 mb-6">Recent borrowing and return transactions</p>
 
+<!-- transaction History  -->
+<section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6 mt-6">
+    <!-- Filters -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div>
+            <h4 class="text-base font-semibold text-gray-800">Transaction History</h4>
+            <p class="text-sm text-gray-600">View and filter recent borrowing and return transactions</p>
+        </div>
+
+        <!-- Right-side filters -->
+        <div class="flex items-center gap-2 text-sm flex-wrap sm:flex-nowrap">
+
+            <!-- Search Input -->
+            <div class="relative">
+                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="transactionSearchInput" placeholder="Search by student..."
+                    class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-48 focus:ring-1 focus:ring-orange-400">
+            </div>
+
+            <!-- Date Picker -->
+            <div class="relative">
+                <input type="date" id="transactionDate" name="transactionDate" value="<?= date('Y-m-d') ?>"
+                    class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-36 focus:ring-1 focus:ring-orange-400">
+            </div>
+
+            <!-- Status Filter -->
+            <div class="relative inline-block text-left">
+                <button id="statusFilterBtn"
+                    class="border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between gap-2 w-36 hover:bg-orange-50 transition">
+                    <span id="statusFilterValue">All Status</span>
+                    <i class="ph ph-caret-down text-xs"></i>
+                </button>
+                <div id="statusFilterMenu"
+                    class="filter-dropdown-menu absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20 text-sm">
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All
+                        Status</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">
+                        Borrowed</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Returned">
+                        Returned</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Transaction Table -->
     <div class="overflow-x-auto rounded-lg border border-orange-200">
-        <table class="min-w-full divide-y divide-gray-300 ">
-            <thead class="bg-orange-50 ">
+        <table class="min-w-full divide-y divide-gray-300">
+            <thead class="bg-orange-50">
                 <tr>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                        Student Name
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                        Student ID
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                        Items Borrowed
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                        Status
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                        Borrowed Date/Time
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                        Returned Date/Time
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
+                        Name</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
+                        ID</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Items
+                        Borrowed</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Borrowed
+                        Date/Time</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Returned
+                        Date/Time</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Status
                     </th>
                 </tr>
             </thead>
             <tbody id="transactionHistoryTableBody" class="bg-white divide-y divide-gray-200">
+                <!-- dynamic data goes here -->
             </tbody>
         </table>
     </div>
-</div>
+</section>
 
-<script src="/libsys/public/js/Admin/qrScanner.js" defer></script>
+
+<script src="/libsys/public/js/admin/qrScanner.js" defer></script>

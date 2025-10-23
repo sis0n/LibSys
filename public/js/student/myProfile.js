@@ -11,18 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let cropper;
 
     // ==========================================================
-    // Registration Form Elements
+    // Registration Form Elements (also used for profile)
     // ==========================================================
     const regFormUpload = document.getElementById('regFormUpload');
     const viewRegForm = document.getElementById('viewRegForm');
+    const saveBtn = document.getElementById('saveRegForm');
+    const removeBtn = document.getElementById('removeRegForm');
+    const uploadBtn = document.getElementById('uploadBtn');
 
     // ==========================================================
-    // Profile Picture Upload and Crop
+    // Profile Picture Upload and Crop (with 1MB file size limit)
     // ==========================================================
-    // Handle upload
+    const MAX_FILE_SIZE = 1 * 1024 * 1024;
+
     uploadInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        if (file.size > MAX_FILE_SIZE) {
+            alert("Image size must be less than 1MB. Please choose a smaller file.");
+            uploadInput.value = "";
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = () => {
@@ -31,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('overflow-hidden');
             setTimeout(() => {
                 cropper = new Cropper(cropImage, {
-                    aspectRatio: 1, // square (for circular profile)
+                    aspectRatio: 1,
                     viewMode: 1,
                     dragMode: 'move',
                     background: false,
@@ -44,12 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
     });
 
-    // Zoom controls
     zoomIn.addEventListener('click', () => cropper && cropper.zoom(0.1));
     zoomOut.addEventListener('click', () => cropper && cropper.zoom(-0.1));
     resetCrop.addEventListener('click', () => cropper && cropper.reset());
 
-    // Cancel crop
     cancelCrop.addEventListener('click', () => {
         cropModal.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
@@ -57,15 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadInput.value = "";
     });
 
-    // Save cropped image
     saveCrop.addEventListener('click', () => {
         const canvas = cropper.getCroppedCanvas({
             width: 200,
             height: 200,
         });
 
-        // Create circular mask
-        const ctx = canvas.getContext('2d');
         const circleCanvas = document.createElement('canvas');
         circleCanvas.width = 200;
         circleCanvas.height = 200;
@@ -84,10 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
         cropModal.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
         cropper.destroy();
+
+        saveBtn.classList.remove('hidden');
+        removeBtn.classList.remove('hidden');
     });
 
     // ==========================================================
-    // Registration Form Upload and Preview
+    // Registration Form Upload with Save/Remove/View
     // ==========================================================
     regFormUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -102,5 +110,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const fileURL = URL.createObjectURL(file);
         viewRegForm.href = fileURL;
         viewRegForm.classList.remove('hidden');
+        saveBtn.classList.remove('hidden');
+        removeBtn.classList.remove('hidden');
+        uploadBtn.classList.add('hidden');
+    });
+
+    removeBtn.addEventListener('click', () => {
+        if (confirm('Remove changes?')) {
+            regFormUpload.value = '';
+            viewRegForm.classList.add('hidden');
+            viewRegForm.href = '#';
+            uploadBtn.classList.remove('hidden');
+
+            profilePreview.src = '';
+            profilePreview.classList.add('hidden');
+            uploadInput.value = '';
+            profilePreview.previousElementSibling.style.display = 'block';
+
+            saveBtn.classList.add('hidden');
+            removeBtn.classList.add('hidden');
+        }
+    });
+
+    saveBtn.addEventListener('click', () => {
+        alert('Saved changes successfully!');
     });
 });

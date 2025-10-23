@@ -212,6 +212,10 @@ WHERE
     full_name IS NOT NULL;
 
 
+ALTER TABLE users
+DROP COLUMN full_name;
+
+
 
 
 

@@ -68,7 +68,7 @@
 <!-- transaction History  -->
 <section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6 mt-6">
     <!-- Filters -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div>
             <h4 class="text-base font-semibold text-gray-800">Transaction History</h4>
             <p class="text-sm text-gray-600">View and filter recent borrowing and return transactions</p>
@@ -99,7 +99,8 @@
                 </button>
                 <div id="statusFilterMenu"
                     class="filter-dropdown-menu absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20 text-sm">
-                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">
+                        All
                         Status</div>
                     <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">
                         Borrowed</div>
@@ -109,6 +110,8 @@
             </div>
         </div>
     </div>
+
+
 
 
     <!-- Transaction Table -->

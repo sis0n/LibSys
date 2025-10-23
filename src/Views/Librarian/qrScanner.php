@@ -68,7 +68,7 @@
 <!-- transaction History  -->
 <section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6 mt-6">
     <!-- Filters -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div>
             <h4 class="text-base font-semibold text-gray-800">Transaction History</h4>
             <p class="text-sm text-gray-600">View and filter recent borrowing and return transactions</p>

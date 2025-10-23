@@ -221,6 +221,18 @@ ALTER TABLE users
 DROP COLUMN full_name;
 
 
+ALTER TABLE `students`
+ADD COLUMN `profile_updated` BOOLEAN NOT NULL DEFAULT FALSE AFTER `status`;
+
+ALTER TABLE `users`
+ADD COLUMN `suffix` VARCHAR(10) NULL DEFAULT NULL AFTER `last_name`;
+
+ALTER TABLE `students`
+ADD COLUMN `contact` VARCHAR(20) NULL DEFAULT NULL AFTER `section`,
+ADD COLUMN `registration_form` VARCHAR(255) NULL DEFAULT NULL AFTER `profile_updated`;
+
+ALTER TABLE students ADD can_edit_profile TINYINT(1) DEFAULT 0 AFTER profile_updated;
+
 
 
 

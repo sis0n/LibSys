@@ -21,7 +21,7 @@ class UserRepository
       // try student_number
       $stmt = $this->db->prepare("
                 SELECT 
-                    u.user_id, u.username, u.password, u.first_name, u.middle_name, u.last_name, u.is_active, u.role,
+                    u.user_id, u.username, u.password, u.first_name, u.middle_name, u.last_name, u.suffix, u.profile_picture, u.is_active, u.role,
                     s.student_id, s.student_number, s.year_level, s.course
                 FROM students s
                 LEFT JOIN users u ON u.user_id = s.user_id
@@ -36,9 +36,10 @@ class UserRepository
         return $student;
       }
 
+      // fallback by username
       $stmt = $this->db->prepare("
                 SELECT 
-                    u.user_id, u.username, u.password, u.first_name, u.middle_name, u.last_name, u.is_active, u.role,
+                    u.user_id, u.username, u.password, u.first_name, u.middle_name, u.last_name, u.suffix, u.profile_picture, u.is_active, u.role,
                     s.student_id, s.student_number, s.year_level, s.course
                 FROM users u
                 LEFT JOIN students s ON u.user_id = s.user_id
@@ -59,20 +60,21 @@ class UserRepository
   public function insertUser(array $data): int
   {
     $stmt = $this->db->prepare("
-        INSERT INTO users (username, password, first_name, middle_name, last_name, email, role, is_active, created_at)
-        VALUES (:username, :password, :first_name, :middle_name, :last_name, :email, :role, :is_active, :created_at)
-    ");
+            INSERT INTO users (username, password, first_name, middle_name, last_name, suffix, email, role, is_active, created_at)
+            VALUES (:username, :password, :first_name, :middle_name, :last_name, :suffix, :email, :role, :is_active, :created_at)
+        ");
 
     $stmt->execute([
-      ':username'     => $data['username'],
-      ':password'     => $data['password'],
-      ':first_name'   => $data['first_name'],
-      ':middle_name'  => $data['middle_name'],
-      ':last_name'    => $data['last_name'],
-      ':email'        => $data['email'] ?? null,
-      ':role'         => $data['role'],
-      ':is_active'    => $data['is_active'] ?? 1,
-      ':created_at'   => $data['created_at'] ?? date('Y-m-d H:i:s')
+      ':username' => $data['username'],
+      ':password' => $data['password'],
+      ':first_name' => $data['first_name'],
+      ':middle_name' => $data['middle_name'] ?? null,
+      ':last_name' => $data['last_name'],
+      ':suffix' => $data['suffix'] ?? null,
+      ':email' => $data['email'] ?? null,
+      ':role' => $data['role'],
+      ':is_active' => $data['is_active'] ?? 1,
+      ':created_at' => $data['created_at'] ?? date('Y-m-d H:i:s')
     ]);
 
     return (int)$this->db->lastInsertId();
@@ -83,7 +85,6 @@ class UserRepository
     $fields = [];
     $params = [':id' => $id];
 
-    // Pinalitan ng bagong fields
     if (isset($data['first_name'])) {
       $fields[] = "first_name = :first_name";
       $params[':first_name'] = $data['first_name'];
@@ -95,6 +96,10 @@ class UserRepository
     if (isset($data['last_name'])) {
       $fields[] = "last_name = :last_name";
       $params[':last_name'] = $data['last_name'];
+    }
+    if (isset($data['suffix'])) {
+      $fields[] = "suffix = :suffix";
+      $params[':suffix'] = $data['suffix'];
     }
     if (isset($data['username'])) {
       $fields[] = "username = :username";
@@ -116,12 +121,16 @@ class UserRepository
       $fields[] = "is_active = :is_active";
       $params[':is_active'] = $data['is_active'];
     }
-
-    $fields[] = "updated_at = NOW()";
+    if (isset($data['profile_picture'])) {
+      $fields[] = "profile_picture = :profile_picture";
+      $params[':profile_picture'] = $data['profile_picture'];
+    }
 
     if (empty($fields)) {
       return false;
     }
+
+    $fields[] = "updated_at = NOW()";
 
     $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE user_id = :id";
     try {
@@ -137,20 +146,21 @@ class UserRepository
   {
     try {
       $stmt = $this->db->query("
-            SELECT 
-                user_id,
-                username,
-                first_name,
-                middle_name,
-                last_name,
-                email,
-                role,
-                is_active,
-                created_at
-            FROM users
-            WHERE deleted_at IS NULL
-            ORDER BY user_id DESC
-        ");
+                SELECT 
+                    user_id,
+                    username,
+                    first_name,
+                    middle_name,
+                    last_name,
+                    suffix,
+                    email,
+                    role,
+                    is_active,
+                    created_at
+                FROM users
+                WHERE deleted_at IS NULL
+                ORDER BY user_id DESC
+            ");
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
       error_log('[UserRepository::getAllUsers] ' . $e->getMessage());
@@ -162,54 +172,53 @@ class UserRepository
   {
     try {
       $stmt = $this->db->prepare("
-            SELECT 
-                u.user_id, 
-                u.username, 
-                u.first_name, 
-                u.middle_name, 
-                u.last_name, 
-                u.is_active, 
-                u.role,
-                s.student_id, 
-                s.student_number, 
-                s.year_level, 
-                s.course
-            FROM users u
-            JOIN students s ON u.user_id = s.user_id
-            WHERE UPPER(s.student_number) = UPPER(:student_number)
-            AND u.deleted_at IS NULL
-            LIMIT 1
-        ");
+                SELECT 
+                    u.user_id, 
+                    u.username, 
+                    u.first_name, 
+                    u.middle_name, 
+                    u.last_name, 
+                    u.suffix,
+                    u.profile_picture,
+                    u.is_active, 
+                    u.role,
+                    s.student_id, 
+                    s.student_number, 
+                    s.year_level, 
+                    s.course,
+                    s.section
+                FROM users u
+                JOIN students s ON u.user_id = s.user_id
+                WHERE UPPER(s.student_number) = UPPER(:student_number)
+                AND u.deleted_at IS NULL
+                LIMIT 1
+            ");
       $stmt->execute(['student_number' => $studentNumber]);
 
       $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-      error_log("[UserRepository] findByStudentNumber CALLED with: $studentNumber");
-      error_log("[UserRepository] findByStudentNumber query result count: " . ($result ? '1' : '0'));
-
-      return $result; 
-
+      return $result;
     } catch (PDOException $e) {
       error_log("[UserRepository::findByStudentNumber] " . $e->getMessage());
-      return false; 
+      return false;
     }
   }
 
   public function getUserById($id)
   {
     $stmt = $this->db->prepare("
-        SELECT 
-            user_id, 
-            first_name, 
-            middle_name, 
-            last_name, 
-            username, 
-            email,
-            role, 
-            is_active 
-        FROM users 
-        WHERE user_id = :id
-    ");
+            SELECT 
+                user_id, 
+                first_name, 
+                middle_name, 
+                last_name, 
+                suffix,
+                username, 
+                email,
+                role, 
+                is_active 
+            FROM users 
+            WHERE user_id = :id AND deleted_at IS NULL
+        ");
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -225,15 +234,16 @@ class UserRepository
                 first_name, 
                 middle_name, 
                 last_name, 
+                suffix,
                 email, 
                 role, 
                 is_active, 
                 created_at
             FROM users
             WHERE (LOWER(first_name) LIKE :query
-               OR LOWER(last_name) LIKE :query
-               OR LOWER(username) LIKE :query
-               OR LOWER(email) LIKE :query)
+                OR LOWER(last_name) LIKE :query
+                OR LOWER(username) LIKE :query
+                OR LOWER(email) LIKE :query)
             AND deleted_at IS NULL
             ORDER BY user_id DESC
         ");
@@ -244,7 +254,7 @@ class UserRepository
   public function deleteUserWithCascade(int $userId, int $deletedBy, $studentRepo): bool
   {
     try {
-      $this->db->beginTransaction(); 
+      $this->db->beginTransaction();
 
       $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = :id");
       $stmt->execute([':id' => $userId]);
@@ -256,20 +266,20 @@ class UserRepository
 
       if ($user['role'] === 'student') {
         $stmt = $this->db->prepare("
-                UPDATE students 
-                SET deleted_at = NOW(), deleted_by = :deleted_by 
-                WHERE user_id = :uid
-            ");
+                    UPDATE students 
+                    SET deleted_at = NOW(), deleted_by = :deleted_by 
+                    WHERE user_id = :uid
+                ");
         $stmt->execute([
           ':deleted_by' => $deletedBy,
           ':uid' => $userId
         ]);
 
         $stmt = $this->db->prepare("
-                INSERT INTO deleted_students (student_id, user_id, student_number, course, year_level, status, deleted_by)
-                SELECT student_id, user_id, student_number, course, year_level, status, :deleted_by
-                FROM students WHERE user_id = :uid
-            ");
+                    INSERT INTO deleted_students (student_id, user_id, student_number, course, year_level, section, status, deleted_by)
+                    SELECT student_id, user_id, student_number, course, year_level, section, status, :deleted_by
+                    FROM students WHERE user_id = :uid
+                ");
         $stmt->execute([
           ':uid' => $userId,
           ':deleted_by' => $deletedBy
@@ -277,20 +287,20 @@ class UserRepository
       }
 
       $stmt = $this->db->prepare("
-            UPDATE users 
-            SET deleted_at = NOW(), deleted_by = :deleted_by 
-            WHERE user_id = :uid
-        ");
+                UPDATE users 
+                SET deleted_at = NOW(), deleted_by = :deleted_by 
+                WHERE user_id = :uid
+            ");
       $stmt->execute([
         ':deleted_by' => $deletedBy,
         ':uid' => $userId
       ]);
 
       $stmt = $this->db->prepare("
-            INSERT INTO deleted_users (user_id, username, first_name, middle_name, last_name, email, role, deleted_by)
-            SELECT user_id, username, first_name, middle_name, last_name, email, role, :deleted_by
-            FROM users WHERE user_id = :uid
-        ");
+                INSERT INTO deleted_users (user_id, username, first_name, middle_name, last_name, suffix, email, role, deleted_by)
+                SELECT user_id, username, first_name, middle_name, last_name, suffix, email, role, :deleted_by
+                FROM users WHERE user_id = :uid
+            ");
       $stmt->execute([
         ':uid' => $userId,
         ':deleted_by' => $deletedBy
@@ -298,7 +308,7 @@ class UserRepository
 
       $this->db->commit();
       return true;
-    } catch (\Exception $e) { 
+    } catch (\Exception $e) {
       $this->db->rollBack();
       error_log("[UserRepository::deleteUserWithCascade] " . $e->getMessage());
       throw $e;
@@ -326,10 +336,10 @@ class UserRepository
   {
     try {
       $stmt = $this->db->prepare("
-            UPDATE users
-            SET password = :password, updated_at = NOW()
-            WHERE user_id = :user_id AND deleted_at IS NULL
-        ");
+                UPDATE users
+                SET password = :password, updated_at = NOW()
+                WHERE user_id = :user_id AND deleted_at IS NULL
+            ");
       return $stmt->execute([
         ':password' => $hashedPassword,
         ':user_id' => $userId

@@ -18,8 +18,8 @@ window.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  let allUsers = []; 
-  let users = []; 
+  let allUsers = [];
+  let users = [];
   let selectedRole = "All Roles";
   let selectedStatus = "All Status";
   let currentEditingUserId = null;
@@ -60,7 +60,7 @@ window.addEventListener("DOMContentLoaded", () => {
             first_name: u.first_name,
             middle_name: u.middle_name,
             last_name: u.last_name,
-            name: buildFullName(u.first_name, u.middle_name, u.last_name), 
+            name: buildFullName(u.first_name, u.middle_name, u.last_name),
             username: u.username,
             email: u.email,
             role: u.role,
@@ -226,7 +226,7 @@ window.addEventListener("DOMContentLoaded", () => {
           first_name: u.first_name,
           middle_name: u.middle_name,
           last_name: u.last_name,
-          name: buildFullName(u.first_name, u.middle_name, u.last_name), 
+          name: buildFullName(u.first_name, u.middle_name, u.last_name),
           username: u.username,
           email: u.email,
           role: u.role,
@@ -252,16 +252,33 @@ window.addEventListener("DOMContentLoaded", () => {
     usersToRender.forEach((user) => {
       const row = document.createElement("tr");
       row.className = user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white";
+
+      let actions = `
+    <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
+      <i class="ph ph-note-pencil text-base"></i><span>Edit</span>
+    </button>
+    <button class="deleteUserBtn flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-700 transition">
+      <i class="ph ph-trash text-base"></i><span>Delete</span>
+    </button>
+  `;
+
+      if (user.role.toLowerCase() === 'student') {
+        actions += `
+      <button class="allow-edit-btn flex items-center gap-1 border border-blue-500 text-blue-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-blue-50 transition" data-id="${user.user_id}">
+        Allow Edit
+      </button>
+    `;
+      }
+
       row.innerHTML = `
-                <td class="px-4 py-3"><p class="font-medium text-gray-800">${user.name}</p><p class="text-gray-500 text-xs">${user.username}</p></td>
-                <td class="px-4 py-3">${user.email || 'N/A'}</td>
-                <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
-                <td class="px-4 py-3"><span class="status-badge cursor-pointer toggle-status-btn">${getStatusBadge(user.status)}</span></td>
-                <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
-                <td class="px-4 py-3"><div class="flex items-center gap-2">
-                    <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition"><i class="ph ph-note-pencil text-base"></i><span>Edit</span></button>
-                    <button class="deleteUserBtn flex items-center gap-1 bg-red-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-700 transition"><i class="ph ph-trash text-base"></i><span>Delete</span></button>
-                </div></td>`;
+    <td class="px-4 py-3"><p class="font-medium text-gray-800">${user.name}</p><p class="text-gray-500 text-xs">${user.username}</p></td>
+    <td class="px-4 py-3">${user.email || 'N/A'}</td>
+    <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
+    <td class="px-4 py-3"><span class="status-badge cursor-pointer toggle-status-btn">${getStatusBadge(user.status)}</span></td>
+    <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
+    <td class="px-4 py-3"><div class="flex items-center gap-2">${actions}</div></td>
+  `;
+
       userTableBody.appendChild(row);
     });
   }
@@ -370,6 +387,28 @@ window.addEventListener("DOMContentLoaded", () => {
           alert("An error occurred while updating user status.");
         }
       }
+
+      if (e.target.closest(".allow-edit-btn")) {
+        const userId = user.user_id;
+        if (!confirm(`Allow "${user.name}" to edit their profile?`)) return;
+
+        try {
+          const res = await fetch(`/LibSys/public/superadmin/userManagement/allowEdit/${userId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert(data.message || "User can now edit their profile.");
+            await loadUsers(); // refresh table
+          } else {
+            alert("Error: " + (data.message || "Failed to allow edit."));
+          }
+        } catch (err) {
+          console.error("Allow Edit error:", err);
+          alert("An error occurred while updating the user.");
+        }
+      }
     });
   }
 
@@ -418,7 +457,7 @@ window.addEventListener("DOMContentLoaded", () => {
         console.error("Update user error:", err);
         alert("An error occurred while updating the user.");
       } finally {
-        closeEditUserModal(); 
+        closeEditUserModal();
       }
     });
   }

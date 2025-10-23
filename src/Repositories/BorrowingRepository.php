@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Core\Database;
-use App\Repositories\BookRepository;
+use App\Repositories\BookCatalogRepository;
 use Error;
 use PDO;
 use Exception;
@@ -16,7 +16,7 @@ class BorrowingRepository
   public function __construct()
   {
     $this->db = Database::getInstance()->getConnection();
-    $this->bookRepo = new BookRepository();
+    $this->bookRepo = new BookCatalogRepository();
   }
 
   public function getAll()

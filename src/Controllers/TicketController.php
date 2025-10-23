@@ -93,14 +93,14 @@ class TicketController extends Controller
         exit;
       }
 
-      $transactionCode = strtoupper(uniqid("TICKET-"));
+      // Generate transaction code WITHOUT "TICKET-"
+      $transactionCode = strtoupper(uniqid());
       $dueDate = date("Y-m-d H:i:s", strtotime("+7 days"));
       $transactionId = $this->ticketRepo->createTransaction($studentId, $transactionCode, $dueDate);
 
       $this->ticketRepo->addTransactionItems($transactionId, $cartItems);
 
-      // TODO: Update book availability status
-
+      // Remove cart items
       $cartItemIdsToRemove = array_column($cartItems, 'cart_id');
       if (!empty($cartItemIdsToRemove)) {
         $this->ticketRepo->removeCartItemsByIds($studentId, $cartItemIdsToRemove);
@@ -108,13 +108,14 @@ class TicketController extends Controller
 
       $_SESSION['last_ticket_code'] = $transactionCode;
 
-      $qrPath = $this->generateQr($transactionCode);
+      // Generate QR with prefix visually
+      $qrPath = $this->generateQr("TICKET-" . $transactionCode);
       if (empty($qrPath)) {
         error_log("Failed to generate QR code image for transaction: " . $transactionCode);
         echo json_encode([
           'success' => true,
           'message' => 'Checkout successful! A new Borrowing Ticket created, but QR image generation failed.',
-          'ticket_code' => $transactionCode,
+          'ticket_code' => 'TICKET-' . $transactionCode,
           'qrPath' => null
         ]);
         exit;
@@ -123,7 +124,7 @@ class TicketController extends Controller
       echo json_encode([
         'success' => true,
         'message' => 'Checkout successful! A new Borrowing Ticket has been created.',
-        'ticket_code' => $transactionCode,
+        'ticket_code' => 'TICKET-' . $transactionCode,
         'qrPath' => $qrPath
       ]);
       exit;
@@ -142,6 +143,7 @@ class TicketController extends Controller
       exit;
     }
   }
+
 
   public function show(string $transactionCode = null)
   {

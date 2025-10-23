@@ -198,6 +198,27 @@ class RouteConfig
         $router->get('student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
         $router->post('student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
 
+
+        // Superadmin QR Scanner
+        $router->post('superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
+        $router->post('superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']); // <-- Add this
+        $router->post('superadmin/qrScanner/returnTransaction', 'QRScannerController@returnTransaction', ['superadmin']); // <-- Add this
+        $router->get('superadmin/qrScanner/transactionHistory', 'QRScannerController@history', ['superadmin']);
+
+        // Admin QR Scanner
+        $router->post('admin/qrScanner/scanTicket', 'QRScannerController@scan', ['admin']);
+        $router->post('admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['admin']); // <-- Add this
+        $router->post('admin/qrScanner/returnTransaction', 'QRScannerController@returnTransaction', ['admin']); // <-- Add this
+        $router->get('admin/qrScanner/transactionHistory', 'QRScannerController@history', ['admin']);
+
+        // Librarian QR Scanner
+        $router->post('librarian/qrScanner/scanTicket', 'QRScannerController@scan', ['librarian']);
+        $router->post('librarian/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['librarian']); // <-- Add this
+        $router->post('librarian/qrScanner/returnTransaction', 'QRScannerController@returnTransaction', ['librarian']); // <-- Add this
+        $router->get('librarian/qrScanner/transactionHistory', 'QRScannerController@history', ['librarian']);
+
+
+
         return $router;
     }
 }

@@ -12,8 +12,9 @@
             <h2 class="text-xl font-semibold mb-2">Scanner</h2>
             <p class="text-gray-500 mb-6">Present QR code to scan or enter manually</p>
 
-            <div
-                class="bg-orange-50 border border-orange-200 rounded-lg text-center p-8 mb-6 flex flex-col justify-center flex-grow transition-all duration-300">
+            <!-- Scanner Box -->
+            <div id="scannerBox"
+                class="bg-orange-50 border border-orange-200 rounded-lg text-center p-8 mb-6 flex flex-col justify-center flex-grow transition-all duration-300 cursor-pointer">
                 <div class="flex justify-center items-center mb-4 flex-grow">
                     <div class="bg-white shadow-md rounded-full inline-flex items-center justify-center p-4 sm:p-6">
                         <i class="ph ph-scan text-7xl sm:text-9xl text-orange-400"></i>
@@ -21,22 +22,19 @@
                 </div>
                 <p class="font-semibold text-gray-700">Present your QR code to librarian</p>
                 <p class="text-sm text-gray-500">Position the QR code within the scanning area</p>
-
-                <!-- Simulate button -->
-                <button id="simulateScanBtn"
-                    class="mt-6 bg-orange-500 text-white py-2 px-6 rounded-lg hover:bg-orange-600 transition">
-                    Simulate Scan (Demo)
-                </button>
             </div>
         </div>
 
-        <!-- Manual Ticket Entry always stays at bottom -->
+        <!-- Hidden QR input -->
+        <input type="text" id="scannerInput" class="absolute opacity-0 pointer-events-none" autocomplete="off">
+
+        <!-- Manual Ticket Entry -->
         <div class="mt-auto">
             <h3 class="font-semibold text-gray-700 mb-2">Manual Ticket Entry</h3>
             <div class="flex gap-2">
-                <input type="text" placeholder="Enter ticket ID"
+                <input type="text" id="manualTicketInput" placeholder="Enter ticket ID"
                     class="flex-grow p-2 bg-orange-50 border border-orange-200 rounded-lg text-sm">
-                <button
+                <button id="manualTicketBtn"
                     class="bg-white border rounded-lg border-orange-200 px-4 py-2 text-gray-700 font-semibold text-sm hover:bg-orange-400 hover:text-white transition">
                     Verify
                 </button>
@@ -46,7 +44,6 @@
 
     <!-- Right Column: Scan Result -->
     <div id="scanResultCard" class="bg-white p-6 rounded-lg shadow-md h-full flex flex-col">
-
         <div>
             <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
             <p class="text-gray-500 mb-6">Review ticket details and process transaction</p>
@@ -63,7 +60,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- transaction History  -->
 <section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6 mt-6">
@@ -140,5 +136,35 @@
     </div>
 </section>
 
+<script src="/libsys/public/js/superadmin/qrScanner.js" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const scannerInput = document.getElementById('scannerInput');
+        const scannerBox = document.getElementById('scannerBox');
+        const manualBtn = document.getElementById('manualTicketBtn');
+        const manualInput = document.getElementById('manualTicketInput');
 
-<script src="/libsys/public/js/SuperAdmin/qrScanner.js" defer></script>
+        scannerInput.focus();
+
+        scannerBox.addEventListener('click', () => scannerInput.focus());
+
+        scannerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+
+                const code = scannerInput.value.trim();
+
+                if (code) {
+                    scanQRCode(code);
+                    scannerInput.value = ''; 
+                }
+            }
+        });
+
+
+        manualBtn.addEventListener('click', () => {
+            const code = manualInput.value.trim();
+            if (code) scanQRCode(code);
+        });
+    });
+</script>

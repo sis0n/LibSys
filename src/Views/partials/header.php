@@ -1,8 +1,10 @@
 <?php
-$role = $_SESSION['role'] ?? 'guest';
-$fullname = $_SESSION['fullname'] ?? 'Guest User';
-$username = $_SESSION['username'] ?? '0000';
-$profilePic = $_SESSION['profile_picture'] ?? null;
+$userData = $_SESSION['user_data'] ?? [];
+
+$role = $userData['role'] ?? 'guest';
+$fullname = $userData['fullname'] ?? 'Guest User';
+$username = $userData['username'] ?? '0000';
+$profilePic = $userData['profile_picture'] ?? null;
 
 switch ($role) {
     case 'admin':

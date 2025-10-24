@@ -121,6 +121,20 @@
     </div>
 </section>
 
+<script>
+    <?php
+    $requestUri = $_SERVER['REQUEST_URI'];
+    if (preg_match('/\/public\/(superadmin|admin|librarian)\/qrScanner/', $requestUri, $matches)) {
+        $rolePrefix = $matches[1];
+    } else {
+        $rolePrefix = 'superadmin';
+    }
+    // Ito ang magiging dynamic base path (e.g., /LibSys/public/admin/qrScanner)
+    $ajaxBasePath = "/LibSys/public/" . $rolePrefix . "/qrScanner";
+    ?>
+    // Itatalaga ang dynamic path sa global variable na gagamitin ng qrScanner.js
+    const BASE_AJAX_PATH = '<?= $ajaxBasePath ?>';
+</script>
 <script src="/libsys/public/js/superadmin/qrScanner.js" defer></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -129,13 +143,10 @@
         const manualBtn = document.getElementById('manualTicketBtn');
         const manualInput = document.getElementById('manualTicketInput');
 
-        // fetchTransactionHistory() ay tatakbo sa loob ng loadLastScan() sa qrScanner.js
-
         scannerInput.focus();
 
         scannerBox.addEventListener('click', () => scannerInput.focus());
 
-        // Scanner device input listener (keypress fix for scanner device)
         scannerInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' || e.keyCode === 13) {
                 e.preventDefault();

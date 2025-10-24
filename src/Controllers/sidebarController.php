@@ -338,11 +338,11 @@ class SidebarController extends Controller
         ]);
     }
 
-    public function librarianOverdueAlert()
+    public function librarianReturning()
     {
-        $this->view("librarian/overdueAlert", [
-            "title"=> "Librarian Overdue Alert",
-            "currentPage" => "overdueAlert"
+        $this->view("librarian/returning", [
+            "title"=> "Librarian Returning",
+            "currentPage" => "returning"
         ]);
     }
 

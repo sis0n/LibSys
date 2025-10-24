@@ -1,7 +1,7 @@
 <div class="min-h-screen">
     <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">Returning</h2>
-        <p class="text-gray-500 mt-4">Scan book barcode to process returns and manage due dates</p>
+        <h2 class="text-3xl font-bold text-gray-800">Returning</h2>
+        <p class="text-gray-500 mt-1">Scan book barcode to process returns and manage due dates</p>
     </div>
 
     <!-- Scanner and Manual Input -->
@@ -312,4 +312,4 @@
     </div>
 </div>
 
-<script src="/libsys/public/js/superadmin/returning.js"></script>
+<script src="/libsys/public/js/librarian/returning.js"></script>

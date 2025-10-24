@@ -43,9 +43,9 @@
         <div class="flex justify-center mt-6">
             <div class="flex items-center w-full max-w-4xl gap-3">
                 <input type="text" placeholder="Enter book barcode or Accession Number"
-                    class="flex-grow p-3 border  border-orange-200/80 rounded-md bg-orange-50/40 focus:ring-2 focus:ring-orange-300 focus:outline-none placeholder-orange-800/40 text-gray-800">
-                <button
-                    class="bg-orange-500 text-white px-5 py-3 rounded-md flex items-center gap-2 hover:bg-orange-600 focus:ring-2 focus:ring-orange-300 focus:outline-none border border-orange-500">
+                    class="flex-grow p-3 border  border-orange-200/80 rounded-md bg-orange-50/40  placeholder-orange-800/40 text-gray-800">
+                <button id="scan-button"
+                    class="bg-orange-500 text-white px-5 py-3 rounded-md flex items-center gap-2 hover:bg-orange-600  border border-orange-500">
                     <i class="ph ph-barcode"></i>
                     <span>Scan</span>
                 </button>
@@ -113,4 +113,203 @@
     </div>
 </div>
 
-<script src="/libsys/public/js/superadmin/returning.js"></script>
+<!-- Borrowed Modal -->
+<div id="return-modal" class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 mx-4">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-3">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">Book Barcode Scanned Successfully</h3>
+                    <p class="text-gray-500 text-sm">Book information retrieved from the system</p>
+                </div>
+            </div>
+            <button id="modal-close-button" class="text-gray-400 hover:text-gray-600">
+                <i class="ph ph-x text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Book Information -->
+        <div class="bg-stone-50 border border-stone-200 rounded-lg p-4 mb-4">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <p class="text-xs text-gray-500">Title</p>
+                    <h4 id="modal-book-title" class="font-bold text-gray-800 text-lg"></h4>
+                    <p id="modal-book-author" class="text-sm text-gray-600 mt-0.5"></p>
+                </div>
+                <span id="modal-book-status"
+                    class="bg-orange-200 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full"></span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mt-3">
+                <div>
+                    <p class="text-xs text-gray-500">ISBN</p>
+                    <p id="modal-book-isbn" class="text-sm font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Book ID</p>
+                    <p id="modal-book-id" class="text-sm font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Call Number</p>
+                    <p id="modal-book-callnumber" class="text-sm font-medium text-gray-700"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Borrower Information -->
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-3">
+                <i class="ph ph-user text-gray-600"></i>
+                <h5 class="font-semibold text-gray-800">Borrower Information</h5>
+            </div>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3">
+                <div>
+                    <p class="text-xs text-gray-500">Name</p>
+                    <p id="modal-borrower-name" class="font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Student ID</p>
+                    <p id="modal-student-id" class="font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Course</p>
+                    <p id="modal-borrower-course" class="font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Year & Section</p>
+                    <p id="modal-borrower-year-section" class="font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Email</p>
+                    <p id="modal-borrower-email" class="font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Contact</p>
+                    <p id="modal-borrower-contact" class="font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Borrow Date</p>
+                    <p id="modal-borrow-date" class="font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Due Date</p>
+                    <p id="modal-due-date" class="font-medium text-gray-700"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex justify-end items-center gap-3 mt-6">
+            <button id="modal-cancel-button"
+                class="text-xs px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 flex items-center gap-2">
+                Cancel
+            </button>
+            <button
+                class="text-xs px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 flex items-center gap-2">
+                <i class="ph ph-calendar"></i> Extend Due Date
+            </button>
+            <button
+                class="text-xs px-6 py-2.5 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 flex items-center gap-2">
+                <i class="ph ph-check-circle"></i> Mark as Returned
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Available Modal -->
+<div id="available-book-modal"
+    class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 mx-4">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-3">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">Book Barcode Scanned Successfully</h3>
+                    <p class="text-gray-500 text-sm">Book information retrieved from the system</p>
+                </div>
+            </div>
+            <button id="available-modal-close-button" class="text-gray-400 hover:text-gray-600">
+                <i class="ph ph-x text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Book Information -->
+        <div class="bg-stone-50 border border-stone-200 rounded-lg p-4 mb-4">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <p class="text-xs text-gray-500">Title</p>
+                    <h4 id="available-modal-title" class="font-bold text-gray-800 text-lg"></h4>
+                    <p id="available-modal-author" class="text-sm text-gray-600 mt-0.5"></p>
+                </div>
+                <span id="available-modal-status" 
+                    class="bg-green-200 text-green-800 text-xs font-semibold px-3 py-1 rounded-full"></span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mt-3">
+                <div>
+                    <p class="text-xs text-gray-500">ISBN</p>
+                    <p id="available-modal-isbn" class="text-sm font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Accession No.</p>
+                    <p id="available-modal-accession" class="text-sm font-medium text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Call Number</p>
+                    <p id="available-modal-call-number" class="text-sm font-medium text-gray-700">
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Book Information -->
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-3">
+                <i class="ph ph-book text-gray-600"></i>
+                <h5 class="font-semibold text-gray-800">Book Details</h5>
+            </div>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3">
+                <div>
+                    <p class="text-xs text-gray-500">Subject</p>
+                    <p id="available-modal-subject" class="font-medium text-gray-700">Biographies--Biography...</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Place</p>
+                    <p id="available-modal-place" class="font-medium text-gray-700">Quezon City</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Publisher</p>
+                    <p id="available-modal-publisher" class="font-medium text-gray-700">C & E Publishing, Inc.</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Year</p>
+                    <p id="available-modal-year" class="font-medium text-gray-700">2018</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Edition</p>
+                    <p id="available-modal-edition" class="font-medium text-gray-700">N/A</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Supplementary</p>
+                    <p id="available-modal-supplementary" class="font-medium text-gray-700">N/A</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-xs text-gray-500">Description</p>
+                    <p id="available-modal-description" class="font-medium text-gray-700 leading-relaxed">181 pages ;
+                        illustrations ; 24 cm</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex justify-end items-center mt-6">
+            <button id="available-modal-close-action"
+                class="text-xs px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 flex items-center gap-2">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="/libsys/public/js/admin/returning.js"></script>

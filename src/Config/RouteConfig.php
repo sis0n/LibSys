@@ -58,7 +58,7 @@ class RouteConfig
         $router->get('librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
         $router->get('librarian/topVisitor', 'SidebarController@librarianTopVisitor', ['librarian']);
         $router->get('librarian/borrowingHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
-        $router->get('librarian/overdueAlert', 'SidebarController@librarianOverdueAlert', ['librarian']);
+        $router->get('librarian/returning', 'SidebarController@librarianReturning', ['librarian']);
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
         $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
         $router->get('librarian/changePassword', 'SidebarController@librarianChangePassword', ['librarian']);

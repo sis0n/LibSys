@@ -233,6 +233,10 @@ ADD COLUMN `registration_form` VARCHAR(255) NULL DEFAULT NULL AFTER `profile_upd
 
 ALTER TABLE students ADD can_edit_profile TINYINT(1) DEFAULT 0 AFTER profile_updated;
 
+ALTER TABLE carts
+ADD COLUMN quantity INT(11) NOT NULL DEFAULT 1 AFTER book_id;
+
+
 di ko nalagay hahaha wait tignan ko structure
 
 

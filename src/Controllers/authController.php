@@ -41,7 +41,6 @@ class AuthController extends Controller
 
         header('Content-Type: application/json');
 
-        // CSRF Check
         if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
             echo json_encode([
                 'status' => 'error',
@@ -74,14 +73,14 @@ class AuthController extends Controller
         }
 
         if ($user) {
-            if (User::isAdmin($user)) {
+            if (User::isSuperadmin($user)) {
+                $redirect = '/libsys/public/superadmin/dashboard';
+            } elseif (User::isAdmin($user)) {
                 $redirect = '/libsys/public/admin/dashboard';
             } elseif (User::isLibrarian($user)) {
                 $redirect = '/libsys/public/librarian/dashboard';
             } elseif (User::isStudent($user)) {
                 $redirect = '/libsys/public/student/dashboard';
-            } elseif (User::isSuperadmin($user)) {
-                $redirect = '/libsys/public/superadmin/dashboard';
             } elseif (User::isScanner($user)) {
                 $redirect = '/libsys/public/scanner/attendance';
             } else {
@@ -109,24 +108,10 @@ class AuthController extends Controller
     public function logout()
     {
         session_start();
-        $_SESSION = [];
-        if (ini_get("session.use_cookies")) {
-            $params = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $params["path"],
-                $params["domain"],
-                $params["secure"],
-                $params["httponly"]
-            );
-        }
-        session_destroy();
+        $this->AuthRepository->logout();
         header("Location: /libsys/public/login");
     }
 
-    // forgot password
     public function forgotPassword()
     {
         session_start();
@@ -180,7 +165,6 @@ class AuthController extends Controller
             exit;
         }
 
-        // get user record
         $user = $this->UserRepository->getUserById($userId);
 
         if (!$user) {
@@ -191,7 +175,6 @@ class AuthController extends Controller
             exit;
         }
 
-        // fetch the full user record (para may password hash)
         $userRepo = new UserRepository();
         $userData = $userRepo->findByIdentifier($user['username']);
 
@@ -203,7 +186,6 @@ class AuthController extends Controller
             exit;
         }
 
-        // update password 
         $changed = $this->AuthRepository->changePassword($userId, $newPassword);
 
         if ($changed) {

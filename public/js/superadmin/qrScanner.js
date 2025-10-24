@@ -104,9 +104,6 @@ function renderScanResult(data) {
         <div class="flex flex-col flex-grow">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold">Scan Result</h2>
-                <button id="clearScanBtn" class="text-red-600 hover:text-red-800 transition px-2 py-1">
-                    <i class="ph ph-x-circle text-lg mr-1"></i> Clear Scan
-                </button>
             </div>
             <p class="text-gray-500 mb-6">Review ticket details and process transaction</p> 
             <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-4">
@@ -115,18 +112,23 @@ function renderScanResult(data) {
             </div>
 
             <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-12 h-12 flex-shrink-0">
-                        <img src="${profilePicPath}" alt="Student Avatar" 
-                             class="w-full h-full object-cover rounded-full border border-orange-300">
-                    </div>
-                    <div>
-                        <p class="font-semibold text-gray-800">${data.student.name}</p> 
-                        <p class="text-sm text-gray-600">
-                            Student Number: <span class="font-medium text-gray-700">${data.student.id}</span> 
-                        </p>
-                    </div>
-                </div>
+                <div class="flex items-center justify-between mb-2">
+    <div class="flex items-center gap-3">
+        <div class="w-16 h-16 flex-shrink-0">
+            <img src="${profilePicPath}" alt="Student Avatar" 
+                 class="w-full h-full object-cover rounded-full border border-orange-300">
+        </div>
+        <div>
+            <p class="font-bold text-lg text-gray-800">${data.student.name}</p> 
+            <p class="text-sm text-gray-600">
+                <span class="text-md text-gray-600">${data.student.id}</span> 
+            </p>
+        </div>
+    </div>
+    <button id="clearScanBtn" class="text-red-600 hover:text-red-800 transition px-2 py-1">
+        <i class="ph ph-x-circle text-lg mr-1"></i> Clear Scan
+    </button>
+</div>
 
                 <h2 class="font-semibold text-gray-700 mb-2">Details:</h2>
                 <div class="space-y-1 text-sm text-gray-700">

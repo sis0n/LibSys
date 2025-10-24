@@ -1,7 +1,6 @@
 const scanResultCard = document.getElementById('scanResultCard');
 const transactionHistoryTableBody = document.getElementById('transactionHistoryTableBody');
-const basePath = '/LibSys/public';
-const defaultAvatar = `${basePath}/img/default_avatar.png`;
+const defaultAvatar = `/LibSys/public/img/default_avatar.png`;
 
 const searchInput = document.getElementById('transactionSearchInput');
 const dateInput = document.getElementById('transactionDate');
@@ -65,7 +64,7 @@ function renderScanResult(data) {
         <div class="flex flex-col flex-grow">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold">Scan Result</h2>
-                </div>
+            </div>
             <p class="text-gray-500 mb-6">Review ticket details and process transaction</p> 
             
             <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-4">
@@ -180,7 +179,7 @@ function processTransaction(transactionCode, action) {
     confirmButtonText: `Yes, Process Borrow!`,
   }).then((result) => {
     if (result.isConfirmed) {
-      const url = `${basePath}/superadmin/qrScanner/borrowTransaction`;
+      const url = `${BASE_AJAX_PATH}/borrowTransaction`;
       const formData = `transaction_code=${encodeURIComponent(transactionCode)}`;
 
       fetch(url, {
@@ -209,11 +208,12 @@ function processTransaction(transactionCode, action) {
 function fetchTransactionHistory(status = statusValue.textContent, search = searchInput.value.trim(), date = dateInput.value) {
   const params = new URLSearchParams({ status, search, date: date || '' });
 
-  fetch(`${basePath}/superadmin/qrScanner/transactionHistory?${params.toString()}`)
+  fetch(`${BASE_AJAX_PATH}/transactionHistory?${params.toString()}`)
     .then(res => res.json())
     .then(res => {
       if (res.success) {
         const formattedData = res.transactions.map(h => ({
+          // FIX: Ang Controller na ang bahala sa tamang mapping (h.studentName, h.studentNumber, etc.)
           studentName: h.studentName,
           studentNumber: h.studentNumber,
           itemsBorrowed: h.itemsBorrowed,
@@ -229,7 +229,7 @@ function fetchTransactionHistory(status = statusValue.textContent, search = sear
 }
 
 function scanQRCode(transactionCode) {
-  fetch(`${basePath}/superadmin/qrScanner/scanTicket`, {
+  fetch(`${BASE_AJAX_PATH}/scanTicket`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: `transaction_code=${encodeURIComponent(transactionCode)}`
@@ -249,7 +249,6 @@ function scanQRCode(transactionCode) {
       }
     });
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchTransactionHistory();

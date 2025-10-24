@@ -42,3 +42,6 @@ Thumbs.db
 
 # uploads
 /public/uploads/
+
+# qr code
+/public/qrcodes/

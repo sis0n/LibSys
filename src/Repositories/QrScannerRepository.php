@@ -98,7 +98,7 @@ class QRScannerRepository
     }
   }
 
-  public function processBorrowing(string $transactionCode)
+  public function processBorrowing(string $transactionCode, ?int $staffId = null)
   {
     try {
       $this->db->beginTransaction();
@@ -106,20 +106,28 @@ class QRScannerRepository
       $dueDate = date('Y-m-d H:i:s', strtotime('+7 days'));
 
       $stmt = $this->db->prepare("
-                UPDATE borrow_transactions 
-                SET status = 'borrowed', borrowed_at = NOW(), due_date = :due_date 
-                WHERE transaction_code = :code AND status = 'pending'
-            ");
-      $stmt->execute(['code' => $transactionCode, 'due_date' => $dueDate]);
+            UPDATE borrow_transactions 
+            SET status = 'borrowed',
+                borrowed_at = NOW(),
+                due_date = :due_date,
+                staff_id = :staff_id
+            WHERE transaction_code = :code AND status = 'pending'
+        ");
+      $stmt->execute([
+        'code' => $transactionCode,
+        'due_date' => $dueDate,
+        'staff_id' => $staffId
+      ]);
 
       $transactionIdStmt = $this->db->prepare("SELECT transaction_id FROM borrow_transactions WHERE transaction_code = :code");
       $transactionIdStmt->execute(['code' => $transactionCode]);
       $transactionId = $transactionIdStmt->fetchColumn();
 
       $stmtItemStatus = $this->db->prepare("
-                UPDATE borrow_transaction_items SET status = 'borrowed' 
-                WHERE transaction_id = :transaction_id AND status = 'pending'
-            ");
+            UPDATE borrow_transaction_items 
+            SET status = 'borrowed' 
+            WHERE transaction_id = :transaction_id AND status = 'pending'
+        ");
       $stmtItemStatus->execute(['transaction_id' => $transactionId]);
 
       $items = $this->getTransactionItems($transactionCode);
@@ -137,6 +145,7 @@ class QRScannerRepository
       return false;
     }
   }
+
 
   public function getTransactionHistory(?string $search = null, ?string $status = null, ?string $date = null)
   {

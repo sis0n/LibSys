@@ -128,7 +128,7 @@
         const manualBtn = document.getElementById('manualTicketBtn');
         const manualInput = document.getElementById('manualTicketInput');
 
-        // Note: fetchTransactionHistory() na lang ang tatakbo sa JS para mag-update ng history.
+        // fetchTransactionHistory() na lang ang tatakbo sa JS
 
         scannerInput.focus();
 

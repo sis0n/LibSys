@@ -9,9 +9,43 @@ const statusBtn = document.getElementById("statusFilterBtn");
 const statusMenu = document.getElementById("statusFilterMenu");
 const statusValue = document.getElementById("statusFilterValue");
 
+/**
+ * NEW FUNCTION: Nagli-clear ng PHP Session at nire-render ang default state.
+ */
+function clearLastScan() {
+  Swal.fire({
+    title: 'Clear Scan Result?',
+    text: "The current scanned ticket will be removed from display.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#f97316',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Yes, Clear it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Tumatawag sa PHP Controller para i-unset ang $_SESSION['last_scanned_ticket']
+      fetch(`${basePath}/superadmin/qrScanner/clearSession`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+        .then(res => res.json())
+        .then(() => {
+          // I-reset ang display at i-load ang history
+          renderScanResult(null);
+          fetchTransactionHistory();
+          document.getElementById('scannerInput').focus();
+        })
+        .catch(() => {
+          Swal.fire('Error', 'Failed to communicate with server.', 'error');
+        });
+    }
+  });
+}
+
 function renderScanResult(data) {
 
   if (!data || !data.isValid) {
+    // Ito ang magre-render ng default state, na tumutugma sa placeholder HTML
     scanResultCard.innerHTML = `
             <div>
                 <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
@@ -32,8 +66,10 @@ function renderScanResult(data) {
 
   const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
 
+  // Gumamit ng buong path na galing sa DB
   let profilePicPath = defaultAvatar;
   if (data.student.profilePicture) {
+    // Tinitiyak na may leading slash ang path (kung wala)
     profilePicPath = data.student.profilePicture.startsWith('/')
       ? data.student.profilePicture
       : `/${data.student.profilePicture}`;
@@ -66,9 +102,13 @@ function renderScanResult(data) {
 
   scanResultCard.innerHTML = `
         <div class="flex flex-col flex-grow">
-            <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
-            <p class="text-gray-500 mb-6">Review ticket details and process transaction</p>
-
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-semibold">Scan Result</h2>
+                <button id="clearScanBtn" class="text-red-600 hover:text-red-800 transition px-2 py-1">
+                    <i class="ph ph-x-circle text-lg mr-1"></i> Clear Scan
+                </button>
+            </div>
+            <p class="text-gray-500 mb-6">Review ticket details and process transaction</p> 
             <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-4">
                 <i class="ph ph-check-circle text-xl"></i>
                 <span>Valid ticket scanned (${isBorrowed ? 'For Return' : 'For Borrow'})</span>
@@ -116,11 +156,17 @@ function renderScanResult(data) {
 
   const processBorrowBtn = document.getElementById('processBorrowBtn');
   const processReturnBtn = document.getElementById('processReturnBtn');
+  const clearBtn = document.getElementById('clearScanBtn');
 
   if (processBorrowBtn) {
     processBorrowBtn.addEventListener('click', () => processTransaction(data.ticket.id, 'borrow'));
   } else if (processReturnBtn) {
     processReturnBtn.addEventListener('click', () => processTransaction(data.ticket.id, 'return'));
+  }
+
+  // I-attach ang handler sa bagong Clear Button
+  if (clearBtn) {
+    clearBtn.addEventListener('click', clearLastScan);
   }
 }
 
@@ -193,7 +239,6 @@ function processTransaction(transactionCode, action) {
         .then(res => res.json())
         .then(res => {
           if (res.success) {
-
             Swal.fire('Success!', res.message, 'success');
             renderScanResult(null);
             loadLastScan();

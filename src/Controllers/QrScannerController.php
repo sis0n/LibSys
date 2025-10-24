@@ -172,4 +172,16 @@ class QRScannerController extends Controller
       'transactions' => $formattedHistory
     ]);
   }
+
+  public function clearSession()
+  {
+    header('Content-Type: application/json');
+
+    if (isset($_SESSION['last_scanned_ticket'])) {
+      unset($_SESSION['last_scanned_ticket']);
+      echo json_encode(['success' => true, 'message' => 'Scan cleared successfully.']);
+    } else {
+      echo json_encode(['success' => true, 'message' => 'Nothing to clear.']);
+    }
+  }
 }

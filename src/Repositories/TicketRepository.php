@@ -176,4 +176,30 @@ class TicketRepository
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
+
+  public function getPendingTransactionByStudentId(int $studentId): ?array
+  {
+    $stmt = $this->db->prepare("
+        SELECT transaction_id, transaction_code, due_date
+        FROM borrow_transactions
+        WHERE student_id = :sid AND status = 'pending'
+        LIMIT 1
+    ");
+    $stmt->execute(['sid' => $studentId]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $result ?: null;
+  }
+
+  public function countItemsInTransaction(int $transactionId): int
+  {
+    $stmt = $this->db->prepare("
+        SELECT COUNT(*) as total
+        FROM borrow_transaction_items
+        WHERE transaction_id = :tid
+    ");
+    $stmt->execute(['tid' => $transactionId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return isset($row['total']) ? (int)$row['total'] : 0;
+  }
 }

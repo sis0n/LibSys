@@ -16,13 +16,16 @@ class QRScannerRepository
   public function getStudentByTransactionCode(string $code)
   {
     $stmt = $this->db->prepare("
-        SELECT s.student_id, s.student_number, s.course, s.year_level, s.section,
-               bt.transaction_code, bt.borrowed_at, bt.due_date, bt.status
-        FROM borrow_transactions bt
-        JOIN students s ON bt.student_id = s.student_id
-        WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code) 
-        LIMIT 1
-    ");
+            SELECT 
+                s.student_id, s.student_number, s.course, s.year_level, s.section, s.user_id,
+                bt.transaction_code, bt.borrowed_at, bt.due_date, bt.status,
+                u.profile_picture, u.first_name, u.last_name, u.middle_name, u.suffix 
+            FROM borrow_transactions bt
+            JOIN students s ON bt.student_id = s.student_id
+            JOIN users u ON s.user_id = u.user_id
+            WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code) 
+            LIMIT 1
+        ");
     $stmt->execute(['code' => trim($code)]);
     return $stmt->fetch(\PDO::FETCH_ASSOC);
   }
@@ -30,12 +33,12 @@ class QRScannerRepository
   public function getTransactionItems(string $code)
   {
     $stmt = $this->db->prepare("
-        SELECT b.title, b.author, b.accession_number, b.call_number, b.book_isbn, b.book_id
-        FROM borrow_transaction_items bti
-        JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
-        JOIN books b ON bti.book_id = b.book_id
-        WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code) 
-    ");
+            SELECT b.title, b.author, b.accession_number, b.call_number, b.book_isbn, b.book_id
+            FROM borrow_transaction_items bti
+            JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
+            JOIN books b ON bti.book_id = b.book_id
+            WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code) 
+        ");
     $stmt->execute(['code' => trim($code)]);
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }

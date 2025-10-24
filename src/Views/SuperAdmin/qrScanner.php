@@ -6,13 +6,11 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
 
-    <!-- Left Column: Scanner -->
-    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col">
+    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col h-full">
         <div class="flex flex-col flex-grow">
             <h2 class="text-xl font-semibold mb-2">Scanner</h2>
             <p class="text-gray-500 mb-6">Present QR code to scan or enter manually</p>
 
-            <!-- Scanner Box -->
             <div id="scannerBox"
                 class="bg-orange-50 border border-orange-200 rounded-lg text-center p-8 mb-6 flex flex-col justify-center flex-grow transition-all duration-300 cursor-pointer">
                 <div class="flex justify-center items-center mb-4 flex-grow">
@@ -25,10 +23,8 @@
             </div>
         </div>
 
-        <!-- Hidden QR input -->
         <input type="text" id="scannerInput" class="absolute opacity-0 pointer-events-none" autocomplete="off">
 
-        <!-- Manual Ticket Entry -->
         <div class="mt-auto">
             <h3 class="font-semibold text-gray-700 mb-2">Manual Ticket Entry</h3>
             <div class="flex gap-2">
@@ -42,8 +38,7 @@
         </div>
     </div>
 
-    <!-- Right Column: Scan Result -->
-    <div id="scanResultCard" class="bg-white p-6 rounded-lg shadow-md h-full flex flex-col">
+    <div id="scanResultCard" class="bg-white p-6 rounded-lg shadow-md flex flex-col h-full">
         <div>
             <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
             <p class="text-gray-500 mb-6">Review ticket details and process transaction</p>
@@ -61,32 +56,26 @@
     </div>
 </div>
 
-<!-- transaction History  -->
 <section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6 mt-6">
-    <!-- Filters -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div>
             <h4 class="text-base font-semibold text-gray-800">Transaction History</h4>
             <p class="text-sm text-gray-600">View and filter recent borrowing and return transactions</p>
         </div>
 
-        <!-- Right-side filters -->
         <div class="flex items-center gap-2 text-sm flex-wrap sm:flex-nowrap">
 
-            <!-- Search Input -->
             <div class="relative">
                 <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input type="text" id="transactionSearchInput" placeholder="Search by student..."
                     class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-48 focus:ring-1 focus:ring-orange-400">
             </div>
 
-            <!-- Date Picker -->
             <div class="relative">
                 <input type="date" id="transactionDate" name="transactionDate" value="<?= date('Y-m-d') ?>"
                     class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-36 focus:ring-1 focus:ring-orange-400">
             </div>
 
-            <!-- Status Filter -->
             <div class="relative inline-block text-left">
                 <button id="statusFilterBtn"
                     class="border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between gap-2 w-36 hover:bg-orange-50 transition">
@@ -107,10 +96,6 @@
         </div>
     </div>
 
-
-
-
-    <!-- Transaction Table -->
     <div class="overflow-x-auto rounded-lg border border-orange-200">
         <table class="min-w-full divide-y divide-gray-300">
             <thead class="bg-orange-50">
@@ -130,7 +115,6 @@
                 </tr>
             </thead>
             <tbody id="transactionHistoryTableBody" class="bg-white divide-y divide-gray-200">
-                <!-- dynamic data goes here -->
             </tbody>
         </table>
     </div>
@@ -144,10 +128,13 @@
         const manualBtn = document.getElementById('manualTicketBtn');
         const manualInput = document.getElementById('manualTicketInput');
 
+        // Note: fetchTransactionHistory() na lang ang tatakbo sa JS para mag-update ng history.
+
         scannerInput.focus();
 
         scannerBox.addEventListener('click', () => scannerInput.focus());
 
+        // Scanner device input listener (keypress fix for scanner device)
         scannerInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' || e.keyCode === 13) {
                 e.preventDefault();
@@ -156,7 +143,7 @@
 
                 if (code) {
                     scanQRCode(code);
-                    scannerInput.value = ''; 
+                    scannerInput.value = '';
                 }
             }
         });

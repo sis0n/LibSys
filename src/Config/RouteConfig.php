@@ -204,6 +204,7 @@ class RouteConfig
         $router->post('superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']); // <-- Add this
         $router->post('superadmin/qrScanner/returnTransaction', 'QRScannerController@returnTransaction', ['superadmin']); // <-- Add this
         $router->get('superadmin/qrScanner/transactionHistory', 'QRScannerController@history', ['superadmin']);
+        $router->get('superadmin/qrScanner/lookup', 'QRScannerController@lookup', ['superadmin']);
 
         // Admin QR Scanner
         $router->post('admin/qrScanner/scanTicket', 'QRScannerController@scan', ['admin']);

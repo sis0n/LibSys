@@ -1,6 +1,7 @@
 const scanResultCard = document.getElementById('scanResultCard');
 const transactionHistoryTableBody = document.getElementById('transactionHistoryTableBody');
-const basePath = '/LibSys/public'; 
+const basePath = '/LibSys/public';
+const defaultAvatar = `${basePath}/img/default_avatar.png`;
 
 const searchInput = document.getElementById('transactionSearchInput');
 const dateInput = document.getElementById('transactionDate');
@@ -9,6 +10,7 @@ const statusMenu = document.getElementById("statusFilterMenu");
 const statusValue = document.getElementById("statusFilterValue");
 
 function renderScanResult(data) {
+
   if (!data || !data.isValid) {
     scanResultCard.innerHTML = `
             <div>
@@ -29,6 +31,14 @@ function renderScanResult(data) {
   }
 
   const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
+
+  let profilePicPath = defaultAvatar;
+  if (data.student.profilePicture) {
+    profilePicPath = data.student.profilePicture.startsWith('/')
+      ? data.student.profilePicture
+      : `/${data.student.profilePicture}`;
+  }
+
   const actionButton = isBorrowed
     ? `<button id="processReturnBtn" data-code="${data.ticket.id}" data-action="return"
               class="w-full bg-green-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-green-600 transition">
@@ -66,13 +76,14 @@ function renderScanResult(data) {
 
             <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
                 <div class="flex items-center gap-3 mb-2">
-                    <div class="bg-orange-200 rounded-full w-10 h-10 flex items-center justify-center">
-                        <i class="ph ph-user text-xl text-orange-700"></i>
+                    <div class="w-12 h-12 flex-shrink-0">
+                        <img src="${profilePicPath}" alt="Student Avatar" 
+                             class="w-full h-full object-cover rounded-full border border-orange-300">
                     </div>
                     <div>
-                        <p class="font-semibold text-gray-800">${data.student.name}</p>
+                        <p class="font-semibold text-gray-800">${data.student.name}</p> 
                         <p class="text-sm text-gray-600">
-                            Student ID: <span class="font-medium text-gray-700">${data.student.id}</span>
+                            Student Number: <span class="font-medium text-gray-700">${data.student.id}</span> 
                         </p>
                     </div>
                 </div>
@@ -182,9 +193,10 @@ function processTransaction(transactionCode, action) {
         .then(res => res.json())
         .then(res => {
           if (res.success) {
+
             Swal.fire('Success!', res.message, 'success');
-            renderScanResult(null); 
-            fetchTransactionHistory(); 
+            renderScanResult(null);
+            loadLastScan();
             document.getElementById('scannerInput').focus();
           } else {
             Swal.fire({ icon: 'error', title: 'Transaction Failed', text: res.message });
@@ -214,13 +226,51 @@ function fetchTransactionHistory(status = statusValue.textContent, search = sear
         }));
         renderTransactionHistory(formattedData);
       } else {
-        renderTransactionHistory([]); 
+        renderTransactionHistory([]);
       }
     });
 }
 
+function scanQRCode(transactionCode) {
+  fetch(`${basePath}/superadmin/qrScanner/scanTicket`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `transaction_code=${encodeURIComponent(transactionCode)}`
+  })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        renderScanResult({ isValid: true, ...res.data });
+        document.getElementById('manualTicketInput').value = '';
+      } else {
+        renderScanResult({ isValid: false, message: res.message });
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Ticket',
+          text: res.message,
+        });
+      }
+    });
+}
+
+function loadLastScan() {
+  fetch(`${basePath}/superadmin/qrScanner/lookup`)
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        renderScanResult({ isValid: true, ...res.data });
+      } else {
+        fetchTransactionHistory();
+      }
+    })
+    .catch(() => {
+      fetchTransactionHistory();
+    });
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
-  fetchTransactionHistory();
+  loadLastScan();
 
   if (statusBtn && statusMenu && statusValue) {
     statusBtn.addEventListener("click", (e) => {
@@ -261,25 +311,3 @@ document.addEventListener('DOMContentLoaded', () => {
     if (code) scanQRCode(code);
   });
 });
-
-function scanQRCode(transactionCode) {
-  fetch(`${basePath}/superadmin/qrScanner/scanTicket`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `transaction_code=${encodeURIComponent(transactionCode)}`
-  })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        renderScanResult({ isValid: true, ...res.data });
-        document.getElementById('manualTicketInput').value = '';
-      } else {
-        renderScanResult({ isValid: false, message: res.message });
-        Swal.fire({
-          icon: 'error',
-          title: 'Invalid Ticket',
-          text: res.message,
-        });
-      }
-    });
-}

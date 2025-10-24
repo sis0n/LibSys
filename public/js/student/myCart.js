@@ -28,7 +28,6 @@ async function checkoutCart() {
             body: JSON.stringify({ cart_ids: selectedIds })
         });
 
-        // Try to read as JSON first
         const text = await res.text();
         console.log("Raw response:", text);
 
@@ -37,7 +36,6 @@ async function checkoutCart() {
             data = JSON.parse(text);
         } catch {
             console.warn("Response was not JSON, maybe redirected or HTML page.");
-            // if not JSON, assume redirect happened (server handled it)
             document.open();
             document.write(text);
             document.close();
@@ -48,7 +46,6 @@ async function checkoutCart() {
 
         if (data.success) {
             alert("Checkout successful! You can now view your QR Borrowing Ticket in the Borrowing Ticket page.");
-            // Optional: reload cart to clear selected items
             loadCart();
         } else {
             alert(data.message || "Checkout failed");
@@ -68,7 +65,7 @@ async function clearCart() {
         });
         if (!res.ok) throw new Error("Failed to clear cart");
         cart = [];
-        alert("are u sure?"); // Ito 'yung original code mo
+        alert("are u sure?"); 
         renderCart();
     } catch (err) {
         console.error(err);
@@ -103,7 +100,6 @@ function renderCart() {
     const selectAllCheckbox = document.getElementById("select-all");
     const selectedItemsSection = document.getElementById("selected-items-section");
 
-    // Clear container
     while (itemsContainer.firstChild) {
         itemsContainer.removeChild(itemsContainer.firstChild);
     }
@@ -126,20 +122,17 @@ function renderCart() {
             const leftDiv = document.createElement("div");
             leftDiv.className = "flex items-center gap-3 w-full";
 
-            // === Checkbox ===
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.className = "w-4 h-4 accent-orange-600 cursor-pointer rounded-full";
             checkbox.dataset.type = item.type;
             checkbox.dataset.id = item.cart_id;
 
-            // Restore state from checkedMap
             if (checkedMap[item.cart_id]) {
                 checkbox.checked = true;
                 toggleHighlight(itemDiv, true);
             }
 
-            // === Icon ===
             const iconDiv = document.createElement("div");
             iconDiv.className = "flex-shrink-0 w-20 h-20 flex items-center justify-center";
             const iconEl = document.createElement("i");
@@ -147,7 +140,6 @@ function renderCart() {
                 `ph ${item.icon || 'ph-book'} text-5xl text-amber-700 w-10 h-10 leading-[2rem] text-center`;
             iconDiv.appendChild(iconEl);
 
-            // === Info ===
             const infoDiv = document.createElement("div");
             infoDiv.className = "flex-1";
 
@@ -198,12 +190,10 @@ function renderCart() {
                 infoDiv.appendChild(infoWrap);
             }
 
-            // === Assemble left side ===
             leftDiv.appendChild(checkbox);
             leftDiv.appendChild(iconDiv);
             leftDiv.appendChild(infoDiv);
 
-            // === Remove Button ===
             const removeBtn = document.createElement("button");
             removeBtn.className = "text-2xl text-gray-800 hover:text-orange-700 transition ml-4";
             const removeIcon = document.createElement("i");
@@ -226,7 +216,6 @@ function renderCart() {
                 syncSelectAll();
             });
 
-            // === Checkbox Click ===
             checkbox.addEventListener("click", (e) => {
                 e.stopPropagation();
                 checkedMap[item.cart_id] = checkbox.checked;
@@ -254,7 +243,6 @@ function renderCart() {
         cartCount.insertBefore(cartIcon, cartCount.firstChild);
     }
 
-    // === Select All handler ===
     if (selectAllCheckbox) {
         selectAllCheckbox.onchange = () => {
             const allItems = document.querySelectorAll("#selected-items input[type='checkbox']");

@@ -209,12 +209,12 @@ switch ($role) {
             </a>
 
             <!-- Borrowing History -->
-            <a href="/LibSys/public/superadmin/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'borrowingHistory'
+            <a href="/LibSys/public/superadmin/transactionHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'transactionHistory'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-clock-counter-clockwise text-2xl"></i>
-                <span>Borrowing History</span>
+                <span>Transaction History</span>
             </a>
 
             <!-- Overdue Alert -->
@@ -322,8 +322,8 @@ switch ($role) {
             </a>
 
             <!-- Borrowing History -->
-            <a href="/LibSys/public/admin/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'borrowingHistory'
+            <a href="/LibSys/public/admin/transactionHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'transactionHistory'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-clock-counter-clockwise text-2xl"></i>
@@ -435,8 +435,8 @@ switch ($role) {
             </a>
 
             <!-- Borrowing History -->
-            <a href="/LibSys/public/librarian/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'borrowingHistory'
+            <a href="/LibSys/public/librarian/transactionHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'transactionHistory'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-clock-counter-clockwise text-2xl"></i>

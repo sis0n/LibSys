@@ -2,6 +2,7 @@
 <p class="text-gray-700">Complete log of all book borrowing transactions with detailed tracking.</p>
 
 
+
 <section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6 mt-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div>

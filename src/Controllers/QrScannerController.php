@@ -8,16 +8,13 @@ use App\Core\Controller;
 class QRScannerController extends Controller
 {
   protected $qrScannerRepository;
+  const MAX_BORROW_LIMIT = 5;
 
   public function __construct()
   {
-    // Tiyakin na ang session ay started sa Controller base class o index.php
     $this->qrScannerRepository = new QRScannerRepository();
   }
 
-  /**
-   * Helper function to process ticket verification and return data structure.
-   */
   private function processTicketLookup(string $transactionCode)
   {
     if (empty($transactionCode)) {
@@ -30,13 +27,24 @@ class QRScannerController extends Controller
       return ['success' => false, 'message' => 'Invalid ticket code or transaction not found.'];
     }
 
-    if (strtolower($transaction['status']) === 'returned') {
-      return ['success' => false, 'message' => 'This transaction has already been fully processed and returned.'];
+    if (strtolower($transaction['status']) === 'borrowed' || strtolower($transaction['status']) === 'returned') {
+      return ['success' => false, 'message' => 'This ticket is already processed. Please use the Return Scanner.'];
+    }
+
+    $currentBorrowed = $this->qrScannerRepository->getStudentBorrowedCount(
+      (int) $transaction['student_id'],
+      $transactionCode
+    );
+
+    $itemsInTicket = count($this->qrScannerRepository->getTransactionItems($transactionCode));
+    $projectedTotal = $currentBorrowed + $itemsInTicket;
+
+    if ($projectedTotal > self::MAX_BORROW_LIMIT) {
+      return ['success' => false, 'message' => "Borrowing limit exceeded. Student currently has {$currentBorrowed} items. Cannot borrow {$itemsInTicket} more (Limit: " . self::MAX_BORROW_LIMIT . " books)."];
     }
 
     $items = $this->qrScannerRepository->getTransactionItems($transactionCode);
 
-    // Construct Full Name
     $middleInitial = !empty($transaction['middle_name']) ? strtoupper(substr($transaction['middle_name'], 0, 1)) . '. ' : '';
     $suffix = !empty($transaction['suffix']) ? ' ' . $transaction['suffix'] : '';
     $fullName = trim("{$transaction['first_name']} {$middleInitial}{$transaction['last_name']}{$suffix}");
@@ -45,7 +53,7 @@ class QRScannerController extends Controller
     $responseData = [
       'student' => [
         'name' => $fullName,
-        'id' => $transaction['student_number'], // Student Number na ang ginamit
+        'id' => $transaction['student_number'],
         'course' => $transaction['course'],
         'yearsection' => $transaction['year_level'] . '-' . $transaction['section'],
         'profilePicture' => $transaction['profile_picture']
@@ -71,9 +79,6 @@ class QRScannerController extends Controller
     return ['success' => true, 'data' => $responseData];
   }
 
-  /**
-   * Scan ticket (QR or manual) - POST method for initial scan.
-   */
   public function scan()
   {
     header('Content-Type: application/json');
@@ -81,7 +86,6 @@ class QRScannerController extends Controller
 
     $result = $this->processTicketLookup($transactionCode);
 
-    // ⭐ PERSISTENCE: I-save sa PHP Session ang code
     if ($result['success']) {
       $_SESSION['last_scanned_ticket'] = $transactionCode;
     } else {
@@ -110,7 +114,17 @@ class QRScannerController extends Controller
     $transaction = $this->qrScannerRepository->getStudentByTransactionCode($transactionCode);
 
     if (!$transaction || strtolower($transaction['status']) !== 'pending') {
-      echo json_encode(['success' => false, 'message' => 'Transaction is not for borrowing or invalid.']);
+      echo json_encode(['success' => false, 'message' => 'Transaction is not in PENDING state.']);
+      return;
+    }
+
+    $currentBorrowed = $this->qrScannerRepository->getStudentBorrowedCount(
+      (int) $transaction['student_id'],
+      $transactionCode
+    );
+
+    if ($currentBorrowed >= self::MAX_BORROW_LIMIT) {
+      echo json_encode(['success' => false, 'message' => "Borrowing limit check failed. Student is already borrowing the maximum amount (Limit: " . self::MAX_BORROW_LIMIT . " books)."]);
       return;
     }
 
@@ -118,31 +132,9 @@ class QRScannerController extends Controller
 
     if ($result) {
       unset($_SESSION['last_scanned_ticket']);
-      echo json_encode(['success' => true, 'message' => 'Borrow transaction successfully confirmed.']);
+      echo json_encode(['success' => true, 'message' => 'Borrow transaction successfully processed. Due date set to 1 week.']);
     } else {
-      echo json_encode(['success' => false, 'message' => 'Failed to confirm borrow transaction.']);
-    }
-  }
-
-  public function returnTransaction()
-  {
-    header('Content-Type: application/json');
-    $transactionCode = trim($_POST['transaction_code'] ?? '');
-
-    $transaction = $this->qrScannerRepository->getStudentByTransactionCode($transactionCode);
-
-    if (!$transaction || strtolower($transaction['status']) !== 'borrowed') {
-      echo json_encode(['success' => false, 'message' => 'Transaction is not for returning or invalid.']);
-      return;
-    }
-
-    $result = $this->qrScannerRepository->processReturning($transactionCode);
-
-    if ($result) {
-      unset($_SESSION['last_scanned_ticket']);
-      echo json_encode(['success' => true, 'message' => 'Return transaction successfully processed.']);
-    } else {
-      echo json_encode(['success' => false, 'message' => 'Failed to process return transaction.']);
+      echo json_encode(['success' => false, 'message' => 'Failed to finalize borrow transaction.']);
     }
   }
 
@@ -157,13 +149,26 @@ class QRScannerController extends Controller
     $history = $this->qrScannerRepository->getTransactionHistory($search, $status, $date);
 
     $formattedHistory = array_map(function ($h) {
+
+      $middleInitial = !empty($h['middle_name']) ? strtoupper(substr($h['middle_name'], 0, 1)) . '. ' : '';
+      $suffix = !empty($h['suffix']) ? ' ' . $h['suffix'] : '';
+      $fullName = trim("{$h['first_name']} {$middleInitial}{$h['last_name']}{$suffix}");
+
+      $borrowedDateTime = $h['borrowed_at']
+        ? date('M d, Y h:i A', strtotime($h['borrowed_at']))
+        : 'N/A';
+
+      $returnedDateTime = $h['returned_at']
+        ? date('M d, Y h:i A', strtotime($h['returned_at']))
+        : 'Not yet returned';
+
       return [
-        'student_number' => $h['student_number'],
-        'student_id' => $h['student_id'],
-        'items_borrowed' => $h['items_borrowed'],
+        'studentName' => $fullName,
+        'studentNumber' => $h['student_number'],
+        'itemsBorrowed' => (int) $h['items_borrowed'],
         'status' => ucfirst($h['status']),
-        'borrowed_at' => date('M d, Y h:i A', strtotime($h['borrowed_at'])),
-        'returned_at' => $h['returned_at'] ? date('M d, Y h:i A', strtotime($h['returned_at'])) : 'Not yet returned'
+        'borrowedDateTime' => $borrowedDateTime,
+        'returnedDateTime' => $returnedDateTime
       ];
     }, $history);
 
@@ -171,17 +176,5 @@ class QRScannerController extends Controller
       'success' => true,
       'transactions' => $formattedHistory
     ]);
-  }
-
-  public function clearSession()
-  {
-    header('Content-Type: application/json');
-
-    if (isset($_SESSION['last_scanned_ticket'])) {
-      unset($_SESSION['last_scanned_ticket']);
-      echo json_encode(['success' => true, 'message' => 'Scan cleared successfully.']);
-    } else {
-      echo json_encode(['success' => true, 'message' => 'Nothing to clear.']);
-    }
   }
 }

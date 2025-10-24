@@ -72,8 +72,9 @@
             </div>
 
             <div class="relative">
-                <input type="date" id="transactionDate" name="transactionDate" value="<?= date('Y-m-d') ?>"
-                    class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-36 focus:ring-1 focus:ring-orange-400">
+                <i class="ph ph-calendar absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                <input type="date" id="transactionDate" name="transactionDate" value=""
+                    class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 pr-9 outline-none transition text-sm text-gray-700 w-36 focus:ring-1 focus:ring-orange-400">
             </div>
 
             <div class="relative inline-block text-left">
@@ -103,7 +104,7 @@
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
                         Name</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
-                        ID</th>
+                        NUMBER</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Items
                         Borrowed</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Borrowed
@@ -128,7 +129,7 @@
         const manualBtn = document.getElementById('manualTicketBtn');
         const manualInput = document.getElementById('manualTicketInput');
 
-        // fetchTransactionHistory() na lang ang tatakbo sa JS
+        // fetchTransactionHistory() ay tatakbo sa loob ng loadLastScan() sa qrScanner.js
 
         scannerInput.focus();
 

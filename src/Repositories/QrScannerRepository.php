@@ -43,6 +43,23 @@ class QRScannerRepository
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
 
+  public function getStudentBorrowedCount(int $studentId, string $currentTransactionCode): int
+  {
+    $stmt = $this->db->prepare("
+            SELECT COUNT(bti.item_id)
+            FROM borrow_transactions bt
+            JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+            WHERE bt.student_id = :student_id 
+              AND bti.status IN ('pending', 'borrowed')
+              AND bt.transaction_code != :current_code
+        ");
+    $stmt->execute([
+      'student_id' => $studentId,
+      'current_code' => $currentTransactionCode
+    ]);
+    return (int) $stmt->fetchColumn();
+  }
+
   public function saveBorrowing(array $data)
   {
     try {
@@ -75,8 +92,8 @@ class QRScannerRepository
       $this->db->commit();
       return $transactionId;
     } catch (\Exception $e) {
-      $this->db->rollBack();
       error_log("Save Borrowing Error: " . $e->getMessage());
+      $this->db->rollBack();
       return 0;
     }
   }
@@ -86,55 +103,27 @@ class QRScannerRepository
     try {
       $this->db->beginTransaction();
 
+      $dueDate = date('Y-m-d H:i:s', strtotime('+7 days'));
+
       $stmt = $this->db->prepare("
-                UPDATE borrow_transactions SET status = 'borrowed', borrowed_at = NOW() 
+                UPDATE borrow_transactions 
+                SET status = 'borrowed', borrowed_at = NOW(), due_date = :due_date 
                 WHERE transaction_code = :code AND status = 'pending'
             ");
-      $stmt->execute(['code' => $transactionCode]);
+      $stmt->execute(['code' => $transactionCode, 'due_date' => $dueDate]);
 
-      $items = $this->getTransactionItems($transactionCode);
+      $transactionIdStmt = $this->db->prepare("SELECT transaction_id FROM borrow_transactions WHERE transaction_code = :code");
+      $transactionIdStmt->execute(['code' => $transactionCode]);
+      $transactionId = $transactionIdStmt->fetchColumn();
 
-      $stmtBook = $this->db->prepare("UPDATE books SET availability = 'borrowed' WHERE book_id = :book_id");
       $stmtItemStatus = $this->db->prepare("
                 UPDATE borrow_transaction_items SET status = 'borrowed' 
-                WHERE book_id = :book_id AND transaction_id = (SELECT transaction_id FROM borrow_transactions WHERE transaction_code = :code)
+                WHERE transaction_id = :transaction_id AND status = 'pending'
             ");
-
-      foreach ($items as $item) {
-        $stmtBook->execute(['book_id' => $item['book_id']]);
-        $stmtItemStatus->execute(['book_id' => $item['book_id'], 'code' => $transactionCode]);
-      }
-
-      $this->db->commit();
-      return true;
-    } catch (\Exception $e) {
-      $this->db->rollBack();
-      error_log("Process Borrowing Error: " . $e->getMessage());
-      return false;
-    }
-  }
-
-
-  public function processReturning(string $transactionCode)
-  {
-    try {
-      $this->db->beginTransaction();
-
-      $stmt = $this->db->prepare("
-                UPDATE borrow_transactions SET status = 'returned' 
-                WHERE transaction_code = :code AND status = 'borrowed'
-            ");
-      $stmt->execute(['code' => $transactionCode]);
+      $stmtItemStatus->execute(['transaction_id' => $transactionId]);
 
       $items = $this->getTransactionItems($transactionCode);
-
-      $stmtItem = $this->db->prepare("
-                UPDATE borrow_transaction_items SET status = 'returned', returned_at = NOW() 
-                WHERE transaction_id = (SELECT transaction_id FROM borrow_transactions WHERE transaction_code = :code) AND status = 'borrowed'
-            ");
-      $stmtItem->execute(['code' => $transactionCode]);
-
-      $stmtBook = $this->db->prepare("UPDATE books SET availability = 'available' WHERE book_id = :book_id");
+      $stmtBook = $this->db->prepare("UPDATE books SET availability = 'borrowed' WHERE book_id = :book_id");
 
       foreach ($items as $item) {
         $stmtBook->execute(['book_id' => $item['book_id']]);
@@ -143,8 +132,8 @@ class QRScannerRepository
       $this->db->commit();
       return true;
     } catch (\Exception $e) {
+      error_log("Process Borrowing Error: " . $e->getMessage());
       $this->db->rollBack();
-      error_log("Process Returning Error: " . $e->getMessage());
       return false;
     }
   }
@@ -159,10 +148,12 @@ class QRScannerRepository
                 bt.borrowed_at, 
                 bt.status,
                 MAX(bti.returned_at) AS returned_at,
-                COUNT(bti.book_id) AS items_borrowed
+                COUNT(bti.book_id) AS items_borrowed,
+                u.first_name, u.last_name, u.middle_name, u.suffix
             FROM borrow_transactions bt
             JOIN students s ON bt.student_id = s.student_id
             JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+            JOIN users u ON s.user_id = u.user_id
             WHERE 1=1
             AND bt.status IN ('borrowed', 'returned', 'pending')
         ";
@@ -184,7 +175,7 @@ class QRScannerRepository
       $params['date'] = $date;
     }
 
-    $query .= " GROUP BY bt.transaction_id ORDER BY bt.borrowed_at DESC";
+    $query .= " GROUP BY bt.transaction_id, s.student_number, s.student_id, bt.transaction_code, bt.borrowed_at, bt.status, u.first_name, u.last_name, u.middle_name, u.suffix ORDER BY bt.borrowed_at DESC";
 
     $stmt = $this->db->prepare($query);
     $stmt->execute($params);

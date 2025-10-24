@@ -1,4 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+    const booksNearDueTableBody = document.querySelector('.books-near-due-table tbody');
+    const overdueBooksTableBody = document.querySelector('.overdue-books-table tbody');
+    // Borrowed Book Modal
+    const returnModal = document.getElementById('return-modal');
+    const closeButton = document.getElementById('modal-close-button');
+    const cancelButton = document.getElementById('modal-cancel-button');
+    // Available Book Modal
+    const availableBookModal = document.getElementById('available-book-modal');
+    const availableModalCloseButton = document.getElementById('available-modal-close-button');
+    const availableModalCloseAction = document.getElementById('available-modal-close-action');
+
+    const scanButton = document.getElementById('scan-button');
+
     // Dummy data for demonstration
     const booksNearDue = [{
             student_name: 'Alex Johnson',
@@ -74,8 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
         description: '524 pages ; illustrations ; 25 cm'
     };
 
-    const booksNearDueTableBody = document.querySelector('.books-near-due-table tbody');
-    const overdueBooksTableBody = document.querySelector('.overdue-books-table tbody');
+
 
     function renderBooksNearDueTable(data) {
         booksNearDueTableBody.innerHTML = '';
@@ -161,19 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
     renderOverdueBooksTable(overdueBooks);
 
     // --- MODAL LOGIC ---
-
-    // Borrowed Book Modal
-    const returnModal = document.getElementById('return-modal');
-    const closeButton = document.getElementById('modal-close-button');
-    const cancelButton = document.getElementById('modal-cancel-button');
-
-    // Available Book Modal
-    const availableBookModal = document.getElementById('available-book-modal');
-    const availableModalCloseButton = document.getElementById('available-modal-close-button');
-    const availableModalCloseAction = document.getElementById('available-modal-close-action');
-
-    const scanButton = document.getElementById('scan-button');
-
     // Function to open the BORROWED book modal
     const openReturnModal = (bookData) => {
         document.getElementById('modal-book-title').textContent = bookData.item_borrowed;

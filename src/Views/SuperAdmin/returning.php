@@ -5,7 +5,7 @@
     </div>
 
     <!-- Scanner and Manual Input -->
-    <div class="bg-white border border-orange-200/80 rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
+    <div class="bg-white rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
         <div class="flex items-center gap-3">
             <i class="ph ph-barcode text-2xl text-gray-700"></i>
             <h3 class="text-xl font-semibold text-gray-800">Scan Book Barcode</h3>

@@ -19,39 +19,33 @@ class AuthRepository
       session_start();
     }
 
-    // Tatawagin na nito 'yung inayos na findByIdentifier mula sa UserRepository
     $user = $this->userRepo->findByIdentifier($username);
-
-    error_log("[AuthRepository] User found by identifier ('$username'): " . print_r($user, true));
 
     if ($user && isset($user['password']) && password_verify($password, $user['password'])) {
       session_regenerate_id(true);
 
-      $_SESSION['user_id'] = $user['user_id'];
-      $_SESSION['username'] = $user['username'] ?? $user['student_number'] ?? $username;
-      $_SESSION['role'] = !empty($user['role']) ? strtolower(trim($user['role'])) : 'guest';
-
-      // --- ITO YUNG MGA AYOS ---
-      // Kukuhanin na nito ang tamang profile picture path
-      $_SESSION['profile_picture'] = $user['profile_picture'] ?? null;
-
-      // Kukuhanin na nito ang mga hiwalay na pangalan
       $firstName = $user['first_name'] ?? '';
       $middleName = $user['middle_name'] ?? '';
       $lastName = $user['last_name'] ?? '';
       $suffix = $user['suffix'] ?? '';
-
-      // Bubuuin ang tamang full name kasama ang suffix
       $fullName = implode(' ', array_filter([$firstName, $middleName, $lastName, $suffix]));
 
-      $_SESSION['fullname'] = !empty(trim($fullName)) ? $fullName : ($_SESSION['username'] ?? 'User');
-      // --- DULO NG AYOS ---
+      $_SESSION['user_data'] = [
+        'user_id' => $user['user_id'],
+        'username' => $user['username'] ?? $user['student_number'] ?? $username,
+        'role' => !empty($user['role']) ? strtolower(trim($user['role'])) : 'guest',
+        'fullname' => !empty(trim($fullName)) ? $fullName : ($_SESSION['username'] ?? 'User'),
+        'profile_picture' => $user['profile_picture'] ?? null,
+        'is_active' => $user['is_active'] ?? 0,
+        'student_id' => $user['student_id'] ?? null
+      ];
 
-      error_log("[AuthRepository] Session data set: " . print_r($_SESSION, true));
+      $_SESSION['user_id'] = $user['user_id'];
+      $_SESSION['username'] = $_SESSION['user_data']['username'];
+      $_SESSION['role'] = $_SESSION['user_data']['role'];
 
       return $user;
     }
-    error_log("[AuthRepository] Login failed for '$username'. User found: " . ($user ? 'Yes' : 'No') . ", Password verify: " . ($user && isset($user['password']) ? (password_verify($password, $user['password']) ? 'Success' : 'Fail') : 'N/A'));
     return null;
   }
 

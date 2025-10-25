@@ -233,6 +233,26 @@ class TicketRepository
     return isset($row['total']) ? (int)$row['total'] : 0;
   }
 
+  public function countBorrowedBooksThisWeek(int $studentId): int
+  {
+    $query = "
+        SELECT COUNT(*) AS total
+        FROM borrow_transaction_items bti
+        INNER JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
+        WHERE bt.student_id = :student_id
+          AND (bt.status = 'pending' OR bt.status = 'borrowed')
+          AND bt.borrowed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    ";
+
+    $stmt = $this->db->prepare($query);
+    $stmt->bindValue(':student_id', $studentId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return (int) $stmt->fetchColumn();
+  }
+
+
+
 
   public function beginTransaction(): void
   {

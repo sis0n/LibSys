@@ -61,7 +61,7 @@ class TicketController extends Controller
     header('Content-Type: application/json');
 
     $userId = $_SESSION['user_id'] ?? null;
-    $MAX_BOOKS_PER_TICKET = 5;
+    $MAX_BOOKS_PER_WEEK = 5;
 
     if (!$userId) {
       http_response_code(403);
@@ -76,7 +76,6 @@ class TicketController extends Controller
       exit;
     }
 
-    // PROFILE COMPLETION CHECK
     $profileCheck = $this->ticketRepo->checkProfileCompletion($studentId);
     if (!$profileCheck['complete']) {
       http_response_code(400);
@@ -92,7 +91,6 @@ class TicketController extends Controller
     }
 
     try {
-      // ✅ Begin Transaction
       $this->ticketRepo->beginTransaction();
 
       $cartItems = !empty($selectedIds)
@@ -100,46 +98,50 @@ class TicketController extends Controller
         : $this->ticketRepo->getCartItems($studentId);
 
       if (empty($cartItems)) {
-        echo json_encode(['success' => false, 'message' => 'Cart is empty or selected items not found.']);
         $this->ticketRepo->rollback();
+        echo json_encode(['success' => false, 'message' => 'Cart is empty or selected items not found.']);
         exit;
       }
 
-      $existingTicket = $this->ticketRepo->getPendingTransactionByStudentId($studentId);
+      $borrowedThisWeek = $this->ticketRepo->countBorrowedBooksThisWeek($studentId);
       $newItemsCount = count($cartItems);
+      $totalAfterCheckout = $borrowedThisWeek + $newItemsCount;
 
-      if ($existingTicket) {
-        $transactionId = (int)$existingTicket['transaction_id'];
-        $transactionCode = $existingTicket['transaction_code'];
+      if ($totalAfterCheckout > $MAX_BOOKS_PER_WEEK) {
+        $this->ticketRepo->rollback();
+        http_response_code(400);
+        echo json_encode([
+          'success' => false,
+          'message' => "You can only borrow a maximum of {$MAX_BOOKS_PER_WEEK} books per week. 
+                You currently have {$borrowedThisWeek} borrowed this week and are trying to add {$newItemsCount} more."
+        ]);
+        exit;
+      }
 
-        // ✅ Lock transaction row to prevent race condition
+      $existingTransaction = $this->ticketRepo->getPendingTransactionByStudentId($studentId);
+
+      if ($existingTransaction) {
+        $transactionId = (int) $existingTransaction['transaction_id'];
+        $transactionCode = $existingTransaction['transaction_code'];
+
         $currentItemsCount = $this->ticketRepo->countItemsInTransaction($transactionId, true);
         $totalItems = $currentItemsCount + $newItemsCount;
 
-        if ($totalItems > $MAX_BOOKS_PER_TICKET) {
+        if ($totalItems > $MAX_BOOKS_PER_WEEK) {
           $this->ticketRepo->rollback();
           http_response_code(400);
           echo json_encode([
             'success' => false,
-            'message' => "You can only borrow a total of {$MAX_BOOKS_PER_TICKET} books per pending ticket (Current: {$currentItemsCount}). You are trying to add {$newItemsCount} more."
+            'message' => "You can only borrow a total of {$MAX_BOOKS_PER_WEEK} books per week (Current: {$borrowedThisWeek})."
           ]);
           exit;
         }
 
         $message = 'Checkout successful! Items added to your pending ticket.';
       } else {
-        if ($newItemsCount > $MAX_BOOKS_PER_TICKET) {
-          $this->ticketRepo->rollback();
-          http_response_code(400);
-          echo json_encode([
-            'success' => false,
-            'message' => "The number of books ({$newItemsCount}) exceeds the maximum limit of {$MAX_BOOKS_PER_TICKET} per ticket."
-          ]);
-          exit;
-        }
-
-        $transactionCode = strtoupper(uniqid());
+        $transactionCode = strtoupper(uniqid('TXN'));
         $dueDate = date("Y-m-d H:i:s", strtotime("+7 days"));
+
         $transactionId = $this->ticketRepo->createTransaction($studentId, $transactionCode, $dueDate);
         $message = 'Checkout successful! A new Borrowing Ticket has been created.';
       }
@@ -155,7 +157,7 @@ class TicketController extends Controller
 
       $qrPath = $this->generateQr($transactionCode);
       if (empty($qrPath)) {
-        error_log("Failed to generate QR code image for transaction: " . $transactionCode);
+        error_log("⚠️ Failed to generate QR code for transaction: " . $transactionCode);
         $this->ticketRepo->commit();
         echo json_encode([
           'success' => true,
@@ -166,7 +168,6 @@ class TicketController extends Controller
         exit;
       }
 
-      // ✅ Commit only after everything succeeds
       $this->ticketRepo->commit();
 
       echo json_encode([
@@ -193,7 +194,6 @@ class TicketController extends Controller
       exit;
     }
   }
-
 
 
   public function show(string $transactionCode = null)

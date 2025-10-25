@@ -216,6 +216,11 @@ class RouteConfig
         $router->post('librarian/returning/markReturned', 'ReturningController@returnBook', ['librarian']);
         $router->post('librarian/returning/extend', 'ReturningController@extendDueDate', ['librarian']);
 
+        $router->get('superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
+        $router->get('admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['admin']);
+        $router->get('librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['librarian']);
+
+
         return $router;
     }
 }

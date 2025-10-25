@@ -233,6 +233,9 @@ ADD COLUMN `registration_form` VARCHAR(255) NULL DEFAULT NULL AFTER `profile_upd
 
 ALTER TABLE students ADD can_edit_profile TINYINT(1) DEFAULT 0 AFTER profile_updated;
 
+ALTER TABLE borrow_transactions
+ADD COLUMN staff_id INT(11) NULL AFTER status;
+
 
 
 

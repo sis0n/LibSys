@@ -202,27 +202,20 @@ class RouteConfig
         // Superadmin QR Scanner
         $router->post('superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
         $router->post('superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']); // <-- Add this
-        $router->post('superadmin/qrScanner/returnTransaction', 'QRScannerController@returnTransaction', ['superadmin']); // <-- Add this
         $router->get('superadmin/qrScanner/transactionHistory', 'QRScannerController@history', ['superadmin']);
-        $router->post('superadmin/qrScanner/clearSession', 'QRScannerController@clearSession', ['superadmin']);
-        $router->get('superadmin/qrScanner/lookup', 'QRScannerController@lookup', ['superadmin']);
 
         // Admin QR Scanner
         $router->post('admin/qrScanner/scanTicket', 'QRScannerController@scan', ['admin']);
         $router->post('admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['admin']); // <-- Add this
-        $router->post('admin/qrScanner/returnTransaction', 'QRScannerController@returnTransaction', ['admin']); // <-- Add this
         $router->get('admin/qrScanner/transactionHistory', 'QRScannerController@history', ['admin']);
-        $router->post('admin/qrScanner/clearSession', 'QRScannerController@clearSession', ['admin']);
-        $router->get('admin/qrScanner/lookup', 'QRScannerController@lookup', ['admin']);
 
         // Librarian QR Scanner
         $router->post('librarian/qrScanner/scanTicket', 'QRScannerController@scan', ['librarian']);
         $router->post('librarian/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['librarian']); // <-- Add this
-        $router->post('librarian/qrScanner/returnTransaction', 'QRScannerController@returnTransaction', ['librarian']); // <-- Add this
         $router->get('librarian/qrScanner/transactionHistory', 'QRScannerController@history', ['librarian']);
-        $router->post('librarian/qrScanner/clearSession', 'QRScannerController@clearSession', ['librarian']);
-        $router->get('librarian/qrScanner/lookup', 'QRScannerController@lookup', ['librarian']);
 
+
+        $router->get('student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
 
         return $router;
     }

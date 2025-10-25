@@ -15,50 +15,6 @@
     </div>
 </div>
 
-<!-- Stats Cards -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <!-- Total Records -->
-    <div class="bg-white border-l-4 border-orange-400 rounded-lg shadow-sm p-5 flex justify-between items-center">
-        <div>
-            <p class="text-sm text-gray-500">Total Records</p>
-            <p class="text-2xl font-bold text-gray-800">3</p>
-        </div>
-        <div>
-            <i class="ph ph-clock-counter-clockwise text-2xl text-orange-500"></i>
-        </div>
-    </div>
-    <!-- Currently Borrowed -->
-    <div class="bg-white border-l-4 border-green-400 rounded-lg shadow-sm p-5 flex justify-between items-center">
-        <div>
-            <p class="text-sm text-gray-500">Currently Borrowed</p>
-            <p class="text-2xl font-bold text-gray-800">1</p>
-        </div>
-        <div>
-            <i class="ph ph-book-open text-2xl text-green-500"></i>
-        </div>
-    </div>
-    <!-- Returned -->
-    <div class="bg-white border-l-4 border-blue-400 rounded-lg shadow-sm p-5 flex justify-between items-center">
-        <div>
-            <p class="text-sm text-gray-500">Returned</p>
-            <p class="text-2xl font-bold text-gray-800">1</p>
-        </div>
-        <div>
-            <i class="ph ph-calendar-check text-2xl text-blue-500"></i>
-        </div>
-    </div>
-    <!-- Overdue -->
-    <div class="bg-white border-l-4 border-red-400 rounded-lg shadow-sm p-5 flex justify-between items-center">
-        <div>
-            <p class="text-sm text-gray-500">Overdue</p>
-            <p class="text-2xl font-bold text-gray-800">1</p>
-        </div>
-        <div>
-            <i class="ph ph-timer text-2xl text-red-500"></i>
-        </div>
-    </div>
-</div>
-
 <!-- Filter and Search -->
 <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
     <div class="flex items-center gap-3 mb-4">
@@ -73,13 +29,13 @@
         <div class="relative flex-grow">
             <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             <input type="text" id="transactionSearchInput" placeholder="Search"
-                class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-full focus:ring-1 focus:ring-orange-400">
+                class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-full">
         </div>
 
         <!-- Date Picker -->
         <div class="relative">
             <input type="date" id="transactionDate" name="transactionDate"
-                class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-400 w-40 focus:ring-1 focus:ring-orange-400">
+                class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-400 w-40">
         </div>
 
         <!-- Status Dropdown -->
@@ -132,8 +88,63 @@
                 </tr>
             </thead>
             <tbody id="transactionHistoryTableBody" class="bg-white divide-y divide-gray-200">
+                <!-- Default state -->
+                <tr id="no-transactions-found">
+                    <td colspan="6" class="text-center py-12">
+                        <div class="flex flex-col items-center justify-center text-gray-500">
+                            <div class="p-4 bg-orange-50 rounded-full mb-4">
+                                <i class="ph ph-clock text-4xl text-orange-500"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-2">No transactions found</h3>
+                            <p class="text-sm">There are no recent borrowing or return activities matching the filters.
+                            </p>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
+        <template id="transaction-row-template">
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800"></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="px-3 py-1 rounded-full font-medium text-xs"></span>
+                </td>
+            </tr>
+        </template>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination-container" class="flex justify-center items-center mt-6">
+        <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
+            <ul class="flex items-center gap-4 text-sm">
+                <!-- Previous -->
+                <li>
+                    <a href="#" id="prev-page"
+                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                        <i class="ph ph-caret-left"></i>
+                        <span>Previous</span>
+                    </a>
+                </li>
+
+                <!-- Page Numbers -->
+                <div id="pagination-numbers" class="flex items-center gap-3">
+                    <!-- JS will insert page numbers here -->
+                </div>
+
+                <!-- Next -->
+                <li>
+                    <a href="#" id="next-page"
+                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                        <span>Next</span>
+                        <i class="ph ph-caret-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </section>
 

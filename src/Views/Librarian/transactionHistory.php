@@ -151,10 +151,11 @@
 <!-- Transaction Details Modal -->
 <div id="transactionDetailsModal"
     class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 hidden">
-    
+
     <!-- Inner Modal Box -->
-    <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-hidden border border-gray-100 mx-4">
-        
+    <div
+        class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-hidden border border-gray-100 mx-4">
+
         <!-- Header -->
         <div class="flex justify-between items-start p-6 border-b border-gray-200">
             <div>

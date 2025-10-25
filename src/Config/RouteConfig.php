@@ -57,7 +57,7 @@ class RouteConfig
         $router->get('librarian/qrScanner', 'SidebarController@librarianQrScanner', ['librarian']);
         $router->get('librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
         $router->get('librarian/topVisitor', 'SidebarController@librarianTopVisitor', ['librarian']);
-        $router->get('librarian/borrowingHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
+        $router->get('librarian/transactionHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
         $router->get('librarian/returning', 'SidebarController@librarianReturning', ['librarian']);
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
         $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
@@ -72,7 +72,7 @@ class RouteConfig
         $router->get('admin/qrScanner', 'SidebarController@adminQrScanner', ['admin']);
         $router->get('admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
         $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['admin']);
-        $router->get('admin/borrowingHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
+        $router->get('admin/transactionHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
         $router->get('admin/returning', 'SidebarController@adminReturning', ['admin']);
         $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
         $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
@@ -88,7 +88,7 @@ class RouteConfig
         $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
         $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
-        $router->get('superadmin/borrowingHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('superadmin/transactionHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
         $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
         $router->get('superadmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);

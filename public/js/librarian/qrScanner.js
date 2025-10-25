@@ -10,8 +10,8 @@ const statusValue = document.getElementById("statusFilterValue");
 
 function renderScanResult(data) {
 
-  if (!data || !data.isValid) {
-    scanResultCard.innerHTML = `
+    if (!data || !data.isValid) {
+        scanResultCard.innerHTML = `
             <div>
                 <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
                 <p class="text-gray-500 mb-6">Review ticket details and process transaction</p>
@@ -26,26 +26,26 @@ function renderScanResult(data) {
                 </div>
             </div>
         `;
-    return;
-  }
+        return;
+    }
 
-  const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
+    const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
 
-  let profilePicPath = defaultAvatar;
-  if (data.student.profilePicture) {
-    profilePicPath = data.student.profilePicture.startsWith('/')
-      ? data.student.profilePicture
-      : `/${data.student.profilePicture}`;
-  }
+    let profilePicPath = defaultAvatar;
+    if (data.student.profilePicture) {
+        profilePicPath = data.student.profilePicture.startsWith('/') ?
+            data.student.profilePicture :
+            `/${data.student.profilePicture}`;
+    }
 
-  const actionButton = isBorrowed
-    ? `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>`
-    : `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
+    const actionButton = isBorrowed ?
+        `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>` :
+        `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
               class="w-full bg-orange-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-orange-600 transition">
               Confirm Borrow (${data.items.length} Items)
            </button>`;
 
-  const itemsHtml = data.items.map((item, index) => `
+    const itemsHtml = data.items.map((item, index) => `
         <li class="mb-3 flex items-start gap-3">
             <span class="text-sm font-semibold text-gray-700 w-6 text-right">${index + 1}.</span>
             <div class="flex-1">
@@ -60,7 +60,7 @@ function renderScanResult(data) {
         </li>
     `).join('');
 
-  scanResultCard.innerHTML = `
+    scanResultCard.innerHTML = `
         <div class="flex flex-col flex-grow">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold">Scan Result</h2>
@@ -192,7 +192,7 @@ function processTransaction(transactionCode, action) {
           if (res.success) {
             Swal.fire('Success!', res.message, 'success');
             renderScanResult(null);
-            fetchTransactionHistory();
+            
             document.getElementById('scannerInput').focus();
           } else {
             Swal.fire({ icon: 'error', title: 'Transaction Failed', text: res.message });
@@ -205,28 +205,7 @@ function processTransaction(transactionCode, action) {
   });
 }
 
-function fetchTransactionHistory(status = statusValue.textContent, search = searchInput.value.trim(), date = dateInput.value) {
-  const params = new URLSearchParams({ status, search, date: date || '' });
 
-  fetch(`${BASE_AJAX_PATH}/transactionHistory?${params.toString()}`)
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        const formattedData = res.transactions.map(h => ({
-          // FIX: Ang Controller na ang bahala sa tamang mapping (h.studentName, h.studentNumber, etc.)
-          studentName: h.studentName,
-          studentNumber: h.studentNumber,
-          itemsBorrowed: h.itemsBorrowed,
-          status: h.status.charAt(0).toUpperCase() + h.status.slice(1),
-          borrowedDateTime: h.borrowedDateTime,
-          returnedDateTime: h.returnedDateTime
-        }));
-        renderTransactionHistory(formattedData);
-      } else {
-        renderTransactionHistory([]);
-      }
-    });
-}
 
 function scanQRCode(transactionCode) {
   fetch(`${BASE_AJAX_PATH}/scanTicket`, {
@@ -251,7 +230,6 @@ function scanQRCode(transactionCode) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  fetchTransactionHistory();
 
   if (statusBtn && statusMenu && statusValue) {
     statusBtn.addEventListener("click", (e) => {
@@ -263,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
       item.addEventListener("click", () => {
         statusValue.textContent = item.dataset.value;
         statusMenu.classList.add("hidden");
-        fetchTransactionHistory();
+        
       });
     });
 

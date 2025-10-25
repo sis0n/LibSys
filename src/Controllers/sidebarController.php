@@ -138,9 +138,9 @@ class SidebarController extends Controller
 
     public function borrowingHistory()
     {
-        $this->view("superadmin/borrowingHistory", [
-            "title"=> "Borrowing History",
-            "currentPage" => "borrowingHistory"
+        $this->view("superadmin/transactionHistory", [
+            "title"=> "Transaction History",
+            "currentPage" => "transactionHistory"
         ]);
     }
 
@@ -234,9 +234,9 @@ class SidebarController extends Controller
 
     public function adminBorrowingHistory()
     {
-        $this->view("admin/borrowingHistory", [
-            "title"=> "Admin Borrowing History",
-            "currentPage" => "borrowingHistory"
+        $this->view("admin/transactionHistory", [
+            "title"=> "Admin Transaction History",
+            "currentPage" => "transactionHistory"
         ]);
     }
 
@@ -332,9 +332,9 @@ class SidebarController extends Controller
 
     public function librarianBorrowingHistory()
     {
-        $this->view("librarian/borrowingHistory", [
-            "title"=> "Librarian Borrowing History",
-            "currentPage" => "borrowingHistory"
+        $this->view("librarian/transactionHistory", [
+            "title"=> "Librarian Transaction History",
+            "currentPage" => "transactionHistory"
         ]);
     }
 

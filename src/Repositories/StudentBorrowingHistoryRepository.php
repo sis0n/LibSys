@@ -25,6 +25,7 @@ class StudentBorrowingHistoryRepository
         JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
         JOIN students s ON bt.student_id = s.student_id
         WHERE s.user_id = :user_id
+        AND bt.status != 'pending'
     ");
     $stmt->execute(['user_id' => $userId]);
     $stats = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -63,6 +64,7 @@ class StudentBorrowingHistoryRepository
         LEFT JOIN users staff 
             ON bt.staff_id = staff.user_id
         WHERE s.user_id = :uid
+        AND bt.status != 'pending'
         ORDER BY bt.borrowed_at DESC
     ");
     $stmt->execute(['uid' => $userId]);

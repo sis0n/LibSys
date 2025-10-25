@@ -67,9 +67,9 @@ class TicketRepository
   public function addTransactionItems(int $transactionId, array $items): void
   {
     $stmt = $this->db->prepare("
-            INSERT INTO borrow_transaction_items (transaction_id, book_id)
-            VALUES (:tid, :bid)
-        ");
+        INSERT INTO borrow_transaction_items (transaction_id, book_id, status)
+        VALUES (:tid, :bid, 'pending')
+    ");
     foreach ($items as $item) {
       $stmt->execute([
         'tid' => $transactionId,
@@ -181,9 +181,9 @@ class TicketRepository
   public function createTransaction(int $studentId, string $transactionCode, string $dueDate): int
   {
     $stmt = $this->db->prepare("
-            INSERT INTO borrow_transactions (student_id, transaction_code, due_date)
-            VALUES (:sid, :tcode, :due_date)
-        ");
+        INSERT INTO borrow_transactions (student_id, transaction_code, due_date)
+        VALUES (:sid, :tcode, :due_date)
+    ");
     $stmt->execute([
       'sid' => $studentId,
       'tcode' => $transactionCode,
@@ -220,15 +220,130 @@ class TicketRepository
     return $result ?: null;
   }
 
-  public function countItemsInTransaction(int $transactionId): int
+  public function countItemsInTransaction(int $transactionId, bool $forUpdate = false): int
   {
+    $lock = $forUpdate ? ' FOR UPDATE' : '';
     $stmt = $this->db->prepare("
-            SELECT COUNT(*) as total
-            FROM borrow_transaction_items
-            WHERE transaction_id = :tid
-        ");
+        SELECT COUNT(*) as total
+        FROM borrow_transaction_items
+        WHERE transaction_id = :tid{$lock}
+    ");
     $stmt->execute(['tid' => $transactionId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return isset($row['total']) ? (int)$row['total'] : 0;
+  }
+
+  public function countBorrowedBooksThisWeek(int $studentId): int
+  {
+    $query = "
+        SELECT COUNT(*) AS total
+        FROM borrow_transaction_items bti
+        INNER JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
+        WHERE bt.student_id = :student_id
+          AND (bt.status = 'pending' OR bt.status = 'borrowed')
+          AND bt.borrowed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    ";
+
+    $stmt = $this->db->prepare($query);
+    $stmt->bindValue(':student_id', $studentId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return (int) $stmt->fetchColumn();
+  }
+
+  public function expireOldPendingTransactions(): void
+  {
+    $stmt = $this->db->prepare("
+        SELECT transaction_id 
+        FROM borrow_transactions
+        WHERE status = 'pending'
+          AND expires_at <= NOW()
+    ");
+    $stmt->execute();
+    $expiredTransactions = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    if (!empty($expiredTransactions)) {
+      $idsPlaceholders = implode(',', array_fill(0, count($expiredTransactions), '?'));
+
+      $updateTrans = $this->db->prepare("
+            UPDATE borrow_transactions
+            SET status = 'expired'
+            WHERE transaction_id IN ($idsPlaceholders)
+        ");
+      $updateTrans->execute($expiredTransactions);
+
+      $updateBooks = $this->db->prepare("
+            UPDATE books b
+            JOIN borrow_transaction_items bti ON b.book_id = bti.book_id
+            SET b.availability = 'available'
+            WHERE bti.transaction_id IN ($idsPlaceholders)
+        ");
+      $updateBooks->execute($expiredTransactions);
+
+      $updateItems = $this->db->prepare("
+            UPDATE borrow_transaction_items
+            SET status = 'expired'
+            WHERE transaction_id IN ($idsPlaceholders)
+        ");
+      $updateItems->execute($expiredTransactions);
+    }
+  }
+
+  public function areBooksAvailable(array $bookIds): array
+  {
+    if (empty($bookIds)) return [];
+
+    $placeholders = implode(',', array_fill(0, count($bookIds), '?'));
+
+    $stmt = $this->db->prepare("
+        SELECT bti.book_id, b.title
+        FROM borrow_transaction_items bti
+        JOIN books b ON bti.book_id = b.book_id
+        JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
+        WHERE bti.book_id IN ($placeholders)
+          AND bt.status IN ('pending','borrowed')
+    ");
+
+    $stmt->execute($bookIds);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  public function setBooksAvailability(array $bookIds, string $availability): void
+  {
+    if ($availability === 'pending') return;
+    if (empty($bookIds)) return;
+
+    $placeholders = implode(',', array_fill(0, count($bookIds), '?'));
+    $stmt = $this->db->prepare("
+        UPDATE books
+        SET availability = ?
+        WHERE book_id IN ($placeholders)
+    ");
+    $stmt->execute(array_merge([$availability], $bookIds));
+  }
+
+  public function setTransactionExpiry(int $transactionId, int $minutes = 15): void
+  {
+    $stmt = $this->db->prepare("
+        UPDATE borrow_transactions
+        SET expires_at = DATE_ADD(borrowed_at, INTERVAL ? MINUTE)
+        WHERE transaction_id = ?
+    ");
+    $stmt->execute([$minutes, $transactionId]);
+  }
+
+  public function beginTransaction(): void
+  {
+    $this->db->beginTransaction();
+  }
+
+  public function commit(): void
+  {
+    $this->db->commit();
+  }
+
+  public function rollback(): void
+  {
+    $this->db->rollBack();
   }
 }

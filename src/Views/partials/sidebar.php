@@ -217,13 +217,13 @@ switch ($role) {
                 <span>Borrowing History</span>
             </a>
 
-            <!-- Overdue Alert -->
-            <a href="/LibSys/public/superadmin/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'overdueAlert'
+            <!-- Returning -->
+            <a href="/LibSys/public/superadmin/returning" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'returning'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-bell-ringing text-2xl"></i>
-                <span>Overdue Alert</span>
+               <i class="ph ph-swap text-2xl"></i>
+                <span>Returning</span>
             </a>
 
             <!-- Global Logs -->
@@ -330,13 +330,13 @@ switch ($role) {
                 <span>Borrowing History</span>
             </a>
 
-            <!-- Overdue Alert -->
-            <a href="/LibSys/public/admin/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'overdueAlert'
+            <!-- Returning -->
+            <a href="/LibSys/public/admin/returning" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'returning'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-bell-ringing text-2xl"></i>
-                <span>Overdue Alert</span>
+                <i class="ph ph-swap text-2xl"></i>
+                <span>Returning</span>
             </a>
 
             <!-- Global Logs -->
@@ -443,13 +443,13 @@ switch ($role) {
                 <span>Borrowing History</span>
             </a>
 
-            <!-- Overdue Alert -->
-            <a href="/LibSys/public/librarian/overdueAlert" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
-                <?= $currentPage === 'overdueAlert'
+            <!-- Returning -->
+            <a href="/LibSys/public/librarian/returning" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'returning'
                     ? 'bg-green-600 text-white font-medium'
                     : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-bell-ringing text-2xl"></i>
-                <span>Overdue Alert</span>
+                <i class="ph ph-swap text-2xl"></i>
+                <span>Retuning</span>
             </a>
 
             <!-- Global Logs -->

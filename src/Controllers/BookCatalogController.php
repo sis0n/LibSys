@@ -43,6 +43,19 @@ class BookCatalogController extends Controller
 
   public function store()
   {
+    if (!isset($_SESSION['user_id'])) {
+      http_response_code(401);
+      echo json_encode(['error' => 'Unauthorized']);
+      exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        http_response_code(403);
+        exit('Invalid CSRF token');
+      }
+    }
+
     $data = $_POST;
     $this->bookRepo->addBook($data);
     header("Location: /books");
@@ -59,6 +72,20 @@ class BookCatalogController extends Controller
 
   public function update($id)
   {
+
+    if (!isset($_SESSION['user_id'])) {
+      http_response_code(401);
+      echo json_encode(['error' => 'Unauthorized']);
+      exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        http_response_code(403);
+        exit('Invalid CSRF token');
+      }
+    }
+
     $data = $_POST;
     $this->bookRepo->updateBook($id, $data);
     header("Location: /books");
@@ -66,6 +93,18 @@ class BookCatalogController extends Controller
 
   public function destroy($id)
   {
+    if (!isset($_SESSION['user_id'])) {
+      http_response_code(401);
+      echo json_encode(['error' => 'Unauthorized']);
+      exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        http_response_code(403);
+        exit('Invalid CSRF token');
+      }
+    }
     $this->bookRepo->deleteBook($id);
     header("Location: /books");
   }
@@ -82,12 +121,18 @@ class BookCatalogController extends Controller
 
   public function fetch()
   {
+    if (!isset($_SESSION['user_id'])) {
+      http_response_code(401);
+      echo json_encode(['error' => 'Unauthorized']);
+      exit;
+    }
+
     $search   = $_GET['search'] ?? '';
     $offset   = (int)($_GET['offset'] ?? 0);
     $limit    = (int)($_GET['limit'] ?? 30);
-    $category = $_GET['category'] ?? ''; 
+    $category = $_GET['category'] ?? '';
     $status   = $_GET['status'] ?? '';
-    $sort     = $_GET['sort'] ?? 'default'; 
+    $sort     = $_GET['sort'] ?? 'default';
 
     $books = $this->bookRepo->getPaginatedFiltered(
       $limit,
@@ -95,7 +140,7 @@ class BookCatalogController extends Controller
       $search,
       $category,
       $status,
-      $sort 
+      $sort
     );
 
     $totalCount = $this->bookRepo->countPaginatedFiltered($search, $category, $status);

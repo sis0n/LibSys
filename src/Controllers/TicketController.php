@@ -266,6 +266,13 @@ class TicketController extends Controller
     if ($transactionData && strtolower($transactionData['status']) === 'expired') {
       $isExpired = true;
 
+      unset($_SESSION['last_ticket_code']);
+
+      $qrFile = __DIR__ . "/../../public/qrcodes/{$transactionCode}.png";
+      if (file_exists($qrFile)) {
+        unlink($qrFile);
+      }
+
       $qrPath = null;
       $books = [];
       $studentInfo = [
@@ -287,11 +294,11 @@ class TicketController extends Controller
       "currentPage" => "qrBorrowingTicket",
       "transaction_id" => $transactionData['transaction_id'] ?? null,
       "transaction_code" => $transactionData['transaction_code'] ?? null,
-      "books" => $books, 
-      "qrPath" => $qrPath, 
-      "due_date" => $transactionData['due_date'] ?? null, 
-      "student" => $studentInfo, 
-      "borrowed_at" => $transactionData['borrowed_at'] ?? null, 
+      "books" => $books,
+      "qrPath" => $qrPath,
+      "due_date" => $transactionData['due_date'] ?? null,
+      "student" => $studentInfo,
+      "borrowed_at" => $transactionData['borrowed_at'] ?? null,
       "message" => $viewMessage,
       "error_message" => $viewError,
       "isExpired" => $isExpired

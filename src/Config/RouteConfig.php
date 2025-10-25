@@ -121,22 +121,6 @@ class RouteConfig
         // AJAX route para sa dropdown filter logs (librarian at admin)
         $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['librarian', 'admin', 'superadmin']);
 
-
-        /**
-         * ========================
-         * BOOK INVENTORY ROUTES
-         * ========================
-         */
-
-        $router->get('books', 'BookController@index', ['librarian', 'admin']);
-        $router->get('books/create', 'BookController@create', ['librarian', 'admin']);
-        $router->post('books/store', 'BookController@store', ['librarian', 'admin']);
-        $router->get('books/edit/{id}', 'BookController@edit', ['librarian', 'admin']);
-        $router->post('books/update/{id}', 'BookController@update', ['librarian', 'admin']);
-        $router->post('books/delete/{id}', 'BookController@destroy', ['librarian', 'admin']);
-        $router->get('books/search', 'BookController@search', ['librarian', 'admin']);
-        $router->get('books/filter', 'BookController@filter', ['librarian', 'admin']);
-
         /**
          * ========================
          * STUDENT CART & CHECKOUT ROUTES

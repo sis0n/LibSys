@@ -47,14 +47,13 @@
             </button>
             <div id="statusFilterMenu"
                 class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20 text-sm">
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All
-                    Status</div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">Borrowed
-                </div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Returned">Returned
-                </div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All Status</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">Borrowed</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Returned">Returned</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Expired">Expired</div>
             </div>
         </div>
+
     </div>
 </div>
 

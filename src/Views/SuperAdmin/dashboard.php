@@ -1,80 +1,91 @@
 <!-- DASHBOARD MAIN CONTENT -->
-<main class="min-h-[85vh] bg-white px-4 sm:px-6 md:px-10 py-6 flex flex-col gap-8">
+<main class="min-h-[85vh]px-4 sm:px-6 md:px-10 py-6 flex flex-col gap-8">
 
   <!-- Welcome Section -->
   <section>
-    <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
+    <h2 class="text-2xl font-bold text-gray-900">
       Welcome back, <span id="adminName">John Anderson</span>!
     </h2>
     <p class="text-gray-600 mt-1 text-sm md:text-base">Here's your library system overview.</p>
   </section>
 
-  <!-- Quick Admin Actions -->
-  <section class="border border-orange-100 rounded-xl shadow-sm p-6">
-    <div class="flex flex-col mb-4">
-      <h3 class="text-base font-semibold text-gray-800 flex items-center gap-2 mb-1">
-        <i class="ph ph-gear text-orange-500 text-lg"></i>
-        Quick Admin Actions
-      </h3>
-      <p class="text-sm text-gray-500 ml-6">Common administrative tasks</p>
-    </div>
+<!-- Quick Admin Actions -->
+<section class="border border-orange-100 border-t-4 border-t-green-500 rounded-2xl shadow-md p-8 bg-white">
+  <div class="flex flex-col mb-6">
+    <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-1">
+      <i class="ph ph-gear text-orange-500 text-xl"></i>
+      Quick Admin Actions
+    </h3>
+    <p class="text-sm text-gray-500 ml-7">Common administrative tasks</p>
+  </div>
 
-    <!-- Responsive Action Buttons -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 justify-items-center">
-      <a href="userManagement" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
-        <i class="ph ph-users text-xl mr-2 align-middle"></i>
-        Manage Users
-      </a>
+  <!-- Responsive Action Buttons -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center gap-4">
+    <a href="userManagement" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
+      <i class="ph ph-users text-xl mr-2 align-middle"></i>
+      Manage Users
+    </a>
 
-      <a href="bookManagement" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
-        <i class="ph ph-books text-xl mr-2 align-middle"></i>
-        Book Inventory
-      </a>
+    <a href="bookManagement" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
+      <i class="ph ph-books text-xl mr-2 align-middle"></i>
+      Book Inventory
+    </a>
 
-      <a href="#" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
-        <i class="ph ph-warning-circle text-xl mr-2 align-middle"></i>
-        System Alerts
-      </a>
+    <a href="#" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
+      <i class="ph ph-warning-circle text-xl mr-2 align-middle"></i>
+      System Alerts
+    </a>
 
-      <a href="#" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
-        <i class="ph ph-activity text-xl mr-2 align-middle"></i>
-        Analytics
-      </a>
-    </div>
-  </section>
+    <a href="#" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
+      <i class="ph ph-activity text-xl mr-2 align-middle"></i>
+      Analytics
+    </a>
+  </div>
+</section>
 
-  <!-- Stats Cards -->
+<!-- Stats Cards -->
 <section class="grid grid-cols-3 gap-6 overflow-x-auto">
   <!-- Total Users -->
-  <div class="border border-orange-100 rounded-lg p-6 shadow-sm min-w-[250px]">
-    <div class="flex justify-between items-center mb-2">
-      <span class="text-sm font-semibold text-gray-600">Total Users</span>
-      <i class="ph ph-user text-orange-500 text-xl"></i>
-    </div>
+ <div class="rounded-lg shadow-sm min-w-[250px] bg-white border-l-4 border-orange-500 overflow-hidden">
+  <div class="bg-orange-50 px-6 py-3 flex justify-between items-center">
+    <span class="text-sm font-semibold text-gray-600">Total Users</span>
+    <i class="ph ph-user text-orange-500 text-xl"></i>
+  </div>
+  <div class="p-6">
     <h4 id="totalUsers" class="text-3xl font-bold text-gray-900">234</h4>
     <p class="text-sm text-green-600 mt-1">+12 this month</p>
   </div>
+</div>
+
 
   <!-- Active Books -->
-  <div class="border border-green-100 rounded-lg p-6 shadow-sm min-w-[250px]">
-    <div class="flex justify-between items-center mb-2">
-      <span class="text-sm font-semibold text-gray-600">Active Books</span>
-      <i class="ph ph-book text-green-500 text-xl"></i>
-    </div>
+ <div class="rounded-lg shadow-sm min-w-[250px] bg-white border-l-4 border-orange-500 overflow-hidden">
+  <div class="bg-green-50 px-6 py-3 flex justify-between items-center">
+    <span class="text-sm font-semibold text-gray-600">Active Books</span>
+    <i class="ph ph-book text-green-500 text-xl"></i>
+  </div>
+  <div class="p-6">
     <h4 id="activeBooks" class="text-3xl font-bold text-gray-900">1,247</h4>
     <p class="text-sm text-green-600 mt-1">89% available</p>
   </div>
+</div>
+
 
   <!-- Daily Visitors -->
-  <div class="border border-yellow-100 rounded-lg p-6 shadow-sm min-w-[250px]">
-    <div class="flex justify-between items-center mb-2">
-      <span class="text-sm font-semibold text-gray-600">Daily Visitors</span>
-      <i class="ph ph-users-three text-orange-400 text-xl"></i>
-    </div>
+  <div class="rounded-lg shadow-sm min-w-[250px] bg-white border-l-4 border-orange-500 overflow-hidden">
+  <div class="bg-orange-50 px-6 py-3 flex justify-between items-center">
+    <span class="text-sm font-semibold text-gray-600">Daily Visitors</span>
+    <i class="ph ph-users-three text-orange-400 text-xl"></i>
+  </div>
+  <div class="p-6">
     <h4 id="dailyVisitors" class="text-3xl font-bold text-gray-900">47</h4>
     <p class="text-sm text-green-600 mt-1">Today</p>
   </div>
+</div>
+
 </section>
+
+
 
   <!-- Charts Section -->
   <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -100,6 +111,8 @@
       <canvas id="weeklyActivityChart" class="h-48"></canvas>
     </div>
   </section>
+
+
 </main>
 
 <!-- Chart.js -->
@@ -136,4 +149,6 @@
     },
     options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
+
+  
 </script>

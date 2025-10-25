@@ -21,10 +21,16 @@ class QRScannerController extends Controller
       return ['success' => false, 'message' => 'Please enter a ticket code.'];
     }
 
+    $this->qrScannerRepository->expireOldPendingTransactions();
+
     $transaction = $this->qrScannerRepository->getStudentByTransactionCode($transactionCode);
 
     if (!$transaction) {
       return ['success' => false, 'message' => 'Invalid ticket code or transaction not found.'];
+    }
+
+    if (strtolower($transaction['status']) === 'expired') {
+      return ['success' => false, 'message' => 'QR Code Ticket Expired'];
     }
 
     if (strtolower($transaction['status']) === 'borrowed' || strtolower($transaction['status']) === 'returned') {

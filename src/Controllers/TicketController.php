@@ -7,8 +7,6 @@ use App\Repositories\TicketRepository;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\Label\Label;
-use Endroid\QrCode\Label\Font\NotoSans;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 
@@ -94,12 +92,16 @@ class TicketController extends Controller
     }
 
     try {
+      // ✅ Begin Transaction
+      $this->ticketRepo->beginTransaction();
+
       $cartItems = !empty($selectedIds)
         ? $this->ticketRepo->getCartItemsByIds($studentId, $selectedIds)
         : $this->ticketRepo->getCartItems($studentId);
 
       if (empty($cartItems)) {
         echo json_encode(['success' => false, 'message' => 'Cart is empty or selected items not found.']);
+        $this->ticketRepo->rollback();
         exit;
       }
 
@@ -109,10 +111,13 @@ class TicketController extends Controller
       if ($existingTicket) {
         $transactionId = (int)$existingTicket['transaction_id'];
         $transactionCode = $existingTicket['transaction_code'];
-        $currentItemsCount = $this->ticketRepo->countItemsInTransaction($transactionId);
+
+        // ✅ Lock transaction row to prevent race condition
+        $currentItemsCount = $this->ticketRepo->countItemsInTransaction($transactionId, true);
         $totalItems = $currentItemsCount + $newItemsCount;
 
         if ($totalItems > $MAX_BOOKS_PER_TICKET) {
+          $this->ticketRepo->rollback();
           http_response_code(400);
           echo json_encode([
             'success' => false,
@@ -124,6 +129,7 @@ class TicketController extends Controller
         $message = 'Checkout successful! Items added to your pending ticket.';
       } else {
         if ($newItemsCount > $MAX_BOOKS_PER_TICKET) {
+          $this->ticketRepo->rollback();
           http_response_code(400);
           echo json_encode([
             'success' => false,
@@ -150,6 +156,7 @@ class TicketController extends Controller
       $qrPath = $this->generateQr($transactionCode);
       if (empty($qrPath)) {
         error_log("Failed to generate QR code image for transaction: " . $transactionCode);
+        $this->ticketRepo->commit();
         echo json_encode([
           'success' => true,
           'message' => 'Checkout successful! Ticket created/updated, but QR image generation failed.',
@@ -159,6 +166,9 @@ class TicketController extends Controller
         exit;
       }
 
+      // ✅ Commit only after everything succeeds
+      $this->ticketRepo->commit();
+
       echo json_encode([
         'success' => true,
         'message' => $message,
@@ -167,11 +177,13 @@ class TicketController extends Controller
       ]);
       exit;
     } catch (\PDOException $dbExc) {
+      $this->ticketRepo->rollback();
       error_log("Database Error during checkout: " . $dbExc->getMessage());
       http_response_code(500);
       echo json_encode(['success' => false, 'message' => 'A database error occurred during checkout. Please try again later.']);
       exit;
     } catch (\Throwable $e) {
+      $this->ticketRepo->rollback();
       error_log("General Error during checkout: " . $e->getMessage());
       http_response_code(500);
       echo json_encode([
@@ -181,6 +193,7 @@ class TicketController extends Controller
       exit;
     }
   }
+
 
 
   public function show(string $transactionCode = null)

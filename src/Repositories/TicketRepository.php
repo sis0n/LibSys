@@ -220,15 +220,32 @@ class TicketRepository
     return $result ?: null;
   }
 
-  public function countItemsInTransaction(int $transactionId): int
+  public function countItemsInTransaction(int $transactionId, bool $forUpdate = false): int
   {
+    $lock = $forUpdate ? ' FOR UPDATE' : '';
     $stmt = $this->db->prepare("
-            SELECT COUNT(*) as total
-            FROM borrow_transaction_items
-            WHERE transaction_id = :tid
-        ");
+        SELECT COUNT(*) as total
+        FROM borrow_transaction_items
+        WHERE transaction_id = :tid{$lock}
+    ");
     $stmt->execute(['tid' => $transactionId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return isset($row['total']) ? (int)$row['total'] : 0;
+  }
+
+
+  public function beginTransaction(): void
+  {
+    $this->db->beginTransaction();
+  }
+
+  public function commit(): void
+  {
+    $this->db->commit();
+  }
+
+  public function rollback(): void
+  {
+    $this->db->rollBack();
   }
 }

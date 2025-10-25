@@ -9,18 +9,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const paginationNumbers = document.getElementById('pagination-numbers');
     const prevPageBtn = document.getElementById('prev-page');
     const nextPageBtn = document.getElementById('next-page');
+    const modal = document.getElementById('transactionDetailsModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
 
     let currentPage = 1;
     const rowsPerPage = 5;
 
     // Dummy data - replace with actual data from your backend
     const transactions = Array.from({ length: 25 }, (_, i) => ({
+        id: i,
         studentName: `Student ${i + 1}`,
         studentNumber: `202300${i + 1}-S`,
+        course: 'BSCS',
+        year: `${(i % 4) + 1}`,
+        section: `A`,
         itemsBorrowed: (i % 3) + 1,
         borrowedDate: `Oct ${24 - (i % 5)}, 2025 ${11 - (i % 6)}:${(i % 60).toString().padStart(2, '0')} PM`,
         returnedDate: i % 2 === 0 ? 'Not yet returned' : `Oct ${25 - (i % 2)}, 2025 ${1 - (i % 12)}:${(i % 60).toString().padStart(2, '0')} PM`,
-        status: i % 2 === 0 ? 'Borrowed' : 'Returned'
+        status: i % 2 === 0 ? 'Borrowed' : 'Returned',
+        title: 'Introduction to Computer Science',
+        author: 'John Smith',
+        accession: `123${i}`,
+        callNo: `CS-100.S45${i}`,
+        isbn: `978-0-123456-78-${i}`,
+        processedBy: 'Sarah Chen'
     }));
 
     // Toggle dropdown
@@ -57,6 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
         paginationContainer.classList.remove('hidden');
         paginatedData.forEach(transaction => {
             const newRow = rowTemplate.cloneNode(true);
+            const tr = newRow.querySelector('tr');
+            tr.dataset.transactionId = transaction.id;
+
             const cells = newRow.querySelectorAll('td');
             cells[0].textContent = transaction.studentName;
             cells[1].textContent = transaction.studentNumber;
@@ -135,6 +150,65 @@ document.addEventListener('DOMContentLoaded', () => {
             renderPagination(transactions);
         }
     });
+
+    // Modal logic
+    closeModalBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+
+    tableBody.addEventListener('click', (e) => {
+        const row = e.target.closest('.transaction-row');
+        if (row) {
+            const transactionId = parseInt(row.dataset.transactionId, 10);
+            const transaction = transactions.find(t => t.id === transactionId);
+            if (transaction) {
+                openModalWithTransaction(transaction);
+            }
+        }
+    });
+
+    function openModalWithTransaction(transaction) {
+        // Student Info
+        document.getElementById('modalStudentName').textContent = transaction.studentName;
+        document.getElementById('modalStudentId').textContent = transaction.studentNumber;
+        document.getElementById('modalCourse').textContent = transaction.course;
+        document.getElementById('modalYear').textContent = transaction.year;
+        document.getElementById('modalSection').textContent = transaction.section;
+
+        // Item Info
+        document.getElementById('modalItemTitle').textContent = transaction.title;
+        document.getElementById('modalItemAuthor').textContent = transaction.author;
+        document.getElementById('modalItemAccession').textContent = transaction.accession;
+        document.getElementById('modalItemCallNo').textContent = transaction.callNo;
+        document.getElementById('modalItemISBN').textContent = transaction.isbn;
+
+        // Transaction Details
+        document.getElementById('modalBorrowedDate').textContent = transaction.borrowedDate;
+        document.getElementById('modalReturnedDate').textContent = transaction.returnedDate;
+        document.getElementById('modalProcessedBy').textContent = transaction.processedBy;
+
+        const statusEl = document.getElementById('modalStatus');
+        statusEl.innerHTML = '';
+
+        const statusSpan = document.createElement('span');
+        statusSpan.textContent = transaction.status.toUpperCase();
+        statusSpan.classList.add('font-semibold', 'tracking-wide');
+
+        if (transaction.status === 'Borrowed') {
+            statusSpan.classList.add('text-orange-600');
+        } else if (transaction.status === 'Returned') {
+            statusSpan.classList.add('text-green-600');
+        }
+        statusEl.appendChild(statusSpan);
+
+        modal.classList.remove('hidden');
+    }
 
     // Initial render
     renderTable(transactions, currentPage);

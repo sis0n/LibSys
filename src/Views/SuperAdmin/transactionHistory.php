@@ -104,7 +104,7 @@
             </tbody>
         </table>
         <template id="transaction-row-template">
-            <tr>
+            <tr class="hover:bg-gray-50 cursor-pointer transaction-row">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800"></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
@@ -147,5 +147,108 @@
         </nav>
     </div>
 </section>
+
+<!-- Transaction Details Modal -->
+<div id="transactionDetailsModal"
+    class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 hidden">
+    
+    <!-- Inner Modal Box -->
+    <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-hidden border border-gray-100 mx-4">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-start p-6 border-b border-gray-200">
+            <div>
+                <h3 class="text-lg font-semibold text-orange-600">Transaction Details</h3>
+                <p class="text-xs text-gray-500">Complete information about this transaction</p>
+            </div>
+            <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 transition">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="p-6 space-y-5 overflow-y-auto max-h-[70vh] pr-2 custom-scrollbar">
+
+            <!-- Transaction Details -->
+            <div class="border border-gray-200 rounded-xl p-3 bg-white/70">
+                <h4 class="text-xs font-semibold text-green-500 mb-3 uppercase tracking-wide">Transaction Details</h4>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-500">Status:</p>
+                        <div id="modalStatus" class="font-medium"></div>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Processed By:</p>
+                        <p id="modalProcessedBy" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Borrowed:</p>
+                        <p id="modalBorrowedDate" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Returned:</p>
+                        <p id="modalReturnedDate" class="font-medium text-gray-800"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Information -->
+            <div class="border border-gray-200 rounded-xl p-3 bg-white/70">
+                <h4 class="text-xs font-semibold text-amber-500 mb-3 uppercase tracking-wide">Student Information</h4>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-500">Student Name:</p>
+                        <p id="modalStudentName" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Student Number:</p>
+                        <p id="modalStudentId" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Course:</p>
+                        <p id="modalCourse" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Year:</p>
+                        <p id="modalYear" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Section:</p>
+                        <p id="modalSection" class="font-medium text-gray-800"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item Information -->
+            <div class="border border-gray-200 rounded-xl p-3 bg-white/70">
+                <h4 class="text-xs font-semibold text-yellow-500 mb-3 uppercase tracking-wide">Item Information</h4>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-500">Title:</p>
+                        <p id="modalItemTitle" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Author:</p>
+                        <p id="modalItemAuthor" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Accession No:</p>
+                        <p id="modalItemAccession" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Call No:</p>
+                        <p id="modalItemCallNo" class="font-medium text-gray-800"></p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-gray-500">ISBN:</p>
+                        <p id="modalItemISBN" class="font-medium text-gray-800"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 <script src="/libsys/public/js/SuperAdmin/transactionHistory.js"></script>

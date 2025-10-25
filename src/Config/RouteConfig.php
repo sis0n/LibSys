@@ -58,7 +58,7 @@ class RouteConfig
         $router->get('librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
         $router->get('librarian/topVisitor', 'SidebarController@librarianTopVisitor', ['librarian']);
         $router->get('librarian/borrowingHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
-        $router->get('librarian/overdueAlert', 'SidebarController@librarianOverdueAlert', ['librarian']);
+        $router->get('librarian/returning', 'SidebarController@librarianReturning', ['librarian']);
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
         $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
         $router->get('librarian/changePassword', 'SidebarController@librarianChangePassword', ['librarian']);
@@ -73,7 +73,7 @@ class RouteConfig
         $router->get('admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
         $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['admin']);
         $router->get('admin/borrowingHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
-        $router->get('admin/overdueAlert', 'SidebarController@adminOverdueAlert', ['admin']);
+        $router->get('admin/returning', 'SidebarController@adminReturning', ['admin']);
         $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
         $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
         $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['admin']);
@@ -89,7 +89,7 @@ class RouteConfig
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
         $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
         $router->get('superadmin/borrowingHistory', 'SidebarController@borrowingHistory', ['superadmin']);
-        $router->get('superadmin/overdueAlert', 'SidebarController@overdueAlert', ['superadmin']);
+        $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
         $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
         $router->get('superadmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);

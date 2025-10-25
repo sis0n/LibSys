@@ -78,6 +78,14 @@ class TicketController extends Controller
       exit;
     }
 
+    // PROFILE COMPLETION CHECK
+    $profileCheck = $this->ticketRepo->checkProfileCompletion($studentId);
+    if (!$profileCheck['complete']) {
+      http_response_code(400);
+      echo json_encode(["success" => false, "message" => $profileCheck['message']]);
+      return;
+    }
+
     $input = json_decode(file_get_contents('php://input'), true);
     $selectedIds = $input['cart_ids'] ?? [];
 

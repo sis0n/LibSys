@@ -1,4 +1,5 @@
 let cart = [];
+let checkedMap = {}; 
 
 async function loadCart() {
     try {
@@ -46,6 +47,7 @@ async function checkoutCart() {
 
         if (data.success) {
             alert("Checkout successful! You can now view your QR Borrowing Ticket in the Borrowing Ticket page.");
+            checkedMap = {};
             loadCart();
         } else {
             alert(data.message || "Checkout failed");
@@ -65,7 +67,7 @@ async function clearCart() {
         });
         if (!res.ok) throw new Error("Failed to clear cart");
         cart = [];
-        alert("are u sure?"); 
+        alert("are u sure?");
         renderCart();
     } catch (err) {
         console.error(err);
@@ -79,18 +81,14 @@ async function removeFromCart(cartId) {
         });
         if (!res.ok) throw new Error("Failed to remove item");
         cart = cart.filter(item => item.cart_id !== cartId);
-        alert("are u sure?"); // Ito 'yung original code mo
+        alert("are u sure?");
         renderCart();
     } catch (err) {
         console.error(err);
     }
 }
 
-let checkedMap = JSON.parse(localStorage.getItem("checkedMap")) || {};
-
-function saveCheckedMap() {
-    localStorage.setItem("checkedMap", JSON.stringify(checkedMap));
-}
+// Inalis ang saveCheckedMap() function
 
 function renderCart() {
     const emptyState = document.getElementById("empty-state");
@@ -202,15 +200,12 @@ function renderCart() {
             removeBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 delete checkedMap[item.cart_id];
-                saveCheckedMap();
                 removeFromCart(item.cart_id);
             });
 
-            // === Card Click Toggle ===
             itemDiv.addEventListener("click", () => {
                 checkbox.checked = !checkbox.checked;
                 checkedMap[item.cart_id] = checkbox.checked;
-                saveCheckedMap();
                 toggleHighlight(itemDiv, checkbox.checked);
                 updateSummary();
                 syncSelectAll();
@@ -219,7 +214,6 @@ function renderCart() {
             checkbox.addEventListener("click", (e) => {
                 e.stopPropagation();
                 checkedMap[item.cart_id] = checkbox.checked;
-                saveCheckedMap();
                 toggleHighlight(itemDiv, checkbox.checked);
                 updateSummary();
                 syncSelectAll();
@@ -251,7 +245,6 @@ function renderCart() {
                 checkedMap[cb.dataset.id] = cb.checked;
                 toggleHighlight(cb.closest("div.mt-4"), cb.checked);
             });
-            saveCheckedMap();
             updateSummary();
         };
     }

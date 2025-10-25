@@ -15,6 +15,43 @@ class TicketRepository
     $this->db = Database::getInstance()->getConnection();
   }
 
+  public function getStudentIdByUserId(int $userId): ?int
+  {
+    $stmt = $this->db->prepare("SELECT student_id FROM students WHERE user_id = :uid");
+    $stmt->execute(['uid' => $userId]);
+    $student = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $student['student_id'] ?? null;
+  }
+
+  public function checkProfileCompletion(int $studentId): array
+  {
+    $sql = "SELECT s.profile_updated, u.profile_picture, s.registration_form
+                FROM students s
+                JOIN users u ON s.user_id = u.user_id
+                WHERE s.student_id = ?";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$studentId]);
+    $studentData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$studentData) {
+      return ['complete' => false, 'message' => 'No student record found.'];
+    }
+
+    $isProfileComplete = (bool)$studentData['profile_updated'];
+    $hasPicture = !empty($studentData['profile_picture']);
+    $hasForm = !empty($studentData['registration_form']);
+
+    if (!$isProfileComplete || !$hasPicture || !$hasForm) {
+      return [
+        'complete' => false,
+        'message' => 'Profile details are incomplete. Please complete your profile, upload a picture, and submit your registration form in "My Profile" before checking out.'
+      ];
+    }
+
+    return ['complete' => true, 'message' => 'Profile is complete.'];
+  }
+
   public function getCartItems(int $studentId): array
   {
     $stmt = $this->db->prepare("
@@ -30,9 +67,9 @@ class TicketRepository
   public function addTransactionItems(int $transactionId, array $items): void
   {
     $stmt = $this->db->prepare("
-                INSERT INTO borrow_transaction_items (transaction_id, book_id)
-                VALUES (:tid, :bid)
-            ");
+            INSERT INTO borrow_transaction_items (transaction_id, book_id)
+            VALUES (:tid, :bid)
+        ");
     foreach ($items as $item) {
       $stmt->execute([
         'tid' => $transactionId,
@@ -76,14 +113,6 @@ class TicketRepository
         ");
     $stmt->execute([$studentId]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
-  }
-
-  public function getStudentIdByUserId(int $userId): ?int
-  {
-    $stmt = $this->db->prepare("SELECT student_id FROM students WHERE user_id = :uid");
-    $stmt->execute(['uid' => $userId]);
-    $student = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $student['student_id'] ?? null;
   }
 
   public function getTransactionByCode(string $transactionCode): array
@@ -180,11 +209,11 @@ class TicketRepository
   public function getPendingTransactionByStudentId(int $studentId): ?array
   {
     $stmt = $this->db->prepare("
-        SELECT transaction_id, transaction_code, due_date
-        FROM borrow_transactions
-        WHERE student_id = :sid AND status = 'pending'
-        LIMIT 1
-    ");
+            SELECT transaction_id, transaction_code, due_date
+            FROM borrow_transactions
+            WHERE student_id = :sid AND status = 'pending'
+            LIMIT 1
+        ");
     $stmt->execute(['sid' => $studentId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -194,10 +223,10 @@ class TicketRepository
   public function countItemsInTransaction(int $transactionId): int
   {
     $stmt = $this->db->prepare("
-        SELECT COUNT(*) as total
-        FROM borrow_transaction_items
-        WHERE transaction_id = :tid
-    ");
+            SELECT COUNT(*) as total
+            FROM borrow_transaction_items
+            WHERE transaction_id = :tid
+        ");
     $stmt->execute(['tid' => $transactionId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return isset($row['total']) ? (int)$row['total'] : 0;

@@ -109,7 +109,14 @@ class QRScannerController extends Controller
   public function borrowTransaction()
   {
     header('Content-Type: application/json');
+
     $transactionCode = trim($_POST['transaction_code'] ?? '');
+    $staffId = $_SESSION['user_id'] ?? null;
+
+    if (!$staffId) {
+      echo json_encode(['success' => false, 'message' => 'Unauthorized access. Staff not logged in.']);
+      return;
+    }
 
     $transaction = $this->qrScannerRepository->getStudentByTransactionCode($transactionCode);
 
@@ -124,19 +131,20 @@ class QRScannerController extends Controller
     );
 
     if ($currentBorrowed >= self::MAX_BORROW_LIMIT) {
-      echo json_encode(['success' => false, 'message' => "Borrowing limit check failed. Student is already borrowing the maximum amount (Limit: " . self::MAX_BORROW_LIMIT . " books)."]);
+      echo json_encode(['success' => false, 'message' => "Borrowing limit check failed. Student already has maximum borrowed books."]);
       return;
     }
 
-    $result = $this->qrScannerRepository->processBorrowing($transactionCode);
+    $result = $this->qrScannerRepository->processBorrowing($transactionCode, $staffId);
 
     if ($result) {
       unset($_SESSION['last_scanned_ticket']);
-      echo json_encode(['success' => true, 'message' => 'Borrow transaction successfully processed. Due date set to 1 week.']);
+      echo json_encode(['success' => true, 'message' => 'Borrow transaction successfully processed. Staff ID recorded.']);
     } else {
       echo json_encode(['success' => false, 'message' => 'Failed to finalize borrow transaction.']);
     }
   }
+
 
   public function history()
   {

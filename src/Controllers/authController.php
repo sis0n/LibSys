@@ -20,6 +20,31 @@ class AuthController extends Controller
 
     public function showLogin()
     {
+
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Cache-Control: post-check=0, pre-check=0', false);
+        header('Pragma: no-cache');
+
+        if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
+            switch (strtolower($_SESSION['role'])) {
+                case 'superadmin':
+                    header("Location: /libsys/public/superadmin/dashboard");
+                    exit;
+                case 'admin':
+                    header("Location: /libsys/public/admin/dashboard");
+                    exit;
+                case 'librarian':
+                    header("Location: /libsys/public/librarian/dashboard");
+                    exit;
+                case 'student':
+                    header("Location: /libsys/public/student/dashboard");
+                    exit;
+                case 'scanner':
+                    header("Location: /libsys/public/scanner/attendance");
+                    exit;
+            }
+        }
+
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }

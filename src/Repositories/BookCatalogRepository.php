@@ -94,8 +94,8 @@ class BookCatalogRepository
     $search = "%$keyword%";
     $stmt = $this->db->prepare("
             SELECT * FROM books 
-            WHERE title LIKE ? OR author LIKE ? OR accession_number LIKE ? OR subject LIKE ? OR book_isbn LIKE ?
-            AND deleted_at IS NULL
+              WHERE (title LIKE ? OR author LIKE ? OR accession_number LIKE ? OR subject LIKE ? OR book_isbn LIKE ?)
+              AND deleted_at IS NULL
         ");
     $stmt->execute([$search, $search, $search, $search, $search]);
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -107,9 +107,15 @@ class BookCatalogRepository
     $place_holder = [];
 
     foreach ($filters as $column => $value) {
-      if (!empty($value) && in_array($column, ['subject', 'availability', 'author', 'year', 'book_publisher'])) {
-        $query .= " AND $column = ?";
-        $place_holder[] = $value;
+      $allowed = [
+        'subject' => 'subject',
+        'availability' => 'availability',
+        'author' => 'author',
+        'year' => 'year',
+        'book_publisher' => 'book_publisher'
+      ];
+      if (isset($allowed[$column])) {
+        $query .= " AND {$allowed[$column]} = ?";
       }
     }
 
@@ -127,8 +133,7 @@ class BookCatalogRepository
     string $sort = 'default'
   ): array {
     $limit = max(1, min($limit, 100));
-    $offset = max(0, $offset);
-
+    $offset = max(0, min($offset, 10000));
     $query = "SELECT * FROM books WHERE 1=1 AND deleted_at IS NULL";
     $params = [];
 
@@ -171,7 +176,7 @@ class BookCatalogRepository
     $stmt = $this->db->prepare($query);
     $stmt->execute($params);
 
-    return $stmt->fetchAll(\PDO::FETCH_ASSOC); 
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
 
   public function countAvailableBooks(): int

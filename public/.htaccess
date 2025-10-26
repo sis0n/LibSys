@@ -1,7 +1,7 @@
 RewriteEngine On
 
 # Base path ng project mo
-RewriteBase /libsys/public/
+RewriteBase /
 
 # Kung file o folder talaga, hayaan lang
 RewriteCond %{REQUEST_FILENAME} !-f

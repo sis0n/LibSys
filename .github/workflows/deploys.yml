@@ -54,7 +54,6 @@ jobs:
           exclude: |
             .git/**
             .github/**
-            .env
             public/**
             docs/**
 

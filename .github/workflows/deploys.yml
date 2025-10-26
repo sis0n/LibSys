@@ -1,7 +1,10 @@
+name: 🚀 Build & Deploy to Hostinger
+
 on:
   push:
     branches:
       - main
+  workflow_dispatch:   # Allows manual trigger
 
 jobs:
   deploy:
@@ -23,21 +26,20 @@ jobs:
 
       # 3️⃣ Install Composer dependencies
       - name: 📦 Install PHP dependencies
-        run: |
-          composer install --no-dev --optimize-autoloader --no-interaction
+        run: composer install --no-dev --optimize-autoloader --no-interaction
 
       # 4️⃣ Setup Node.js for Tailwind/DaisyUI
       - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
       # 5️⃣ Build frontend CSS (Tailwind + DaisyUI)
       - name: 🎨 Build frontend assets
-        run: |
-          npm run build:css
+        run: npm ci && npm run build:css
 
-      # 6️⃣ Deploy everything via FTP (full project)
+      # 6️⃣ Deploy everything via FTP
       - name: 🚀 Deploy full project to Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -49,12 +51,12 @@ jobs:
           local-dir: ./
           server-dir: /
           exclude: |
-            **/.git*
-            **/.github*
-            **/node_modules/*
-            **docs*
-            **/vendor/**
-            **/storage/**
-            **/tests/**
+            **/.git
+            **/.github
+            **/node_modules
+            **/docs
+            **/vendor
+            **/storage
+            **/tests
             **/README.md
             **/deploy.yml

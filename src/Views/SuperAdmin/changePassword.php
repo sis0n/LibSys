@@ -1,5 +1,4 @@
-<div class="flex flex-col md:flex-row justify-center items-start gap-6 mt-6 mb-6 px-4 sm:px-6 lg:px-8">
-
+<div class="flex justify-center items-start">
   <div class="w-full md:w-[650px] flex flex-col items-center">
 
     <div class="w-full text-center md:text-left">

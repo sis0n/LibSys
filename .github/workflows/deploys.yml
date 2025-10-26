@@ -3,17 +3,20 @@ name: 🚀 Deploy to Hostinger via FTP
 on:
   push:
     branches:
-      - main   
+      - main   # deploy only when main branch is updated
+  workflow_dispatch:  # optional: manual deploy from GitHub UI
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # Step 1: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Upload public folder
+      # Step 2: Upload contents of public/ folder
+      - name: 📤 Upload public folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -21,14 +24,16 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          local-dir: public/
+          passive: true
+          local-dir: public/*        # uploads contents, not the folder itself
           server-dir: ${{ secrets.FTP_PATH }}/
           exclude: |
             **/.git*
             **/.github*
             node_modules/**
 
-      - name: Upload src folder
+      # Step 3: Upload src/ folder to server directly
+      - name: 📤 Upload src folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -36,13 +41,16 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          local-dir: src/
+          passive: true
+          local-dir: src/*          # contents only
           server-dir: ${{ secrets.FTP_PATH }}/src/
           exclude: |
             **/.git*
             **/.github*
 
+      # Step 4: Upload vendor/ folder (optional)
       - name: 📤 Upload vendor folder
+        if: ${{ secrets.DEPLOY_VENDOR == 'true' }}  # optional flag
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -50,7 +58,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          local-dir: vendor/
+          passive: true
+          local-dir: vendor/*      # contents only
           server-dir: ${{ secrets.FTP_PATH }}/vendor/
           exclude: |
             **/.git*

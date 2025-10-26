@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Upload public folder (includes .htaccess and assets)
       - name: Upload public folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -30,8 +28,7 @@ jobs:
             **/.github*
             node_modules/**
 
-      # Step 3: Upload src folder (PHP backend code)
-      - name: 📤 Upload src folder
+      - name: Upload src folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -45,7 +42,6 @@ jobs:
             **/.git*
             **/.github*
 
-      # Step 4: Upload vendor folder (Composer dependencies)
       - name: 📤 Upload vendor folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

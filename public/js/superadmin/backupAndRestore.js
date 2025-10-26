@@ -1,193 +1,256 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const usersTabBtn = document.getElementById('usersTabBtn');
-    const booksTabBtn = document.getElementById('booksTabBtn');
-    const usersContent = document.getElementById('usersContent');
-    const booksContent = document.getElementById('booksContent');
+    // Tabs
+    const backupTabBtn = document.getElementById('backupTabBtn');
+    const restoreTabBtn = document.getElementById('restoreTabBtn');
+    const backupContent = document.getElementById('backupContent');
+    const restoreContent = document.getElementById('restoreContent');
 
-    const deletedUsersTableBody = document.getElementById('deletedUsersTableBody');
-    const userRowTemplate = document.getElementById('user-row-template').content;
+    // Search and Filter
+    const searchInput = document.getElementById('searchInput');
+    const typeDropdownBtn = document.getElementById('typeDropdownBtn');
+    const typeDropdownMenu = document.getElementById('typeDropdownMenu');
+    const typeDropdownSpan = typeDropdownBtn.querySelector('span');
 
+    // Table
+    const deletedItemsTableBody = document.getElementById('deletedItemsTableBody');
+    const itemRowTemplate = document.getElementById('item-row-template').content;
+
+    // Modals
     const userDetailsModal = document.getElementById('userDetailsModal');
     const closeUserDetailsModalBtn = document.getElementById('closeUserDetailsModalBtn');
+    const bookDetailsModal = document.getElementById('bookDetailsModal');
+    const closeBookDetailsModalBtn = document.getElementById('closeBookDetailsModalBtn');
 
-    // Dummy data for deleted users
+    let currentFilter = 'Users';
+
+    // --- DUMMY DATA ---
     const deletedUsers = [{
             id: 1,
+            type: 'user',
             fullName: 'Michael Johnson',
             username: '20231234-S',
             role: 'student',
             email: 'michael.johnson@student.university.edu',
             createdDate: '8/15/2024, 8:00:00 AM',
-            deletedDate: '8/1/2025, 8:00:00 AM',
-            deletedBy: 'Admin',
-            status: 'active'
+            deleted_date: '8/1/2025, 8:00:00 AM',
+            deleted_by: 'Admin',
         },
         {
             id: 2,
+            type: 'user',
             fullName: 'Lisa Wang',
             username: 'Librarian1',
             role: 'librarian',
             email: 'lisa.wang@university.edu',
             createdDate: '7/20/2024, 9:30:00 AM',
-            deletedDate: '7/30/2025, 10:00:00 AM',
-            deletedBy: 'Dr. Maria Santos',
-            status: 'active'
+            deleted_date: '7/30/2025, 10:00:00 AM',
+            deleted_by: 'Dr. Maria Santos',
         },
-        {
-            id: 3,
-            fullName: 'David Kim',
-            username: 'AdminUser',
-            role: 'admin',
-            email: 'lisa.wang@university.edu',
-            createdDate: '7/20/2024, 9:30:00 AM',
-            deletedDate: '7/30/2025, 10:00:00 AM',
-            deletedBy: 'Dr. Maria Santos',
-            status: 'active'
-        }
     ];
 
-    // Function to set active tab styling
-    function setActiveTab(activeTab) {
-        // Reset all tab buttons to inactive state
-        usersTabBtn.classList.remove('bg-white', 'shadow-sm', 'font-semibold', 'text-gray-800');
-        usersTabBtn.classList.add('font-medium', 'text-gray-500');
-        booksTabBtn.classList.remove('bg-white', 'shadow-sm', 'font-semibold', 'text-gray-800');
-        booksTabBtn.classList.add('font-medium', 'text-gray-500');
+    const deletedBooks = [{
+            id: 1,
+            type: 'book',
+            title: "The Hitchhiker's Guide to the Galaxy",
+            author: 'Douglas Adams',
+            accession_number: 'AN-12345',
+            call_number: 'CN-67890',
+            publisher: 'Megadodo Publications',
+            year: '1979',
+            isbn: '0-345-39180-2',
+            subject: 'Science Fiction, Comedy',
+            place_of_publication: 'Ursa Minor Beta',
+            created_date: '10/10/2020, 11:00:00 AM',
+            deleted_date: '10/25/2025, 5:00:00 PM',
+            deleted_by: 'SuperAdmin'
+        },
+        {
+            id: 2,
+            type: 'book',
+            title: 'A Brief History of Time',
+            author: 'Stephen Hawking',
+            accession_number: 'AN-54321',
+            call_number: 'CN-09876',
+            publisher: 'Bantam Dell Publishing Group',
+            year: '1988',
+            isbn: '0-553-10953-7',
+            subject: 'Cosmology, Physics',
+            place_of_publication: 'United States',
+            created_date: '01/15/2018, 10:00:00 AM',
+            deleted_date: '09/15/2025, 3:15:00 PM',
+            deleted_by: 'Admin'
+        },
+    ];
 
-        // Set active tab styling
-        if (activeTab === 'users') {
-            usersTabBtn.classList.add('bg-white', 'shadow-sm', 'font-semibold', 'text-gray-800');
-            usersTabBtn.classList.remove('font-medium', 'text-gray-500');
-            usersContent.classList.remove('hidden');
-            booksContent.classList.add('hidden');
-            renderUsersTable(deletedUsers); // Render users table when users tab is active
-        } else if (activeTab === 'books') {
-            booksTabBtn.classList.add('bg-white', 'shadow-sm', 'font-semibold', 'text-gray-800');
-            booksTabBtn.classList.remove('font-medium', 'text-gray-500');
-            booksContent.classList.remove('hidden');
-            usersContent.classList.add('hidden');
-            // renderBooksTable(deletedBooks); // Call a function to render books table when books tab is active
+    // --- TAB MANAGEMENT ---
+    function setActiveTab(tab) {
+        const isRestore = tab === 'restore';
+
+        restoreTabBtn.classList.toggle('bg-white', isRestore);
+        restoreTabBtn.classList.toggle('shadow-sm', isRestore);
+        restoreTabBtn.classList.toggle('font-semibold', isRestore);
+        restoreTabBtn.classList.toggle('text-gray-800', isRestore);
+        restoreTabBtn.classList.toggle('font-medium', !isRestore);
+        restoreTabBtn.classList.toggle('text-gray-500', !isRestore);
+        restoreContent.classList.toggle('hidden', !isRestore);
+
+        backupTabBtn.classList.toggle('bg-white', !isRestore);
+        backupTabBtn.classList.toggle('shadow-sm', !isRestore);
+        backupTabBtn.classList.toggle('font-semibold', !isRestore);
+        backupTabBtn.classList.toggle('text-gray-800', !isRestore);
+        backupTabBtn.classList.toggle('font-medium', isRestore);
+        backupTabBtn.classList.toggle('text-gray-500', isRestore);
+        backupContent.classList.toggle('hidden', isRestore);
+
+        if (isRestore) {
+            filterAndRender();
         }
     }
 
-    // Function to render the users table
-    function renderUsersTable(users) {
-        deletedUsersTableBody.innerHTML = ''; // Clear existing rows
-        users.forEach(user => {
-            const newRow = userRowTemplate.cloneNode(true);
+    // --- TABLE RENDERING ---
+    function renderTable(items) {
+        deletedItemsTableBody.innerHTML = ''; // Clear existing rows
+        if (items.length === 0) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 6;
+            td.className = 'text-center py-10 text-gray-500';
+            td.textContent = 'No items found.';
+            tr.appendChild(td);
+            deletedItemsTableBody.appendChild(tr);
+            return;
+        }
+
+        items.forEach(item => {
+            const newRow = itemRowTemplate.cloneNode(true);
             const tr = newRow.querySelector('tr');
-            tr.dataset.userId = user.id;
+            tr.dataset.itemId = item.id;
+            tr.dataset.itemType = item.type;
 
-            newRow.querySelector('.user-full-name').textContent = user.fullName;
-            newRow.querySelector('.user-username').textContent = user.username;
-            newRow.querySelector('.user-role').textContent = user.role;
-            newRow.querySelector('.user-status').textContent = user.status;
-            newRow.querySelector('.user-deleted-date').textContent = user.deletedDate;
-            newRow.querySelector('.user-deleted-by').textContent = user.deletedBy;
-
-            // Apply role-based styling
-            const roleSpan = newRow.querySelector('.user-role');
-            if (user.role === 'admin') {
-                roleSpan.classList.add('bg-orange-500', 'text-white');
-            } else if (user.role === 'librarian') {
-                roleSpan.classList.add('bg-amber-500', 'text-white');
-            } else if (user.role === 'student') {
-                roleSpan.classList.add('bg-green-500', 'text-white');
+            const badge = newRow.querySelector('.item-type-badge');
+            badge.textContent = item.type;
+            if (item.type === 'user') {
+                badge.classList.add('bg-blue-100', 'text-blue-800');
+                newRow.querySelector('.item-main-identifier').textContent = item.fullName;
+                newRow.querySelector('.item-secondary-identifier').textContent = item.username;
+            } else { // book
+                badge.classList.add('bg-green-100', 'text-green-800');
+                newRow.querySelector('.item-main-identifier').textContent = item.title;
+                newRow.querySelector('.item-secondary-identifier').textContent = item.author;
             }
 
-            // Apply status-based styling
-            const statusSpan = newRow.querySelector('.user-status');
-            if (user.status === 'active') {
-                statusSpan.classList.add('bg-green-500', 'text-white');
-            } else if (user.status === 'inactive') {
-                statusSpan.classList.add('bg-orange-500', 'text-white');
-            }
+            newRow.querySelector('.item-deleted-date').textContent = item.deleted_date;
+            newRow.querySelector('.item-deleted-by').textContent = item.deleted_by;
 
-            deletedUsersTableBody.appendChild(newRow);
+            deletedItemsTableBody.appendChild(newRow);
         });
     }
 
-    // Function to populate and show user details modal
+    // --- FILTER AND SEARCH ---
+    function filterAndRender() {
+        const searchTerm = searchInput.value.toLowerCase();
+        let data = [];
+
+        if (currentFilter === 'Users') {
+            data = deletedUsers.filter(u =>
+                u.fullName.toLowerCase().includes(searchTerm) ||
+                u.username.toLowerCase().includes(searchTerm)
+            );
+        } else { // Books
+            data = deletedBooks.filter(b =>
+                b.title.toLowerCase().includes(searchTerm) ||
+                b.author.toLowerCase().includes(searchTerm)
+            );
+        }
+        renderTable(data);
+    }
+
+    // --- MODAL MANAGEMENT ---
     function populateUserDetailsModal(user) {
         document.getElementById('modalUserFullName').textContent = user.fullName;
         document.getElementById('modalUsername').textContent = user.username;
         document.getElementById('modalUserRole').textContent = user.role;
         document.getElementById('modalUserEmail').textContent = user.email;
         document.getElementById('modalUserCreatedDate').textContent = user.createdDate;
-        document.getElementById('modalUserDeletedDate').textContent = user.deletedDate;
-        document.getElementById('modalUserDeletedBy').textContent = user.deletedBy;
+        document.getElementById('modalUserDeletedDate').textContent = user.deleted_date;
+        document.getElementById('modalUserDeletedBy').textContent = user.deleted_by;
         userDetailsModal.classList.remove('hidden');
     }
 
-    // Event Listeners for tab buttons
-    usersTabBtn.addEventListener('click', () => setActiveTab('users'));
-    booksTabBtn.addEventListener('click', () => setActiveTab('books'));
+    function populateBookDetailsModal(book) {
+        document.getElementById('modalBookAccessionNumber').textContent = book.accession_number;
+        document.getElementById('modalBookCallNumber').textContent = book.call_number;
+        document.getElementById('modalBookIsbn').textContent = book.isbn;
+        document.getElementById('modalBookTitle').textContent = book.title;
+        document.getElementById('modalBookAuthor').textContent = book.author;
+        document.getElementById('modalBookPublisher').textContent = book.publisher;
+        document.getElementById('modalBookYear').textContent = book.year;
+        document.getElementById('modalBookSubject').textContent = book.subject;
+        document.getElementById('modalBookPlace').textContent = book.place_of_publication;
+        document.getElementById('modalBookCreatedDate').textContent = book.created_date;
+        document.getElementById('modalBookDeletedDate').textContent = book.deleted_date;
+        document.getElementById('modalBookDeletedBy').textContent = book.deleted_by;
+        bookDetailsModal.classList.remove('hidden');
+    }
 
-    // Event listener for user table rows (to open modal)
-    deletedUsersTableBody.addEventListener('click', (e) => {
-        const row = e.target.closest('.user-row');
-        if (row) {
-            const userId = parseInt(row.dataset.userId, 10);
-            const user = deletedUsers.find(u => u.id === userId);
-            if (user) {
-                populateUserDetailsModal(user);
-            }
-        }
-    });
+    function closeModal(modal) {
+        modal.classList.add('hidden');
+    }
 
-    // Event listeners for closing user details modal
-    closeUserDetailsModalBtn.addEventListener('click', () => {
-        userDetailsModal.classList.add('hidden');
-    });
+    // --- EVENT LISTENERS ---
+    restoreTabBtn.addEventListener('click', () => setActiveTab('restore'));
+    backupTabBtn.addEventListener('click', () => setActiveTab('backup'));
 
-    userDetailsModal.addEventListener('click', (e) => {
-        if (e.target === userDetailsModal) {
-            userDetailsModal.classList.add('hidden');
-        }
-    });
+    searchInput.addEventListener('input', filterAndRender);
 
-    // Initial active tab (default to users)
-    setActiveTab('users');
-
-    // Dropdown logic for User Roles
-    const userRoleDropdownBtn = document.getElementById('userRoleDropdownBtn');
-    const userRoleDropdownMenu = document.getElementById('userRoleDropdownMenu');
-    const userRoleDropdownSpan = userRoleDropdownBtn.querySelector('span');
-
-    userRoleDropdownBtn.addEventListener('click', (e) => {
+    typeDropdownBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        userRoleDropdownMenu.classList.toggle('hidden');
+        typeDropdownMenu.classList.toggle('hidden');
     });
 
-    userRoleDropdownMenu.querySelectorAll('a').forEach(item => {
+    typeDropdownMenu.querySelectorAll('a').forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
-            userRoleDropdownSpan.textContent = item.dataset.value;
-            userRoleDropdownMenu.classList.add('hidden');
+            currentFilter = item.dataset.value;
+            typeDropdownSpan.textContent = currentFilter;
+            searchInput.placeholder = `Search in ${currentFilter}...`;
+            typeDropdownMenu.classList.add('hidden');
+            filterAndRender();
         });
     });
 
-    // Dropdown logic for Book Categories
-    const bookCategoryDropdownBtn = document.getElementById('bookCategoryDropdownBtn');
-    const bookCategoryDropdownMenu = document.getElementById('bookCategoryDropdownMenu');
-    const bookCategoryDropdownSpan = bookCategoryDropdownBtn.querySelector('span');
+    deletedItemsTableBody.addEventListener('click', (e) => {
+        const row = e.target.closest('.item-row');
+        if (!row) return;
 
-    bookCategoryDropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        bookCategoryDropdownMenu.classList.toggle('hidden');
+        // Check if a button was clicked inside the row
+        if (e.target.closest('.restore-btn') || e.target.closest('.delete-btn')) {
+            return;
+        }
+
+        const id = parseInt(row.dataset.itemId, 10);
+        const type = row.dataset.itemType;
+
+        if (type === 'user') {
+            const user = deletedUsers.find(u => u.id === id);
+            if (user) populateUserDetailsModal(user);
+        } else if (type === 'book') {
+            const book = deletedBooks.find(b => b.id === id);
+            if (book) populateBookDetailsModal(book);
+        }
     });
 
-    bookCategoryDropdownMenu.querySelectorAll('a').forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            bookCategoryDropdownSpan.textContent = item.dataset.value;
-            bookCategoryDropdownMenu.classList.add('hidden');
-        });
-    });
+    // Modal closing events
+    closeUserDetailsModalBtn.addEventListener('click', () => closeModal(userDetailsModal));
+    userDetailsModal.addEventListener('click', (e) => e.target === userDetailsModal && closeModal(userDetailsModal));
+    closeBookDetailsModalBtn.addEventListener('click', () => closeModal(bookDetailsModal));
+    bookDetailsModal.addEventListener('click', (e) => e.target === bookDetailsModal && closeModal(bookDetailsModal));
 
-    // Close dropdowns when clicking outside
     document.addEventListener('click', () => {
-        userRoleDropdownMenu.classList.add('hidden');
-        bookCategoryDropdownMenu.classList.add('hidden');
+        typeDropdownMenu.classList.add('hidden');
     });
+
+    // --- INITIALIZATION ---
+    setActiveTab('restore');
+    searchInput.placeholder = `Search in ${currentFilter}...`;
 });

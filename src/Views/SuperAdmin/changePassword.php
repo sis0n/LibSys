@@ -138,6 +138,6 @@
   </div>
 </div>
 
-<script src="/libsys/public/js/changePassword.js" defer></script>
+<script src="/libsys/public/js/superadmin/changePassword.js" defer></script>
 
 </body>

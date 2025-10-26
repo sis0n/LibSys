@@ -30,7 +30,10 @@ jobs:
           node-version: '20'
 
       - name: 📦 Install Node Modules
-        run: npm install
+        run: npm ci
+
+      - name: 🎨 Build frontend CSS
+        run: npm run build
 
       - name: 🚀 Deploy full project to Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:   # Allows manual trigger
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   deploy:
@@ -37,10 +37,12 @@ jobs:
 
       # 5️⃣ Build frontend CSS (Tailwind + DaisyUI)
       - name: 🎨 Build frontend assets
-        run: npm ci && npm run build
+        run: |
+          npm ci
+          npm run build
 
-      # 6️⃣ Deploy everything via FTP
-      - name: 🚀 Deploy full project to Hostinger
+      # 6️⃣ Deploy backend & frontend via FTP
+      - name: 🚀 Deploy project to Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}

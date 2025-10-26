@@ -249,11 +249,32 @@ switch ($role) {
                 </div>
             </div>
 
-            <!-- Backup and Restore -->
-            <a href="/LibSys/public/superadmin/backupAndRestore"
-                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'backupAndRestore' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+            <!-- Backup -->
+            <a href="/LibSys/public/superadmin/backup"
+                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'backup' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-database text-2xl"></i>
-                <span>Backup & Restore</span>
+                <span>Backup</span>
+            </a>
+
+            <!-- Restore Books -->
+            <a href="/LibSys/public/superadmin/restoreBooks"
+                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreBooks' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-book-open-user text-2xl"></i>
+                <span>Restore Books</span>
+            </a>
+
+            <!-- Restore Equipment -->
+            <a href="/LibSys/public/superadmin/restoreEquipment"
+                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreEquipment' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-desktop-tower text-2xl"></i>
+                <span>Restore Books</span>
+            </a>
+
+            <!-- Restore User -->
+            <a href="/LibSys/public/superadmin/restoreUser"
+                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restorerUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-user-switch text-2xl"></i>
+                <span>Restore User</span>
             </a>
 
             <!-- Change Password -->

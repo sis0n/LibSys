@@ -1,81 +1,64 @@
 name: 🚀 Deploy to Hostinger via FTP
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-    steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
-      # 1. I-se-setup ang PHP
-      - name: 🐘 Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, pdo, pdo_mysql, gd, intl, bcmath
-          coverage: none
+      - name: 🐘 Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_mysql, gd, intl, bcmath
+          coverage: none
 
-      # 2. I-ka-cache ang vendor folder para mas mabilis sa susunod
-      - name: ⚡ Cache Composer dependencies
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+      - name: ⚡ Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-      # 3. Ito ang gagawa ng buong 'vendor' folder mo
-      - name: 📦 Install Composer Dependencies
-        run: composer install --no-dev --prefer-dist -o
+      - name: 📦 Install Composer Dependencies
+        run: composer install --no-dev --prefer-dist -o
 
-      # 4. I-a-upload ang backend files (src, vendor, composer, etc.) sa BASE PATH
-      - name: 📤 Upload Backend Files (Outside public_html)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          
-          # Kukunin lahat ng files
-          local-dir: ./
-          
-          # GAGAMITIN ANG BAGONG SECRET: FTP_BASE_PATH
-          server-dir: ${{ secrets.FTP_BASE_PATH }}/
-          
-          # I-e-exclude ang 'public' folder at iba pa
-          exclude: |
-            **/.git*
-            **/.github*
-            .env
-            node_modules/**
-            public/       
+      - name: 📤 Upload Backend Files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          local-dir: ./
+          server-dir: ${{ secrets.FTP_BASE_PATH }}/
+          exclude: |
+            **/.git*
+            **/.github*
+            .env
+            node_modules/**
+            public/
 
-      # 5. I-a-upload ang frontend files (loob ng 'public') sa WEB ROOT
-      - name: 📤 Upload Frontend Files (to public_html)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          
-          # Kukunin lang ang laman ng 'public' folder
-          local-dir: public/
-          
-          # I-a-upload sa 'public_html' (FTP_PATH)
-          server-dir: ${{ secrets.FTP_PATH }}/
-          
-          # Standard excludes
-          exclude: |
-            **/.git*
-            **/.github*
+      - name: 📤 Upload Frontend Files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          local-dir: public/
+          server-dir: ${{ secrets.FTP_PATH }}/
+          exclude: |
+            **/.git*
+            **/.github*

@@ -8,10 +8,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
+      # Step 1: Checkout repository
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Upload public folder
       - name: 📤 Upload public folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -26,6 +29,7 @@ jobs:
             **/.git*
             **/.github*
 
+      # Step 3: Upload src folder
       - name: 📤 Upload src folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

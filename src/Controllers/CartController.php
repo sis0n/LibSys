@@ -136,8 +136,8 @@ class CartController extends Controller
       session_start();
     }
 
-    if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'student') {
-      header('Location: /login');
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+      header('Location: libsys/public/login');
       exit;
     }
 

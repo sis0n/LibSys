@@ -25,7 +25,7 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
           passive: true
-          local-dir: public/*        # uploads contents, not the folder itself
+          local-dir: public/       
           server-dir: ${{ secrets.FTP_PATH }}/
           exclude: |
             **/.git*
@@ -42,7 +42,7 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
           passive: true
-          local-dir: src/*          # contents only
+          local-dir: src/         
           server-dir: ${{ secrets.FTP_PATH }}/src/
           exclude: |
             **/.git*
@@ -58,7 +58,7 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
           passive: true
-          local-dir: vendor/*      # contents only
+          local-dir: vendor/     
           server-dir: ${{ secrets.FTP_PATH }}/vendor/
           exclude: |
             **/.git*

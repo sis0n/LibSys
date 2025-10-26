@@ -21,22 +21,13 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql, gd, intl, bcmath
           coverage: none
 
-      - name: ⚡ Cache Composer dependencies
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
       - name: 📦 Install Composer Dependencies
-        run: composer install --no-dev --prefer-dist -o
+        run: composer install --no-dev --optimize-autoloader --no-interaction
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: '20'
 
       - name: 📦 Install Node Modules
         run: npm install
@@ -69,6 +60,25 @@ jobs:
           local-dir: ./
           server-dir: /
           exclude: |
-            .git/**
-            .github/**
-            docs/**
+            .
+
+      - name: 🚀 Deploy full project to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          local-dir: ./
+          server-dir: /
+          exclude: |
+            */.git
+            */.github
+            */node_modules/*
+            */vendor/*
+            */docs/*
+            *checkout_test.txt*
+            *resetdata.php*
+            *sandbox.php*
+            **/deploy.yml

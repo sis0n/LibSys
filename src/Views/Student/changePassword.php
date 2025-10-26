@@ -1,6 +1,5 @@
-<!-- Main Container: two columns -->
-<div class="flex flex-col md:flex-row justify-center items-start gap-6 mt-6 mb-6 px-4 sm:px-6 lg:px-8">
-
+<!-- Main Container -->
+<main class="flex justify-center items-start ">
   <!-- Column 1: Change Password -->
   <div class="w-full md:w-[650px] flex flex-col items-center">
 
@@ -151,6 +150,5 @@
       </form>
     </div>
   </div>
-
-</div>
+</main>
 <script src="/LibSys/public/js/student/changePassword.js" defer></script>

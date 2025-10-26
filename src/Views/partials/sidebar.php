@@ -249,33 +249,39 @@ switch ($role) {
                 </div>
             </div>
 
-            <!-- Backup -->
-            <a href="/LibSys/public/superadmin/backup"
-                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'backup' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-database text-2xl"></i>
-                <span>Backup</span>
-            </a>
-
-            <!-- Restore Books -->
-            <a href="/LibSys/public/superadmin/restoreBooks"
-                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreBooks' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-book-open-user text-2xl"></i>
-                <span>Restore Books</span>
-            </a>
-
-            <!-- Restore Equipment -->
-            <a href="/LibSys/public/superadmin/restoreEquipment"
-                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreEquipment' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-desktop-tower text-2xl"></i>
-                <span>Restore Books</span>
-            </a>
-
-            <!-- Restore User -->
-            <a href="/LibSys/public/superadmin/restoreUser"
-                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restorerUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-user-switch text-2xl"></i>
-                <span>Restore User</span>
-            </a>
+            <!-- Backup & Restore Dropdown -->
+            <div class="sidebar-dropdown" data-pages='["backup", "restoreBooks", "restoreEquipment", "restoreUser"]'>
+                <button
+                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
+                    <span class="flex items-center gap-x-3">
+                        <i class="ph ph-database text-2xl"></i>
+                        <span class="text-base">Backup & Restore</span>
+                    </span>
+                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
+                </button>
+                <div class="pl-5 pt-1 space-y-1 hidden">
+                    <a href="/LibSys/public/superadmin/backup"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'backup' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-floppy-disk text-xl"></i>
+                        <span class="text-base text-sm">Backup</span>
+                    </a>
+                    <a href="/LibSys/public/superadmin/restoreBooks"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreBooks' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-book text-xl"></i>
+                        <span class="text-base text-sm">Restore Books</span>
+                    </a>
+                    <a href="/LibSys/public/superadmin/restoreEquipment"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreEquipment' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-wrench text-xl"></i>
+                        <span class="text-base text-sm">Restore Equipment</span>
+                    </a>
+                    <a href="/LibSys/public/superadmin/restoreUser"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-user-gear text-xl"></i>
+                        <span class="text-base text-sm">Restore User</span>
+                    </a>
+                </div>
+            </div>
 
             <!-- Change Password -->
             <a href="/libsys/public/superadmin/changePassword"
@@ -322,7 +328,7 @@ switch ($role) {
                 <button
                     class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
                     <span class="flex items-center gap-x-3">
-                        <i class="ph ph-qr-code text-2xl"></i>
+                        <i class="ph ph-swap text-2xl"></i>
                         <span class="text-base">QR & Returning</span>
                     </span>
                     <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>

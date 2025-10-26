@@ -1,74 +1,60 @@
-name: 🚀 Deploy to Hostinger via FTP
-
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   deploy:
+    name: 🚀 Build & Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # 1️⃣ Checkout the repository
+      - name: 🧾 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🐘 Setup PHP
+      # 2️⃣ Setup PHP for Composer
+      - name: ⚙️ Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, pdo, pdo_mysql, gd, intl, bcmath
+          extensions: mbstring, bcmath, intl, pdo, pdo_mysql, curl, dom, gd, json, xml
           coverage: none
 
-      - name: ⚡ Cache Composer dependencies
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+      # 3️⃣ Install Composer dependencies
+      - name: 📦 Install PHP dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader --no-interaction
 
-      - name: 📦 Install Composer Dependencies
-        run: composer install --no-dev --prefer-dist -o
-
-      - name: 🟢 Setup Node.js
+      # 4️⃣ Setup Node.js for Tailwind/DaisyUI
+      - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: 20
 
-      - name: 📦 Install Node Modules
-        run: npm install
+      # 5️⃣ Build frontend CSS (Tailwind + DaisyUI)
+      - name: 🎨 Build frontend assets
+        run: |
+          npm run build:css
 
-      - name: 📤 Upload Backend Files
+      # 6️⃣ Deploy everything via FTP (full project)
+      - name: 🚀 Deploy full project to Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
           protocol: ftp
+          port: ${{ secrets.FTP_PORT }}
           local-dir: ./
-          server-dir: ${{ secrets.FTP_BASE_PATH }}/
+          server-dir: /
           exclude: |
-            .git/**
-            .github/**
-            public/**
-            docs/**
-            .env
-
-      - name: 📤 Upload Frontend Files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          local-dir: public/
-          server-dir: ${{ secrets.FTP_PATH }}/public_html/
-          exclude: |
-            .git/**
-            .github/**
-            docs/**
+            **/.git*
+            **/.github*
+            **/node_modules/*
+            **docs*
+            **/vendor/**
+            **/storage/**
+            **/tests/**
+            **/README.md
+            **/deploy.yml

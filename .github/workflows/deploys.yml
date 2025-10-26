@@ -50,7 +50,6 @@ jobs:
 
       # Step 4: Upload vendor/ folder (optional)
       - name: 📤 Upload vendor folder
-        if: ${{ secrets.DEPLOY_VENDOR == 'true' }}  # optional flag
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}

@@ -32,6 +32,15 @@ jobs:
       - name: 📦 Install Composer Dependencies
         run: composer install --no-dev --prefer-dist -o
 
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install Node Modules
+        run: npm install
+
       - name: 📤 Upload Backend Files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -43,11 +52,11 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.FTP_BASE_PATH }}/
           exclude: |
-            **/.git*
-            **/.github*
+            .git/**
+            .github/**
             .env
-            node_modules/**
-            public/
+            public/**
+            docs/**
 
       - name: 📤 Upload Frontend Files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -60,5 +69,6 @@ jobs:
           local-dir: public/
           server-dir: ${{ secrets.FTP_PATH }}/
           exclude: |
-            **/.git*
-            **/.github*
+            .git/**
+            .github/**
+            docs/**

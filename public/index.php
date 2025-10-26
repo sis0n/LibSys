@@ -12,7 +12,7 @@ $router = RouteConfig::register();
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // pangdefine lang ng base path to
-$basePath = '/libsys/public/';
+$basePath = '/';
 $uri = substr($uri, strlen($basePath));
 
 // default route

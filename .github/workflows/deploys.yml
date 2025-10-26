@@ -23,7 +23,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          local-dir: ./libsys/public
+          local-dir: ./libsys/public/
           server-dir: ${{ secrets.FTP_PATH }}
           exclude: |
             **/.git*
@@ -38,7 +38,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          local-dir: ./libsys/src
+          local-dir: ./libsys/src/
           server-dir: ${{ secrets.FTP_PATH }}/src
           exclude: |
             **/.git*

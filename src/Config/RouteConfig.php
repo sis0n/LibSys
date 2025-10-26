@@ -91,7 +91,10 @@ class RouteConfig
         $router->get('superadmin/transactionHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
         $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
-        $router->get('superadmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
+        $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);
+        $router->get('superadmin/restoreBooks', 'SidebarController@restoreBooks', ['superadmin']);
+        $router->get('superadmin/restoreEquipment', 'SidebarController@restoreEquipment', ['superadmin']);
+        $router->get('superadmin/restoreUser', 'SidebarController@restoreUser', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
         $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
 

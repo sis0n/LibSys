@@ -1,4 +1,4 @@
-<div class="min-h-screen p-6">
+<div class="min-h-screen">
     <div class="mb-6">
         <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
             My Profile

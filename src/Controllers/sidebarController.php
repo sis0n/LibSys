@@ -161,11 +161,35 @@ class SidebarController extends Controller
     }
 
     
-    public function backupAndRestore()
+    public function backup()
     {
-        $this->view("superadmin/backupAndRestore", [
-            "title"=> "Backup & Restore",
-            "currentPage" => "backupAndRestore"
+        $this->view("superadmin/backup", [
+            "title"=> "Backup",
+            "currentPage" => "backup"
+        ]);
+    }
+
+      public function restoreBooks()
+    {
+        $this->view("superadmin/restoreBooks", [
+            "title"=> "Restore Books",
+            "currentPage" => "restoreBooks"
+        ]);
+    }
+
+      public function restoreEquipment()
+    {
+        $this->view("superadmin/restoreEquipment", [
+            "title"=> "Restore Equipment",
+            "currentPage" => "restoreEquipment"
+        ]);
+    }
+
+      public function restoreUser()
+    {
+        $this->view("superadmin/restoreUser", [
+            "title"=> "Restore User",
+            "currentPage" => "restoreUser"
         ]);
     }
 

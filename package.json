@@ -7,13 +7,12 @@
     "doc": "docs"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.1.13",
     "tailwindcss": "^4.1.13"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify",
-    "watch": "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch"
+    "build": "node_modules/.bin/tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify",
+    "watch": "node_modules/.bin/tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch"
   },
   "repository": {
     "type": "git",

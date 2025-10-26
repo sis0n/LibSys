@@ -1,4 +1,4 @@
-<div class="min-h-screen">
+<main class="min-h-screen">
     <!-- Header -->
     <div class="flex items-center gap-3 mb-3">
         <div>
@@ -27,7 +27,7 @@
 
             <!-- Users Only Card -->
             <button class="group flex flex-col items-center justify-center p-2 border border-gray-200 rounded-lg shadow-sm 
-               hover:bg-amber-500 hover:border-orange-500 hover:shadow-md transition-all duration-200 cursor-pointer"> 
+               hover:bg-amber-500 hover:border-orange-500 hover:shadow-md transition-all duration-200 cursor-pointer">
                 <i class="ph ph-users text-3xl text-orange-500 group-hover:text-white transition-colors"></i>
                 <span class="text-base font-semibold text-gray-700 group-hover:text-white mt-2">Users Only</span>
                 <span class="text-sm text-gray-700 group-hover:text-white">User accounts</span>
@@ -61,33 +61,39 @@
         <p class="text-gray-600 mb-6">Available backup files for download or deletion.</p>
 
         <div class="overflow-x-auto rounded-lg border border-gray-200">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File
-                            Name</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Created Date</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Created By</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="backupFilesTableBody" class="bg-white divide-y divide-gray-200">
-                    <!-- Backup file rows will be inserted here by JavaScript -->
-                </tbody>
-            </table>
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[220px]">
+                                File Name
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                Type
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px]">
+                                Size
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[160px]">
+                                Created Date
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
+                                Created By
+                            </th>
+                            <th scope="col"
+                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="backupFilesTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
             <p id="noBackupFilesFound" class="text-gray-500 text-center w-full py-10 hidden">
                 <i class="ph ph-folder-simple-x text-4xl block mb-2 text-gray-400"></i>
                 No backup files found.
@@ -124,7 +130,7 @@
             </nav>
         </div>
     </div>
-</div>
+</main>
 
 <script src="/libsys/public/js/superadmin/backup.js"></script>
 
@@ -142,10 +148,12 @@
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 created-by"></td>
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <button class="download-btn inline-flex items-center px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 mr-2">
+            <button
+                class="download-btn inline-flex items-center px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 mr-2">
                 <i class="ph ph-download-simple text-lg mr-1"></i> Download
             </button>
-            <button class="delete-btn inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+            <button
+                class="delete-btn inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                 <i class="ph ph-trash text-lg mr-1"></i> Delete
             </button>
         </td>

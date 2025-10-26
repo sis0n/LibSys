@@ -11,14 +11,14 @@ class Database{
     private $connection;
 
     private function __construct(){
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../../');
         $dotenv->load();
 
-        $driver = $_ENV['DB_CONNECTION'] ?? 'mysql';
-        $host = $_ENV['DB_HOST'] ?? 'localhost';
-        $db = $_ENV['DB_DATABASE'] ?? 'library_system';
-        $user = $_ENV['DB_USERNAME'] ?? 'root';
-        $pass = $_ENV['DB_PASSWORD'] ?? '';
+        $driver = getenv('DB_CONNECTION') ?: 'mysql';
+        $host = getenv('DB_HOST') ?: 'localhost';
+        $db = getenv('DB_DATABASE') ?: 'library_system';
+        $user = getenv('DB_USERNAME') ?: 'root';
+        $pass = getenv('DB_PASSWORD') ?: '';
 
         try{
             $this->connection = new PDO("$driver:host=$host;dbname=$db;charset=utf8", $user, $pass);

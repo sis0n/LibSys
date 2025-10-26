@@ -3,19 +3,18 @@ name: 🚀 Deploy to Hostinger via FTP
 on:
   push:
     branches:
-      - main   # deploy only when main branch is updated
-  workflow_dispatch:  # optional: manual deploy from GitHub UI
+      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Upload contents of public/ folder
+      # Upload frontend
       - name: 📤 Upload public folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -24,15 +23,14 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          passive: true
-          local-dir: public/       
+          local-dir: public/
           server-dir: ${{ secrets.FTP_PATH }}/
           exclude: |
             **/.git*
             **/.github*
             node_modules/**
 
-      # Step 3: Upload src/ folder to server directly
+      # Upload backend src/ outside public_html
       - name: 📤 Upload src folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -41,14 +39,13 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          passive: true
-          local-dir: src/         
-          server-dir: ${{ secrets.FTP_PATH }}/src/
+          local-dir: src/
+          server-dir: /src/
           exclude: |
             **/.git*
             **/.github*
 
-      # Step 4: Upload vendor/ folder (optional)
+      # Upload vendor/ outside public_html
       - name: 📤 Upload vendor folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -57,9 +54,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          passive: true
-          local-dir: vendor/     
-          server-dir: ${{ secrets.FTP_PATH }}/vendor/
+          local-dir: vendor/
+          server-dir: /vendor/
           exclude: |
             **/.git*
             **/.github*

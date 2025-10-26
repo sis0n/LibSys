@@ -57,7 +57,7 @@ class RouteConfig
         $router->get('librarian/qrScanner', 'SidebarController@librarianQrScanner', ['librarian']);
         $router->get('librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
         $router->get('librarian/topVisitor', 'SidebarController@librarianTopVisitor', ['librarian']);
-        $router->get('librarian/borrowingHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
+        $router->get('librarian/transactionHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
         $router->get('librarian/returning', 'SidebarController@librarianReturning', ['librarian']);
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
         $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
@@ -72,7 +72,7 @@ class RouteConfig
         $router->get('admin/qrScanner', 'SidebarController@adminQrScanner', ['admin']);
         $router->get('admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
         $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['admin']);
-        $router->get('admin/borrowingHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
+        $router->get('admin/transactionHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
         $router->get('admin/returning', 'SidebarController@adminReturning', ['admin']);
         $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
         $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
@@ -88,7 +88,7 @@ class RouteConfig
         $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
         $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
-        $router->get('superadmin/borrowingHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('superadmin/transactionHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
         $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
         $router->get('superadmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
@@ -120,22 +120,6 @@ class RouteConfig
 
         // AJAX route para sa dropdown filter logs (librarian at admin)
         $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['librarian', 'admin', 'superadmin']);
-
-
-        /**
-         * ========================
-         * BOOK INVENTORY ROUTES
-         * ========================
-         */
-
-        $router->get('books', 'BookController@index', ['librarian', 'admin']);
-        $router->get('books/create', 'BookController@create', ['librarian', 'admin']);
-        $router->post('books/store', 'BookController@store', ['librarian', 'admin']);
-        $router->get('books/edit/{id}', 'BookController@edit', ['librarian', 'admin']);
-        $router->post('books/update/{id}', 'BookController@update', ['librarian', 'admin']);
-        $router->post('books/delete/{id}', 'BookController@destroy', ['librarian', 'admin']);
-        $router->get('books/search', 'BookController@search', ['librarian', 'admin']);
-        $router->get('books/filter', 'BookController@filter', ['librarian', 'admin']);
 
         /**
          * ========================
@@ -216,6 +200,26 @@ class RouteConfig
 
 
         $router->get('student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
+
+        $router->get('superadmin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['superadmin']);
+        $router->post('superadmin/returning/checkBook', 'ReturningController@checkBookStatus', ['superadmin']);
+        $router->post('superadmin/returning/markReturned', 'ReturningController@returnBook', ['superadmin']);
+        $router->post('superadmin/returning/extend', 'ReturningController@extendDueDate', ['superadmin']);
+
+        $router->get('admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['admin']);
+        $router->post('admin/returning/checkBook', 'ReturningController@checkBookStatus', ['admin']);
+        $router->post('admin/returning/markReturned', 'ReturningController@returnBook', ['admin']);
+        $router->post('admin/returning/extend', 'ReturningController@extendDueDate', ['admin']);
+
+        $router->get('librarian/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['librarian']);
+        $router->post('librarian/returning/checkBook', 'ReturningController@checkBookStatus', ['librarian']);
+        $router->post('librarian/returning/markReturned', 'ReturningController@returnBook', ['librarian']);
+        $router->post('librarian/returning/extend', 'ReturningController@extendDueDate', ['librarian']);
+
+        $router->get('superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
+        $router->get('admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['admin']);
+        $router->get('librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['librarian']);
+
 
         return $router;
     }

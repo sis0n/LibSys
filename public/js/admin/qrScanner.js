@@ -33,14 +33,14 @@ function renderScanResult(data) {
 
     let profilePicPath = defaultAvatar;
     if (data.student.profilePicture) {
-        profilePicPath = data.student.profilePicture.startsWith('/')
-            ? data.student.profilePicture
-            : `/${data.student.profilePicture}`;
+        profilePicPath = data.student.profilePicture.startsWith('/') ?
+            data.student.profilePicture :
+            `/${data.student.profilePicture}`;
     }
 
-    const actionButton = isBorrowed
-        ? `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>`
-        : `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
+    const actionButton = isBorrowed ?
+        `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>` :
+        `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
               class="w-full bg-orange-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-orange-600 transition">
               Confirm Borrow (${data.items.length} Items)
            </button>`;
@@ -112,18 +112,18 @@ function renderScanResult(data) {
         </div>
     `;
 
-    const processBorrowBtn = document.getElementById('processBorrowBtn');
+  const processBorrowBtn = document.getElementById('processBorrowBtn');
 
-    if (processBorrowBtn) {
-        processBorrowBtn.addEventListener('click', () => processTransaction(data.ticket.id, 'borrow'));
-    }
+  if (processBorrowBtn) {
+    processBorrowBtn.addEventListener('click', () => processTransaction(data.ticket.id, 'borrow'));
+  }
 }
 
 function renderTransactionHistory(transactions) {
-    if (!transactionHistoryTableBody) return;
+  if (!transactionHistoryTableBody) return;
 
-    if (!transactions || transactions.length === 0) {
-        transactionHistoryTableBody.innerHTML = `
+  if (!transactions || transactions.length === 0) {
+    transactionHistoryTableBody.innerHTML = `
             <tr>
                 <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                     <div class="flex flex-col items-center justify-center gap-3 mt-6 mb-6">
@@ -136,18 +136,18 @@ function renderTransactionHistory(transactions) {
                 </td>
             </tr>
         `;
-        return;
-    }
+    return;
+  }
 
-    let tableRowsHtml = '';
-    transactions.forEach(transaction => {
-        const statusClass = transaction.status === 'Borrowed'
-            ? 'bg-orange-100 text-orange-800'
-            : transaction.status === 'Returned'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-gray-100 text-gray-800';
+  let tableRowsHtml = '';
+  transactions.forEach(transaction => {
+    const statusClass = transaction.status === 'Borrowed'
+      ? 'bg-orange-100 text-orange-800'
+      : transaction.status === 'Returned'
+        ? 'bg-green-100 text-green-800'
+        : 'bg-gray-100 text-gray-800';
 
-        tableRowsHtml += `
+    tableRowsHtml += `
             <tr class="hover:bg-orange-50 transition">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${transaction.studentName}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${transaction.studentNumber}</td>
@@ -161,134 +161,112 @@ function renderTransactionHistory(transactions) {
                 </td>
             </tr>
         `;
-    });
+  });
 
-    transactionHistoryTableBody.innerHTML = tableRowsHtml;
+  transactionHistoryTableBody.innerHTML = tableRowsHtml;
 }
 
 function processTransaction(transactionCode, action) {
-    const actionText = 'finalize this borrowing transaction';
+  const actionText = 'finalize this borrowing transaction';
 
-    Swal.fire({
-        title: `Borrow Transaction?`,
-        text: `Are you sure you want to ${actionText} for ticket ${transactionCode}?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#f97316',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: `Yes, Process Borrow!`,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            const url = `${BASE_AJAX_PATH}/borrowTransaction`;
-            const formData = `transaction_code=${encodeURIComponent(transactionCode)}`;
+  Swal.fire({
+    title: `Borrow Transaction?`,
+    text: `Are you sure you want to ${actionText} for ticket ${transactionCode}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#f97316',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: `Yes, Process Borrow!`,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const url = `${BASE_AJAX_PATH}/borrowTransaction`;
+      const formData = `transaction_code=${encodeURIComponent(transactionCode)}`;
 
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: formData
-            })
-                .then(res => res.json())
-                .then(res => {
-                    if (res.success) {
-                        Swal.fire('Success!', res.message, 'success');
-                        renderScanResult(null);
-                        fetchTransactionHistory();
-                        document.getElementById('scannerInput').focus();
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'Transaction Failed', text: res.message });
-                    }
-                })
-                .catch(() => {
-                    Swal.fire({ icon: 'error', title: 'Network Error', text: 'Could not connect to the server.' });
-                });
-        }
-    });
-}
-
-function fetchTransactionHistory(status = statusValue.textContent, search = searchInput.value.trim(), date = dateInput.value) {
-    const params = new URLSearchParams({ status, search, date: date || '' });
-
-    fetch(`${BASE_AJAX_PATH}/transactionHistory?${params.toString()}`)
-        .then(res => res.json())
-        .then(res => {
-            if (res.success) {
-                const formattedData = res.transactions.map(h => ({
-                    // FIX: Ang Controller na ang bahala sa tamang mapping (h.studentName, h.studentNumber, etc.)
-                    studentName: h.studentName,
-                    studentNumber: h.studentNumber,
-                    itemsBorrowed: h.itemsBorrowed,
-                    status: h.status.charAt(0).toUpperCase() + h.status.slice(1),
-                    borrowedDateTime: h.borrowedDateTime,
-                    returnedDateTime: h.returnedDateTime
-                }));
-                renderTransactionHistory(formattedData);
-            } else {
-                renderTransactionHistory([]);
-            }
-        });
-}
-
-function scanQRCode(transactionCode) {
-    fetch(`${BASE_AJAX_PATH}/scanTicket`, {
+      fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `transaction_code=${encodeURIComponent(transactionCode)}`
-    })
+        body: formData
+      })
         .then(res => res.json())
         .then(res => {
-            if (res.success) {
-                renderScanResult({ isValid: true, ...res.data });
-                document.getElementById('manualTicketInput').value = '';
-            } else {
-                renderScanResult({ isValid: false, message: res.message });
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Ticket',
-                    text: res.message,
-                });
-            }
+          if (res.success) {
+            Swal.fire('Success!', res.message, 'success');
+            renderScanResult(null);
+            
+            document.getElementById('scannerInput').focus();
+          } else {
+            Swal.fire({ icon: 'error', title: 'Transaction Failed', text: res.message });
+          }
+        })
+        .catch(() => {
+          Swal.fire({ icon: 'error', title: 'Network Error', text: 'Could not connect to the server.' });
         });
+    }
+  });
+}
+
+
+
+function scanQRCode(transactionCode) {
+  fetch(`${BASE_AJAX_PATH}/scanTicket`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `transaction_code=${encodeURIComponent(transactionCode)}`
+  })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        renderScanResult({ isValid: true, ...res.data });
+        document.getElementById('manualTicketInput').value = '';
+      } else {
+        renderScanResult({ isValid: false, message: res.message });
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Ticket',
+          text: res.message,
+        });
+      }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchTransactionHistory();
 
-    if (statusBtn && statusMenu && statusValue) {
-        statusBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            statusMenu.classList.toggle("hidden");
-        });
-
-        statusMenu.querySelectorAll(".dropdown-item").forEach(item => {
-            item.addEventListener("click", () => {
-                statusValue.textContent = item.dataset.value;
-                statusMenu.classList.add("hidden");
-                fetchTransactionHistory();
-            });
-        });
-
-        document.addEventListener("click", e => {
-            if (!statusBtn.contains(e.target) && !statusMenu.contains(e.target)) {
-                statusMenu.classList.add("hidden");
-            }
-        });
-    }
-
-    searchInput.addEventListener('input', () => fetchTransactionHistory());
-    dateInput.addEventListener('change', () => fetchTransactionHistory());
-
-    const scannerInput = document.getElementById('scannerInput');
-    const scannerBox = document.getElementById('scannerBox');
-    const manualBtn = document.getElementById('manualTicketBtn');
-    const manualInput = document.getElementById('manualTicketInput');
-
-    if (scannerInput && scannerBox) {
-        scannerBox.addEventListener('click', () => scannerInput.focus());
-        scannerInput.focus();
-    }
-
-    manualBtn.addEventListener('click', () => {
-        const code = manualInput.value.trim();
-        if (code) scanQRCode(code);
+  if (statusBtn && statusMenu && statusValue) {
+    statusBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      statusMenu.classList.toggle("hidden");
     });
+
+    statusMenu.querySelectorAll(".dropdown-item").forEach(item => {
+      item.addEventListener("click", () => {
+        statusValue.textContent = item.dataset.value;
+        statusMenu.classList.add("hidden");
+        
+      });
+    });
+
+    document.addEventListener("click", e => {
+      if (!statusBtn.contains(e.target) && !statusMenu.contains(e.target)) {
+        statusMenu.classList.add("hidden");
+      }
+    });
+  }
+
+  searchInput.addEventListener('input', () => fetchTransactionHistory());
+  dateInput.addEventListener('change', () => fetchTransactionHistory());
+
+  const scannerInput = document.getElementById('scannerInput');
+  const scannerBox = document.getElementById('scannerBox');
+  const manualBtn = document.getElementById('manualTicketBtn');
+  const manualInput = document.getElementById('manualTicketInput');
+
+  if (scannerInput && scannerBox) {
+    scannerBox.addEventListener('click', () => scannerInput.focus());
+    scannerInput.focus();
+  }
+
+  manualBtn.addEventListener('click', () => {
+    const code = manualInput.value.trim();
+    if (code) scanQRCode(code);
+  });
 });

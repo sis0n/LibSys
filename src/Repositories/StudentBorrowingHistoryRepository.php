@@ -25,6 +25,7 @@ class StudentBorrowingHistoryRepository
         JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
         JOIN students s ON bt.student_id = s.student_id
         WHERE s.user_id = :user_id
+        AND bt.status != 'pending'
     ");
     $stmt->execute(['user_id' => $userId]);
     $stats = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -50,7 +51,7 @@ class StudentBorrowingHistoryRepository
             bti.returned_at, 
             bti.status,
             CONCAT(borrower.first_name, ' ', borrower.last_name) AS borrower_name,
-            COALESCE(CONCAT(staff.first_name, ' ', staff.last_name), 'N/A') AS staff_name
+            COALESCE(CONCAT(librarian.first_name, ' ', librarian.last_name), 'N/A') AS librarian_name
         FROM borrow_transactions bt
         JOIN borrow_transaction_items bti 
             ON bt.transaction_id = bti.transaction_id
@@ -60,9 +61,10 @@ class StudentBorrowingHistoryRepository
             ON bt.student_id = s.student_id
         LEFT JOIN users borrower 
             ON s.user_id = borrower.user_id
-        LEFT JOIN users staff 
-            ON bt.staff_id = staff.user_id
+        LEFT JOIN users librarian 
+            ON bt.librarian_id = librarian.user_id
         WHERE s.user_id = :uid
+        AND bt.status != 'pending'
         ORDER BY bt.borrowed_at DESC
     ");
     $stmt->execute(['uid' => $userId]);

@@ -1,257 +1,323 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
+    // --- Table Elements ---
     const booksNearDueTableBody = document.querySelector('.books-near-due-table tbody');
     const overdueBooksTableBody = document.querySelector('.overdue-books-table tbody');
-    // Borrowed Book Modal
+
+    // --- Modal Elements ---
     const returnModal = document.getElementById('return-modal');
     const closeButton = document.getElementById('modal-close-button');
     const cancelButton = document.getElementById('modal-cancel-button');
-    // Available Book Modal
+    const modalReturnButton = document.getElementById('modal-return-button');
+    const modalExtendButton = document.getElementById('modal-extend-button');
+
     const availableBookModal = document.getElementById('available-book-modal');
     const availableModalCloseButton = document.getElementById('available-modal-close-button');
     const availableModalCloseAction = document.getElementById('available-modal-close-action');
 
+    // --- Input Elements ---
+    const accessionInput = document.getElementById('accession-input');
     const scanButton = document.getElementById('scan-button');
+    const qrCodeValueInput = document.getElementById('qrCodeValue');
 
-    // Dummy data for demonstration
-    const booksNearDue = [{
-            student_name: 'Alex Johnson',
-            student_id: 'ST-2024-001',
-            student_course: 'BS Computer Science - 3rd A',
-            item_borrowed: 'Introduction to Algorithms',
-            date_borrowed: '2025-09-15',
-            due_date: '2025-10-25',
-            contact: '+63 912 345 6789',
-            email: 'alex.johnson@student.ucc.edu',
-            author: 'Thomas H. Cormen',
-            isbn: '978-0-262-03384-8',
-            book_id: 'BK-2024-001',
-            status: 'borrowed' // Added status
-        },
-        {
-            student_name: 'Sarah Lee',
-            student_id: 'ST-2024-007',
-            student_course: 'BS Civil Engineering - 4th C',
-            item_borrowed: 'Structural Analysis',
-            date_borrowed: '2025-10-05',
-            due_date: '2025-10-22',
-            contact: '+639152345678',
-            days_until_due: 1
+    // =================================================================
+    // INITIAL DATA LOADING
+    // =================================================================
+    async function fetchTableData() {
+        try {
+            const response = await fetch('/libsys/public/superadmin/returning/getTableData');
+            if (!response.ok) throw new Error('Network response not ok');
+            const result = await response.json();
+            if (result.success) {
+                renderBooksNearDueTable(result.data.nearDue);
+                renderOverdueBooksTable(result.data.overdue);
+            } else showTableError(result.message);
+        } catch (error) {
+            console.error('Error fetching table data:', error);
+            showTableError('Could not connect to server.');
         }
-    ];
+    }
 
-    const overdueBooks = [{
-            student_name: 'David Chen',
-            student_id: 'ST-2024-003',
-            student_course: 'BS Accountancy - 2nd B',
-            item_borrowed: 'Financial Accounting Principles',
-            date_borrowed: '2025-09-10',
-            due_date: '2025-10-10',
-            contact: '+639176543210',
-            days_overdue: 11
-        },
-        {
-            student_name: 'Emma Wilson',
-            student_id: 'ST-2024-009',
-            student_course: 'BS Psychology - 3rd A',
-            item_borrowed: 'Cognitive Psychology',
-            date_borrowed: '2025-09-25',
-            due_date: '2025-10-15',
-            contact: '+639201234567',
-            days_overdue: 6
-        },
-        {
-            student_name: 'James Rodriguez',
-            student_id: 'ST-2024-012',
-            student_course: 'BS Marketing - 1st D',
-            item_borrowed: 'Marketing Management',
-            date_borrowed: '2025-09-20',
-            due_date: '2025-10-12',
-            contact: '+639229876543',
-            days_overdue: 9
-        }
-    ];
-
-    const availableBook = {
-        title: 'Psychology',
-        author: 'Carole Wade, Carol Tavris',
-        status: 'available',
-        call_number: 'PSY-150.W123',
-        accession_number: '1426',
-        isbn: '70572720',
-        subject: 'Psychology.',
-        place: 'USA',
-        publisher: 'The McGraw-Hill Companies, Inc.',
-        year: '1997',
-        edition: '4th',
-        supplementary: 'N/A',
-        description: '524 pages ; illustrations ; 25 cm'
-    };
-
-
+    function showTableError(message) {
+        const errorRow = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">${message}</td></tr>`;
+        booksNearDueTableBody.innerHTML = errorRow;
+        overdueBooksTableBody.innerHTML = errorRow;
+    }
 
     function renderBooksNearDueTable(data) {
         booksNearDueTableBody.innerHTML = '';
-        if (data.length === 0) {
-            booksNearDueTableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                    No books near due date.
-                </td>
-            </tr>
-        `;
+        if (!data || data.length === 0) {
+            booksNearDueTableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No books near due date.</td></tr>`;
             return;
         }
-
         data.forEach(book => {
             const row = `
-            <tr class="align-middle"> <!-- Vertically centered -->
+            <tr class="align-middle">
                 <td class="px-6 py-4 align-middle">
                     <div class="font-semibold text-gray-800">${book.student_name}</div>
                     <div class="text-gray-500 text-xs">${book.student_id}</div>
                     <div class="text-gray-500 text-xs">${book.student_course}</div>
                 </td>
-                <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">
-                    ${book.item_borrowed}
-                </td>
+                <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
                 <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
                 <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
                 <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
                 <td class="px-6 py-4 align-middle">
-                    <a href="tel:${book.contact}"
-                        class="inline-flex items-center px-3 py-1.5 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100">
+                    <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100">
                         <i class="ph ph-phone text-base mr-1"></i> Contact
                     </a>
                 </td>
-            </tr>
-        `;
+            </tr>`;
             booksNearDueTableBody.insertAdjacentHTML('beforeend', row);
         });
     }
 
     function renderOverdueBooksTable(data) {
         overdueBooksTableBody.innerHTML = '';
-        if (data.length === 0) {
-            overdueBooksTableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                    No overdue books.
-                </td>
-            </tr>
-        `;
+        if (!data || data.length === 0) {
+            overdueBooksTableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No overdue books.</td></tr>`;
             return;
         }
-
         data.forEach(book => {
             const row = `
-            <tr class="align-middle"> <!-- Vertically center cells -->
+            <tr class="align-middle">
                 <td class="px-6 py-4 align-middle">
                     <div class="font-semibold text-gray-800">${book.student_name}</div>
                     <div class="text-gray-500 text-xs">${book.student_id}</div>
                     <div class="text-gray-500 text-xs">${book.student_course}</div>
                 </td>
-                <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">
-                    ${book.item_borrowed}
-                </td>
+                <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
                 <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
                 <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
                 <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
                 <td class="px-6 py-4 align-middle">
-                    <a href="tel:${book.contact}"
-                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
+                    <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
                         <i class="ph ph-phone text-base mr-1"></i> Contact
                     </a>
                 </td>
-            </tr>
-        `;
+            </tr>`;
             overdueBooksTableBody.insertAdjacentHTML('beforeend', row);
         });
     }
 
+    // =================================================================
+    // HANDLE BOOK CHECK
+    // =================================================================
+    let scanInProgress = false; // prevent multiple requests
 
-    // Initial render
-    renderBooksNearDueTable(booksNearDue);
-    renderOverdueBooksTable(overdueBooks);
+    async function handleBookCheck(accessionNumber) {
+        if (!accessionNumber || scanInProgress) return;
+        scanInProgress = true;
 
-    // --- MODAL LOGIC ---
-    // Function to open the BORROWED book modal
-    const openReturnModal = (bookData) => {
-        document.getElementById('modal-book-title').textContent = bookData.item_borrowed;
-        document.getElementById('modal-book-status').textContent = 'borrowed';
-        document.getElementById('modal-book-author').textContent = bookData.author || 'N/A';
-        document.getElementById('modal-book-isbn').textContent = bookData.isbn || 'N/A';
-        document.getElementById('modal-book-id').textContent = bookData.book_id || 'N/A';
-        document.getElementById('modal-book-callnumber').textContent = bookData.call_number || 'N/A';
+        try {
+            const formData = new FormData();
+            formData.append('accession_number', accessionNumber);
 
-        document.getElementById('modal-borrower-name').textContent = bookData.student_name;
-        document.getElementById('modal-student-id').textContent = bookData.student_id;
+            const response = await fetch('/libsys/public/superadmin/returning/checkBook', {
+                method: 'POST',
+                body: formData
+            });
 
-        const course_parts = bookData.student_course.split(' - ');
-        document.getElementById('modal-borrower-course').textContent = course_parts[0];
-        document.getElementById('modal-borrower-year-section').textContent = course_parts[1];
+            const result = await response.json();
 
-        document.getElementById('modal-borrower-email').textContent = bookData.email;
-        document.getElementById('modal-borrower-contact').textContent = bookData.contact;
-        document.getElementById('modal-borrow-date').textContent = bookData.date_borrowed;
-        document.getElementById('modal-due-date').textContent = bookData.due_date;
+            if (result.success) {
+                const data = result.data;
+                console.log('Book Data Received:', result.data);
 
-        returnModal.classList.remove('hidden');
-    };
-
-    // Function to open the AVAILABLE book modal
-    const openAvailableModal = (bookData) => {
-        document.getElementById('available-modal-title').textContent = bookData.title || 'N/A';
-        document.getElementById('available-modal-author').textContent = bookData.author || 'N/A';
-        const statusEl = document.getElementById('available-modal-status');
-        statusEl.textContent = bookData.status;
-        if (bookData.status === 'available') {
-            statusEl.className = 'bg-green-200 text-green-800 text-xs font-semibold px-3 py-1 rounded-full';
-        } else {
-            statusEl.className = 'bg-orange-200 text-orange-800 text-md font-semibold px-3 py-1 rounded-full';
-        }
-        document.getElementById('available-modal-call-number').textContent = bookData.call_number || 'N/A';
-        document.getElementById('available-modal-accession').textContent = bookData.accession_number || 'N/A';
-        document.getElementById('available-modal-isbn').textContent = bookData.isbn || 'N/A';
-        document.getElementById('available-modal-subject').textContent = bookData.subject || 'N/A';
-        document.getElementById('available-modal-place').textContent = bookData.place || 'N/A';
-        document.getElementById('available-modal-publisher').textContent = bookData.publisher || 'N/A';
-        document.getElementById('available-modal-year').textContent = bookData.year || 'N/A';
-        document.getElementById('available-modal-edition').textContent = bookData.edition || 'N/A';
-        document.getElementById('available-modal-supplementary').textContent = bookData.supplementary || 'N/A';
-        document.getElementById('available-modal-description').textContent = bookData.description || 'N/A';
-
-        availableBookModal.classList.remove('hidden');
-    };
-
-    const closeReturnModal = () => {
-        if (returnModal) returnModal.classList.add('hidden');
-    };
-
-    const closeAvailableModal = () => {
-        if (availableBookModal) availableBookModal.classList.add('hidden');
-    };
-
-    if (scanButton) {
-        scanButton.addEventListener('click', (e) => {
-            // SIMULATION: Click with ALT key to show borrowed modal, otherwise show available modal.
-            if (e.altKey) {
-                openReturnModal(booksNearDue[0]);
+                if (data.status === 'borrowed' && data.details) openReturnModal(data.details);
+                else if (data.status === 'available' && data.details) openAvailableModal(data.details, data.status);
+                else Swal.fire('Not Found', 'No book found with that Accession Number.', 'warning');
             } else {
-                openAvailableModal(availableBook);
+                Swal.fire('Error', result.message || 'An error occurred.', 'error');
+            }
+        } catch (error) {
+            console.error('Error checking book:', error);
+            Swal.fire('Error', 'Could not connect to the server.', 'error');
+        }
+
+        // Clear inputs
+        if (accessionInput) accessionInput.value = '';
+        if (qrCodeValueInput) qrCodeValueInput.value = '';
+
+        // Restore focus to QR scanner
+        if (qrCodeValueInput) qrCodeValueInput.focus();
+
+        scanInProgress = false;
+    }
+
+    // =================================================================
+    // MODAL HANDLERS
+    // =================================================================
+    // --- Update Return Modal ---
+    // --- Update Return Modal ---
+    const openReturnModal = (bookData) => {
+        const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value || 'N/A';
+        };
+
+        // Book info
+        setText('modal-book-title', bookData.title);
+        setText('modal-book-author', bookData.author);
+        setText('modal-book-status', bookData.status);
+        setText('modal-book-isbn', bookData.isbn);
+        setText('modal-book-accessionnumber', bookData.accession_number); // dito ang mahalaga
+        setText('modal-book-callnumber', bookData.call_number);
+
+        // Borrower info
+        setText('modal-borrower-name', bookData.student_name);
+        setText('modal-student-id', bookData.student_id);
+        const courseParts = (bookData.student_course || ' - ').split(' - ');
+        setText('modal-borrower-course', courseParts[0]);
+        setText('modal-borrower-year-section', courseParts[1]);
+        setText('modal-borrower-email', bookData.email);
+        setText('modal-borrower-contact', bookData.contact);
+        setText('modal-borrow-date', bookData.date_borrowed);
+        setText('modal-due-date', bookData.due_date);
+
+        // Attach borrowing ID to buttons
+        if (modalReturnButton) modalReturnButton.dataset.borrowingId = bookData.borrowing_id;
+        if (modalExtendButton) modalExtendButton.dataset.borrowingId = bookData.borrowing_id;
+
+        // Show modal
+        if (returnModal) returnModal.classList.remove('hidden');
+    };
+
+
+    // --- Update Available Modal ---
+    // --- Update Available Modal ---
+    const openAvailableModal = (bookData, status) => {
+        const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value || 'N/A';
+        };
+
+        // Book basic info
+        setText('available-modal-title', bookData.title);
+        setText('available-modal-author', bookData.author);
+        setText('available-modal-isbn', bookData.isbn);
+        setText('available-modal-accession', bookData.accession_number);
+        setText('available-modal-call-number', bookData.call_number);
+
+        // Status
+        const statusEl = document.getElementById('available-modal-status');
+        const displayStatus = status || 'Unknown';
+        statusEl.textContent = displayStatus;
+        statusEl.className = displayStatus === 'available'
+            ? 'bg-green-200 text-green-800 text-xs font-semibold px-3 py-1 rounded-full'
+            : 'bg-gray-200 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full';
+
+        // Additional Book Details
+        setText('available-modal-subject', bookData.subject);
+        setText('available-modal-place', bookData.book_place);
+        setText('available-modal-publisher', bookData.book_publisher);
+        setText('available-modal-year', bookData.year);
+        setText('available-modal-edition', bookData.book_edition);
+        setText('available-modal-supplementary', bookData.book_supplementary);
+        setText('available-modal-description', bookData.description);
+
+        // Show modal
+        if (availableBookModal) availableBookModal.classList.remove('hidden');
+    };
+
+
+
+
+    const closeReturnModal = () => { if (returnModal) returnModal.classList.add('hidden'); };
+    const closeAvailableModal = () => { if (availableBookModal) availableBookModal.classList.add('hidden'); };
+
+    // =================================================================
+    // EVENT LISTENERS
+    // =================================================================
+    fetchTableData();
+
+    // --- QR Scanner input ---
+    if (qrCodeValueInput) {
+        let debounceTimer;
+        qrCodeValueInput.removeAttribute('readonly');
+        qrCodeValueInput.focus();
+
+        const processQRCode = () => {
+            const qrValue = qrCodeValueInput.value.trim();
+            if (qrValue) handleBookCheck(qrValue);
+            qrCodeValueInput.value = '';
+        };
+
+        qrCodeValueInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(processQRCode, 150);
+        });
+
+        qrCodeValueInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(debounceTimer);
+                processQRCode();
+            }
+        });
+
+        // Always keep QR scanner input focused when clicking anywhere
+        document.addEventListener('click', (e) => {
+            // Optional: huwag i-focus kapag nagta-type sa manual input
+            if (e.target !== accessionInput) {
+                setTimeout(() => qrCodeValueInput.focus(), 10);
             }
         });
     }
 
-    // Event listeners for closing modals
+
+    // --- Manual input / Enter key ---
+    if (accessionInput) {
+        accessionInput.removeAttribute('readonly');
+        accessionInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleBookCheck(accessionInput.value.trim());
+            }
+        });
+    }
+
+    // --- Handle "Mark as Returned" ---
+    if (modalReturnButton) {
+        modalReturnButton.addEventListener('click', async () => {
+            const borrowingId = modalReturnButton.dataset.borrowingId;
+            if (!borrowingId) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('borrowing_id', borrowingId);
+
+                const response = await fetch('/libsys/public/superadmin/returning/markReturned', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire('Success', 'Book marked as returned successfully.', 'success');
+                    closeReturnModal();
+                    fetchTableData(); // refresh the tables
+                } else {
+                    Swal.fire('Error', result.message || 'Could not mark as returned.', 'error');
+                }
+            } catch (error) {
+                console.error('Error marking book as returned:', error);
+                Swal.fire('Error', 'Could not connect to server.', 'error');
+            }
+        });
+    }
+
+
+    // --- Manual Scan button ---
+    if (scanButton) scanButton.addEventListener('click', () => handleBookCheck(accessionInput.value.trim()));
+
+    // --- Close modals ---
     if (closeButton) closeButton.addEventListener('click', closeReturnModal);
     if (cancelButton) cancelButton.addEventListener('click', closeReturnModal);
-    if (returnModal) returnModal.addEventListener('click', (event) => {
-        if (event.target === returnModal) closeReturnModal();
-    });
-
+    if (returnModal) returnModal.addEventListener('click', e => { if (e.target === returnModal) closeReturnModal(); });
     if (availableModalCloseButton) availableModalCloseButton.addEventListener('click', closeAvailableModal);
     if (availableModalCloseAction) availableModalCloseAction.addEventListener('click', closeAvailableModal);
-    if (availableBookModal) availableBookModal.addEventListener('click', (event) => {
-        if (event.target === availableBookModal) closeAvailableModal();
-    });
+    if (availableBookModal) availableBookModal.addEventListener('click', e => { if (e.target === availableBookModal) closeAvailableModal(); });
+
 });

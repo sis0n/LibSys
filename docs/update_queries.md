@@ -236,6 +236,17 @@ ALTER TABLE students ADD can_edit_profile TINYINT(1) DEFAULT 0 AFTER profile_upd
 ALTER TABLE borrow_transactions
 ADD COLUMN staff_id INT(11) NULL AFTER status;
 
+ALTER TABLE borrow_transactions 
+ADD COLUMN expires_at DATETIME NULL AFTER borrowed_at;
+
+ALTER TABLE borrow_transactions 
+MODIFY COLUMN status ENUM('pending', 'borrowed', 'returned', 'overdue', 'expired') DEFAULT 'pending';
+
+ALTER TABLE borrow_transaction_items
+MODIFY COLUMN status ENUM('pending', 'borrowed', 'returned', 'overdue') NOT NULL DEFAULT 'pending';
+
+
+
 
 
 

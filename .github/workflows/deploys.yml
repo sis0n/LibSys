@@ -38,7 +38,6 @@ jobs:
       # 5️⃣ Build frontend CSS (Tailwind + DaisyUI)
       - name: 🎨 Build frontend assets
         run: |
-          npm ci
           npm run build
 
       # 6️⃣ Deploy backend & frontend via FTP

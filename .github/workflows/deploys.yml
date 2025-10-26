@@ -3,18 +3,18 @@ name: 🚀 Deploy to Hostinger via FTP
 on:
   push:
     branches:
-      - main
+      - main   # deploys only when main branch is updated
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout the repository
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Upload public folder
+      # Step 2: Upload public folder (includes .htaccess and assets)
       - name: 📤 Upload public folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -23,13 +23,14 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          local-dir: ./libsys/public/
+          local-dir: libsys/public/
           server-dir: ${{ secrets.FTP_PATH }}/
           exclude: |
             **/.git*
             **/.github*
+            node_modules/**
 
-      # Step 3: Upload src folder
+      # Step 3: Upload src folder (PHP backend code)
       - name: 📤 Upload src folder
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -38,8 +39,23 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          local-dir: ./libsys/src/
+          local-dir: libsys/src/
           server-dir: ${{ secrets.FTP_PATH }}/src/
+          exclude: |
+            **/.git*
+            **/.github*
+
+      # Step 4: Upload vendor folder (Composer dependencies)
+      - name: 📤 Upload vendor folder
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          local-dir: libsys/vendor/
+          server-dir: ${{ secrets.FTP_PATH }}/vendor/
           exclude: |
             **/.git*
             **/.github*

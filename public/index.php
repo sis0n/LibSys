@@ -1,8 +1,13 @@
 <?php
 session_start();
-
-// pang load lang ng lahat ng classes
 require __DIR__ . '/../vendor/autoload.php';
+
+try {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
+} catch (\Dotenv\Exception\InvalidPathException $e) {
+    die("CRITICAL ERROR: Could not find or read .env file from base path. Deployment is broken. " . $e->getMessage());
+}
 
 use App\Config\RouteConfig;
 

@@ -21,15 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentFilteredTransactions = [];
 
     async function loadTransactions() {
-        try {
-            const response = await fetch('/libsys/public/superadmin/transactionHistory/json');
-            allTransactions = await response.json();
-            currentFilteredTransactions = allTransactions;
-            applyAndRenderFilters();
-        } catch (error) {
-            console.error('Error fetching transactions:', error);
-        }
+    try {
+        const response = await fetch(`${BASE_URL}superadmin/transactionHistory/json`);
+        allTransactions = await response.json();
+        currentFilteredTransactions = allTransactions;
+        applyAndRenderFilters();
+    } catch (error) {
+        console.error('Error fetching transactions:', error);
     }
+}
 
     function applyAndRenderFilters() {
         const status = statusValue.textContent;

@@ -46,7 +46,7 @@ class TicketController extends Controller
       $result = $builder->build();
       $result->saveToFile($qrPath);
 
-      return "/libsys/public/qrcodes/{$transactionCode}.png";
+      return base_url("qrcodes/{$transactionCode}.png");
     } catch (\Exception $e) {
       error_log("QR Code Generation Error for code '$transactionCode': " . $e->getMessage());
       return '';
@@ -190,7 +190,7 @@ class TicketController extends Controller
     $userId = $_SESSION['user_id'] ?? null;
     if (!$userId) {
       $_SESSION['error_message'] = "Please login to view your ticket.";
-      header("Location: /libsys/public/login");
+      header("Location: " . base_url("login"));
       exit;
     }
 

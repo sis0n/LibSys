@@ -28,19 +28,19 @@ class AuthController extends Controller
         if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
             switch (strtolower($_SESSION['role'])) {
                 case 'superadmin':
-                    header("Location: /libsys/public/superadmin/dashboard");
+                    header("Location: " . base_url('superadmin/dashboard'));
                     exit;
                 case 'admin':
-                    header("Location: /libsys/public/admin/dashboard");
+                    header("Location: " . base_url('admin/dashboard'));
                     exit;
                 case 'librarian':
-                    header("Location: /libsys/public/librarian/dashboard");
+                    header("Location: " . base_url('librarian/dashboard'));
                     exit;
                 case 'student':
-                    header("Location: /libsys/public/student/dashboard");
+                    header("Location: ". base_url('student/dashboard'));
                     exit;
                 case 'scanner':
-                    header("Location: /libsys/public/scanner/attendance");
+                    header("Location: " . base_url('scanner/attendance'));
                     exit;
             }
         }
@@ -99,15 +99,15 @@ class AuthController extends Controller
 
         if ($user) {
             if (User::isSuperadmin($user)) {
-                $redirect = '/libsys/public/superadmin/dashboard';
+                $redirect = base_url('superadmin/dashboard');
             } elseif (User::isAdmin($user)) {
-                $redirect = '/libsys/public/admin/dashboard';
+                $redirect = base_url('admin/dashboard');
             } elseif (User::isLibrarian($user)) {
-                $redirect = '/libsys/public/librarian/dashboard';
+                $redirect = base_url('librarian/dashboard');
             } elseif (User::isStudent($user)) {
-                $redirect = '/libsys/public/student/dashboard';
+                $redirect = base_url('student/dashboard');
             } elseif (User::isScanner($user)) {
-                $redirect = '/libsys/public/scanner/attendance';
+                $redirect = base_url('scanner/attendance');
             } else {
                 echo json_encode([
                     'status' => 'error',
@@ -134,7 +134,7 @@ class AuthController extends Controller
     {
         session_start();
         $this->AuthRepository->logout();
-        header("Location: /libsys/public/login");
+        header("Location: " . base_url('login'));
     }
 
     public function forgotPassword()

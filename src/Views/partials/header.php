@@ -53,7 +53,7 @@ switch ($role) {
             </div>
         </div>
 
-        <form method="POST" action="/LibSys/public/logout" id="logoutForm">
+        <form method="POST" action="<?= base_url('logout') ?>" id="logoutForm">
             <button type="submit" class="p-2 rounded hover:bg-gray-100">
                 <i class="ph ph-sign-out"></i>
             </button>

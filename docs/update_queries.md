@@ -27,36 +27,36 @@ ALTER TABLE books
 DROP TABLE IF EXISTS borrowings;
 DROP TABLE IF EXISTS books;
 
--- Recreate books
-CREATE TABLE books (
-    book_id INT AUTO_INCREMENT PRIMARY KEY,
-    accession_number VARCHAR(50) NOT NULL UNIQUE,
-    call_number VARCHAR(50),
-    title VARCHAR(255) NOT NULL,
-    author VARCHAR(255),
-    book_place VARCHAR(150),
-    book_publisher VARCHAR(150),
-    year YEAR,
-    book_edition VARCHAR(50),
-    description TEXT,
-    book_isbn VARCHAR(50),
-    book_supplementary VARCHAR(255),
-    subject VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+  -- Recreate books
+  CREATE TABLE books (
+      book_id INT AUTO_INCREMENT PRIMARY KEY,
+      accession_number VARCHAR(50) NOT NULL UNIQUE,
+      call_number VARCHAR(50),
+      title VARCHAR(255) NOT NULL,
+      author VARCHAR(255),
+      book_place VARCHAR(150),
+      book_publisher VARCHAR(150),
+      year YEAR,
+      book_edition VARCHAR(50),
+      description TEXT,
+      book_isbn VARCHAR(50),
+      book_supplementary VARCHAR(255),
+      subject VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
 
--- Recreate borrowings with new FK to books
-CREATE TABLE borrowings (
-  borrowing_id INT AUTO_INCREMENT PRIMARY KEY,
-  student_id INT,
-  book_id INT,
-  borrowed_at DATETIME,
-  due_date DATETIME,
-  returned_at DATETIME NULL,
-  status ENUM('borrowed','returned','overdue') DEFAULT 'borrowed',
-  FOREIGN KEY (student_id) REFERENCES students(student_id),
-  FOREIGN KEY (book_id) REFERENCES books(book_id)
-);
+  -- Recreate borrowings with new FK to books
+  CREATE TABLE borrowings (
+    borrowing_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    book_id INT,
+    borrowed_at DATETIME,
+    due_date DATETIME,
+    returned_at DATETIME NULL,
+    status ENUM('borrowed','returned','overdue') DEFAULT 'borrowed',
+    FOREIGN KEY (student_id) REFERENCES students(student_id),
+    FOREIGN KEY (book_id) REFERENCES books(book_id)
+  );
 
 
 -- pang add ng csv file sa mysql pero naka query
@@ -234,7 +234,7 @@ ADD COLUMN `registration_form` VARCHAR(255) NULL DEFAULT NULL AFTER `profile_upd
 ALTER TABLE students ADD can_edit_profile TINYINT(1) DEFAULT 0 AFTER profile_updated;
 
 ALTER TABLE borrow_transactions
-ADD COLUMN staff_id INT(11) NULL AFTER status;
+ADD COLUMN staff_id INT(11) NULL AFTER status;nv
 
 ALTER TABLE borrow_transactions 
 ADD COLUMN expires_at DATETIME NULL AFTER borrowed_at;

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library | Login</title>
     <!-- Tailwind CSS -->
-    <link href="/LibSys/public/css/output.css" rel="stylesheet">
+    <link href="<?= base_url('css/output.css') ?>" rel="stylesheet">
     <!-- PHOSPHOR ICONS -->
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
@@ -29,7 +29,7 @@
 
         <div class="mt-2 sm:mt-0 flex items-center gap-4">
             <!-- Logout -->
-            <form method="POST" action="/LibSys/public/logout">
+            <form method="POST" action="<?= base_url('logout') ?>">
                 <button type="submit" class="p-2 rounded hover:bg-gray-100">
                     <i class="ph ph-sign-out"></i>
                 </button>
@@ -43,7 +43,7 @@
 
 
             <!-- QR Code Scanner Form -->
-            <form action="/libsys/public/scanner/scan" method="POST"
+            <form action="<?= base_url('scanner/scan') ?>" method="POST"
                 class="relative bg-white shadow rounded-lg border border-orange-200 p-4 sm:p-6 text-center">
                 <h2 class="text-xl sm:text-2xl font-semibold text-orange-700 mb-2">
                     Attendance Scanner
@@ -72,7 +72,7 @@
                     Manually record student attendance when you don't have ID or QR scanning
                 </p>
 
-                <form action="/libsys/public/scanner/manual" method="POST"
+                <form action="<?= base_url('scanner/manual') ?>" method="POST"
                     class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
                         <label for="studentNumber" class="block text-md font-medium text-gray-700 mb-1">
@@ -157,7 +157,7 @@
 
             const formData = new FormData(qrForm);
             try {
-                const res = await fetch("/libsys/public/scanner/scan", {
+                const res = await fetch("<?= base_url('scanner/scan') ?>", {
                     method: "POST",
                     body: formData
                 });
@@ -248,14 +248,14 @@
 
 
     // === MANUAL FORM ===
-    const manualForm = document.querySelector("form[action='/libsys/public/scanner/manual']");
+    const manualForm = document.querySelector("form[action='<?= base_url('scanner/manual') ?>']");
     if (manualForm) {
         manualForm.addEventListener("submit", async (e) => {
             e.preventDefault();
 
             const formData = new FormData(manualForm);
             try {
-                const res = await fetch("/libsys/public/scanner/manual", {
+                const res = await fetch("<?= base_url('scanner/manual') ?>", {
                     method: "POST",
                     body: formData
                 });

@@ -565,5 +565,5 @@
     </div>
 </div>
 
-<script src="/libsys/public/js/superadmin/userManagement.js" defer></script>
+<script src="<?= base_url('js/superadmin/userManagement.js') ?>" defer></script>
 

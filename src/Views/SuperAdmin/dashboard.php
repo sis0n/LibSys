@@ -101,7 +101,7 @@
   <!-- Charts Section -->
   <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Top Visitors -->
-    <div class="border border-green-200 rounded-lg p-6 shadow-sm">
+    <div class="border border-green-200 rounded-lg p-6 shadow-sm bg-white">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
           <i class="ph ph-chart-bar text-green-500 text-lg"></i> Top Visitors
@@ -112,7 +112,7 @@
     </div>
 
     <!-- Weekly Activity -->
-    <div class="border border-blue-200 rounded-lg p-6 shadow-sm">
+    <div class="border border-blue-200 rounded-lg p-6 shadow-sm bg-white">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
           <i class="ph ph-activity text-blue-500 text-lg"></i> Weekly Activity
@@ -133,7 +133,7 @@
   new Chart(topCtx, {
     type: 'bar',
     data: {
-      labels: ['John', 'Maria', 'Luke', 'Ella', 'Sophia'],
+      labels: ['BSCS', 'BSIT', 'BSEMC', 'BSIS', 'BSCE'],
       datasets: [{
         label: 'Visits',
         data: [15, 10, 8, 12, 9],

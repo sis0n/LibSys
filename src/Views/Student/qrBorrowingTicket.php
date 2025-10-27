@@ -41,7 +41,7 @@
                     </p>
                     <p id="due_date" class="text-[var(--font-size-xs)] text-[var(--color-gray-500)]">
                         Expiration:
-                        <?= !empty($due_date) ? 'Ticket will expire within 15 minutes' : 'N/A' ?>
+                        <?= !empty($expires_at) ? 'Ticket will expire within 15 minutes' : 'N/A' ?>
                     </p>
                 </div>
 

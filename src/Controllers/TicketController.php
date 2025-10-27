@@ -308,20 +308,20 @@ class TicketController extends Controller
   }
 
   public function checkStatus()
-  {
+{
     if (session_status() === PHP_SESSION_NONE) session_start();
     header('Content-Type: application/json');
 
     $userId = $_SESSION['user_id'] ?? null;
     if (!$userId) {
-      echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-      exit;
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        exit;
     }
 
     $studentId = $this->ticketRepo->getStudentIdByUserId((int)$userId);
     if (!$studentId) {
-      echo json_encode(['success' => false, 'message' => 'No student record found.']);
-      exit;
+        echo json_encode(['success' => false, 'message' => 'No student record found.']);
+        exit;
     }
 
     $this->ticketRepo->expireOldPendingTransactions();
@@ -329,16 +329,27 @@ class TicketController extends Controller
     $pendingTransaction = $this->ticketRepo->getPendingTransactionByStudentId($studentId);
 
     if ($pendingTransaction) {
-      echo json_encode([
-        'success' => true,
-        'status' => 'pending',
-        'transaction_code' => $pendingTransaction['transaction_code']
-      ]);
+        echo json_encode([
+            'success' => true,
+            'status' => 'pending',
+            'transaction_code' => $pendingTransaction['transaction_code']
+        ]);
     } else {
-      echo json_encode([
-        'success' => true,
-        'status' => 'expired'
-      ]);
+        $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByStudentId($studentId);
+        if ($borrowedTransaction) {
+            echo json_encode([
+                'success' => true,
+                'status' => 'borrowed',
+                'transaction_code' => $borrowedTransaction['transaction_code'],
+                'due_date' => $borrowedTransaction['due_date']
+            ]);
+        } else {
+            echo json_encode([
+                'success' => true,
+                'status' => 'expired'
+            ]);
+        }
     }
-  }
+}
+
 }

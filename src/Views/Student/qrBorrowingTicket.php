@@ -8,20 +8,22 @@
             class="flex-1 bg-[var(--color-card)] rounded-[var(--radius-lg)] shadow-md border border-[var(--color-border)] p-6 flex flex-col justify-between text-center">
             <div>
                 <h3 class="text-[var(--font-size-lg)] font-semibold mb-1">Your QR Ticket</h3>
-                <p class="text-[var(--font-size-sm)] text-[var(--color-gray-600)] mb-6">Present this to the librarian</p>
+                <p class="text-[var(--font-size-sm)] text-[var(--color-gray-600)] mb-6">Present this to the librarian
+                </p>
 
-                <div class="w-full p-4 border border-gray-300 rounded-lg bg-white flex justify-center items-center relative">
+                <div
+                    class="w-full p-4 border border-gray-300 rounded-lg bg-white flex justify-center items-center relative">
                     <p id="ticket-message" class="text-red-500 font-semibold text-lg">
                         <?php if (!empty($isExpired) && $isExpired): ?>
-                            QR Code Ticket Expired
+                        QR Code Ticket Expired
                         <?php elseif (!empty($isBorrowed) && $isBorrowed): ?>
-                            QR Code Successfully Scanned!
+                        QR Code Successfully Scanned!
                         <?php elseif (empty($qrPath)): ?>
-                            No QR code available
+                        No QR code available
                         <?php endif; ?>
                     </p>
                     <?php if (!empty($qrPath) && empty($isExpired) && empty($isBorrowed)): ?>
-                        <img id="qr-image" src="<?= $qrPath ?>" alt="QR Code" class="w-56 h-56 object-contain" />
+                    <img id="qr-image" src="<?= $qrPath ?>" alt="QR Code" class="w-56 h-56 object-contain" />
                     <?php endif; ?>
                 </div>
             </div>
@@ -93,44 +95,82 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
 
-            function resetToDefault() {
-                const qrImage = document.getElementById('qr-image');
-                const ticketMessageDiv = document.getElementById('ticket-message');
-                const downloadButton = document.getElementById('download-button');
+        const qrImage = document.getElementById('qr-image');
+        const ticketMessageDiv = document.getElementById('ticket-message');
+        const downloadButton = document.getElementById('download-button');
+        const transactionCode = document.getElementById('transaction-code');
+        const generatedDate = document.getElementById('generated-date');
 
-                if (qrImage) qrImage.style.display = 'none';
-                if (ticketMessageDiv) {
-                    ticketMessageDiv.innerText = "You do not currently have an active borrowing ticket.";
-                    ticketMessageDiv.classList.remove('text-red-500');
-                    ticketMessageDiv.classList.add('text-gray-700');
-                }
-                if (downloadButton) {
-                    downloadButton.style.display = 'none';
-                    downloadButton.classList.add('opacity-50', 'cursor-not-allowed');
-                }
+        // ✅ Reset UI to default state
+        function resetToDefault() {
+            if (qrImage) qrImage.style.display = 'none';
+            if (ticketMessageDiv) ticketMessageDiv.innerText =
+                "You do not currently have an active borrowing ticket.";
+            if (downloadButton) {
+                downloadButton.style.display = 'none';
+                downloadButton.classList.add('opacity-50', 'cursor-not-allowed');
             }
+            if (transactionCode) transactionCode.innerText = "N/A";
+            if (generatedDate) generatedDate.innerText = "N/A";
+        }
 
-            function checkTicketStatus() {
-                fetch('/libsys/public/student/qrBorrowingTicket/checkStatus')
-                    .then(res => res.json())
-                    .then(data => {
-                        if (!data.success) return;
+        function showQR(transaction_code, generated_date) {
+            if (qrImage) qrImage.style.display = 'block';
+            if (downloadButton) {
+                downloadButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            if (transactionCode && transaction_code) transactionCode.innerText = transaction_code;
+            if (generatedDate && generated_date) generatedDate.innerText = generated_date;
+        }
 
-                        if (data.status === 'borrowed') {
+        async function checkTicketStatus() {
+            try {
+                const res = await fetch('/libsys/public/student/qrBorrowingTicket/checkStatus');
+                const data = await res.json();
+                if (!data.success) return;
+
+                const lastStatus = sessionStorage.getItem('lastStatus');
+
+                switch (data.status) {
+                    case 'pending':
+                        showQR(data.transaction_code, data.generated_date);
+                        sessionStorage.setItem('lastStatus', 'pending');
+                        break;
+
+                    case 'borrowed':
+                        if (lastStatus !== 'borrowed') {
                             alert('QR code successfully scanned!');
                             resetToDefault();
-                        } else if (data.status === 'expired') {
+                            sessionStorage.setItem('lastStatus', 'borrowed');
+                        }
+                        break;
+
+                    case 'expired':
+                        if (lastStatus !== 'expired') {
                             alert('QR code expired. Please request a new one.');
                             resetToDefault();
+                            sessionStorage.setItem('lastStatus', 'expired');
                         }
-                    })
-                    .catch(err => console.error('Error checking ticket status:', err));
-            }
+                        break;
 
-            // ✅ Check immediately on page load
-            checkTicketStatus();
-        });
+                    default:
+                        resetToDefault();
+                        sessionStorage.removeItem('lastStatus');
+                        break;
+                }
+
+            } catch (err) {
+                console.error('Error checking ticket status:', err);
+            }
+        }
+
+        // ✅ Check once immediately (so no delay on first load)
+        checkTicketStatus();
+
+        // ✅ Then every 3 seconds for real-time updates
+        setInterval(checkTicketStatus, 3000);
+    });
     </script>
 </body>

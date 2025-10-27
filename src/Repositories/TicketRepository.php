@@ -220,6 +220,20 @@ class TicketRepository
     return $result ?: null;
   }
 
+  public function getBorrowedTransactionByStudentId(int $studentId): ?array
+  {
+    $stmt = $this->db->prepare("
+            SELECT transaction_id, transaction_code, due_date
+            FROM borrow_transactions
+            WHERE student_id = :sid AND status = 'borrowed'
+            LIMIT 1
+        ");
+    $stmt->execute(['sid' => $studentId]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $result ?: null;
+  }
+
   public function countItemsInTransaction(int $transactionId, bool $forUpdate = false): int
   {
     $lock = $forUpdate ? ' FOR UPDATE' : '';

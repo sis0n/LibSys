@@ -141,6 +141,86 @@ switch ($role) {
                 </div>
             </div>
 
+            <?php elseif ($role === 'faculty'): ?>
+            <!-- Student Sidebar -->
+            <a href="/libsys/public/faculty/dashboard"
+                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'dashboard') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-house text-2xl"></i>
+                <span class="text-base">Dashboard</span>
+            </a>
+
+            <!-- Library Catalog Dropdown -->
+            <div class="sidebar-dropdown" data-pages='["bookCatalog", "equipmentCatalog"]'>
+                <button
+                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
+                    <span class="flex items-center gap-x-3">
+                        <i class="ph ph-books text-2xl"></i>
+                        <span class="text-base">Library Catalog</span>
+                    </span>
+                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
+                </button>
+                <div class="pl-5 pt-1 space-y-1 hidden">
+                    <a href="/libsys/public/faculty/bookCatalog"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'bookCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-book text-xl"></i>
+                        <span class="text-base text-sm">Book Catalog</span>
+                    </a>
+                    <a href="/libsys/public/faculty/equipmentCatalog"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'equipmentCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-desktop-tower text-xl"></i>
+                        <span class="text-base text-sm">Equipment Catalog</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Borrowings Dropdown -->
+            <div class="sidebar-dropdown" data-pages='["myCart", "qrBorrowingTicket"]'>
+                <button
+                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
+                    <span class="flex items-center gap-x-3">
+                        <i class="ph ph-handbag text-2xl"></i>
+                        <span class="text-base">Borrowings</span>
+                    </span>
+                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
+                </button>
+                <div class="pl-5 pt-1 space-y-1 hidden">
+                    <a href="/libsys/public/faculty/myCart"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myCart') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-shopping-cart text-xl"></i>
+                        <span class="text-base text-sm">Bookbag</span>
+                    </a>
+                    <a href="/libsys/public/faculty/qrBorrowingTicket"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'qrBorrowingTicket') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-qr-code text-xl"></i>
+                        <span class="text-base text-sm">QR Borrowing Ticket</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- History Dropdown -->
+            <div class="sidebar-dropdown" data-pages='["borrowingHistory", "myAttendance"]'>
+                <button
+                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
+                    <span class="flex items-center gap-x-3">
+                        <i class="ph ph-clock-counter-clockwise text-2xl"></i>
+                        <span class="text-base">History</span>
+                    </span>
+                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
+                </button>
+                <div class="pl-5 pt-1 space-y-1 hidden">
+                    <a href="/libsys/public/faculty/borrowingHistory"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'borrowingHistory') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-bookmarks text-xl"></i>
+                        <span class="text-base text-sm">Borrowing History</span>
+                    </a>
+                    <a href="/libsys/public/faculty/myAttendance"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myAttendance') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-calendar-check text-xl"></i>
+                        <span class="text-base text-sm">Attendance</span>
+                    </a>
+                </div>
+            </div>
+
             <!-- Account Settings Dropdown -->
             <div class="sidebar-dropdown" data-pages='["myProfile", "changePassword"]'>
                 <button
@@ -152,12 +232,12 @@ switch ($role) {
                     <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                 </button>
                 <div class="pl-5 pt-1 space-y-1 hidden">
-                    <a href="/libsys/public/student/myProfile"
+                    <a href="/libsys/public/faculty/myProfile"
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myProfile') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                         <i class="ph ph-user-circle text-xl"></i>
                         <span class="text-base text-sm">Profile</span>
                     </a>
-                    <a href="/libsys/public/student/changePassword"
+                    <a href="/libsys/public/faculty/changePassword"
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                         <i class="ph ph-key text-xl"></i>
                         <span class="text-base text-sm">Change Password</span>

@@ -277,4 +277,4 @@ ALTER TABLE borrow_transactions
 ADD COLUMN generated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 
-
+ALTER TABLE `users` CHANGE `role` `role` ENUM('superadmin','admin','librarian','student','scanner','faculty','staff') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;

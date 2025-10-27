@@ -263,4 +263,14 @@ ALTER TABLE students DROP INDEX student_number;
 
 ALTER TABLE `books` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `deleted_by`;
 
+CREATE TABLE backup_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_name VARCHAR(255) NOT NULL,
+    file_type VARCHAR(50) NOT NULL,
+    type VARCHAR(50) NOT NULL,        
+    size DECIMAL(10,2) DEFAULT 0,  
+    created_by VARCHAR(50) NOT NULL, 
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 

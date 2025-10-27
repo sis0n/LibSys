@@ -246,7 +246,7 @@ ALTER TABLE borrow_transaction_items
 MODIFY COLUMN status ENUM('pending', 'borrowed', 'returned', 'overdue') NOT NULL DEFAULT 'pending';
 
 
-
+ALTER TABLE `borrow_transactions` CHANGE `staff_id` `librarian_id` INT(11) NULL DEFAULT NULL;
 
 
 

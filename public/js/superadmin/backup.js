@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchBackupFiles = async () => {
         showLoadingState();
         try {
-            const res = await fetch('/libsys/public/superadmin/backup/logs');
+            const res = await fetch(`${BASE_URL}/superadmin/backup/logs`);
             const data = await res.json();
 
             if (data.success && Array.isArray(data.logs)) {
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     size: log.size || 'N/A',
                     createdDate: log.created_at,
                     createdBy: log.created_by,
-                    downloadLink: `/libsys/public/superadmin/backup/secure_download/${encodeURIComponent(log.file_name)}`
+                    downloadLink: `${BASE_URL}superadmin/backup/secure_download/${encodeURIComponent(log.file_name)}`
                 }));
 
                 goToPage(1);
@@ -166,8 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('opacity-70');
 
             const exportUrl = type === 'full_sql'
-                ? '/libsys/public/superadmin/backup/database/full'
-                : `/libsys/public/superadmin/backup/export/zip/${type}`;
+                ? `${BASE_URL}/superadmin/backup/database/full`
+                : `${BASE_URL}/superadmin/backup/export/zip/${type}`;
 
             try {
                 const exportRes = await fetch(exportUrl);
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exportData = await exportRes.json();
                 if (!exportData.success || !exportData.filename) throw new Error(exportData.message || 'Failed to create backup.');
 
-                const downloadUrl = `/libsys/public/superadmin/backup/secure_download/${encodeURIComponent(exportData.filename)}`;
+                const downloadUrl = `${BASE_URL}/superadmin/backup/secure_download/${encodeURIComponent(exportData.filename)}`;
                 await secureDownload(downloadUrl, exportData.filename);
 
 

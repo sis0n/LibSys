@@ -16,6 +16,8 @@
         href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    const BASE_URL = "<?= base_url() ?>";</script>
 </head>
 
 <body class="bg-gray-50 text-gray-800">

@@ -257,11 +257,11 @@ ADD COLUMN section DATETIME NULL AFTER year_level;
 
 
 ALTER TABLE `users` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `deleted_by`;
+ALTER TABLE `books` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `deleted_by`;
 
 ALTER TABLE users DROP INDEX username;
 ALTER TABLE students DROP INDEX student_number;
 
-ALTER TABLE `books` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `deleted_by`;
 
 CREATE TABLE backup_log (
     id INT AUTO_INCREMENT PRIMARY KEY,

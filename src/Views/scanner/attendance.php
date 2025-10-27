@@ -21,7 +21,7 @@
     <header
         class="sticky top-0 z-10 bg-white border-b border-orange-200 px-4 sm:px-6 flex flex-wrap justify-between items-center">
         <div class="flex items-center gap-3 sm:gap-4">
-            <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Logo" class="h-12">
+            <img src="<?= base_url('assets/library-icons/apple-touch-icon.png') ?>" alt="Logo" class="h-12">
             <span class="font-semibold text-lg sm:text-xl text-orange-700 whitespace-nowrap">
                 Library Online Software
             </span>

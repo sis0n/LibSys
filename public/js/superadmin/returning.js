@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const formData = new FormData();
                 formData.append('borrowing_id', borrowingId);
 
-                const response = await fetch('/libsys/public/superadmin/returning/markReturned', {
+                const response = await fetch(`${BASE_URL}superadmin/returning/markReturned`, {
                     method: 'POST',
                     body: formData
                 });

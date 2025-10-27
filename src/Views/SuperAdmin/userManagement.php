@@ -565,5 +565,6 @@
     </div>
 </div>
 
+
 <script src="<?= base_url('js/superadmin/userManagement.js') ?>" defer></script>
 

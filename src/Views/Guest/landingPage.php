@@ -3,16 +3,16 @@
     if (isset($_SESSION['user_id'])) {
         switch ($_SESSION['role']) {
             case 'superadmin':
-                header('Location: /LibSys/public/superadmin/dashboard');
+                header('Location: ' . base_url('superadmin/dashboard'));
                 break;
             case 'admin':
-                header('Location: /LibSys/public/admin/dashboard');
+                header('Location: ' . base_url('admin/dashboard'));
                 break;
             case 'librarian':
-                header('Location: /LibSys/public/librarian/dashboard');
+                header('Location: ' . base_url('librarian/dashboard'));
                 break;
             default:
-                header('Location: /LibSys/public/student/dashboard');
+                header('Location: ' . base_url('student/dashboard'));
         }
         exit;
     }
@@ -26,7 +26,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Library | Guest</title>
         <!-- Tailwind CSS -->
-        <link href="/LibSys/public/css/output.css" rel="stylesheet">
+        <link href="<?= base_url('css/output.css') ?>" rel="stylesheet">
         <!-- PHOSPHOR ICONS -->
         <link rel="stylesheet" type="text/css"
             href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
@@ -57,7 +57,7 @@
                 </div>
 
                 <!-- Sign In Button -->
-                <button onclick="window.location.href='/LibSys/public/login'"
+                <button onclick="window.location.href='<?= base_url('login') ?>'">
                     class="self-center bg-white text-orange-700 flex items-center gap-2 px-6 py-4 rounded-md text-base text-sm font-medium hover:bg-orange-50 hover:shadow-md transition">
                     <i class="ph ph-sign-in text-lg"></i>
                     Sign In to Borrow
@@ -269,7 +269,7 @@
                 <div class="px-3 py-4 bg-gray-50">
                     <button id="signInToBorrowBtn"
                         class="inline-flex items-center justify-center whitespace-nowrap text-sm w-full gap-3 h-11 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl font-semibold"
-                        onclick="window.location.href='/LibSys/public/login'">
+                        onclick="window.location.href='<?= base_url('login') ?>'">
                         <span><i class="ph ph-sign-in"></i></span> Sign In to Borrow
                     </button>
                 </div>

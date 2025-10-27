@@ -19,7 +19,7 @@
         <p class="text-gray-600 mb-6">Choose the type and format for the data export.</p>
 
         <!-- FORM: Ginagamit ito para mag-set ng type bago mag-download -->
-        <form id="backupForm" method="GET" action="/libsys/public/backup/export/csv">
+        <form id="backupForm" method="GET" action="<?= base_url('backup/export/csv') ?>">
             <!-- Hidden input para malaman ng JS kung anong table ang i-export -->
             <input type="hidden" name="type" id="backupType" value="">
 
@@ -143,7 +143,7 @@
     </div>
 </main>
 
-<script src="/libsys/public/js/superadmin/backup.js"></script>
+<script src="<?=base_url('js/superadmin/backup.js') ?>"></script>
 
 <template id="backup-file-row-template">
     <tr>

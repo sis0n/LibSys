@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadTransactions() {
         try {
-            const response = await fetch('/libsys/public/admin/transactionHistory/json');
+            const response = await fetch(`${BASE_URL}/admin/transactionHistory/json`);
             allTransactions = await response.json();
             currentFilteredTransactions = allTransactions;
             applyAndRenderFilters();

@@ -39,7 +39,7 @@ switch ($role) {
     <!-- Logo -->
     <a href="<?= base_url("$roleFolder/dashboard")?>"
         class="flex items-center gap-4 px-6 py-4 border-b border-orange-200 cursor-pointer">
-        <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Logo" class="h-18">
+        <img src="<?= base_url('assets/library-icons/apple-touch-icon.png') ?>" alt="Logo" class="h-18">
         <span class="font-semibold text-lg text-orange-700">
             Library Online Software
         </span>

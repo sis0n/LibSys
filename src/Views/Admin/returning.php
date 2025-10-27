@@ -26,7 +26,7 @@
                 </p>
 
                 <!-- QR Code Scanner Box -->
-                <form action="/libsys/public/scanner/scan" method="POST" class="inline-block">
+                <form action="<?= base_url('scanner/scan') ?>" method="POST" class="inline-block">
                     <div id="qrBox"
                         class="w-40 h-40 sm:w-48 sm:h-48 mx-auto border-2 border-dashed border-orange-300 rounded-lg flex items-center justify-center bg-orange-50">
                         <i class="ph ph-qr-code text-orange-500 text-8xl sm:text-9xl"></i>
@@ -312,4 +312,4 @@
     </div>
 </div>
 
-<script src="/libsys/public/js/admin/returning.js"></script>
+<script src="<?= base_url('js/admin/returning.js') ?>"></script>

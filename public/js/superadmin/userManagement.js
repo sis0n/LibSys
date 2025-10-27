@@ -48,7 +48,7 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
     try {
-      const res = await fetch(`/LibSys/public/superadmin/userManagement/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${BASE_URL}/superadmin/userManagement/search?q=${encodeURIComponent(query)}`);
       if (!res.ok) throw new Error(`Search request failed with status ${res.status}`);
       const data = await res.json();
 
@@ -221,7 +221,7 @@ window.addEventListener("DOMContentLoaded", () => {
         </tr>
     `;
     try {
-        const res = await fetch(`${BASE_URL}superadmin/userManagement/getAll`);
+        const res = await fetch(`${BASE_URL}/superadmin/userManagement/getAll`);
         const data = await res.json();
         if (!data.success) throw new Error(data.message || "Failed to fetch users");
 
@@ -306,7 +306,7 @@ window.addEventListener("DOMContentLoaded", () => {
         return alert("Please fill in all required fields (First Name, Last Name, Username, Role).");
       }
       try {
-        const res = await fetch(`${BASE_URL}superadmin/userManagement/add`, {
+        const res = await fetch(`${BASE_URL}/superadmin/userManagement/add`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -361,7 +361,7 @@ window.addEventListener("DOMContentLoaded", () => {
       if (e.target.closest(".deleteUserBtn")) {
         if (!confirm(`Delete user "${user.name}" (${user.role})?`)) return;
         try {
-          const res = await fetch(`/LibSys/public/superadmin/userManagement/delete/${user.user_id}`, {
+          const res = await fetch(`${BASE_URL}/superadmin/userManagement/delete/${user.user_id}`, {
             method: "POST"
           });
           const data = await res.json();
@@ -382,7 +382,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const confirmMsg = user.status === 'Active' ? `Deactivate ${user.name}?` : `Activate ${user.name}?`;
         if (!confirm(confirmMsg)) return;
         try {
-          const res = await fetch(`${BASE_URL}superadmin/userManagement/toggleStatus/${user.user_id}`, {
+          const res = await fetch(`${BASE_URL}/superadmin/userManagement/toggleStatus/${user.user_id}`, {
             method: "POST"
           });
           const data = await res.json();
@@ -403,7 +403,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!confirm(`Allow "${user.name}" to edit their profile?`)) return;
 
         try {
-          const res = await fetch(`${BASE_URL}superadmin/userManagement/allowEdit/${userId}`, {
+          const res = await fetch(`${BASE_URL}/superadmin/userManagement/allowEdit/${userId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" }
          });
@@ -450,7 +450,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const res = await fetch(`${BASE_URL}superadmin/userManagement/update/${currentEditingUserId}`, {
+        const res = await fetch(`${BASE_URL}/superadmin/userManagement/update/${currentEditingUserId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)

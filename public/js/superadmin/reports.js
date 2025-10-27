@@ -135,4 +135,167 @@ document.addEventListener('DOMContentLoaded', function () {
     populateCirculatedBooks();
     populateLibraryVisitByCourse();
     populateTopVisitors();
+
+    // --- Dropdown Filters ---
+    const circulatedBooksFilter = document.getElementById('circulatedBooksFilter');
+    if (circulatedBooksFilter) {
+        circulatedBooksFilter.addEventListener('change', function() {
+            updateCirculatedBooksTableHeaders(this.value);
+        });
+        // Initialize headers on load
+        updateCirculatedBooksTableHeaders(circulatedBooksFilter.value);
+    }
+
+    const libraryVisitFilter = document.getElementById('libraryVisitFilter');
+    if (libraryVisitFilter) {
+        libraryVisitFilter.addEventListener('change', function() {
+            updateLibraryVisitTableHeaders(this.value);
+        });
+        // Initialize headers on load
+        updateLibraryVisitTableHeaders(libraryVisitFilter.value);
+    }
+
+    function updateCirculatedBooksTableHeaders(filter) {
+        const theadRow = document.querySelector('#circulated-books-tbody').previousElementSibling.querySelector('tr');
+        if (theadRow) {
+            if (filter === 'month') {
+                theadRow.children[1].textContent = 'Today';
+                theadRow.children[2].textContent = 'Week';
+                theadRow.children[3].textContent = 'Month';
+            } else if (filter === 'semester') {
+                theadRow.children[1].textContent = '1st Sem';
+                theadRow.children[2].textContent = '2nd Sem';
+                theadRow.children[3].textContent = 'All Sem';
+            } else if (filter === 'year') {
+                theadRow.children[1].textContent = '2025';
+                theadRow.children[2].textContent = '2026';
+                theadRow.children[3].textContent = '2027';
+            }
+        }
+    }
+
+    function updateLibraryVisitTableHeaders(filter) {
+        const theadRow = document.querySelector('#library-visit-tbody').previousElementSibling.querySelector('tr');
+        if (theadRow) {
+            if (filter === 'month') {
+                theadRow.children[1].textContent = 'Today';
+                theadRow.children[2].textContent = 'Week';
+                theadRow.children[3].textContent = 'Month';
+            } else if (filter === 'semester') {
+                theadRow.children[1].textContent = '1st Sem';
+                theadRow.children[2].textContent = '2nd Sem';
+                theadRow.children[3].textContent = 'All Sem';
+            } else if (filter === 'year') {
+                theadRow.children[1].textContent = '2025';
+                theadRow.children[2].textContent = '2026';
+                theadRow.children[3].textContent = '2027';
+            }
+        }
+    }
+
+    // --- Charts ---
+    initializeCharts(); // Call initializeCharts here
 });
+
+// Define initializeCharts function outside DOMContentLoaded
+function initializeCharts() {
+    // Top Visitors Chart
+    const topCtx = document.getElementById('topVisitorsChart');
+    if (topCtx) {
+        new Chart(topCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['BSCS', 'BSIT', 'BSEMC', 'BSIS', 'BSCE'],
+                datasets: [{
+                    label: 'Visits',
+                    data: [15, 10, 8, 12, 9],
+                    backgroundColor: '#22c55e',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Weekly Activity Chart
+    const weeklyCtx = document.getElementById('weeklyActivityChart');
+    if (weeklyCtx) {
+        new Chart(weeklyCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [
+                    {
+                        label: 'Visitors',
+                        data: [12, 19, 9, 14, 8, 11, 15],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59,130,246,0.1)',
+                        tension: 0.4,
+                        fill: true,
+                    },
+                    {
+                        label: 'Checkouts',
+                        data: [8, 14, 5, 10, 6, 9, 11],
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249,115,22,0.1)',
+                        tension: 0.4,
+                        fill: false,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            boxWidth: 8,
+                            boxHeight: 8,
+                            padding: 16,
+                            font: {
+                                size: 12,
+                                weight: '500',
+                            },
+                        },
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f3f4f6' },
+                        ticks: { color: '#4b5563' },
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#4b5563' },
+                    },
+                },
+            },
+        });
+    }
+}

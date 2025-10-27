@@ -246,6 +246,11 @@ ALTER TABLE borrow_transaction_items
 MODIFY COLUMN status ENUM('pending', 'borrowed', 'returned', 'overdue') NOT NULL DEFAULT 'pending';
 
 
+ALTER TABLE borrow_transactions ADD COLUMN generated_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE borrow_transactions
+MODIFY borrowed_at DATETIME DEFAULT NULL,
+
 
 
 

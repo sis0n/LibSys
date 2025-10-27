@@ -307,49 +307,52 @@ class TicketController extends Controller
     $this->view("student/qrBorrowingTicket", $viewData);
   }
 
-  public function checkStatus()
-{
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    header('Content-Type: application/json');
+    public function checkStatus()
+  {
+      if (session_status() === PHP_SESSION_NONE) session_start();
+      header('Content-Type: application/json');
 
-    $userId = $_SESSION['user_id'] ?? null;
-    if (!$userId) {
-        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-        exit;
-    }
+      $userId = $_SESSION['user_id'] ?? null;
+      if (!$userId) {
+          echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+          exit;
+      }
 
-    $studentId = $this->ticketRepo->getStudentIdByUserId((int)$userId);
-    if (!$studentId) {
-        echo json_encode(['success' => false, 'message' => 'No student record found.']);
-        exit;
-    }
+      $studentId = $this->ticketRepo->getStudentIdByUserId((int)$userId);
+      if (!$studentId) {
+          echo json_encode(['success' => false, 'message' => 'No student record found.']);
+          exit;
+      }
 
-    $this->ticketRepo->expireOldPendingTransactions();
+      $this->ticketRepo->expireOldPendingTransactions();
 
-    $pendingTransaction = $this->ticketRepo->getPendingTransactionByStudentId($studentId);
+      $pendingTransaction = $this->ticketRepo->getPendingTransactionByStudentId($studentId);
 
-    if ($pendingTransaction) {
-        echo json_encode([
-            'success' => true,
-            'status' => 'pending',
-            'transaction_code' => $pendingTransaction['transaction_code']
+      if ($pendingTransaction) {
+          echo json_encode([
+          'success' => true,
+          'status' => 'pending',
+          'transaction_code' => $pendingTransaction['transaction_code'],
+          'generated_at' => $pendingTransaction['generated_at'],
+          'due_date' => $pendingTransaction['due_date']
+
         ]);
-    } else {
-        $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByStudentId($studentId);
-        if ($borrowedTransaction) {
-            echo json_encode([
-                'success' => true,
-                'status' => 'borrowed',
-                'transaction_code' => $borrowedTransaction['transaction_code'],
-                'due_date' => $borrowedTransaction['due_date']
-            ]);
-        } else {
-            echo json_encode([
-                'success' => true,
-                'status' => 'expired'
-            ]);
-        }
-    }
-}
+      } else {
+          $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByStudentId($studentId);
+          if ($borrowedTransaction) {
+              echo json_encode([
+                  'success' => true,
+                  'status' => 'borrowed',
+                  'transaction_code' => $borrowedTransaction['transaction_code'],
+                  'due_date' => $borrowedTransaction['due_date']
+              ]);
+          } else {
+              echo json_encode([
+                  'success' => true,
+                  'status' => 'expired'
+              ]);
+          }
+      }
+  }
 
 }

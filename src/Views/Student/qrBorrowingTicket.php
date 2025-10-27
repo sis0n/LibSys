@@ -31,16 +31,17 @@
             <div class="mt-6">
                 <div
                     class="text-[var(--font-size-sm)] text-[var(--color-gray-700)] border-t border-[var(--color-border)] pt-4">
-                    <p class="font-medium">
+                    <p class="font-medium" id="ticket_code">
                         Ticket Code:
                         <span class="text-[var(--color-primary)]"><?= $transaction_code ?? 'N/A' ?></span>
                     </p>
-                    <p class="text-[var(--font-size-xs)] text-[var(--color-gray-500)]">
-                        Generated:
-                        <?= !empty($borrowed_at) ? date("m/d/Y, h:i:s A", strtotime($borrowed_at)) : "N/A" ?>
+                    <p id="generated_date" class="text-[var(--font-size-xs)] text-[var(--color-gray-500)]">
+                        Generated Time:
+                        <?= !empty($generated_at) ? date("h:i:s A", strtotime($generated_at)) : "N/A" ?>
                     </p>
-                    <p class="text-[var(--font-size-xs)] text-[var(--color-gray-500)]">
-                        Due Date: <?= !empty($due_date) ? date("m/d/Y", strtotime($due_date)) : 'N/A' ?>
+                    <p id="due_date" class="text-[var(--font-size-xs)] text-[var(--color-gray-500)]">
+                        Expiration:
+                        <?= !empty($due_date) ? 'Ticket will expire within 15 minutes' : 'N/A' ?>
                     </p>
                 </div>
 
@@ -97,79 +98,136 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        const qrImage = document.getElementById('qr-image');
-        const ticketMessageDiv = document.getElementById('ticket-message');
-        const downloadButton = document.getElementById('download-button');
-        const transactionCode = document.getElementById('transaction-code');
-        const generatedDate = document.getElementById('generated-date');
-
-        // ✅ Reset UI to default state
         function resetToDefault() {
+            const qrImage = document.getElementById('qr-image');
+            const ticketMessageDiv = document.getElementById('ticket-message');
+            const downloadButton = document.getElementById('download-button');
+            const ticketCode = document.querySelector('#ticket_code span');
+            const generatedDate = document.getElementById('generated_date');
+            const dueDate = document.getElementById('due_date');
+
+            // Hide QR image
             if (qrImage) qrImage.style.display = 'none';
-            if (ticketMessageDiv) ticketMessageDiv.innerText =
-                "You do not currently have an active borrowing ticket.";
+
+            // Reset message
+            if (ticketMessageDiv) {
+                ticketMessageDiv.innerText = "You do not currently have an active borrowing ticket.";
+                ticketMessageDiv.classList.add('text-red-500');
+            }
+
+            // Disable download button
             if (downloadButton) {
                 downloadButton.style.display = 'none';
                 downloadButton.classList.add('opacity-50', 'cursor-not-allowed');
             }
-            if (transactionCode) transactionCode.innerText = "N/A";
-            if (generatedDate) generatedDate.innerText = "N/A";
+
+            // Reset text content
+            if (ticketCode) ticketCode.textContent = 'N/A';
+            if (generatedDate) generatedDate.style.display = 'none';
+            if (dueDate) dueDate.style.display = 'none';
         }
 
-        function showQR(transaction_code, generated_date) {
+        function showQR(ticket) {
+            const qrImage = document.getElementById('qr-image');
+            const downloadButton = document.getElementById('download-button');
+            const ticketCode = document.querySelector('#ticket_code span');
+            const generatedDate = document.getElementById('generated_date');
+            const dueDate = document.getElementById('due_date');
+            const ticketMessageDiv = document.getElementById('ticket-message');
+
+            // Hide the "no active ticket" message
+            if (ticketMessageDiv) ticketMessageDiv.style.display = 'none';
+
+            // Show QR image
             if (qrImage) qrImage.style.display = 'block';
+
+            // Enable download button
             if (downloadButton) {
+                downloadButton.style.display = 'block';
                 downloadButton.classList.remove('opacity-50', 'cursor-not-allowed');
             }
-            if (transactionCode && transaction_code) transactionCode.innerText = transaction_code;
-            if (generatedDate && generated_date) generatedDate.innerText = generated_date;
+
+            // Update details (PHP already formats these values)
+            if (ticketCode) ticketCode.textContent = ticket.transaction_code || 'N/A';
+            if (generatedDate) generatedDate.style.display = 'block';
+            if (dueDate) dueDate.style.display = 'block';
         }
 
+        let isChecking = false;
+
         async function checkTicketStatus() {
+            if (isChecking) return;
+            isChecking = true;
+
             try {
                 const res = await fetch('/libsys/public/student/qrBorrowingTicket/checkStatus');
                 const data = await res.json();
-                if (!data.success) return;
+
+                if (!data.success) {
+                    isChecking = false;
+                    return;
+                }
 
                 const lastStatus = sessionStorage.getItem('lastStatus');
+                const lastTransactionCode = sessionStorage.getItem('lastTransactionCode');
 
-                switch (data.status) {
-                    case 'pending':
-                        showQR(data.transaction_code, data.generated_date);
+                console.log(
+                    `[Check] Status: ${data.status}, Code: ${data.transaction_code}, Last: ${lastStatus}, LastCode: ${lastTransactionCode}`
+                );
+
+                if (data.status === 'pending') {
+                    if (data.transaction_code !== lastTransactionCode || lastStatus !== 'pending') {
+                        showQR({
+                            transaction_code: data.transaction_code,
+                            generated_at: data.generated_at,
+                            due_date: data.due_date
+                        });
                         sessionStorage.setItem('lastStatus', 'pending');
-                        break;
+                        sessionStorage.setItem('lastTransactionCode', data.transaction_code);
+                    }
+                }
 
-                    case 'borrowed':
-                        if (lastStatus !== 'borrowed') {
-                            alert('QR code successfully scanned!');
-                            resetToDefault();
-                            sessionStorage.setItem('lastStatus', 'borrowed');
-                        }
-                        break;
+                // ✅ Borrowed
+                else if (data.status === 'borrowed') {
+                    if (lastStatus !== 'borrowed') {
+                        alert('QR code successfully scanned!');
+                        resetToDefault();
+                        sessionStorage.setItem('lastStatus', 'borrowed');
+                        sessionStorage.removeItem('lastTransactionCode');
+                    }
+                }
 
-                    case 'expired':
-                        if (lastStatus !== 'expired') {
-                            alert('QR code expired. Please request a new one.');
-                            resetToDefault();
-                            sessionStorage.setItem('lastStatus', 'expired');
-                        }
-                        break;
+                // ✅ Expired
+                else if (data.status === 'expired') {
+                    if (lastStatus !== 'expired') {
+                        alert('QR code expired. Please request a new one.');
+                        resetToDefault();
+                        sessionStorage.setItem('lastStatus', 'expired');
+                        sessionStorage.removeItem('lastTransactionCode');
+                    }
+                }
 
-                    default:
+                // ✅ No active ticket
+                else {
+                    if (lastStatus !== 'none') {
                         resetToDefault();
                         sessionStorage.removeItem('lastStatus');
-                        break;
+                        sessionStorage.removeItem('lastTransactionCode');
+                    }
                 }
 
             } catch (err) {
                 console.error('Error checking ticket status:', err);
+            } finally {
+                isChecking = false;
             }
         }
 
-        // ✅ Check once immediately (so no delay on first load)
-        checkTicketStatus();
+        if (['borrowed', 'expired'].includes(sessionStorage.getItem('lastStatus'))) {
+            resetToDefault();
+        }
 
-        // ✅ Then every 3 seconds for real-time updates
+        // ✅ Run check every 3 seconds
         setInterval(checkTicketStatus, 3000);
     });
     </script>

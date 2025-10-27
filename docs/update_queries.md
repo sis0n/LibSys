@@ -298,4 +298,4 @@ ADD CONSTRAINT fk_faculty_id FOREIGN KEY (faculty_id) REFERENCES faculty(faculty
 
 
 
-
+ALTER TABLE `users` CHANGE `role` `role` ENUM('superadmin','admin','librarian','student','scanner','faculty','staff') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;

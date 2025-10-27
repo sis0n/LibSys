@@ -223,6 +223,9 @@ class RouteConfig
         $router->get('admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['admin']);
         $router->get('librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['librarian']);
 
+        $router->get('superadmin/restoreUser/fetch', 'RestoreController@getDeletedUsersJson', ['superadmin']); 
+        $router->post('superadmin/restoreUser/restore', 'RestoreController@restore', ['superadmin']);             
+        $router->post('superadmin/restoreUser/delete/{id}', 'RestoreController@archive', ['superadmin']); 
 
         return $router;
     }

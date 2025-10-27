@@ -14,35 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const paginationNumbersDiv = document.getElementById('pagination-numbers');
     const prevPageBtn = document.getElementById('prev-page');
     const nextPageBtn = document.getElementById('next-page');
+    const csrfTokenInput = document.getElementById('csrf_token');
 
-    // Dummy Data
-    const allDeletedUsers = [
-        { id: 1, fullname: 'John Doeasdfasdfasd fasdfasdfasfad asdfasdfasdfasdfasdfas', username: 'johndoe', role: 'Student', email: 'john.doe@example.com',contact:'09090909091', status: 'Active', created_date: '2023-01-15', deleted_date: '2025-10-20', deleted_by: 'Admin' },
-        { id: 2, fullname: 'Jane Smith', username: 'janesmith', role: 'Faculty', email: 'jane.smith@example.com',contact:'09090909091', status: 'Inactive', created_date: '2022-11-20', deleted_date: '2025-10-22', deleted_by: 'SuperAdmin' },
-        { id: 3, fullname: 'Peter Jones', username: 'peterjones', role: 'Staff', email: 'peter.jones@example.com',contact:'09090909091', status: 'Active', created_date: '2023-03-10', deleted_date: '2025-09-15', deleted_by: 'Admin' },
-        { id: 4, fullname: 'Mary Jane', username: 'maryjane', role: 'Librarian', email: 'mary.jane@example.com',contact:'09090909091', status: 'Active', created_date: '2021-05-20', deleted_date: '2025-08-20', deleted_by: 'SuperAdmin' },
-        { id: 5, fullname: 'Chris Lee', username: 'chrislee', role: 'Admin', email: 'chris.lee@example.com',contact:'09090909091', status: 'Active', created_date: '2020-02-10', deleted_date: '2025-07-11', deleted_by: 'SuperAdmin' },
-        { id: 1, fullname: 'John Doe', username: 'johndoe', role: 'Student', email: 'john.doe@example.com',contact:'09090909091', status: 'Active', created_date: '2023-01-15', deleted_date: '2025-10-20', deleted_by: 'Admin' },
-        { id: 2, fullname: 'Jane Smith', username: 'janesmith', role: 'Faculty', email: 'jane.smith@example.com',contact:'09090909091', status: 'Inactive', created_date: '2022-11-20', deleted_date: '2025-10-22', deleted_by: 'SuperAdmin' },
-        { id: 3, fullname: 'Peter Jones', username: 'peterjones', role: 'Staff', email: 'peter.jones@example.com',contact:'09090909091', status: 'Active', created_date: '2023-03-10', deleted_date: '2025-09-15', deleted_by: 'Admin' },
-        { id: 4, fullname: 'Mary Jane', username: 'maryjane', role: 'Librarian', email: 'mary.jane@example.com',contact:'09090909091', status: 'Active', created_date: '2021-05-20', deleted_date: '2025-08-20', deleted_by: 'SuperAdmin' },
-        { id: 5, fullname: 'Chris Lee', username: 'chrislee', role: 'Admin', email: 'chris.lee@example.com',contact:'09090909091', status: 'Active', created_date: '2020-02-10', deleted_date: '2025-07-11', deleted_by: 'SuperAdmin' },
-        { id: 1, fullname: 'John Doe', username: 'johndoe', role: 'Student', email: 'john.doe@example.com',contact:'09090909091', status: 'Active', created_date: '2023-01-15', deleted_date: '2025-10-20', deleted_by: 'Admin' },
-        { id: 2, fullname: 'Jane Smith', username: 'janesmith', role: 'Faculty', email: 'jane.smith@example.com',contact:'09090909091', status: 'Inactive', created_date: '2022-11-20', deleted_date: '2025-10-22', deleted_by: 'SuperAdmin' },
-        { id: 3, fullname: 'Peter Jones', username: 'peterjones', role: 'Staff', email: 'peter.jones@example.com',contact:'09090909091', status: 'Active', created_date: '2023-03-10', deleted_date: '2025-09-15', deleted_by: 'Admin' },
-        { id: 4, fullname: 'Mary Jane', username: 'maryjane', role: 'Librarian', email: 'mary.jane@example.com',contact:'09090909091', status: 'Active', created_date: '2021-05-20', deleted_date: '2025-08-20', deleted_by: 'SuperAdmin' },
-        { id: 5, fullname: 'Chris Lee', username: 'chrislee', role: 'Admin', email: 'chris.lee@example.com',contact:'09090909091', status: 'Active', created_date: '2020-02-10', deleted_date: '2025-07-11', deleted_by: 'SuperAdmin' },
-        
-    ];
+    let allDeletedUsers = [];
 
     let currentSearchTerm = '';
     let currentRoleFilter = 'All Users';
     let currentDateFilter = '';
-    let filteredUsers = [...allDeletedUsers];
+    let filteredUsers = [];
     const itemsPerPage = 10;
     let currentPage = 1;
 
-    // --- MODAL ELEMENTS ---
     const userDetailsModal = document.getElementById('userDetailsModal');
     const closeUserDetailsModalBtn = document.getElementById('closeUserDetailsModalBtn');
     const modalUserFullName = document.getElementById('modalUserFullName');
@@ -54,39 +36,147 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalUserDeletedDate = document.getElementById('modalUserDeletedDate');
     const modalUserDeletedBy = document.getElementById('modalUserDeletedBy');
 
-    function renderDeletedUsers(users) {
+    async function fetchDeletedUsers() {
+        showLoadingState();
+        try {
+            const response = await fetch('/libsys/public/superadmin/restoreUser/fetch');
+            const data = await response.json();
+
+            if (data.success && Array.isArray(data.users)) {
+                allDeletedUsers = data.users;
+                applyFiltersAndRender();
+            } else {
+                console.error('Error fetching deleted users:', data.message);
+                showErrorState('Failed to load deleted users.');
+                allDeletedUsers = [];
+                applyFiltersAndRender();
+            }
+        } catch (error) {
+            console.error('Network error fetching deleted users:', error);
+            showErrorState('Network error. Could not load deleted users.');
+            allDeletedUsers = [];
+            applyFiltersAndRender();
+        }
+    }
+
+    function showLoadingState() {
+        deletedUsersTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-gray-500">Loading...</td></tr>';
+        noDeletedUsersFound.classList.add('hidden');
+        paginationContainer.classList.add('hidden');
+    }
+
+    function showErrorState(message) {
+        deletedUsersTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500">${message}</td></tr>`;
+        noDeletedUsersFound.classList.add('hidden');
+        paginationContainer.classList.add('hidden');
+        deletedUsersCount.textContent = 0;
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        try {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+        } catch (e) {
+            return dateString;
+        }
+    }
+
+    function renderDeletedUsers(usersToRender) {
         deletedUsersTableBody.innerHTML = '';
         deletedUsersCount.textContent = filteredUsers.length;
 
-        if (users.length === 0) {
-            noDeletedUsersFound.classList.remove('hidden');
+        if (usersToRender.length === 0) {
+            if (filteredUsers.length === 0 && !currentSearchTerm && currentRoleFilter === 'All Users' && !currentDateFilter) {
+                noDeletedUsersFound.textContent = 'No deleted users found.';
+                noDeletedUsersFound.classList.remove('hidden');
+            } else if (filteredUsers.length === 0) {
+                noDeletedUsersFound.textContent = 'No deleted users found matching filters.';
+                noDeletedUsersFound.classList.remove('hidden');
+            } else {
+                deletedUsersTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-gray-500">No users found on this page.</td></tr>';
+                noDeletedUsersFound.classList.add('hidden');
+            }
             paginationContainer.classList.add('hidden');
             return;
         }
         noDeletedUsersFound.classList.add('hidden');
+        paginationContainer.classList.remove('hidden');
 
-        users.forEach(user => {
+        usersToRender.forEach(user => {
             const newRow = deletedUserRowTemplate.cloneNode(true);
             const tr = newRow.querySelector('tr');
             tr.dataset.userId = user.id;
 
-            newRow.querySelector('.user-fullname').textContent = user.fullname;
-            newRow.querySelector('.user-username').textContent = user.username;
-            newRow.querySelector('.user-role').textContent = user.role;
-            newRow.querySelector('.user-deleted-date').textContent = user.deleted_date;
-            newRow.querySelector('.user-deleted-by').textContent = user.deleted_by;
+            newRow.querySelector('.user-fullname').textContent = user.fullname || 'N/A';
+            newRow.querySelector('.user-username').textContent = user.username || 'N/A';
+            newRow.querySelector('.user-role').textContent = user.role || 'N/A';
+            newRow.querySelector('.user-deleted-date').textContent = formatDate(user.deleted_date);
+            newRow.querySelector('.user-deleted-by').textContent = user.deleted_by_name || 'Unknown';
 
             const restoreBtn = newRow.querySelector('.restore-btn');
-            restoreBtn.addEventListener('click', (e) => {
+            restoreBtn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                alert(`Restoring ${user.fullname} (ID: ${user.id})`);
+                if (confirm(`Are you sure you want to restore ${user.fullname || user.username}?`)) {
+                    restoreBtn.disabled = true;
+                    restoreBtn.classList.add('opacity-50');
+                    try {
+                        const response = await fetch('/libsys/public/superadmin/restoreUser/restore', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfTokenInput ? csrfTokenInput.value : ''
+                            },
+                            body: JSON.stringify({ user_id: user.id })
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            alert(result.message);
+                            fetchDeletedUsers();
+                        } else {
+                            alert(`Restore failed: ${result.message}`);
+                            restoreBtn.disabled = false;
+                            restoreBtn.classList.remove('opacity-50');
+                        }
+                    } catch (error) {
+                        console.error('Error restoring user:', error);
+                        alert('An error occurred during restoration.');
+                        restoreBtn.disabled = false;
+                        restoreBtn.classList.remove('opacity-50');
+                    }
+                }
             });
 
-            const deleteBtn = newRow.querySelector('.delete-btn');
-            deleteBtn.addEventListener('click', (e) => {
+            const archiveBtn = newRow.querySelector('.archive-btn');
+            archiveBtn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                if (confirm(`Are you sure you want to permanently delete ${user.fullname} (ID: ${user.id})?`)) {
-                    alert(`Permanently deleting ${user.fullname}`);
+                if (confirm(`ARCHIVE ${user.fullname || user.username}? This will copy the record to the archive tables for reporting.`)) {
+                    archiveBtn.disabled = true;
+                    archiveBtn.classList.add('opacity-50');
+                    try {
+                        const response = await fetch(`/libsys/public/superadmin/restoreUser/delete/${user.id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfTokenInput ? csrfTokenInput.value : ''
+                            }
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            alert(result.message);
+                            fetchDeletedUsers();
+                        } else {
+                            alert(`Archive failed: ${result.message}`);
+                            archiveBtn.disabled = false;
+                            archiveBtn.classList.remove('opacity-50');
+                        }
+                    } catch (error) {
+                        console.error('Error archiving user:', error);
+                        alert('An error occurred during archiving.');
+                        archiveBtn.disabled = false;
+                        archiveBtn.classList.remove('opacity-50');
+                    }
                 }
             });
 
@@ -95,118 +185,71 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderPagination(totalItems, itemsPerPage, currentPage) {
-        paginationNumbersDiv.innerHTML = ''; // Clear existing page numbers
+        paginationNumbersDiv.innerHTML = '';
         const totalPages = Math.ceil(totalItems / itemsPerPage);
 
         if (totalItems <= itemsPerPage || totalPages <= 1) {
             paginationContainer.classList.add('hidden');
             return;
         }
-
         paginationContainer.classList.remove('hidden');
 
-        if (currentPage === 1) {
-            prevPageBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        } else {
-            prevPageBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        }
+        prevPageBtn.classList.toggle('opacity-50', currentPage === 1);
+        prevPageBtn.classList.toggle('cursor-not-allowed', currentPage === 1);
+        nextPageBtn.classList.toggle('opacity-50', currentPage === totalPages);
+        nextPageBtn.classList.toggle('cursor-not-allowed', currentPage === totalPages);
 
-        if (currentPage === totalPages) {
-            nextPageBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        } else {
-            nextPageBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        }
-        const maxPagesToShow = 3; 
-        let startPage = Math.max(1, currentPage - 1);
+        const maxPagesToShow = 3;
+        let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
 
         if (endPage - startPage + 1 < maxPagesToShow) {
-            startPage = Math.max(1, totalPages - maxPagesToShow + 1);
+            startPage = Math.max(1, endPage - maxPagesToShow + 1);
         }
-        startPage = Math.max(1, startPage);
 
         if (startPage > 1) {
-            const li = document.createElement('li');
-            const link = document.createElement('a');
-            link.href = '#';
-            link.textContent = '1';
-            link.classList.add(
-                'flex', 'items-center', 'justify-center',
-                'w-8', 'h-8', 'rounded-full', 'text-gray-700',
-                'hover:bg-gray-100', 'transition'
-            );
-            if (1 === currentPage) {
-                link.classList.add('bg-orange-500', 'text-white', 'font-semibold');
-            }
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                goToPage(1);
-            });
-            paginationNumbersDiv.appendChild(li).appendChild(link);
-
-            if (startPage > 2) {
-                const ellipsisLi = document.createElement('li');
-                const ellipsisSpan = document.createElement('span');
-                ellipsisSpan.textContent = '...';
-                ellipsisSpan.classList.add(
-                    'flex', 'items-center', 'justify-center',
-                    'w-8', 'h-8', 'text-gray-500'
-                );
-                paginationNumbersDiv.appendChild(ellipsisLi).appendChild(ellipsisSpan);
-            }
+            createPageLink(1);
+            if (startPage > 2) createEllipsis();
         }
 
         for (let i = startPage; i <= endPage; i++) {
-            const li = document.createElement('li');
-            const link = document.createElement('a');
-            link.href = '#';
-            link.textContent = i;
-            link.classList.add(
-                'flex', 'items-center', 'justify-center',
-                'w-8', 'h-8', 'rounded-full', 'text-gray-700',
-                'hover:bg-gray-100', 'transition'
-            );
-            if (i === currentPage) {
-                link.classList.add('bg-orange-500', 'text-white', 'font-semibold');
-            }
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                goToPage(i);
-            });
-            paginationNumbersDiv.appendChild(li).appendChild(link);
+            createPageLink(i, i === currentPage);
         }
 
-        // ✅ Always show last page if not in range
         if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                const ellipsisLi = document.createElement('li');
-                const ellipsisSpan = document.createElement('span');
-                ellipsisSpan.textContent = '...';
-                ellipsisSpan.classList.add(
-                    'flex', 'items-center', 'justify-center',
-                    'w-8', 'h-8', 'text-gray-500'
-                );
-                paginationNumbersDiv.appendChild(ellipsisLi).appendChild(ellipsisSpan);
-            }
-
-            const li = document.createElement('li');
-            const link = document.createElement('a');
-            link.href = '#';
-            link.textContent = totalPages;
-            link.classList.add(
-                'flex', 'items-center', 'justify-center',
-                'w-8', 'h-8', 'rounded-full', 'text-gray-700',
-                'hover:bg-gray-100', 'transition'
-            );
-            if (totalPages === currentPage) {
-                link.classList.add('bg-orange-500', 'text-white', 'font-semibold');
-            }
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                goToPage(totalPages);
-            });
-            paginationNumbersDiv.appendChild(li).appendChild(link);
+            if (endPage < totalPages - 1) createEllipsis();
+            createPageLink(totalPages);
         }
+    }
+
+    function createPageLink(pageNumber, isActive = false) {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = pageNumber;
+        link.classList.add(
+            'flex', 'items-center', 'justify-center',
+            'w-8', 'h-8', 'rounded-full', 'text-gray-700',
+            'hover:bg-orange-50', 'hover:text-orange-600', 'transition'
+        );
+        if (isActive) {
+            link.classList.add('bg-orange-500', 'text-white', 'font-semibold');
+            link.classList.remove('hover:bg-orange-50', 'hover:text-orange-600', 'text-gray-700');
+        }
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            goToPage(pageNumber);
+        });
+        paginationNumbersDiv.appendChild(link);
+    }
+
+    function createEllipsis() {
+        const ellipsisSpan = document.createElement('span');
+        ellipsisSpan.textContent = '...';
+        ellipsisSpan.classList.add(
+            'flex', 'items-center', 'justify-center',
+            'w-8', 'h-8', 'text-gray-500'
+        );
+        paginationNumbersDiv.appendChild(ellipsisSpan);
     }
 
     function goToPage(page) {
@@ -220,32 +263,47 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPagination(filteredUsers.length, itemsPerPage, currentPage);
     }
 
-    function filterAndSearchUsers() {
-        let filtered = allDeletedUsers.filter(user => {
-            const matchesSearch = user.fullname.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
-                                  user.username.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
-                                  user.email.toLowerCase().includes(currentSearchTerm.toLowerCase());
+    function applyFiltersAndRender() {
+        let tempFiltered = allDeletedUsers.filter(user => {
+            const searchLower = currentSearchTerm.toLowerCase();
+            const matchesSearch = !currentSearchTerm ||
+                (user.fullname && user.fullname.toLowerCase().includes(searchLower)) ||
+                (user.username && user.username.toLowerCase().includes(searchLower)) ||
+                (user.email && user.email.toLowerCase().includes(searchLower));
 
-            const matchesRole = currentRoleFilter === 'All Users' || user.role === currentRoleFilter;
+            const matchesRole = currentRoleFilter === 'All Users' || (user.role && user.role.toLowerCase() === currentRoleFilter.toLowerCase());
 
-            const matchesDate = !currentDateFilter || (new Date(user.deleted_date).toDateString() === new Date(currentDateFilter).toDateString());
+            let matchesDate = true;
+            if (currentDateFilter && user.deleted_date) {
+                try {
+                    const deletedDate = new Date(user.deleted_date);
+                    const filterDate = new Date(currentDateFilter + "T00:00:00");
+                    matchesDate = deletedDate.getFullYear() === filterDate.getFullYear() &&
+                        deletedDate.getMonth() === filterDate.getMonth() &&
+                        deletedDate.getDate() === filterDate.getDate();
+                } catch (e) {
+                    matchesDate = false;
+                    console.error("Date comparison error:", e);
+                }
+            } else if (currentDateFilter && !user.deleted_date) {
+                matchesDate = false;
+            }
 
             return matchesSearch && matchesRole && matchesDate;
         });
-        filteredUsers = filtered;
+        filteredUsers = tempFiltered;
         goToPage(1);
     }
 
-    // --- MODAL MANAGEMENT ---
     function openUserDetailsModal(user) {
         modalUserFullName.textContent = user.fullname || 'N/A';
         modalUsername.textContent = user.username || 'N/A';
         modalUserRole.textContent = user.role || 'N/A';
         modalUserEmail.textContent = user.email || 'N/A';
         modalContact.textContent = user.contact || 'N/A';
-        modalUserCreatedDate.textContent = user.created_date || 'N/A';
-        modalUserDeletedDate.textContent = user.deleted_date || 'N/A';
-        modalUserDeletedBy.textContent = user.deleted_by || 'N/A';
+        modalUserCreatedDate.textContent = formatDate(user.created_date);
+        modalUserDeletedDate.textContent = formatDate(user.deleted_date);
+        modalUserDeletedBy.textContent = user.deleted_by_name || 'Unknown';
         userDetailsModal.classList.remove('hidden');
     }
 
@@ -253,10 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
         userDetailsModal.classList.add('hidden');
     }
 
-    // --- EVENT LISTENERS ---
     userSearchInput.addEventListener('input', (e) => {
         currentSearchTerm = e.target.value;
-        filterAndSearchUsers();
+        applyFiltersAndRender();
     });
 
     roleFilterDropdownBtn.addEventListener('click', (e) => {
@@ -270,34 +327,41 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRoleFilter = item.dataset.value;
             roleFilterDropdownSpan.textContent = currentRoleFilter;
             roleFilterDropdownMenu.classList.add('hidden');
-            filterAndSearchUsers();
+            applyFiltersAndRender();
         });
     });
 
     deletedUserDateFilter.addEventListener('change', (e) => {
         currentDateFilter = e.target.value;
-        filterAndSearchUsers();
+        applyFiltersAndRender();
     });
 
-    document.addEventListener('click', () => {
-        roleFilterDropdownMenu.classList.add('hidden');
+    document.addEventListener('click', (e) => {
+        if (!roleFilterDropdownBtn.contains(e.target) && !roleFilterDropdownMenu.contains(e.target)) {
+            roleFilterDropdownMenu.classList.add('hidden');
+        }
     });
 
     prevPageBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        goToPage(currentPage - 1);
+        if (currentPage > 1) {
+            goToPage(currentPage - 1);
+        }
     });
 
     nextPageBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        goToPage(currentPage + 1);
+        const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+        if (currentPage < totalPages) {
+            goToPage(currentPage + 1);
+        }
     });
 
     deletedUsersTableBody.addEventListener('click', (e) => {
         const row = e.target.closest('.deleted-user-row');
         if (!row) return;
 
-        if (e.target.closest('.restore-btn') || e.target.closest('.delete-btn')) {
+        if (e.target.closest('.restore-btn') || e.target.closest('.archive-btn')) {
             return;
         }
 
@@ -305,6 +369,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = allDeletedUsers.find(u => u.id === userId);
         if (user) {
             openUserDetailsModal(user);
+        } else {
+            console.error("Could not find user data for ID:", userId);
         }
     });
 
@@ -320,6 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initial load
-    filterAndSearchUsers();
+    fetchDeletedUsers();
 });
+

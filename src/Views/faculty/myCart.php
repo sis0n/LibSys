@@ -53,6 +53,6 @@
         <div id="selected-items"></div>
     </div>
 
-    <script src="/libsys/public/js/faculty/myCart.js" defer></script> 
+    <script src="/libsys/public/js/student/myCart.js" defer></script> 
 
 </body>

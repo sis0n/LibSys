@@ -1,5 +1,5 @@
-<!-- Main Container -->
-<main class="flex justify-center items-start ">
+<div class="flex justify-center items-start">
+
   <!-- Column 1: Change Password -->
   <div class="w-full md:w-[650px] flex flex-col items-center">
 

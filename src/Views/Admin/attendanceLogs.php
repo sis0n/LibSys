@@ -29,7 +29,7 @@ foreach ($logs as $log) {
 <body class="min-h-screen p-6">
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h2 class="text-2xl font-bold flex items-center gap-2">
+            <h2 class="text-2xl font-bold flex items-center gap-2 mb-4">
                 Attendance Logs
             </h2>
             <p class="text-gray-700 text-md">
@@ -37,7 +37,7 @@ foreach ($logs as $log) {
             </p>
         </div>
         <button
-            class="px-4 py-2 text-sm font-medium border rounded-lg shadow-sm bg-[var(--color-card)] border-[var(--color-border)] hover:bg-[var(--color-orange-600)] hover:text-white transition">
+            class="px-4 py-2 text-sm font-medium border rounded-lg shadow-sm bg-[var(--color-card)] border-[var(--color-border)] hover:bg-orange-100 transition">
             <i class="ph ph-download-simple mr-2"></i>
             Export Logs
         </button>

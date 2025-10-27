@@ -28,7 +28,7 @@ class CartController extends Controller
 
   public function index()
   {
-    $userId = $_SESSION['user_id'] ?? null;
+    $userId = $this->ensureStudent();
     if (!$userId) $this->showErrorPage(401, "Bawal ka dito boi");
 
     $studentId = $this->getStudentId($userId);
@@ -43,7 +43,7 @@ class CartController extends Controller
 
   public function add($bookId)
   {
-    $userId = $_SESSION['user_id'] ?? null;
+    $userId = $this->ensureStudent();
     if (!$userId) $this->showErrorPage(401, "Not logged in");
 
     $studentId = $this->getStudentId($userId);
@@ -60,7 +60,7 @@ class CartController extends Controller
 
   public function remove($cartId)
   {
-    $userId = $_SESSION['user_id'] ?? null;
+    $userId = $this->ensureStudent();
     if (!$userId) $this->showErrorPage(401, "Not logged in");
 
     $studentId = $this->getStudentId($userId);
@@ -74,7 +74,7 @@ class CartController extends Controller
 
   public function clearCart()
   {
-    $userId = $_SESSION['user_id'] ?? null;
+    $userId = $this->ensureStudent();
     if (!$userId) $this->showErrorPage(401, "Not logged in");
 
     $studentId = $this->getStudentId($userId);
@@ -88,7 +88,7 @@ class CartController extends Controller
 
   public function getCartJson()
   {
-    $userId = $_SESSION['user_id'] ?? null;
+    $userId = $this->ensureStudent();
     if (!$userId) $this->showErrorPage(401, "Not logged in");
 
     $studentId = $this->getStudentId($userId);
@@ -102,7 +102,7 @@ class CartController extends Controller
 
   public function checkout()
   {
-    $userId = $_SESSION['user_id'] ?? null;
+    $userId = $this->ensureStudent();
     if (!$userId) $this->showErrorPage(401, "Not logged in");
 
     $studentId = $this->getStudentId($userId);
@@ -128,5 +128,19 @@ class CartController extends Controller
       "success" => true,
       "ticket_id" => $ticketId
     ]);
+  }
+
+  private function ensureStudent()
+  {
+    if (session_status() === PHP_SESSION_NONE) {
+      session_start();
+    }
+
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+      header('Location: libsys/public/login');
+      exit;
+    }
+
+    return $_SESSION['user_id'];
   }
 }

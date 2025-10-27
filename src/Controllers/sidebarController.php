@@ -138,17 +138,17 @@ class SidebarController extends Controller
 
     public function borrowingHistory()
     {
-        $this->view("superadmin/borrowingHistory", [
-            "title"=> "Borrowing History",
-            "currentPage" => "borrowingHistory"
+        $this->view("superadmin/transactionHistory", [
+            "title"=> "Transaction History",
+            "currentPage" => "transactionHistory"
         ]);
     }
 
-    public function overdueAlert()
+    public function returning()
     {
-        $this->view("superadmin/overdueAlert", [
-            "title"=> "Overdue Alert",
-            "currentPage" => "overdueAlert"
+        $this->view("superadmin/returning", [
+            "title"=> "Returning",
+            "currentPage" => "returning"
         ]);
     }
 
@@ -161,11 +161,36 @@ class SidebarController extends Controller
     }
 
     
-    public function backupAndRestore()
+    public function backup()
     {
-        $this->view("superadmin/backupAndRestore", [
-            "title"=> "Backup & Restore",
-            "currentPage" => "backupAndRestore"
+        $this->view("superadmin/backup", [
+            "title"=> "Backup",
+            "currentPage" => "backup"
+        ]);
+    }
+
+      public function restoreBooks()
+    {
+        $this->view("superadmin/restoreBooks", [
+            "title"=> "Restore Books",
+            "currentPage" => "restoreBooks",
+            "csrf_token" => $_SESSION['csrf_token']
+        ]);
+    }
+
+      public function restoreEquipment()
+    {
+        $this->view("superadmin/restoreEquipment", [
+            "title"=> "Restore Equipment",
+            "currentPage" => "restoreEquipment"
+        ]);
+    }
+
+      public function restoreUser()
+    {
+        $this->view("superadmin/restoreUser", [
+            "title"=> "Restore User",
+            "currentPage" => "restoreUser"
         ]);
     }
 
@@ -234,17 +259,17 @@ class SidebarController extends Controller
 
     public function adminBorrowingHistory()
     {
-        $this->view("admin/borrowingHistory", [
-            "title"=> "Admin Borrowing History",
-            "currentPage" => "borrowingHistory"
+        $this->view("admin/transactionHistory", [
+            "title"=> "Admin Transaction History",
+            "currentPage" => "transactionHistory"
         ]);
     }
 
-    public function adminOverdueAlert()
+    public function adminReturning()
     {
-        $this->view("admin/overdueAlert", [
-            "title"=> "Admin Overdue Alert",
-            "currentPage" => "overdueAlert"
+        $this->view("admin/returning", [
+            "title"=> "Admin Returning",
+            "currentPage" => "returning"
         ]);
     }
 
@@ -332,17 +357,17 @@ class SidebarController extends Controller
 
     public function librarianBorrowingHistory()
     {
-        $this->view("librarian/borrowingHistory", [
-            "title"=> "Librarian Borrowing History",
-            "currentPage" => "borrowingHistory"
+        $this->view("librarian/transactionHistory", [
+            "title"=> "Librarian Transaction History",
+            "currentPage" => "transactionHistory"
         ]);
     }
 
-    public function librarianOverdueAlert()
+    public function librarianReturning()
     {
-        $this->view("librarian/overdueAlert", [
-            "title"=> "Librarian Overdue Alert",
-            "currentPage" => "overdueAlert"
+        $this->view("librarian/returning", [
+            "title"=> "Librarian Returning",
+            "currentPage" => "returning"
         ]);
     }
 

@@ -98,7 +98,7 @@ class QRScannerRepository
     }
   }
 
-  public function processBorrowing(string $transactionCode, ?int $staffId = null)
+  public function processBorrowing(string $transactionCode, ?int $librarianId = null)
   {
     try {
       $this->db->beginTransaction();
@@ -110,13 +110,13 @@ class QRScannerRepository
             SET status = 'borrowed',
                 borrowed_at = NOW(),
                 due_date = :due_date,
-                staff_id = :staff_id
+                librarian_id = :librarian_id
             WHERE transaction_code = :code AND status = 'pending'
         ");
       $stmt->execute([
         'code' => $transactionCode,
         'due_date' => $dueDate,
-        'staff_id' => $staffId
+        'librarian_id' => $librarianId
       ]);
 
       $transactionIdStmt = $this->db->prepare("SELECT transaction_id FROM borrow_transactions WHERE transaction_code = :code");
@@ -195,5 +195,43 @@ class QRScannerRepository
   {
     $stmt = $this->db->query("SELECT transaction_code, status FROM borrow_transactions");
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  public function expireOldPendingTransactions(): void
+  {
+    $stmt = $this->db->prepare("
+        SELECT transaction_id 
+        FROM borrow_transactions
+        WHERE status = 'pending'
+          AND expires_at <= NOW()
+    ");
+    $stmt->execute();
+    $expiredTransactions = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+    if (!empty($expiredTransactions)) {
+      $idsPlaceholders = implode(',', array_fill(0, count($expiredTransactions), '?'));
+
+      $updateTrans = $this->db->prepare("
+            UPDATE borrow_transactions
+            SET status = 'expired'
+            WHERE transaction_id IN ($idsPlaceholders)
+        ");
+      $updateTrans->execute($expiredTransactions);
+
+      $updateItems = $this->db->prepare("
+            UPDATE borrow_transaction_items
+            SET status = 'expired'
+            WHERE transaction_id IN ($idsPlaceholders)
+        ");
+      $updateItems->execute($expiredTransactions);
+
+      $updateBooks = $this->db->prepare("
+            UPDATE books b
+            JOIN borrow_transaction_items bti ON b.book_id = bti.book_id
+            SET b.availability = 'available'
+            WHERE bti.transaction_id IN ($idsPlaceholders)
+        ");
+      $updateBooks->execute($expiredTransactions);
+    }
   }
 }

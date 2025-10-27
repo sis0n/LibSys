@@ -14,6 +14,20 @@ class StudentRepository
     $this->db = Database::getInstance()->getConnection();
   }
 
+  public function studentNumberExists(string $studentNumber): bool
+  {
+    $stmt = $this->db->prepare("
+            SELECT s.student_id 
+            FROM students s
+            JOIN users u ON s.user_id = u.user_id
+            WHERE s.student_number = :student_number 
+            AND u.is_archived = 0
+            LIMIT 1
+        ");
+    $stmt->execute(['student_number' => $studentNumber]);
+    return (bool) $stmt->fetch();
+  }
+
   public function insertStudent(int $userId, string $studentNumber, string $course, int $yearLevel, string $status): int
   {
     $stmt = $this->db->prepare("

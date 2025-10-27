@@ -1,11 +1,8 @@
 RewriteEngine On
 
-# Base path ng project mo
 RewriteBase /libsys/public/
 
-# Kung file o folder talaga, hayaan lang
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Lahat ng iba, ipapasa sa index.php (pero hindi na lalabas sa URL)
 RewriteRule ^ index.php [QSA,L]

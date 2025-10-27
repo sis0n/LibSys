@@ -276,5 +276,26 @@ CREATE TABLE backup_log (
 ALTER TABLE borrow_transactions
 ADD COLUMN generated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
+CREATE TABLE faculty (
+    faculty_id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    user_id INT(11) NULL, 
+    department VARCHAR(100) NULL,
+    contact VARCHAR(20) NULL,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    profile_updated TINYINT(1) NOT NULL DEFAULT 0,
+    deleted_at TIMESTAMP NULL,
+    deleted_by INT(11) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+ALTER TABLE carts
+ADD COLUMN faculty_id INT NULL AFTER student_id,
+ADD CONSTRAINT fk_faculty_id FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id);
+
+
+
+
 
 

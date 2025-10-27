@@ -83,10 +83,21 @@ class UserManagementController extends Controller
     }
 
     try {
-      if ($this->userRepo->usernameExists($username)) {
-        echo json_encode(['success' => false, 'message' => 'Username already exists']);
-        return;
+
+      if (strtolower($role) === 'student') {
+        $studentNumber = $username; 
+
+        if (!$studentNumber) {
+          echo json_encode(['success' => false, 'message' => 'Student Number (Username) is required for students.']);
+          return;
+        }
+
+        if ($this->studentRepo->studentNumberExists($studentNumber)) {
+          echo json_encode(['success' => false, 'message' => 'Student Number is already in use by an active or soft-deleted user.']);
+          return;
+        }
       }
+
 
       $defaultPassword = '12345';
       $hashedPassword = password_hash($defaultPassword, PASSWORD_DEFAULT);

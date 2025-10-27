@@ -8,49 +8,22 @@ class RouteConfig
 {
     public static function register(): Router
     {
-        // convert {param} style to regex
         $router = new Router();
 
-        /**
-         * ========================
-         * Landing Page Routes
-         * ========================
-         */
         $router->get('landingPage', 'GuestController@guestDisplay');
         $router->get('guest/fetchBooks', 'GuestController@fetchGuestBooks');
 
-        /**
-         * ========================
-         * auth routes
-         * ========================
-         */
         $router->get('login', 'AuthController@showLogin');
         $router->post('login', 'AuthController@login');
         $router->post('logout', 'AuthController@logout');
 
-        /**
-         * ========================
-         * forgot password route
-         * ========================
-         */
         $router->get('forgotPassword', 'AuthController@forgotPassword');
 
-        /**
-         * ========================
-         * scanner route
-         * ========================
-         */
         $router->post('scanner/scan', 'ScannerController@attendance', ['scanner']);
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
         $router->post('scanner/manual', 'ScannerController@manual', ['scanner']);
 
 
-        /**
-         * ========================
-         * dashboard routes
-         * ========================
-         */
-        // Librarian Sidebar Page Navigation Display
         $router->get('librarian/dashboard', 'SidebarController@librarianDashboard', ['librarian']);
         $router->get('librarian/bookManagement', 'SidebarController@librarianBookManagement', ['librarian']);
         $router->get('librarian/equipmentManagement', 'SidebarController@librarianEquipmentManagement', ['librarian']);
@@ -64,8 +37,6 @@ class RouteConfig
         $router->get('librarian/changePassword', 'SidebarController@librarianChangePassword', ['librarian']);
         $router->get('librarian/myProfile', 'SidebarController@librarianMyProfile', ['librarian']);
 
-
-        // Admin Sidebar Page Navigation Display
         $router->get('admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
         $router->get('admin/bookManagement', 'SidebarController@adminBookManagement', ['admin']);
         $router->get('admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['admin']);
@@ -79,8 +50,6 @@ class RouteConfig
         $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['admin']);
         $router->get('admin/myProfile', 'SidebarController@adminMyProfile', ['admin']);
 
-
-        // Super Admin Sidebar Page Navigation Display
         $router->get('superadmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
         $router->get('superadmin/userManagement', 'SidebarController@userManagement', ['superadmin']);
         $router->get('superadmin/bookManagement', 'SidebarController@bookManagement', ['superadmin']);
@@ -99,7 +68,6 @@ class RouteConfig
         $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
 
 
-        // Student Sidebar Page Navigation Display
         $router->get('student/dashboard', 'SidebarController@studentDashboard', ['student']);
         $router->get('student/bookCatalog', 'SidebarController@studentBookCatalog', ['student']);
         $router->get('student/equipmentCatalog', 'SidebarController@studentEquipmentCatalog', ['student']);
@@ -111,24 +79,8 @@ class RouteConfig
         $router->get('student/changePassword', 'SidebarController@studentChangePassword', ['student']);
         $router->get('student/myProfile', 'SidebarController@studentMyProfile', ['student']);
 
-
-
-        /**
-         * 
-         * ATTENDANCE ROUTES (SAMPLE LANG TO BES)
-         * $router->get('attendance', 'AttendanceController@index', ['librarian', 'admin']);
-         * $router->post('attendance/scan', 'AttendanceController@scan', ['librarian']);
-         * $router->get('attendance/logs', 'AttendanceController@logs', ['librarian', 'admin']);
-         */
-
-        // AJAX route para sa dropdown filter logs (librarian at admin)
         $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['librarian', 'admin', 'superadmin']);
 
-        /**
-         * ========================
-         * STUDENT CART & CHECKOUT ROUTES
-         * ========================
-         */
         $router->get('student/cart', 'CartController@index', ['student']);
         $router->get('student/cart/add/{id}', 'CartController@add', ['student']);
         $router->post('student/cart/remove/{id}', 'CartController@remove', ['student']);
@@ -136,7 +88,6 @@ class RouteConfig
         $router->get('student/cart/json', 'CartController@getCartJson', ['student']);
 
 
-        // checkout routes
         $router->post('student/cart/checkout', 'TicketController@checkout', ['student']);
         $router->get('student/qrBorrowingTicket', 'TicketController@show', ['student']);
         $router->get('student/qrBorrowingTicket/checkStatus', 'TicketController@checkStatus', ['student']);
@@ -148,15 +99,9 @@ class RouteConfig
         $router->get('student/bookCatalog/availableCount', 'BookCatalogController@getAvailableCount', ['student']);
         $router->get('student/bookCatalog/fetch', 'BookCatalogController@fetch', ['student']);
 
-        //change password
         $router->post('/change-password', 'AuthController@changePassword');
 
 
-        // ===============================
-        // SUPERADMIN USER MANAGEMENT ROUTES
-        // ===============================
-
-        // $router->get('superadmin/userManagement', 'UserManagementController@index', ['superadmin']);
         $router->get('superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
         $router->get('superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
         $router->get('superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
@@ -226,6 +171,18 @@ class RouteConfig
         $router->get('admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['admin']);
         $router->get('librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['librarian']);
 
+        $router->get('superadmin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['superadmin']);
+        $router->post('superadmin/restoreUser/restore', 'RestoreUserController@restore', ['superadmin']);
+        $router->post('superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']);
+
+        $router->get('superadmin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['superadmin']);
+        $router->post('superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);
+        $router->post('superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['superadmin']);
+
+        $router->get('/superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats');
+        $router->get('/superadmin/backup/database/full', 'BackupController@initiateBackup');
+        $router->get('/superadmin/backup/secure_download/{filename}', 'BackupController@downloadBackup');
+        $router->get('/superadmin/backup/logs', 'BackupController@listBackupLogs');
 
         return $router;
     }

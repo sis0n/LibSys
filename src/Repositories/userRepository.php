@@ -251,75 +251,60 @@ class UserRepository
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public function deleteUserWithCascade(int $userId, int $deletedBy, $studentRepo): bool
+  public function deleteUserWithCascade(int $userId, int $deletedBy): bool
   {
     try {
       $this->db->beginTransaction();
 
-      $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = :id");
-      $stmt->execute([':id' => $userId]);
-      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+      $stmtCheck = $this->db->prepare("SELECT role FROM users WHERE user_id = :id AND deleted_at IS NULL");
+      $stmtCheck->execute([':id' => $userId]);
+      $user = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
       if (!$user) {
-        throw new \Exception("User not found.");
+        $this->db->rollBack();
+        error_log("[UserRepository::deleteUserWithCascade] User $userId not found or already deleted.");
+        return false;
       }
 
-      if ($user['role'] === 'student') {
-        $stmt = $this->db->prepare("
-                    UPDATE students 
-                    SET deleted_at = NOW(), deleted_by = :deleted_by 
-                    WHERE user_id = :uid
-                ");
-        $stmt->execute([
-          ':deleted_by' => $deletedBy,
-          ':uid' => $userId
-        ]);
-
-        $stmt = $this->db->prepare("
-                    INSERT INTO deleted_students (student_id, user_id, student_number, course, year_level, section, status, deleted_by)
-                    SELECT student_id, user_id, student_number, course, year_level, section, status, :deleted_by
-                    FROM students WHERE user_id = :uid
-                ");
-        $stmt->execute([
-          ':uid' => $userId,
-          ':deleted_by' => $deletedBy
-        ]);
-      }
-
-      $stmt = $this->db->prepare("
+      $stmtUpdateUser = $this->db->prepare("
                 UPDATE users 
                 SET deleted_at = NOW(), deleted_by = :deleted_by 
-                WHERE user_id = :uid
+                WHERE user_id = :uid AND deleted_at IS NULL 
             ");
-      $stmt->execute([
+      $stmtUpdateUser->execute([
         ':deleted_by' => $deletedBy,
         ':uid' => $userId
       ]);
 
-      $stmt = $this->db->prepare("
-                INSERT INTO deleted_users (user_id, username, first_name, middle_name, last_name, suffix, email, role, deleted_by)
-                SELECT user_id, username, first_name, middle_name, last_name, suffix, email, role, :deleted_by
-                FROM users WHERE user_id = :uid
-            ");
-      $stmt->execute([
-        ':uid' => $userId,
-        ':deleted_by' => $deletedBy
-      ]);
+      if ($stmtUpdateUser->rowCount() === 0) {
+        $this->db->rollBack();
+        error_log("[UserRepository::deleteUserWithCascade] Failed to update user $userId.");
+        return false;
+      }
+
+      if (isset($user['role']) && strtolower($user['role']) === 'student') {
+        $stmtUpdateStudent = $this->db->prepare("
+                    UPDATE students 
+                    SET deleted_at = NOW(), deleted_by = :deleted_by 
+                    WHERE user_id = :uid AND deleted_at IS NULL
+                ");
+        $stmtUpdateStudent->execute([
+          ':deleted_by' => $deletedBy,
+          ':uid' => $userId
+        ]);
+      }
 
       $this->db->commit();
       return true;
+    } catch (PDOException $e) {
+      $this->db->rollBack();
+      error_log("[UserRepository::deleteUserWithCascade] PDOException: " . $e->getMessage());
+      return false;
     } catch (\Exception $e) {
       $this->db->rollBack();
-      error_log("[UserRepository::deleteUserWithCascade] " . $e->getMessage());
-      throw $e;
+      error_log("[UserRepository::deleteUserWithCascade] Exception: " . $e->getMessage());
+      return false;
     }
-  }
-
-  public function usernameExists(string $username): bool
-  {
-    $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE username = :username AND deleted_at IS NULL");
-    $stmt->execute([':username' => $username]);
-    return $stmt->fetchColumn() > 0;
   }
 
   public function toggleUserStatus(int $userId): bool

@@ -246,12 +246,31 @@ ALTER TABLE borrow_transaction_items
 MODIFY COLUMN status ENUM('pending', 'borrowed', 'returned', 'overdue') NOT NULL DEFAULT 'pending';
 
 
-ALTER TABLE borrow_transactions ADD COLUMN generated_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE `borrow_transactions` CHANGE `staff_id` `librarian_id` INT(11) NULL DEFAULT NULL;
 
-ALTER TABLE borrow_transactions
-MODIFY borrowed_at DATETIME DEFAULT NULL,
+ALTER TABLE deleted_users 
+ADD COLUMN suffix DATETIME NULL AFTER last_name;
 
 
+ALTER TABLE deleted_students 
+ADD COLUMN section DATETIME NULL AFTER year_level;
 
+
+ALTER TABLE `users` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `deleted_by`;
+
+ALTER TABLE users DROP INDEX username;
+ALTER TABLE students DROP INDEX student_number;
+
+ALTER TABLE `books` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `deleted_by`;
+
+CREATE TABLE backup_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_name VARCHAR(255) NOT NULL,
+    file_type VARCHAR(50) NOT NULL,
+    type VARCHAR(50) NOT NULL,        
+    size DECIMAL(10,2) DEFAULT 0,  
+    created_by VARCHAR(50) NOT NULL, 
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
 

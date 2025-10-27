@@ -173,7 +173,8 @@ class SidebarController extends Controller
     {
         $this->view("superadmin/restoreBooks", [
             "title"=> "Restore Books",
-            "currentPage" => "restoreBooks"
+            "currentPage" => "restoreBooks",
+            "csrf_token" => $_SESSION['csrf_token']
         ]);
     }
 

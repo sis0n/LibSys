@@ -1,31 +1,25 @@
 <main class="min-h-screen">
-    <!-- Header -->
     <div class="flex items-center gap-3 mb-6">
         <i class="ph-fill ph-user-plus text-3xl text-gray-700"></i>
         <div>
             <h2 class="text-2xl font-bold mb-1">Restore User</h2>
-            <p class="text-gray-500">Recover user records from your previous backups and restore them to the system.</p>
+            <p class="text-gray-500">View and manage users that have been soft-deleted from the system.</p>
         </div>
     </div>
 
-    <!-- Search & Filter Section -->
     <div class="bg-white shadow-sm border border-gray-200 rounded-lg p-6 mb-6">
-        <!-- Header -->
         <div class="flex items-center gap-2 mb-4">
             <i class="ph ph-funnel text-xl text-orange-700"></i>
             <h3 class="text-lg font-semibold text-orange-700">Search & Filter</h3>
         </div>
 
-        <!-- Filter Controls -->
         <div class="flex flex-col md:flex-row md:items-center gap-4">
-            <!-- Search Bar -->
             <div class="relative flex-grow">
                 <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input type="text" id="userSearchInput" placeholder="Search by name, username, or email..."
                     class="bg-orange-50 border border-orange-200 rounded-lg pl-11 pr-4 py-2.5 w-full text-sm outline-none transition focus:ring-1 focus:ring-orange-400">
             </div>
 
-            <!-- Role Filter Dropdown -->
             <div class="relative w-full md:w-44">
                 <button id="roleFilterDropdownBtn"
                     class="bg-orange-50 border border-orange-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 flex items-center justify-between w-full">
@@ -39,15 +33,13 @@
                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
                         data-value="All Users">All Users</a>
                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
-                        data-value="Student">Student</a>
+                        data-value="student">Student</a>
                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
-                        data-value="Staff">Staff</a>
+                        data-value="librarian">Librarian</a>
                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
-                        data-value="Faculty">Faculty</a>
+                        data-value="admin">Admin</a>
                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
-                        data-value="Librarian">Librarian</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
-                        data-value="Admin">Admin</a>
+                        data-value="superadmin">Super Admin</a>
                 </div>
             </div>
 
@@ -65,7 +57,8 @@
             <i class="ph ph-users text-xl text-orange-700"></i>
             <h3 class="text-lg font-semibold text-orange-700">Deleted Users (<span id="deletedUsersCount">0</span>)</h3>
         </div>
-        <p class="text-gray-600 mb-6">Users that have been deleted can be restored or permanently removed.</p>
+        <!-- Inayos ang description -->
+        <p class="text-gray-600 mb-6">Users that have been soft-deleted can be restored or archived.</p>
 
         <div class="overflow-x-auto rounded-lg border border-orange-200">
             <table class="min-w-full divide-y divide-gray-200 text-sm table-fixed">
@@ -95,7 +88,7 @@
             </table>
             <p id="noDeletedUsersFound" class="text-gray-500 text-center w-full py-10 hidden">
                 <i class="ph ph-user-slash text-4xl block mb-2 text-gray-400"></i>
-                No deleted users found.
+                No deleted users found matching filters.
             </p>
         </div>
 
@@ -122,7 +115,7 @@
             <div class="text-sm font-medium text-gray-900 user-fullname"></div>
         </td>
         <td class="px-4 py-3 break-words whitespace-normal text-sm text-gray-500 user-username"></td>
-        <td class="px-4 py-3 break-words whitespace-normal text-sm text-gray-500 user-role"></td>
+        <td class="px-4 py-3 break-words whitespace-normal text-sm text-gray-500 user-role capitalize"></td> <!-- Added capitalize -->
         <td class="px-4 py-3 break-words whitespace-normal text-sm text-gray-500 user-deleted-date"></td>
         <td class="px-4 py-3 break-words whitespace-normal text-sm text-gray-500 user-deleted-by"></td>
         <td class="px-4 py-3 text-center text-sm font-medium">
@@ -133,10 +126,11 @@
                     <span>Restore</span>
                 </button>
 
+                <!-- PINALITAN ANG TEXT DITO -->
                 <button
-                    class="delete-btn inline-flex items-center gap-2 px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition">
-                    <i class="ph ph-trash text-base"></i>
-                    <span>Delete</span>
+                    class="archive-btn inline-flex items-center gap-2 px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition">
+                    <i class="ph ph-archive text-base"></i> <!-- Pinalitan ang icon -->
+                    <span>Archive</span>
                 </button>
             </div>
         </td>
@@ -157,7 +151,7 @@
                 <i class="ph ph-x text-2xl"></i>
             </button>
         </div>
-        <div class="p-8 space-y-6 overflow-y-auto">
+        <div class="p-8 space-y-6 overflow-y-auto max-h-[70vh]"> <!-- Added max-h for scroll -->
             <div class="border border-gray-200 rounded-lg p-4 shadow-sm">
                 <h4 class="text-sm font-semibold text-orange-500 mb-4 uppercase tracking-wider">User Information</h4>
                 <div class="grid grid-cols-2 gap-4 text-sm">
@@ -171,7 +165,7 @@
                     </div>
                     <div>
                         <p class="text-gray-500">Role:</p>
-                        <p id="modalUserRole" class="font-medium text-gray-800 break-words"></p>
+                        <p id="modalUserRole" class="font-medium text-gray-800 break-words capitalize"></p> <!-- Added capitalize -->
                     </div>
                     <div>
                         <p class="text-gray-500">Email:</p>
@@ -203,5 +197,7 @@
         </div>
     </div>
 </div>
+
+<input type="hidden" id="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
 <script src="/libsys/public/js/superadmin/restoreUser.js"></script>

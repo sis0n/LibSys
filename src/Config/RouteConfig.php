@@ -90,6 +90,9 @@ class RouteConfig
 
         $router->post('student/cart/checkout', 'TicketController@checkout', ['student']);
         $router->get('student/qrBorrowingTicket', 'TicketController@show', ['student']);
+        $router->get('student/qrBorrowingTicket/checkStatus', 'TicketController@checkStatus', ['student']);
+
+
 
 
 

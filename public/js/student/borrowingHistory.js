@@ -47,7 +47,7 @@ function renderRecords(records) {
                     </div>
                     <div class="bg-[var(--color-gray-100)] p-2 rounded text-sm">
                         <i class="ph ph-user text-gray-600 mr-1"></i>
-                        Staff<br><span class="font-medium">${record.staffName || 'N/A'}</span>
+                        Librarian<br><span class="font-medium">${record.librarianName || 'N/A'}</span>
                     </div>
                 </div>
             </div>

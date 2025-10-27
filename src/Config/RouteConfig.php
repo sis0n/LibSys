@@ -23,23 +23,6 @@ class RouteConfig
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
         $router->post('scanner/manual', 'ScannerController@manual', ['scanner']);
 
-        $router->get('faculty/dashboard', 'SidebarController@facultyDashboard', ['faculty']);
-        $router->get('faculty/bookCatalog', 'SidebarController@facultyBookCatalog', ['faculty']);
-        $router->get('faculty/equipmentCatalog', 'SidebarController@facultyEquipmentCatalog', ['faculty']);
-        $router->get('faculty/myCart', 'SidebarController@facultyMyCart', ['faculty']);
-        $router->get('faculty/qrBorrowingTicket', 'SidebarController@facultyQrBorrowingTicket', ['faculty']);
-        $router->get('faculty/borrowingHistory', 'SidebarController@facultyBorrowingHistory', ['faculty']);
-        $router->get('faculty/changePassword', 'SidebarController@facultyChangePassword', ['faculty']);
-        $router->get('faculty/myProfile', 'SidebarController@facultyMyProfile', ['faculty']);
-
-        $router->get('staff/dashboard', 'SidebarController@staffDashboard', ['staff']);
-        $router->get('staff/bookCatalog', 'SidebarController@staffBookCatalog', ['staff']);
-        $router->get('staff/equipmentCatalog', 'SidebarController@staffEquipmentCatalog', ['staff']);
-        $router->get('staff/myCart', 'SidebarController@staffMyCart', ['staff']);
-        $router->get('staff/qrBorrowingTicket', 'SidebarController@staffQrBorrowingTicket', ['staff']);
-        $router->get('staff/borrowingHistory', 'SidebarController@staffBorrowingHistory', ['staff']);
-        $router->get('staff/changePassword', 'SidebarController@staffChangePassword', ['staff']);
-        $router->get('staff/myProfile', 'SidebarController@staffMyProfile', ['staff']);
 
         $router->get('librarian/dashboard', 'SidebarController@librarianDashboard', ['librarian']);
         $router->get('librarian/bookManagement', 'SidebarController@librarianBookManagement', ['librarian']);
@@ -83,6 +66,7 @@ class RouteConfig
         $router->get('superadmin/restoreUser', 'SidebarController@restoreUser', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
         $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
+
 
         $router->get('student/dashboard', 'SidebarController@studentDashboard', ['student']);
         $router->get('student/bookCatalog', 'SidebarController@studentBookCatalog', ['student']);

@@ -220,68 +220,163 @@ switch ($role) {
                 </div>
             </div>
 
-            <!-- Activity & Logs Dropdown -->
-            <div class="sidebar-dropdown" data-pages='["attendanceLogs", "topVisitor", "transactionHistory"]'>
-                <button
-                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
-                    <span class="flex items-center gap-x-3">
-                        <i class="ph ph-activity text-2xl"></i>
-                        <span class="text-base">Activity & Logs</span>
-                    </span>
-                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
-                </button>
-                <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                    <a href="/LibSys/public/superadmin/attendanceLogs"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'attendanceLogs' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-calendar-check text-xl"></i>
-                        <span class="text-base text-sm">Attendance Logs</span>
-                    </a>
-                    <a href="/LibSys/public/superadmin/topVisitor"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'topVisitor' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-chart-bar text-xl"></i>
-                        <span class="text-base text-sm">Reports</span>
-                    </a>
-                    <a href="/LibSys/public/superadmin/transactionHistory"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'transactionHistory' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-arrows-left-right text-xl"></i>
-                        <span class="text-base text-sm">Transaction History</span>
-                    </a>
-                </div>
-            </div>
+            <!-- Top Visitors -->
+            <a href="/LibSys/public/superadmin/topVisitor" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'topVisitor'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-chart-bar text-2xl"></i>
+                <span>Top Visitors</span>
+            </a>
 
-            <!-- Backup & Restore Dropdown -->
-            <div class="sidebar-dropdown" data-pages='["backup", "restoreBooks", "restoreEquipment", "restoreUser"]'>
-                <button
-                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
-                    <span class="flex items-center gap-x-3">
-                        <i class="ph ph-database text-2xl"></i>
-                        <span class="text-base">Backup & Restore</span>
-                    </span>
-                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
-                </button>
-                <div class="pl-5 pt-1 space-y-1 hidden">
-                    <a href="/LibSys/public/superadmin/backup"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'backup' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-floppy-disk text-xl"></i>
-                        <span class="text-base text-sm">Backup</span>
-                    </a>
-                    <a href="/LibSys/public/superadmin/restoreBooks"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreBooks' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-book text-xl"></i>
-                        <span class="text-base text-sm">Restore Books</span>
-                    </a>
-                    <a href="/LibSys/public/superadmin/restoreEquipment"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreEquipment' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-wrench text-xl"></i>
-                        <span class="text-base text-sm">Restore Equipment</span>
-                    </a>
-                    <a href="/LibSys/public/superadmin/restoreUser"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-user-gear text-xl"></i>
-                        <span class="text-base text-sm">Restore User</span>
-                    </a>
-                </div>
-            </div>
+            <!-- Borrowing History -->
+            <a href="/LibSys/public/superadmin/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'borrowingHistory'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-clock-counter-clockwise text-2xl"></i>
+                <span>Borrowing History</span>
+            </a>
+
+            <!-- Returning -->
+            <a href="/LibSys/public/superadmin/returning" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'returning'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+               <i class="ph ph-swap text-2xl"></i>
+                <span>Returning</span>
+            </a>
+
+            <!-- Global Logs -->
+            <a href="/LibSys/public/superadmin/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'globalLogs'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-database text-2xl"></i>
+                <span>Global Logs</span>
+            </a>
+
+            <!-- Backup and Restore -->
+            <a href="/LibSys/public/superadmin/backupAndRestore" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'backupAndRestore'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-cloud-arrow-up text-2xl"></i>
+                <span>Backup & Restore</span>
+            </a>
+
+            <!-- Change Password -->
+            <a href="/libsys/public/superadmin/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'changePassword')
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-key text-2xl"></i>
+                <span class="text-base">Change Password</span>
+            </a>
+
+             <!-- My Profile -->
+            <a href="/libsys/public/superadmin/myProfile" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+           <?= ($currentPage === 'myProfile')
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-user-gear text-2xl"></i>
+                <span class="text-base">My Profile</span>
+            </a>
+        </nav>
+
+        <!--Admin Sidebar  -->
+        <!-- Navigation -->
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <?php elseif ($role === 'admin'): ?>
+            <!-- Dashboard -->
+            <a href="/LibSys/public/admin/dashboard" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'dashboard'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-house text-2xl"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <!-- Book Management -->
+            <a href="/LibSys/public/admin/bookManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'bookManagement'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-book-open text-2xl"></i>
+                <span>Book Management</span>
+            </a>
+
+            <!-- Equipment Management -->
+            <a href="/LibSys/public/admin/equipmentManagement" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'equipmentManagement'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-desktop text-2xl"></i>
+                <span>Equipment Management</span>
+            </a>
+
+            <!-- QR Code Scanner -->
+            <a href="/LibSys/public/admin/qrScanner" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'qrScanner'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-qr-code text-2xl"></i>
+                <span>QR Scanner</span>
+            </a>
+
+            <!-- Attendance Logs -->
+            <a href="/LibSys/public/admin/attendanceLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'attendanceLogs'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-clipboard-text text-2xl"></i>
+                <span>Attendance Logs</span>
+            </a>
+
+            <!-- Top Visitors -->
+            <a href="/LibSys/public/admin/topVisitor" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'topVisitor'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-chart-bar text-2xl"></i>
+                <span>Top Visitors</span>
+            </a>
+
+            <!-- Borrowing History -->
+            <a href="/LibSys/public/admin/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'borrowingHistory'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-clock-counter-clockwise text-2xl"></i>
+                <span>Borrowing History</span>
+            </a>
+
+            <!-- Returning -->
+            <a href="/LibSys/public/admin/returning" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'returning'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-swap text-2xl"></i>
+                <span>Returning</span>
+            </a>
+
+            <!-- Global Logs -->
+            <a href="/LibSys/public/admin/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'globalLogs'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-database text-2xl"></i>
+                <span>Global Logs</span>
+            </a>
+
+            <!-- Backup and Restore -->
+            <a href="/LibSys/public/admin/backupAndRestore" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'backupAndRestore'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-cloud-arrow-up text-2xl"></i>
+                <span>Backup & Restore</span>
+            </a>
 
             <!-- Change Password -->
             <a href="/libsys/public/superadmin/changePassword"
@@ -347,34 +442,41 @@ switch ($role) {
                 </div>
             </div>
 
-            <!-- Activity & Logs Dropdown -->
-            <div class="sidebar-dropdown" data-pages='["attendanceLogs", "topVisitor", "transactionHistory"]'>
-                <button
-                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
-                    <span class="flex items-center gap-x-3">
-                        <i class="ph ph-activity text-2xl"></i>
-                        <span class="text-base">Activity & Logs</span>
-                    </span>
-                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
-                </button>
-                <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                    <a href="/LibSys/public/<?= $roleFolder ?>/attendanceLogs"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'attendanceLogs' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-calendar-check text-xl"></i>
-                        <span class="text-base text-sm">Attendance Logs</span>
-                    </a>
-                    <a href="/LibSys/public/<?= $roleFolder ?>/topVisitor"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'topVisitor' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-chart-bar text-xl"></i>
-                        <span class="text-base text-sm">Reports</span>
-                    </a>
-                    <a href="/LibSys/public/<?= $roleFolder ?>/transactionHistory"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'transactionHistory' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-arrows-left-right text-xl"></i>
-                        <span class="text-base text-sm">Transaction History</span>
-                    </a>
-                </div>
-            </div>
+            <!-- Top Visitors -->
+            <a href="/LibSys/public/librarian/topVisitor" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'topVisitor'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-chart-bar text-2xl"></i>
+                <span>Top Visitors</span>
+            </a>
+
+            <!-- Borrowing History -->
+            <a href="/LibSys/public/librarian/borrowingHistory" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'borrowingHistory'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-clock-counter-clockwise text-2xl"></i>
+                <span>Borrowing History</span>
+            </a>
+
+            <!-- Returning -->
+            <a href="/LibSys/public/librarian/returning" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'returning'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-swap text-2xl"></i>
+                <span>Retuning</span>
+            </a>
+
+            <!-- Global Logs -->
+            <a href="/LibSys/public/librarian/globalLogs" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition 
+                <?= $currentPage === 'globalLogs'
+                    ? 'bg-green-600 text-white font-medium'
+                    : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-database text-2xl"></i>
+                <span>Global Logs</span>
+            </a>
 
             <!-- Profile Settings Dropdown -->
             <div class="sidebar-dropdown" data-pages='["myProfile", "changePassword"]'>

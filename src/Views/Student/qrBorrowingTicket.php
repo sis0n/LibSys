@@ -112,7 +112,7 @@
             // Reset message
             if (ticketMessageDiv) {
                 ticketMessageDiv.innerText = "You do not currently have an active borrowing ticket.";
-                ticketMessageDiv.classList.add('text-red-500');
+                    ticketMessageDiv.classList.add('text-red-500');
             }
 
             // Disable download button

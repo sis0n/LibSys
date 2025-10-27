@@ -13,6 +13,12 @@ switch ($role) {
     case 'student':
         $roleFolder = 'student';
         break;
+    case 'faculty':
+        $roleFolder = 'faculty';
+        break;
+    case 'staff':
+        $roleFolder = 'staff';
+        break;
     case 'librarian':
         $roleFolder = 'librarian';
         break;

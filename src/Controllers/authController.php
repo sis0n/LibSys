@@ -107,6 +107,10 @@ class AuthController extends Controller
             } elseif (User::isStudent($user)) {
                 $redirect = '/libsys/public/student/dashboard';
             } elseif (User::isScanner($user)) {
+                $redirect = '/libsys/public/faculty/dashboard';
+            } elseif (User::isScanner($user)) {
+                $redirect = '/libsys/public/staff/dashboard';
+            } elseif (User::isScanner($user)) {
                 $redirect = '/libsys/public/scanner/attendance';
             } else {
                 echo json_encode([

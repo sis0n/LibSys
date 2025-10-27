@@ -468,23 +468,7 @@
         // ==========================
         // DYNAMIC URL HELPER
         // ==========================
-        function getApiBaseUrl() {
-            if (currentApiBaseUrl) return currentApiBaseUrl;
-
-            const path = window.location.pathname;
-
-            if (path.includes('/superadmin/')) {
-                currentApiBaseUrl = '/libsys/public/superadmin';
-            } else if (path.includes('/admin/')) {
-                currentApiBaseUrl = '/libsys/public/admin';
-            } else if (path.includes('/librarian/')) {
-                currentApiBaseUrl = '/libsys/public/librarian';
-            } else {
-                console.error("CRITICAL: Cannot determine user role from URL path.");
-                currentApiBaseUrl = '/libsys/public/superadmin'; // Fallback
-            }
-            return currentApiBaseUrl;
-        }
+        
 
         // ==========================
         // MODAL HELPERS & LISTENERS
@@ -652,7 +636,6 @@
             paginationControls.classList.add('hidden');
             resultsIndicator.textContent = 'Loading...';
             const offset = (page - 1) * limit;
-            const apiBaseUrl = getApiBaseUrl(); // Kunin ang tamang role prefix
 
             try {
                 const params = new URLSearchParams({
@@ -855,7 +838,7 @@
                 return;
             }
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/store`, {
+                const res = await fetch(`${BASE_URL}/booksmanagement/store`, {
                     method: "POST",
                     body: formData
                 });
@@ -879,7 +862,7 @@
         window.viewBook = async (bookId) => {
             if (!bookId) return;
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/get/${bookId}`);
+                const res = await fetch(`${BASE_URL}/booksmanagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
 
                 const data = await res.json();
@@ -921,7 +904,7 @@
             if (!bookId) return;
             currentEditingBookId = bookId;
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/get/${bookId}`);
+                const res = await fetch(`${BASE_URL}/booksmanagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
                 const data = await res.json();
                 if (data.success && data.book) {
@@ -967,7 +950,7 @@
                 return;
             }
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/update/${currentEditingBookId}`, {
+                const res = await fetch(`${BASE_URL}/booksmanagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
@@ -998,7 +981,7 @@
             });
             if (result.isConfirmed) {
                 try {
-                    const res = await fetch(`${getApiBaseUrl()}/booksmanagement/delete/${bookId}`, {
+                    const res = await fetch(`${BASE_URL}/booksmanagement/delete/${bookId}`, {
                         method: "POST"
                     });
                     const result = await res.json();

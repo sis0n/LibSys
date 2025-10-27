@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const totalRow = document.createElement('tr');
-        totalRow.classList.add('bg-orange-50', 'font-bold', 'text-teal-800');
+        totalRow.classList.add('bg-orange-50', 'font-bold', 'text-gray-800');
         totalRow.innerHTML = `
             <td class="px-4 py-2 text-left">TOTAL</td>
             <td class="px-4 py-2 text-center">-</td>

@@ -6,7 +6,7 @@ use App\Core\Database;
 use PDO;
 use PDOException;
 
-class RestoreRepository
+class RestoreUserRepository
 {
   protected PDO $db;
 

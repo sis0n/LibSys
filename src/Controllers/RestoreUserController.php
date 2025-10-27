@@ -3,15 +3,15 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Repositories\RestoreRepository;
+use App\Repositories\restoreUserRepository;
 
-class RestoreController extends Controller
+class RestoreUserController extends Controller
 {
-  protected RestoreRepository $restoreRepo;
+  protected RestoreUserRepository $restoreUserRepo;
 
   public function __construct()
   {
-    $this->restoreRepo = new RestoreRepository();
+    $this->restoreUserRepo = new RestoreUserRepository();
   }
 
   private function validateCsrf(string $token): bool
@@ -40,7 +40,7 @@ class RestoreController extends Controller
   {
     header('Content-Type: application/json');
     try {
-      $users = $this->restoreRepo->getDeletedUsers();
+      $users = $this->restoreUserRepo->getDeletedUsers();
       echo json_encode(['success' => true, 'users' => $users]);
     } catch (\Throwable $e) {
       error_log("Error in getDeletedUsersJson: " . $e->getMessage());
@@ -77,7 +77,7 @@ class RestoreController extends Controller
     }
 
     try {
-      $restored = $this->restoreRepo->restoreUser((int)$userId);
+      $restored = $this->restoreUserRepo->restoreUser((int)$userId);
       if ($restored) {
         echo json_encode(['success' => true, 'message' => 'User restored successfully.']);
       } else {
@@ -115,7 +115,7 @@ class RestoreController extends Controller
     }
 
     try {
-      $result = $this->restoreRepo->archiveUser($userId, $librarianId);
+      $result = $this->restoreUserRepo->archiveUser($userId, $librarianId);
       if ($result['success']) {
         echo json_encode(['success' => true, 'message' => 'User data successfully archived.']);
       } else {

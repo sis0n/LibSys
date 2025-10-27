@@ -261,3 +261,6 @@ ALTER TABLE `users` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER
 ALTER TABLE users DROP INDEX username;
 ALTER TABLE students DROP INDEX student_number;
 
+ALTER TABLE `books` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `deleted_by`;
+
+

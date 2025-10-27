@@ -60,7 +60,7 @@ class StudentBorrowingHistoryController extends Controller
                 'borrowedDate' => $record['borrowed_at'] ? date('M d, Y', strtotime($record['borrowed_at'])) : 'N/A',
                 'dueDate' => $record['due_date'] ? date('M d, Y', $dueDate) : 'N/A',
                 'returnedDate' => $returnedDate ? date('M d, Y', $returnedDate) : 'Not returned',
-                'staffName' => $record['staff_name'] ?? 'N/A',
+                'librarianName' => $record['librarian_name'] ?? 'N/A',
                 'statusText' => $statusText,
                 'statusBgClass' => $statusBgClass,
                 'isOverdue' => $isOverdue

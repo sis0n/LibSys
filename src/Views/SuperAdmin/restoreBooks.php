@@ -1,10 +1,13 @@
+<?php if (!empty($csrf_token)) : ?>
+    <input type="hidden" id="csrf_token" value="<?= $csrf_token ?>">
+<?php endif; ?>
 <main class="min-h-screen">
     <!-- Header -->
     <div class="flex items-center gap-3 mb-6">
         <i class="ph-fill ph-book-open-text text-3xl text-gray-700"></i>
         <div>
             <h2 class="text-2xl font-bold mb-1">Restore Books</h2>
-            <p class="text-gray-500">Recover book records from your previous backups and restore them to the system.</p>
+            <p class="text-gray-500">View, restore, or permanently archive soft-deleted book records.</p>
         </div>
     </div>
 
@@ -59,35 +62,35 @@
             <i class="ph ph-book-bookmark text-xl text-orange-700"></i>
             <h3 class="text-lg font-semibold text-orange-700">Deleted Books (<span id="deletedBooksCount">0</span>)</h3>
         </div>
-        <p class="text-gray-600 mb-6">Books that have been deleted can be restored or permanently removed.</p>
+        <p class="text-gray-600 mb-6">Books that have been soft-deleted can be restored or permanently archived.</p>
 
         <div class="overflow-x-auto rounded-lg border border-orange-200">
             <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <table class="min-w-full divide-y divide-gray-200 text-sm table-fixed"> <!-- Added table-fixed -->
                     <thead class="bg-orange-100">
                         <tr>
                             <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[240px]">
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[28%]">
                                 Book Title
                             </th>
                             <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px]">
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
                                 Author
                             </th>
                             <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[150px]">
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
                                 Accession Number
                             </th>
                             <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[150px]">
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
                                 Deleted Date
                             </th>
                             <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px]">
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
                                 Deleted By
                             </th>
                             <th scope="col"
-                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
                                 Actions
                             </th>
                         </tr>
@@ -149,8 +152,8 @@
                 <i class="ph ph-arrow-counter-clockwise text-lg mr-1"></i> Restore
             </button>
             <button
-                class="delete-btn inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
-                <i class="ph ph-trash text-lg mr-1"></i> Delete
+                class="archive-btn inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                <i class="ph ph-archive text-lg mr-1"></i> Archive
             </button>
         </td>
     </tr>
@@ -240,3 +243,6 @@
         </div>
     </div>
 </div>
+
+<!-- Idinagdag ang hidden input field para sa CSRF Token -->
+<input type="hidden" id="csrf_token" value="<?= $csrf_token ?? '' ?>">

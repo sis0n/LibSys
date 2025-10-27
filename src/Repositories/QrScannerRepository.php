@@ -98,7 +98,7 @@ class QRScannerRepository
     }
   }
 
-  public function processBorrowing(string $transactionCode, ?int $staffId = null)
+  public function processBorrowing(string $transactionCode, ?int $librarianId = null)
   {
     try {
       $this->db->beginTransaction();
@@ -110,13 +110,13 @@ class QRScannerRepository
             SET status = 'borrowed',
                 borrowed_at = NOW(),
                 due_date = :due_date,
-                staff_id = :staff_id
+                librarian_id = :librarian_id
             WHERE transaction_code = :code AND status = 'pending'
         ");
       $stmt->execute([
         'code' => $transactionCode,
         'due_date' => $dueDate,
-        'staff_id' => $staffId
+        'librarian_id' => $librarianId
       ]);
 
       $transactionIdStmt = $this->db->prepare("SELECT transaction_id FROM borrow_transactions WHERE transaction_code = :code");

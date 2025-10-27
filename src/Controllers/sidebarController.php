@@ -145,6 +145,73 @@ class SidebarController extends Controller
         ]);
     }
 
+    //Staff Display Caller
+
+    public function staffDashboard()
+    {
+        $this->view("staff/dashboard", [
+            "title" => "Staff Dashboard",
+            "currentPage" => "dashboard"
+        ]);
+    }
+
+    public function staffBookCatalog()
+    {
+        $this->view("staff/bookCatalog", [
+            "title" => "Book Catalog",
+            "currentPage" => "bookCatalog"
+        ]);
+    }
+
+    public function staffEquipmentCatalog()
+    {
+        $this->view("staff/equipmentCatalog", [
+            "title" => "Equipment Catalog",
+            "currentPage" => "equipmentCatalog"
+        ]);
+    }
+    
+    public function staffMyCart()
+    {
+        $this->view("staff/myCart", [
+            "title" => "My Cart",
+            "currentPage" => "myCart"
+        ]);
+    }
+
+    public function staffQrBorrowingTicket()
+    {
+        $this->view("staff/qrBorrowingTicket", [
+            "title" => "QR Borrowing Ticket",
+            "currentPage" => "qrBorrowingTicket"
+        ]);
+    }
+
+    public function staffBorrowingHistory()
+    {
+        $this->view("staff/borrowingHistory", [
+            "title" => "Borrowing History",
+            "currentPage" => "borrowingHistory"
+        ]);
+    }
+
+    public function staffChangePassword()
+    {
+        $this->view("staff/changePassword", [
+            "title" => "Change Password",
+            "currentPage" => "changePassword"
+        ]);
+    }
+
+    public function staffMyProfile()
+    {
+        $this->view("staff/myProfile", [
+            "title" => "My Profile",
+            "currentPage" => "myProfile"
+        ]);
+    }
+
+
 
 
     // Super Admin Display Caller 

@@ -1,4 +1,4 @@
-<body class="min-h-screen p-6">
+<main class="min-h-screen">
     <h2 class="text-2xl font-bold mb-4">QR Borrowing Ticket</h2>
     <p class="text-gray-700">Your QR code for book borrowing and library access.</p>
 
@@ -231,4 +231,4 @@
         setInterval(checkTicketStatus, 3000);
     });
     </script>
-</body>
+</main>

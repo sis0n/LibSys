@@ -210,6 +210,8 @@ class RouteConfig
         $router->post('superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
         $router->post('superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
         $router->post('superadmin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
+        $router->post('superadmin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['superadmin']);
+
 
         $router->get('admin/booksmanagement/fetch', 'BookManagementController@fetch', ['admin']);
         $router->get('admin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['admin']);

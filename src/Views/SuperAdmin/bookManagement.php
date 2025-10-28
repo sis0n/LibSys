@@ -455,7 +455,7 @@
         const limit = 30;
         let currentPage = 1;
         let totalPages = 1;
-        let currentApiBaseUrl = ''; 
+        let currentApiBaseUrl = '';
 
 
         fileInput.addEventListener("change", () => {
@@ -475,7 +475,7 @@
             console.log("Uploading file:", fileInput.files[0].name);
 
             try {
-                const res = await fetch("/LibSys/public/superadmin/booksmanagement/bulkImport", {
+                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/bulkImport`, {
                     method: "POST",
                     body: formData
                 });

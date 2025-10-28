@@ -197,7 +197,7 @@
                             <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                 onclick="selectUserRole(this, 'Faculty')">Faculty</div>
                             <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                                onclick="selectUserRole(this, 'Faculty')">Staff</div>
+                                onclick="selectUserRole(this, 'Staff')">Staff</div>
                         </div>
                     </div>
                 </div>

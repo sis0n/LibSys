@@ -276,5 +276,51 @@ CREATE TABLE backup_log (
 ALTER TABLE borrow_transactions
 ADD COLUMN generated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
+CREATE TABLE faculty (
+    faculty_id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    user_id INT(11) NULL, 
+    department VARCHAR(100) NULL,
+    contact VARCHAR(20) NULL,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    profile_updated TINYINT(1) NOT NULL DEFAULT 0,
+    deleted_at TIMESTAMP NULL,
+    deleted_by INT(11) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
 
+ALTER TABLE carts
+ADD COLUMN faculty_id INT NULL AFTER student_id,
+ADD CONSTRAINT fk_faculty_id FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id);
+
+
+
+
+
+ALTER TABLE `users` CHANGE `role` `role` ENUM('superadmin','admin','librarian','student','scanner','faculty','staff') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE borrow_transactions
+MODIFY student_id INT(11) NULL;
+
+CREATE TABLE `staff` (
+  `staff_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NULL,
+  `employee_id` VARCHAR(50) NULL UNIQUE,
+  `position` VARCHAR(100) NOT NULL,
+  `contact_number` VARCHAR(20) NULL,
+  `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_by` INT NULL DEFAULT NULL,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  INDEX `idx_staff_status` (`status`),
+  INDEX `idx_staff_position` (`position`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE `staff` ADD CONSTRAINT `fk_staff_deleted_by` FOREIGN KEY (`deleted_by`) REFERENCES `users`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE borrow_transactions
+ADD COLUMN staff_id INT(11) NULL AFTER student_id;
 

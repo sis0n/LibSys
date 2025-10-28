@@ -206,18 +206,18 @@ class TicketRepository
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public function getPendingTransactionByStudentId(int $studentId): ?array
+  public function getPendingTransactionByStudentId(int $studentId)
   {
     $stmt = $this->db->prepare("
-        SELECT transaction_id, transaction_code, due_date, generated_at
+        SELECT transaction_id, transaction_code, generated_at, expires_at
         FROM borrow_transactions
-        WHERE student_id = :sid AND status = 'pending'
+        WHERE student_id = :sid
+          AND status = 'pending'
+        ORDER BY generated_at DESC
         LIMIT 1
     ");
     $stmt->execute(['sid' => $studentId]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    return $result ?: null;
+    return $stmt->fetch(\PDO::FETCH_ASSOC);
   }
 
 

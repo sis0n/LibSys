@@ -15,14 +15,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const availableModalCloseButton = document.getElementById('available-modal-close-button');
     const availableModalCloseAction = document.getElementById('available-modal-close-action');
 
-    // --- Input Elements ---
     const accessionInput = document.getElementById('accession-input');
     const scanButton = document.getElementById('scan-button');
     const qrCodeValueInput = document.getElementById('qrCodeValue');
 
-    // =================================================================
-    // INITIAL DATA LOADING
-    // =================================================================
     async function fetchTableData() {
         try {
             const response = await fetch(`${BASE_URL}superadmin/returning/getTableData`);
@@ -52,25 +48,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         data.forEach(book => {
             const row = `
-            <tr class="align-middle">
-                <td class="px-6 py-4 align-middle">
-                    <div class="font-semibold text-gray-800">${book.student_name}</div>
-                    <div class="text-gray-500 text-xs">${book.student_id}</div>
-                    <div class="text-gray-500 text-xs">${book.student_course}</div>
-                </td>
-                <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
-                <td class="px-6 py-4 align-middle">
-                    <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100">
-                        <i class="ph ph-phone text-base mr-1"></i> Contact
-                    </a>
-                </td>
-            </tr>`;
+        <tr class="align-middle">
+            <td class="px-6 py-4 align-middle">
+                <div class="font-semibold text-gray-800">${book.user_name}</div>
+                <div class="text-gray-500 text-xs">${book.user_id}</div>
+                <div class="text-gray-500 text-xs">${book.department_or_course}</div>
+            </td>
+            <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
+            <td class="px-6 py-4 align-middle">
+                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100">
+                    <i class="ph ph-phone text-base mr-1"></i> Contact
+                </a>
+            </td>
+        </tr>`;
             booksNearDueTableBody.insertAdjacentHTML('beforeend', row);
         });
     }
+
 
     function renderOverdueBooksTable(data) {
         overdueBooksTableBody.innerHTML = '';
@@ -80,25 +77,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         data.forEach(book => {
             const row = `
-            <tr class="align-middle">
-                <td class="px-6 py-4 align-middle">
-                    <div class="font-semibold text-gray-800">${book.student_name}</div>
-                    <div class="text-gray-500 text-xs">${book.student_id}</div>
-                    <div class="text-gray-500 text-xs">${book.student_course}</div>
-                </td>
-                <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
-                <td class="px-6 py-4 align-middle">
-                    <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
-                        <i class="ph ph-phone text-base mr-1"></i> Contact
-                    </a>
-                </td>
-            </tr>`;
+        <tr class="align-middle">
+            <td class="px-6 py-4 align-middle">
+                <div class="font-semibold text-gray-800">${book.user_name}</div>
+                <div class="text-gray-500 text-xs">${book.user_id}</div>
+                <div class="text-gray-500 text-xs">${book.department_or_course}</div>
+            </td>
+            <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
+            <td class="px-6 py-4 align-middle">
+                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
+                    <i class="ph ph-phone text-base mr-1"></i> Contact
+                </a>
+            </td>
+        </tr>`;
             overdueBooksTableBody.insertAdjacentHTML('beforeend', row);
         });
     }
+
 
     // =================================================================
     // HANDLE BOOK CHECK

@@ -12,6 +12,10 @@ window.addEventListener("DOMContentLoaded", () => {
   const editUserModal = document.getElementById("editUserModal");
   const closeEditUserBtn = document.getElementById("closeEditUserModal");
   const cancelEditUserBtn = document.getElementById("cancelEditUser");
+  const bulkImportForm = document.getElementById("bulkImportForm");
+  const fileInput = document.getElementById("csvFile");
+  const importMessage = document.getElementById("importMessage");
+
 
   if (!modal || !searchInput || !userTableBody || !addUserModal || !editUserModal) {
     console.error("UserManagement Error: Core components (modals, table, search) not found. Script initialization failed.");
@@ -23,6 +27,54 @@ window.addEventListener("DOMContentLoaded", () => {
   let selectedRole = "All Roles";
   let selectedStatus = "All Status";
   let currentEditingUserId = null;
+
+  if (openBtn) openBtn.addEventListener("click", () => { modal.classList.remove("hidden"); document.body.classList.add("overflow-hidden"); });
+  [closeBtn, cancelBtn].forEach(btn => btn?.addEventListener("click", () => closeModal(modal)));
+  modal?.addEventListener("click", e => { if (e.target === modal) closeModal(modal); });
+
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length) {
+      bulkImportForm.requestSubmit(); 
+    }
+  });
+
+  bulkImportForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    console.log("Submit fired!");
+    console.log("Files:", fileInput.files);
+    if (!fileInput.files.length) return;
+
+    const formData = new FormData();
+    formData.append("csv_file", fileInput.files[0]);
+    console.log("Uploading file:", fileInput.files[0].name);
+
+    try {
+      const res = await fetch("/LibSys/public/superadmin/userManagement/bulkImport", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        if (importMessage) {
+          importMessage.textContent = `Imported: ${data.imported} rows successfully!`;
+          importMessage.classList.remove("hidden");
+          setTimeout(() => importMessage.classList.add("hidden"), 5000);
+        }
+
+        fileInput.value = "";
+        closeModal(document.getElementById("importModal"));
+
+        if (typeof loadUsers === "function") await loadUsers();
+      } else {
+        alert("Error: " + (data.message || "Failed to import CSV."));
+      }
+    } catch (err) {
+      console.error("Error importing CSV:", err);
+      alert("Error importing CSV.");
+    }
+  });
 
   function buildFullName(firstName, middleName, lastName) {
     return [firstName, middleName, lastName].filter(Boolean).join(' ');
@@ -96,9 +148,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  if (openBtn) openBtn.addEventListener("click", () => { modal.classList.remove("hidden"); document.body.classList.add("overflow-hidden"); });
-  [closeBtn, cancelBtn].forEach(btn => btn?.addEventListener("click", () => closeModal(modal)));
-  modal?.addEventListener("click", e => { if (e.target === modal) closeModal(modal); });
 
   function closeAddUserModal() {
     closeModal(addUserModal);

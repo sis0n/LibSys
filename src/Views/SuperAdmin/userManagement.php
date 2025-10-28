@@ -47,6 +47,10 @@
                         onclick="selectRole(this, 'Librarian')">Librarian</div>
                     <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
                         onclick="selectRole(this, 'Admin')">Admin</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectRole(this, 'Faculty')">Faculty</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectRole(this, 'Staff')">Staff</div>
                 </div>
             </div>
 
@@ -107,15 +111,19 @@
         <p class="text-sm text-gray-600 mb-4">
             Import multiple users from a CSV file or use sample data.
         </p>
-
-        <label for="csvFile"
-            class="block border-2 border-dashed border-[var(--color-border)] rounded-lg p-8 text-center cursor-pointer hover:border-[var(--color-ring)]/60 transition">
-            <i class="ph ph-upload text-[var(--color-ring)] text-3xl mb-2 block"></i>
-            <p class="font-medium text-[var(--color-ring)]">Drop CSV file here or click to browse</p>
-            <p class="text-xs text-gray-500 mt-1">Expected format: Name, Username, Role</p>
-            <input type="file" id="csvFile" accept=".csv" class="hidden" />
-        </label>
-
+        <div id="importMessage" class="text-green-600 font-medium mb-2 hidden"></div>
+        <form id="bulkImportForm" enctype="multipart/form-data">
+            <label for="csvFile"
+                class="block border-2 border-dashed border-[var(--color-border)] rounded-lg p-8 text-center cursor-pointer hover:border-[var(--color-ring)]/60 transition">
+                <i class="ph ph-upload text-[var(--color-ring)] text-3xl mb-2 block"></i>
+                <p class="font-medium text-[var(--color-ring)]">Drop CSV file here or click to browse</p>
+                <p class="text-xs text-gray-500 mt-1">Expected format: Name, Username, Role</p>
+                <input type="file" id="csvFile" name="csv_file" accept=".csv" class="hidden" />
+            </label>
+            <!-- <button type="submit" class="mt-4 bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition">
+                Import CSV
+            </button> -->
+        </form>
         <div class="text-center mt-4">
             <button id="cancelImport"
                 class="mt-2 border border-[var(--color-border)] px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition">
@@ -190,6 +198,10 @@
                                 onclick="selectUserRole(this, 'Librarian')">Librarian</div>
                             <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                 onclick="selectUserRole(this, 'Admin')">Admin</div>
+                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                onclick="selectUserRole(this, 'Faculty')">Faculty</div>
+                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                onclick="selectUserRole(this, 'Staff')">Staff</div>
                         </div>
                     </div>
                 </div>
@@ -382,6 +394,10 @@
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditRole(this, 'Student')">Student</div>
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectEditRole(this, 'Faculty')">Faculty</div>
+                                <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectEditRole(this, 'Staff')">Staff</div>
+                                <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditRole(this, 'Librarian')">Librarian</div>
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditRole(this, 'Admin')">Admin</div>
@@ -468,7 +484,7 @@
                 </p>
 
                 <div class="grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto rounded-xl p-2">
-                   <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Archives
                         </h4>
                         <div class="space-y-1 text-sm text-gray-700">
@@ -565,6 +581,4 @@
     </div>
 </div>
 
-
-<script src="<?= base_url('js/superadmin/userManagement.js') ?>" defer></script>
-
+<script src="/libsys/public/js/superadmin/userManagement.js" defer></script>

@@ -78,27 +78,29 @@
         const manualBtn = document.getElementById('manualTicketBtn');
         const manualInput = document.getElementById('manualTicketInput');
 
-        scannerInput.focus();
+        if (scannerInput && scannerBox && manualBtn && manualInput) {
+            scannerBox.addEventListener('click', () => scannerInput.focus());
 
-        scannerBox.addEventListener('click', () => scannerInput.focus());
-
-        scannerInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-                e.preventDefault();
-
-                const code = scannerInput.value.trim();
-
-                if (code) {
-                    scanQRCode(code);
+            scannerInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    const code = scannerInput.value.trim();
+                    if (code) scanQRCode(code);
                     scannerInput.value = '';
                 }
-            }
-        });
+            });
 
-
-        manualBtn.addEventListener('click', () => {
-            const code = manualInput.value.trim();
-            if (code) scanQRCode(code);
-        });
+            manualBtn.addEventListener('click', () => {
+                const code = manualInput.value.trim();
+                if (code) scanQRCode(code);
+            });
+        } else {
+            console.error("QR Scanner elements not found:", {
+                scannerInput,
+                scannerBox,
+                manualBtn,
+                manualInput
+            });
+        }
     });
 </script>

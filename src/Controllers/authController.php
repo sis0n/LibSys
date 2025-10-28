@@ -39,6 +39,12 @@ class AuthController extends Controller
                 case 'student':
                     header("Location: ". base_url('student/dashboard'));
                     exit;
+                case 'faculty':
+                    header("Location: /libsys/public/faculty/dashboard");
+                    exit;
+                case 'staff':
+                    header("Location: /libsys/public/staff/dashboard");
+                    exit;
                 case 'scanner':
                     header("Location: " . base_url('scanner/attendance'));
                     exit;
@@ -105,7 +111,11 @@ class AuthController extends Controller
             } elseif (User::isLibrarian($user)) {
                 $redirect = base_url('librarian/dashboard');
             } elseif (User::isStudent($user)) {
-                $redirect = base_url('student/dashboard');
+                $redirect = '/libsys/public/student/dashboard';
+            } elseif (User::isFaculty($user)) {
+                $redirect = '/libsys/public/faculty/dashboard';
+            } elseif (User::isStaff($user)) {
+                $redirect = '/libsys/public/staff/dashboard';
             } elseif (User::isScanner($user)) {
                 $redirect = base_url('scanner/attendance');
             } else {

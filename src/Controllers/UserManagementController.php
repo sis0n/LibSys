@@ -75,17 +75,19 @@ class UserManagementController extends Controller
     $middle_name = trim($data['middle_name'] ?? null);
     $last_name = trim($data['last_name'] ?? '');
     $username = trim($data['username'] ?? '');
-    $role = trim($data['role'] ?? '');
+    $role = strtolower(trim($data['role'] ?? ''));
 
     if (!$first_name || !$last_name || !$username || !$role) {
-      echo json_encode(['success' => false, 'message' => 'First Name, Last Name, Username, and Role are required.']);
+      echo json_encode([
+        'success' => false,
+        'message' => 'First Name, Last Name, Username, and Role are required.'
+      ]);
       return;
     }
 
     try {
-
-      if (strtolower($role) === 'student') {
-        $studentNumber = $username; 
+      if ($role === 'student') {
+        $studentNumber = $username;
 
         if (!$studentNumber) {
           echo json_encode(['success' => false, 'message' => 'Student Number (Username) is required for students.']);
@@ -93,11 +95,10 @@ class UserManagementController extends Controller
         }
 
         if ($this->studentRepo->studentNumberExists($studentNumber)) {
-          echo json_encode(['success' => false, 'message' => 'Student Number is already in use by an active or soft-deleted user.']);
+          echo json_encode(['success' => false, 'message' => 'Student Number already exists.']);
           return;
         }
       }
-
 
       $defaultPassword = '12345';
       $hashedPassword = password_hash($defaultPassword, PASSWORD_DEFAULT);
@@ -108,29 +109,65 @@ class UserManagementController extends Controller
         'first_name' => $first_name,
         'middle_name' => $middle_name,
         'last_name' => $last_name,
-        'email' => null,
-        'role' => $role,
+        'email' => $data['email'] ?? null,
+        'role' => ucfirst($role),
         'is_active' => 1,
         'created_at' => date('Y-m-d H:i:s')
       ];
 
       $userId = $this->userRepo->insertUser($userData);
 
-      if (strtolower($role) === 'student') {
-        $this->studentRepo->insertStudent(
-          $userId,
-          $username,
-          $data['course'] ?? 'N/A',
-          $data['year_level'] ?? 1,
-          'enrolled'
-        );
+      // --- Insert to specific tables based on role ---
+      switch ($role) {
+        case 'student':
+          $this->studentRepo->insertStudent(
+            $userId,
+            $username,
+            $data['course'] ?? 'N/A',
+            $data['year_level'] ?? 1,
+            'enrolled'
+          );
+          break;
+
+        case 'faculty':
+          $facultyRepo = new \App\Repositories\FacultyRepository();
+          $facultyRepo->insertFaculty(
+            $userId,
+            $data['department'] ?? 'N/A',
+            $data['contact'] ?? 'N/A',
+            'active'
+          );
+          break;
+
+        case 'staff':
+          $staffRepo = new \App\Repositories\StaffRepository();
+          $staffRepo->insertStaff(
+            $userId,
+            $data['employee_id'] ?? 'N/A',
+            $data['position'] ?? 'N/A',
+            $data['contact_number'] ?? 'N/A',
+            'active'
+          );
+          break;
+
+        default:
+          echo json_encode(['success' => false, 'message' => 'Invalid role specified.']);
+          return;
       }
 
-      echo json_encode(['success' => true, 'message' => 'User added successfully.']);
+      echo json_encode([
+        'success' => true,
+        'message' => ucfirst($role) . ' user added successfully.',
+        'user_id' => $userId
+      ]);
     } catch (\Exception $e) {
-      echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+      echo json_encode([
+        'success' => false,
+        'message' => 'Error: ' . $e->getMessage()
+      ]);
     }
   }
+
 
   public function deleteUser($id)
   {

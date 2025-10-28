@@ -77,8 +77,6 @@ class RouteConfig
         $router->get('librarian/changePassword', 'SidebarController@librarianChangePassword', ['librarian']);
         $router->get('librarian/myProfile', 'SidebarController@librarianMyProfile', ['librarian']);
 
-
-        // Admin Sidebar Page Navigation Display
         $router->get('admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
         $router->get('admin/bookManagement', 'SidebarController@adminBookManagement', ['admin']);
         $router->get('admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['admin']);
@@ -92,8 +90,6 @@ class RouteConfig
         $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['admin']);
         $router->get('admin/myProfile', 'SidebarController@adminMyProfile', ['admin']);
 
-
-        // Super Admin Sidebar Page Navigation Display
         $router->get('superadmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
         $router->get('superadmin/userManagement', 'SidebarController@userManagement', ['superadmin']);
         $router->get('superadmin/bookManagement', 'SidebarController@bookManagement', ['superadmin']);
@@ -101,15 +97,15 @@ class RouteConfig
         $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
         $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
-        $router->get('superadmin/transactionHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('superadmin/transcationHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
-        // $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
+        $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
+        $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
+        $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
         $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);
         $router->get('superadmin/restoreBooks', 'SidebarController@restoreBooks', ['superadmin']);
         $router->get('superadmin/restoreUser', 'SidebarController@restoreUser', ['superadmin']);
         $router->get('superadmin/restoreEquipment', 'SidebarController@restoreEquipment', ['superadmin']);
-        $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
-        $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
 
 
         // Student Sidebar Page Navigation Display
@@ -168,6 +164,9 @@ class RouteConfig
         // checkout routes
         $router->post('student/cart/checkout', 'TicketController@checkout', ['student']);
         $router->get('student/qrBorrowingTicket', 'TicketController@show', ['student']);
+        $router->get('student/qrBorrowingTicket/checkStatus', 'TicketController@checkStatus');
+        $router->get('faculty/qrBorrowingTicket/checkStatus', 'FacultyTicketController@checkStatus');
+
 
 
 
@@ -181,6 +180,9 @@ class RouteConfig
         $router->post('faculty/cart/remove/{id}', 'FacultyCartController@remove', ['faculty']);
         $router->post('faculty/cart/clear', 'FacultyCartController@clearCart', ['faculty']);
         $router->get('faculty/cart/json', 'FacultyCartController@getCartJson', ['faculty']);
+
+        $router->post('faculty/cart/checkout', 'FacultyTicketController@checkout', ['faculty']);
+        $router->get('faculty/qrBorrowingTicket', 'FacultyTicketController@show', ['faculty']);
         
 
         //change password
@@ -222,6 +224,9 @@ class RouteConfig
         //student profile routes
         $router->get('student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
         $router->post('student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
+
+        $router->get('faculty/myprofile/get', 'FacultyProfileController@getProfile', ['faculty']);
+        $router->post('faculty/myprofile/update', 'FacultyProfileController@updateProfile', ['faculty']);
 
 
         // Superadmin QR Scanner

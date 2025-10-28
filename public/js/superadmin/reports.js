@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // --- Modal Elements ---
+    const customDateModal = document.getElementById('customDateModal');
+    const confirmDateRangeBtn = document.getElementById('confirmDateRange');
+    const cancelDateRangeBtn = document.getElementById('cancelDateRange');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    let previousCirculatedFilter = 'year'; // Default value
+    let previousLibraryVisitFilter = 'year'; // Default value for library visit
+    let activeTableFilter = null; // To track which table initiated the modal
+
     // --- Library Resources ---
     const libraryResourcesData = [
         { year: 2025, title: '-', volume: '-', processed: '-' },
@@ -31,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function populateCirculatedBooks() {
         const tbody = document.getElementById('circulated-books-tbody');
         if (!tbody) return;
+        tbody.innerHTML = ''; // Clear existing rows
 
         circulatedBooksData.forEach(data => {
             const row = document.createElement('tr');
@@ -67,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function populateLibraryVisitByCourse() {
         const tbody = document.getElementById('library-visit-tbody');
         if (!tbody) return;
+        tbody.innerHTML = ''; // Clear existing rows
 
         libraryVisitByCourseData.forEach(data => {
             const row = document.createElement('tr');
@@ -141,7 +153,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const circulatedBooksFilter = document.getElementById('circulatedBooksFilter');
     if (circulatedBooksFilter) {
         circulatedBooksFilter.addEventListener('change', function() {
-            updateCirculatedBooksTableHeaders(this.value);
+            if (this.value === 'custom') {
+                activeTableFilter = 'circulatedBooks';
+                if(customDateModal) customDateModal.classList.remove('hidden');
+            } else {
+                updateCirculatedBooksTableHeaders(this.value);
+                previousCirculatedFilter = this.value;
+            }
         });
         // Initialize headers on load
         updateCirculatedBooksTableHeaders(circulatedBooksFilter.value);
@@ -150,46 +168,161 @@ document.addEventListener('DOMContentLoaded', function () {
     const libraryVisitFilter = document.getElementById('libraryVisitFilter');
     if (libraryVisitFilter) {
         libraryVisitFilter.addEventListener('change', function() {
-            updateLibraryVisitTableHeaders(this.value);
+            if (this.value === 'custom') {
+                activeTableFilter = 'libraryVisit';
+                if(customDateModal) customDateModal.classList.remove('hidden');
+            } else {
+                updateLibraryVisitTableHeaders(this.value);
+                previousLibraryVisitFilter = this.value;
+            }
         });
         // Initialize headers on load
         updateLibraryVisitTableHeaders(libraryVisitFilter.value);
     }
 
-    function updateCirculatedBooksTableHeaders(filter) {
+    if(customDateModal) {
+        cancelDateRangeBtn.addEventListener('click', () => {
+            customDateModal.classList.add('hidden');
+            if (activeTableFilter === 'circulatedBooks') {
+                circulatedBooksFilter.value = previousCirculatedFilter; // Revert to previous selection
+            } else if (activeTableFilter === 'libraryVisit') {
+                libraryVisitFilter.value = previousLibraryVisitFilter; // Revert to previous selection
+            }
+            activeTableFilter = null; // Reset active filter
+        });
+
+        confirmDateRangeBtn.addEventListener('click', () => {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            if (startDate && endDate) {
+                customDateModal.classList.add('hidden');
+                if (activeTableFilter === 'circulatedBooks') {
+                    updateCirculatedBooksTableHeaders('custom', { startDate, endDate });
+                    previousCirculatedFilter = 'custom';
+                } else if (activeTableFilter === 'libraryVisit') {
+                    updateLibraryVisitTableHeaders('custom', { startDate, endDate });
+                    previousLibraryVisitFilter = 'custom';
+                }
+                activeTableFilter = null; // Reset active filter
+            } else {
+                alert('Please select both start and end dates.');
+            }
+        });
+    }
+
+    function updateCirculatedBooksTableHeaders(filter, dateRange = null) {
         const theadRow = document.querySelector('#circulated-books-tbody').previousElementSibling.querySelector('tr');
         if (theadRow) {
-            if (filter === 'month') {
-                theadRow.children[1].textContent = 'Today';
-                theadRow.children[2].textContent = 'Week';
-                theadRow.children[3].textContent = 'Month';
-            } else if (filter === 'semester') {
-                theadRow.children[1].textContent = '1st Sem';
-                theadRow.children[2].textContent = '2nd Sem';
-                theadRow.children[3].textContent = 'All Sem';
-            } else if (filter === 'year') {
-                theadRow.children[1].textContent = '2025';
-                theadRow.children[2].textContent = '2026';
-                theadRow.children[3].textContent = '2027';
+            if (filter === 'custom' && dateRange) {
+                const formattedStartDate = new Date(dateRange.startDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+                const formattedEndDate = new Date(dateRange.endDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+
+                theadRow.innerHTML = `
+                    <th scope="col" class="px-4 py-3 text-left">Category</th>
+                    <th scope="col" class="px-4 py-3 text-center">
+                        Total Borrowed
+                        <span class="block text-xs font-normal text-gray-500">(${formattedStartDate} – ${formattedEndDate})</span>
+                    </th>
+                `;
+                const tbody = document.getElementById('circulated-books-tbody');
+                tbody.innerHTML = `
+                    <tr class="border-b border-orange-100">
+                        <td class="px-4 py-2 text-left font-medium text-gray-700">Student</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                    <tr class="border-b border-orange-100">
+                        <td class="px-4 py-2 text-left font-medium text-gray-700">Faculty</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                    <tr class="border-b border-orange-100">
+                        <td class="px-4 py-2 text-left font-medium text-gray-700">Staff</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                    <tr class="bg-orange-50 font-bold">
+                        <td class="px-4 py-2 text-left">TOTAL</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                `;
+            } else {
+                 theadRow.innerHTML = `
+                    <th scope="col" class="px-4 py-3 text-left">Category</th>
+                    <th scope="col" class="px-4 py-3 text-center"></th>
+                    <th scope="col" class="px-4 py-3 text-center"></th>
+                    <th scope="col" class="px-4 py-3 text-center"></th>
+                `;
+                if (filter === 'month') {
+                    theadRow.children[1].textContent = 'Today';
+                    theadRow.children[2].textContent = 'Weekly';
+                    theadRow.children[3].textContent = 'Monthly';
+                } else if (filter === 'year') {
+                    theadRow.children[1].textContent = '2025';
+                    theadRow.children[2].textContent = '2026';
+                    theadRow.children[3].textContent = '2027';
+                }
+                populateCirculatedBooks();
             }
         }
     }
 
-    function updateLibraryVisitTableHeaders(filter) {
+    function updateLibraryVisitTableHeaders(filter, dateRange = null) {
         const theadRow = document.querySelector('#library-visit-tbody').previousElementSibling.querySelector('tr');
         if (theadRow) {
-            if (filter === 'month') {
-                theadRow.children[1].textContent = 'Today';
-                theadRow.children[2].textContent = 'Week';
-                theadRow.children[3].textContent = 'Month';
-            } else if (filter === 'semester') {
-                theadRow.children[1].textContent = '1st Sem';
-                theadRow.children[2].textContent = '2nd Sem';
-                theadRow.children[3].textContent = 'All Sem';
-            } else if (filter === 'year') {
-                theadRow.children[1].textContent = '2025';
-                theadRow.children[2].textContent = '2026';
-                theadRow.children[3].textContent = '2027';
+            if (filter === 'custom' && dateRange) {
+                const formattedStartDate = new Date(dateRange.startDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+                const formattedEndDate = new Date(dateRange.endDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+
+                theadRow.innerHTML = `
+                    <th scope="col" class="px-4 py-3 text-left">Category</th>
+                    <th scope="col" class="px-4 py-3 text-center">
+                        Total Count
+                        <span class="block text-xs font-normal text-gray-500">(${formattedStartDate} – ${formattedEndDate})</span>
+                    </th>
+                `;
+                const tbody = document.getElementById('library-visit-tbody');
+                tbody.innerHTML = `
+                    <tr class="border-b border-orange-100">
+                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSIT</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                    <tr class="border-b border-orange-100">
+                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSCS</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                    <tr class="border-b border-orange-100">
+                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSIS</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                    <tr class="border-b border-orange-100">
+                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSCE</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                    <tr class="border-b border-orange-100">
+                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSEE</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                    <tr class="bg-orange-50 font-bold text-gray-800">
+                        <td class="px-4 py-2 text-left">TOTAL</td>
+                        <td class="px-4 py-2 text-center">-</td>
+                    </tr>
+                `;
+            } else {
+                 theadRow.innerHTML = `
+                    <th scope="col" class="px-4 py-3 text-left">Course</th>
+                    <th scope="col" class="px-4 py-3 text-center"></th>
+                    <th scope="col" class="px-4 py-3 text-center"></th>
+                    <th scope="col" class="px-4 py-3 text-center"></th>
+                `;
+                if (filter === 'month') {
+                    theadRow.children[1].textContent = 'Today';
+                    theadRow.children[2].textContent = 'Weekly';
+                    theadRow.children[3].textContent = 'Monthly';
+                } else if (filter === 'year') {
+                    theadRow.children[1].textContent = '2025';
+                    theadRow.children[2].textContent = '2026';
+                    theadRow.children[3].textContent = '2027';
+                }
+                populateLibraryVisitByCourse();
             }
         }
     }

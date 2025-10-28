@@ -134,6 +134,7 @@
                             <th scope="col" class="px-4 py-3 text-left">Rank</th>
                             <th scope="col" class="px-4 py-3 text-left">Name</th>
                             <th scope="col" class="px-4 py-3 text-center">Student ID</th>
+                            <th scope="col" class="px-4 py-3 text-center">Course</th>
                             <th scope="col" class="px-4 py-3 text-center">Visits</th>
                         </tr>
                     </thead>

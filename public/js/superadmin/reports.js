@@ -93,16 +93,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Top 10 Visitors ---
     const topVisitorsData = [
-        { rank: 1, name: 'Alex Johnson', id: '20230001-S', visits: '-' },
-        { rank: 2, name: 'Maria Garcia', id: '20230002-S', visits: '-' },
-        { rank: 3, name: 'David Wilson', id: '20230003-S', visits: '-' },
-        { rank: 4, name: 'Emma Davis', id: '20230004-S', visits: '-' },
-        { rank: 5, name: 'Michael Brown', id: '20230004-S', visits: '-' },
-        { rank: 6, name: 'Sophie Wilson', id: '20230004-S', visits: '-' },
-        { rank: 7, name: 'James Taylor', id: '20230004-S', visits: '-' },
-        { rank: 8, name: 'Lisa Anderson', id: '20230004-S', visits: '-' },
-        { rank: 9, name: 'Paul Walker', id: '20230004-S', visits: '-' },
-        { rank: 10, name: 'Nancy Wheeler', id: '20230004-S', visits: '-' },
+        { rank: 1, name: 'Alex Johnson', id: '20230001-S', course:'BSCS', visits: '-' },
+        { rank: 2, name: 'Maria Garcia', id: '20230002-S', course:'BSCS', visits: '-' },
+        { rank: 3, name: 'David Wilson', id: '20230003-S', course:'BSCS', visits: '-' },
+        { rank: 4, name: 'Emma Davis', id: '20230004-S', course:'BSCS', visits: '-' },
+        { rank: 5, name: 'Michael Brown', id: '20230004-S', course:'BSCS', visits: '-' },
+        { rank: 6, name: 'Sophie Wilson', id: '20230004-S', course:'BSCS', visits: '-' },
+        { rank: 7, name: 'James Taylor', id: '20230004-S', course:'BSCS', visits: '-' },
+        { rank: 8, name: 'Lisa Anderson', id: '20230004-S', course:'BSCS', visits: '-' },
+        { rank: 9, name: 'Paul Walker', id: '20230004-S', course:'BSCS', visits: '-' },
+        { rank: 10, name: 'Nancy Wheeler', id: '20230004-S', course:'BSCS', visits: '-' },
     ];
 
     function populateTopVisitors() {
@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </td>
             <td class="px-4 py-2 text-left font-medium text-gray-700">${data.name}</td>
             <td class="px-4 py-2 text-center">${data.id}</td>
+            <td class="px-4 py-2 text-center">${data.course}</td>
             <td class="px-4 py-2 text-center">${data.visits}</td>
         `;
         tbody.appendChild(row);

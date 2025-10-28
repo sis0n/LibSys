@@ -117,21 +117,29 @@ function fetchAndRenderEquipment() {
 
 function createEquipmentCard(equipment) {
     const card = document.createElement('div');
-    card.className = 'bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden border border-[var(--color-border)] cursor-pointer hover:shadow-lg transition-shadow duration-200 group';
+    card.className = 'relative bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden border border-[var(--color-border)] cursor-pointer hover:shadow-lg transition-shadow duration-200 group';
     
     // Using a generic icon as placeholder for equipment image
     const icon = equipment.type === 'Computer' ? 'ph-desktop' : 'ph-game-controller';
 
+    const isAvailable = equipment.status === "Available";
+    const badgeColor = isAvailable ? "bg-green-500" : "bg-orange-500";
+    const badgeHTML = `<span class="absolute top-2 left-2 ${badgeColor} text-white text-xs px-2 py-1 rounded-full shadow">${equipment.status}</span>`;
+
     card.innerHTML = `
+        ${badgeHTML}
         <div class="w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
              <i class="ph ${icon} text-5xl text-gray-400 group-hover:scale-110 transition-transform"></i>
         </div>
-        <div class="p-3">
-            <h3 class="font-semibold text-sm text-gray-800 truncate" title="${equipment.name}">${equipment.name}</h3>
+        <div class="p-3 ">
+            <h3 class="font-semibold text-sm text-gray-800 truncate  group-hover:text-orange-600" title="${equipment.name}">${equipment.name}</h3>
             <p class="text-xs text-gray-500">${equipment.type}</p>
         </div>
     `;
-    card.addEventListener('click', () => openModal(equipment));
+    card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openModal(equipment);
+    });
     return card;
 }
 
@@ -264,7 +272,7 @@ async function updateCartCount() {
     const currentCount = parseInt(currentCountText.match(/\d+/)[0] || '0');
     // This is a fake update. A real app would fetch the count.
     if (document.querySelector('#addToCartBtn[disabled]')) { // only increment if we just added something
-        const newCount = currentCount + 1;
+        const newCount = currentCount;
         cartCountEl.innerHTML = `<i class="ph ph-shopping-cart text-xs"></i> ${newCount} total items`;
     }
 }

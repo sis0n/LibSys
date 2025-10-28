@@ -79,22 +79,23 @@
         <ul id="paginationList" class="flex items-center -space-x-px h-10 text-sm"> </ul>
     </nav>
 
+    <!-- Modal -->
     <div id="equipmentModal"
         class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300 ease-out">
         <div id="equipmentModalContent"
             class="bg-[var(--color-card)] w-full max-w-md rounded-2xl shadow-lg overflow-hidden transform scale-95 transition-transform duration-300 ease-out">
             <div class="p-4 flex justify-between items-center border-b border-[var(--color-border)]">
-                <h2 id="modalName" class="text-lg font-bold text-gray-800">Equipment Name</h2>
+                <div class="flex inline-flex gap-4 items-center">
+                    <h2 id="modalName" class="text-lg font-bold text-gray-800">Equipment Name</h2>
+                    <p id="modalStatus" class="font-semibold text-xs px-2 py-1 rounded-full">AVAILABLE</p>
+                </div>
                 <button id="closeModal" class="text-gray-500 text-3xl hover:text-red-500 transition-colors duration-200">
                     <i class="ph ph-x-circle"></i>
                 </button>
             </div>
 
             <div class="p-4 space-y-3">
-                <div class="p-3 shadow-sm border border-orange-200 bg-orange-50 rounded-lg flex items-center justify-between">
-                    <p class="text-sm text-orange-500 font-semibold">STATUS</p>
-                    <p id="modalStatus" class="font-semibold text-xs px-2 py-1 rounded-full">AVAILABLE</p>
-                </div>
+                
 
                 <div class="text-sm bg-white rounded-lg border border-gray-200 p-3 space-y-1">
                     <p class="font-semibold text-foreground text-sm mb-1">Equipment Information</p>

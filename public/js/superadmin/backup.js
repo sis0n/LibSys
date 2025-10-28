@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const backupButtons = document.querySelectorAll('.backup-btn');
 
     if (!backupFilesTableBody || !backupFileRowTemplate) {
+        console.error("Required table elements not found.");
         return;
     }
 
@@ -47,7 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
             newRow.querySelector('.file-name').textContent = file.fileName;
             newRow.querySelector('.file-size').textContent = file.size;
             newRow.querySelector('.created-date').textContent = file.createdDate;
-            newRow.querySelector('.created-by').textContent = file.createdBy;
+
+            // *** AYOS DITO: Gamitin ang pangalan imbis na ID ***
+            newRow.querySelector('.created-by').textContent = file.createdByName || 'Unknown User'; // Display name
 
             const typeBadge = newRow.querySelector('.file-type-badge');
             typeBadge.textContent = file.type;
@@ -117,10 +120,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success && Array.isArray(data.logs)) {
                 allBackupFiles = data.logs.map(log => ({
                     fileName: log.file_name,
-                    type: log.file_type,                
+                    type: log.file_type,
                     size: log.size || 'N/A',
                     createdDate: log.created_at,
-                    createdBy: log.created_by,
+                    // *** AYOS DITO: Kunin ang pangalan mula sa response ***
+                    createdByName: log.created_by_name, // Assume backend sends this
+                    // createdBy: log.created_by, // Keep ID if needed elsewhere
                     downloadLink: `/libsys/public/superadmin/backup/secure_download/${encodeURIComponent(log.file_name)}`
                 }));
 

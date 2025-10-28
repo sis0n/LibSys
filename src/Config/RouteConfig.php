@@ -78,20 +78,6 @@ class RouteConfig
         $router->get('librarian/myProfile', 'SidebarController@librarianMyProfile', ['librarian']);
 
 
-        // Admin Sidebar Page Navigation Display
-        $router->get('admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
-        $router->get('admin/bookManagement', 'SidebarController@adminBookManagement', ['admin']);
-        $router->get('admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['admin']);
-        $router->get('admin/qrScanner', 'SidebarController@adminQrScanner', ['admin']);
-        $router->get('admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
-        $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['admin']);
-        $router->get('admin/borrowingHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
-        $router->get('admin/returning', 'SidebarController@adminReturning', ['admin']);
-        $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
-        $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
-        $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['admin']);
-        $router->get('admin/myProfile', 'SidebarController@adminMyProfile', ['admin']);
-
 
         // Super Admin Sidebar Page Navigation Display
         $router->get('superadmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
@@ -107,6 +93,10 @@ class RouteConfig
         $router->get('superadmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
         $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
+        $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);
+        $router->get('superadmin/restoreBooks', 'SidebarController@restoreBooks', ['superadmin']);
+        $router->get('superadmin/restoreUser', 'SidebarController@restoreUser', ['superadmin']);
+        $router->get('superadmin/restoreEquipment', 'SidebarController@restoreEquipment', ['superadmin']);
 
 
         // Student Sidebar Page Navigation Display

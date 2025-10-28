@@ -1,5 +1,5 @@
 let cart = [];
-let checkedMap = {}; 
+let checkedMap = {};
 
 async function loadCart() {
     try {

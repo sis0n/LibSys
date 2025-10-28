@@ -11,82 +11,511 @@ async function loadCart() {
         console.error("Error loading cart:", err);
     }
 }
-
 async function checkoutCart() {
-    console.log("Checkout button clicked");
-    const selectedIds = Object.keys(checkedMap).filter(id => checkedMap[id]);
-    console.log("Selected IDs for checkout:", selectedIds);
+  console.log("Checkout button clicked");
+  const selectedIds = Object.keys(checkedMap).filter(id => checkedMap[id]);
+  console.log("Selected IDs for checkout:", selectedIds);
 
-    if (selectedIds.length === 0) {
-        alert("Please select at least one item to checkout.");
-        return;
-    }
+  // 🟠 No item selected
+  if (selectedIds.length === 0) {
+    Swal.fire({
+      toast: true,
+      position: "bottom-end",
+      showConfirmButton: false,
+      timer: 3000,
+      width: "360px",
+      background: "transparent",
+      html: `
+        <div class="flex flex-col text-left">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 text-orange-600">
+              <i class="ph ph-warning text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-[15px] font-semibold text-orange-600">Walang Item na Napili</h3>
+              <p class="text-[13px] text-gray-700 mt-0.5">Pumili muna ng kahit isang item bago mag-checkout.</p>
+            </div>
+          </div>
+        </div>
+      `,
+      customClass: {
+        popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm shadow-[0_0_8px_#ffb34770]",
+      },
+    });
+    return;
+  }
 
+  // 🟡 Confirmation Alert
+  const confirmationResult = await Swal.fire({
+    background: "transparent",
+    html: `
+      <div class="flex flex-col text-center">
+        <div class="flex justify-center mb-3">
+          <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+            <i class="ph ph-question text-2xl"></i>
+          </div>
+        </div>
+        <h3 class="text-[17px] font-semibold text-orange-700">Kumpirmahin ang Checkout?</h3>
+        <p class="text-[14px] text-gray-700 mt-1">
+          Iche-checkout mo ang <span class="font-semibold">${selectedIds.length}</span> item. Ipagpatuloy?
+        </p>
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonText: "Oo, Mag-checkout!",
+    cancelButtonText: "Kanselahin",
+    customClass: {
+      popup: "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] shadow-[0_0_8px_#ffb34770]",
+      confirmButton: "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+      cancelButton: "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+    },
+  });
+
+  if (!confirmationResult.isConfirmed) {
+    Swal.fire({
+      toast: true,
+      position: "bottom-end",
+      showConfirmButton: false,
+      timer: 2000,
+      width: "360px",
+      background: "transparent",
+      html: `
+        <div class="flex flex-col text-left">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+              <i class="ph ph-x-circle text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-[15px] font-semibold text-red-600">Kinansela</h3>
+              <p class="text-[13px] text-gray-700 mt-0.5">Ang iyong checkout ay kinansela.</p>
+            </div>
+          </div>
+        </div>
+      `,
+      customClass: {
+        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+      },
+    });
+    return;
+  }
+
+  // 🔵 Loading
+  Swal.fire({
+    background: "transparent",
+    html: `
+      <div class="flex flex-col items-center justify-center gap-2">
+        <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+        <p class="text-gray-700 text-[14px]">Nagpo-proseso...<br><span class="text-sm text-gray-500">Huwag isara ang page.</span></p>
+      </div>
+    `,
+    allowOutsideClick: false,
+    showConfirmButton: false,
+    customClass: {
+      popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] shadow-[0_0_8px_#3b82f670]",
+    },
+  });
+
+  // 🟢 Proceed with checkout logic
+  try {
+    const res = await fetch("/libsys/public/student/cart/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cart_ids: selectedIds }),
+    });
+
+    const text = await res.text();
+    Swal.close();
+
+    let data;
     try {
-        const res = await fetch("/libsys/public/student/cart/checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cart_ids: selectedIds })
-        });
-
-        const text = await res.text();
-        console.log("Raw response:", text);
-
-        let data;
-        try {
-            data = JSON.parse(text);
-        } catch {
-            console.warn("Response was not JSON, maybe redirected or HTML page.");
-            document.open();
-            document.write(text);
-            document.close();
-            return;
-        }
-
-        console.log("Parsed data:", data);
-
-        if (data.success) {
-            alert("Checkout successful! You can now view your QR Borrowing Ticket in the Borrowing Ticket page.");
-            checkedMap = {};
-            loadCart();
-        } else {
-            alert(data.message || "Checkout failed");
-        }
-    } catch (err) {
-        console.error("Checkout error:", err);
-        alert("Something went wrong. Please try again.");
+      data = JSON.parse(text);
+    } catch {
+      document.open();
+      document.write(text);
+      document.close();
+      return;
     }
+
+    if (data.success) {
+      Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 3000,
+        width: "360px",
+        background: "transparent",
+        html: `
+          <div class="flex flex-col text-left">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+                <i class="ph ph-check-circle text-lg"></i>
+              </div>
+              <div>
+                <h3 class="text-[15px] font-semibold text-green-600">Checkout Successful!</h3>
+                <p class="text-[13px] text-gray-700 mt-0.5">
+                  Maaari mo nang tingnan ang iyong QR Borrowing Ticket sa Borrowing Ticket page.
+                </p>
+              </div>
+            </div>
+          </div>
+        `,
+        customClass: {
+          popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] backdrop-blur-sm shadow-[0_0_8px_#22c55e70]",
+        },
+      });
+
+      checkedMap = {};
+      loadCart();
+
+    } else {
+      Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 3000,
+        width: "360px",
+        background: "transparent",
+        html: `
+          <div class="flex flex-col text-left">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                <i class="ph ph-x-circle text-lg"></i>
+              </div>
+              <div>
+                <h3 class="text-[15px] font-semibold text-red-600">Checkout Failed</h3>
+                <p class="text-[13px] text-gray-700 mt-0.5">${data.message || "Checkout failed due to an unknown error."}</p>
+              </div>
+            </div>
+          </div>
+        `,
+        customClass: {
+          popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+        },
+      });
+    }
+  } catch (err) {
+    console.error("Checkout error:", err);
+    Swal.close();
+    Swal.fire({
+      toast: true,
+      position: "bottom-end",
+      showConfirmButton: false,
+      timer: 3000,
+      width: "360px",
+      background: "transparent",
+      html: `
+        <div class="flex flex-col text-left">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+              <i class="ph ph-x-circle text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+              <p class="text-[13px] text-gray-700 mt-0.5">May problema sa koneksyon. Pakisubukan muli.</p>
+            </div>
+          </div>
+        </div>
+      `,
+      customClass: {
+        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+      },
+    });
+  }
 }
+
 
 
 
 async function clearCart() {
-    try {
-        const res = await fetch("/libsys/public/student/cart/clear", {
-            method: "POST"
-        });
-        if (!res.ok) throw new Error("Failed to clear cart");
-        cart = [];
-        alert("are u sure?");
-        renderCart();
-    } catch (err) {
-        console.error(err);
+  try {
+    // 🟠 SweetAlert Confirmation
+    const confirmation = await Swal.fire({
+      background: "transparent",
+      html: `
+        <div class="flex flex-col text-center">
+          <div class="flex justify-center mb-3">
+            <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+              <i class="ph ph-trash text-2xl"></i>
+            </div>
+          </div>
+          <h3 class="text-[17px] font-semibold text-orange-700">I-clear ang Cart?</h3>
+          <p class="text-[14px] text-gray-700 mt-1">
+            Sigurado ka bang gusto mong alisin lahat ng item sa iyong cart?
+          </p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Oo, I-clear!",
+      cancelButtonText: "Kanselahin",
+      customClass: {
+        popup:
+          "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+        confirmButton:
+          "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+        cancelButton:
+          "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+      },
+    });
+
+    if (!confirmation.isConfirmed) {
+      // ❌ Cancel toast
+      Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 2000,
+        width: "360px",
+        background: "transparent",
+        html: `
+          <div class="flex flex-col text-left">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                <i class="ph ph-x-circle text-lg"></i>
+              </div>
+              <div>
+                <h3 class="text-[15px] font-semibold text-red-600">Kinansela</h3>
+                <p class="text-[13px] text-gray-700 mt-0.5">Hindi na-clear ang cart.</p>
+              </div>
+            </div>
+          </div>
+        `,
+        customClass: {
+          popup:
+            "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+        },
+      });
+      return;
     }
+
+    // 🔵 Loading Animation
+    Swal.fire({
+      background: "transparent",
+      html: `
+        <div class="flex flex-col items-center justify-center gap-2">
+          <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+          <p class="text-gray-700 text-[14px]">Nililinis ang cart...<br><span class="text-sm text-gray-500">Sandali lang.</span></p>
+        </div>
+      `,
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      customClass: {
+        popup:
+          "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+      },
+    });
+
+    const res = await fetch("/libsys/public/student/cart/clear", { method: "POST" });
+    if (!res.ok) throw new Error("Failed to clear cart");
+    cart = [];
+
+    // Simulate loading delay (optional)
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    await Swal.close();
+
+    // 🟢 Success Toast
+    Swal.fire({
+      toast: true,
+      position: "bottom-end",
+      showConfirmButton: false,
+      timer: 3000,
+      width: "360px",
+      background: "transparent",
+      html: `
+        <div class="flex flex-col text-left">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+              <i class="ph ph-check-circle text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-[15px] font-semibold text-green-600">Cart Cleared!</h3>
+              <p class="text-[13px] text-gray-700 mt-0.5">Matagumpay na naalis lahat ng item sa iyong cart.</p>
+            </div>
+          </div>
+        </div>
+      `,
+      customClass: {
+        popup:
+          "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
+      },
+    });
+
+    renderCart();
+  } catch (err) {
+    console.error(err);
+
+    // 🔴 Error Toast
+    Swal.fire({
+      toast: true,
+      position: "bottom-end",
+      showConfirmButton: false,
+      timer: 3000,
+      width: "360px",
+      background: "transparent",
+      html: `
+        <div class="flex flex-col text-left">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+              <i class="ph ph-x-circle text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-[15px] font-semibold text-red-600">Error</h3>
+              <p class="text-[13px] text-gray-700 mt-0.5">May problema sa pag-clear ng cart.</p>
+            </div>
+          </div>
+        </div>
+      `,
+      customClass: {
+        popup:
+          "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+      },
+    });
+  }
 }
+
 
 async function removeFromCart(cartId) {
     try {
+        // 🟠 SweetAlert Confirmation
+        const confirmation = await Swal.fire({
+            background: "transparent",
+            html: `
+                <div class="flex flex-col text-center">
+                    <div class="flex justify-center mb-3">
+                        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                            <i class="ph ph-trash text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-[17px] font-semibold text-orange-700">Tanggalin ang Item?</h3>
+                    <p class="text-[14px] text-gray-700 mt-1">
+                        Sigurado ka bang gusto mong alisin ang item na ito sa iyong cart?
+                    </p>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: "Oo, Tanggalin!",
+            cancelButtonText: "Kanselahin",
+            customClass: {
+                popup: "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+                confirmButton: "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+                cancelButton: "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+            },
+        });
+
+        if (!confirmation.isConfirmed) {
+            // ❌ Cancel toast
+            Swal.fire({
+                toast: true,
+                position: "bottom-end",
+                showConfirmButton: false,
+                timer: 2000,
+                width: "360px",
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col text-left">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                <i class="ph ph-x-circle text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-semibold text-red-600">Kinansela</h3>
+                                <p class="text-[13px] text-gray-700 mt-0.5">Hindi natanggal ang item sa cart.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                },
+            });
+            return;
+        }
+
+        // 🔵 Loading Animation
+        Swal.fire({
+            background: "transparent",
+            html: `
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                    <p class="text-gray-700 text-[14px]">Tinatanggal ang item...<br><span class="text-sm text-gray-500">Sandali lang.</span></p>
+                </div>
+            `,
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+            },
+        });
+
         const res = await fetch(`/libsys/public/student/cart/remove/${cartId}`, {
             method: "POST"
         });
         if (!res.ok) throw new Error("Failed to remove item");
+
         cart = cart.filter(item => item.cart_id !== cartId);
-        alert("are u sure?");
+
+        // simulate slight delay
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        await Swal.close();
+
+        // 🟢 Success Toast
+        Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 3000,
+            width: "360px",
+            background: "transparent",
+            html: `
+                <div class="flex flex-col text-left">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+                            <i class="ph ph-check-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[15px] font-semibold text-green-600">Item Removed!</h3>
+                            <p class="text-[13px] text-gray-700 mt-0.5">Matagumpay na natanggal ang item sa iyong cart.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
+            },
+        });
+
         renderCart();
+
     } catch (err) {
         console.error(err);
+        // 🔴 Error Toast
+        Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 3000,
+            width: "360px",
+            background: "transparent",
+            html: `
+                <div class="flex flex-col text-left">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                            <i class="ph ph-x-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[15px] font-semibold text-red-600">Error</h3>
+                            <p class="text-[13px] text-gray-700 mt-0.5">May problema sa pagtanggal ng item.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+            },
+        });
     }
 }
+
 
 // Inalis ang saveCheckedMap() function
 

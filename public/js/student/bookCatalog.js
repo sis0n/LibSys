@@ -130,30 +130,129 @@ window.addEventListener("DOMContentLoaded", () => {
     cartCount.appendChild(document.createTextNode(`${c} item(s)`));
   }
 
-  async function addToCart(id) {
-    if (!id) return;
-    try {
-      const r = await fetch(`/libsys/public/student/cart/add/${id}`);
-      if (!r.ok) throw Error((await r.json()).message || `Err ${r.status}`);
-      const d = await r.json();
-      if (d.success) {
-        cart = d.cart || [];
-        updateCartBadge();
-      }
-      if (typeof Swal != 'undefined') Swal.fire({
-        toast: !0,
+async function addToCart(id) {
+  if (!id) return;
+  try {
+    const r = await fetch(`/libsys/public/student/cart/add/${id}`);
+    if (!r.ok) throw Error((await r.json()).message || `Err ${r.status}`);
+    const d = await r.json();
+
+    if (d.success) {
+      cart = d.cart || [];
+      updateCartBadge();
+    }
+
+    if (typeof Swal != "undefined") {
+      const isSuccess = d.success;
+      const mainTitle = isSuccess ? "Added to Cart" : "Already in Cart";
+      const bodyText = isSuccess
+        ? "The book has been successfully added to your request cart."
+        : "This book is already in your cart or not available for request.";
+      const icon = isSuccess ? "ph-check-circle" : "ph-warning";
+
+      const accentColor = isSuccess ? "text-green-600" : "text-orange-600";
+      const accentBg = isSuccess ? "bg-green-100" : "bg-orange-100";
+      const borderColor = isSuccess ? "border-green-200" : "border-orange-200";
+      const fillColor = isSuccess ? "bg-green-600" : "bg-orange-600";
+
+      const duration = 3000;
+
+      Swal.fire({
+        toast: true,
         position: "bottom-end",
-        icon: d.success ? "success" : "warning",
-        title: d.message || (d.success ? "Added" : "Already in Cart"),
-        showConfirmButton: !1,
-        timer: 2500,
-        timerProgressBar: !0
+        showConfirmButton: false,
+        timer: duration,
+        timerProgressBar: false, // manual bar
+        background: "transparent",
+        width: "360px",
+        html: `
+          <div class="flex flex-col text-left">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full ${accentBg} ${accentColor}">
+                <i class="ph ${icon} text-lg"></i>
+              </div>
+              <div>
+                <h3 class="text-[15px] font-semibold ${accentColor}">${mainTitle}</h3>
+                <p class="text-[13px] text-gray-700 mt-0.5">${bodyText}</p>
+              </div>
+            </div>
+            <div id="swal-progress-bar" class="h-[5px] w-full bg-gray-200 rounded-full overflow-hidden mt-1">
+              <div id="swal-progress-fill" class="h-full w-0 ${fillColor} rounded-full transition-all"></div>
+            </div>
+          </div>
+        `,
+        customClass: {
+          popup: `!rounded-xl !shadow-md ${borderColor} border !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm`,
+        },
+        didOpen: (toast) => {
+          // fade in animation
+          toast.classList.add("animate-[fadeInUp_0.35s_ease-out]");
+          const fill = toast.querySelector("#swal-progress-fill");
+          const start = performance.now();
+
+          function animate(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            fill.style.width = `${progress * 100}%`;
+            if (progress < 1) requestAnimationFrame(animate);
+          }
+
+          requestAnimationFrame(animate);
+        },
       });
-      else alert(d.message || (d.success ? "Added" : "Already in Cart"));
-    } catch (e) {
-      console.error("Add cart err:", e);
+
+      // Tailwind animation keyframes
+      if (!document.getElementById("swal-anim")) {
+        const style = document.createElement("style");
+        style.id = "swal-anim";
+        style.innerHTML = `
+          @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+    } else {
+      alert(d.message || (d.success ? "Added to Cart!" : "Already in Cart / Not Available"));
+    }
+
+  } catch (e) {
+    console.error("Add cart err:", e);
+    if (typeof Swal != "undefined") {
+      Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 3000,
+        background: "transparent",
+        width: "360px",
+        html: `
+          <div class="flex flex-col text-left">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                <i class="ph ph-x-circle text-lg"></i>
+              </div>
+              <div>
+                <h3 class="text-[15px] font-semibold text-red-600">Failed to Add Book</h3>
+                <p class="text-[13px] text-gray-700 mt-0.5">Please try again later.</p>
+              </div>
+            </div>
+          </div>
+        `,
+        customClass: {
+          popup: "!rounded-xl !shadow-md border border-red-200 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm",
+        },
+      });
     }
   }
+}
+
+
+
+
+
   async function removeFromCart(id) {
     if (!id) return;
     try {

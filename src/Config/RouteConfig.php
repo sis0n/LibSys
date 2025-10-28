@@ -165,6 +165,9 @@ class RouteConfig
         // checkout routes
         $router->post('student/cart/checkout', 'TicketController@checkout', ['student']);
         $router->get('student/qrBorrowingTicket', 'TicketController@show', ['student']);
+        $router->get('student/qrBorrowingTicket/checkStatus', 'TicketController@checkStatus');
+        $router->get('faculty/qrBorrowingTicket/checkStatus', 'FacultyTicketController@checkStatus');
+
 
 
 
@@ -178,6 +181,9 @@ class RouteConfig
         $router->post('faculty/cart/remove/{id}', 'FacultyCartController@remove', ['faculty']);
         $router->post('faculty/cart/clear', 'FacultyCartController@clearCart', ['faculty']);
         $router->get('faculty/cart/json', 'FacultyCartController@getCartJson', ['faculty']);
+
+        $router->post('faculty/cart/checkout', 'FacultyTicketController@checkout', ['faculty']);
+        $router->get('faculty/qrBorrowingTicket', 'FacultyTicketController@show', ['faculty']);
         
 
         //change password
@@ -219,6 +225,9 @@ class RouteConfig
         //student profile routes
         $router->get('student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
         $router->post('student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
+
+        $router->get('faculty/myprofile/get', 'FacultyProfileController@getProfile', ['faculty']);
+        $router->post('faculty/myprofile/update', 'FacultyProfileController@updateProfile', ['faculty']);
 
 
         // Superadmin QR Scanner

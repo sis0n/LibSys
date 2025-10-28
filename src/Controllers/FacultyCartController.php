@@ -44,17 +44,40 @@ class FacultyCartController extends Controller
 
   public function add($bookId)
   {
-    $userId = $this->ensureFaculty();
+    if (session_status() === PHP_SESSION_NONE) {
+      session_start();
+    }
+
+    $userId = $_SESSION['user_id'] ?? null;
+    if (!$userId) {
+      http_response_code(401);
+      echo json_encode([
+        'success' => false,
+        'message' => 'Unauthorized. Please log in first.'
+      ]);
+      return;
+    }
+
+    // Kunin ang tamang faculty_id
     $facultyId = $this->getFacultyId($userId);
+    if (!$facultyId) {
+      http_response_code(400);
+      echo json_encode([
+        'success' => false,
+        'message' => 'No faculty record found for this user.'
+      ]);
+      return;
+    }
 
-    $success = $this->cartRepo->addToCart($facultyId, $bookId);
-
-    header('Content-Type: application/json');
-    echo json_encode([
-      "success" => $success,
-      "cart_count" => $this->cartRepo->countCartItems($facultyId)
-    ]);
+    // Add to cart
+    $result = $this->cartRepo->addToCart((int)$facultyId, $bookId);
+    echo json_encode(['success' => $result]);
   }
+
+
+
+
+
 
   public function remove($cartId)
   {

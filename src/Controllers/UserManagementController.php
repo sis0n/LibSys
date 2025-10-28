@@ -279,4 +279,91 @@ class UserManagementController extends Controller
       echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
   }
+
+  public function bulkImport()
+  {
+    header('Content-Type: application/json');
+
+    $imported = 0;
+    $errors = [];
+
+    if (!isset($_FILES['csv_file'])) {
+      echo json_encode(['success' => false, 'message' => 'No file uploaded.']);
+      exit;
+    }
+
+    $file = $_FILES['csv_file']['tmp_name'];
+
+    if (!file_exists($file) || !is_readable($file)) {
+      echo json_encode(['success' => false, 'message' => 'Uploaded file not readable.']);
+      exit;
+    }
+
+    $userRepo = new \App\Repositories\UserRepository();
+
+    if (($handle = fopen($file, 'r')) !== false) {
+      $header = fgetcsv($handle); 
+      $rowNumber = 2;
+
+      while (($row = fgetcsv($handle)) !== false) {
+        $firstName = trim($row[0] ?? '');
+        $middleName = trim($row[1] ?? '');
+        $lastName = trim($row[2] ?? '');
+        $username = trim($row[3] ?? '');
+        $role = trim($row[4] ?? '');
+
+        if (!$firstName || !$lastName || !$username || !$role) {
+          $errors[] = "Row $rowNumber missing required fields";
+          $rowNumber++;
+          continue;
+        }
+
+        $existingUser = $userRepo->findByIdentifier($username);
+        if ($existingUser) {
+          $errors[] = "Row $rowNumber: Username '$username' already exists";
+          $rowNumber++;
+          continue;
+        }
+
+        try {
+          if (strtolower($role) === 'student') {
+            $userRepo->insertStudent([
+              'first_name' => $firstName,
+              'middle_name' => $middleName ?: null,
+              'last_name' => $lastName,
+              'username' => $username,
+              'role' => 'student',
+              'password' => password_hash('defaultpassword', PASSWORD_DEFAULT),
+              'is_active' => 1
+            ]);
+          } else {
+            $userRepo->insertUser([
+              'first_name' => $firstName,
+              'middle_name' => $middleName ?: null,
+              'last_name' => $lastName,
+              'username' => $username,
+              'role' => $role,
+              'password' => password_hash('defaultpassword', PASSWORD_DEFAULT),
+              'is_active' => 1,
+              'created_at' => date('Y-m-d H:i:s')
+            ]);
+          }
+
+          $imported++;
+        } catch (\Exception $e) {
+          $errors[] = "Row $rowNumber: " . $e->getMessage();
+        }
+
+        $rowNumber++;
+      }
+
+      fclose($handle);
+    }
+
+    echo json_encode([
+      'success' => true,
+      'imported' => $imported,
+      'errors' => $errors
+    ]);
+  }
 }

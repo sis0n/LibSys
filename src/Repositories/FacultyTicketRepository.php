@@ -101,7 +101,6 @@ class FacultyTicketRepository
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  // Check faculty profile completion (optional, adjust if needed)
   public function checkProfileCompletion(int $facultyId): array
   {
     $stmt = $this->db->prepare("

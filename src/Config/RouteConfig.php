@@ -246,6 +246,7 @@ class RouteConfig
 
 
         $router->get('student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
+        $router->get('faculty/borrowingHistory/fetch', 'FacultyBorrowingHistoryController@fetchHistory', ['faculty']);
 
         return $router;
     }

@@ -259,6 +259,18 @@ class RouteConfig
         $router->post('librarian/returning/markReturned', 'ReturningController@returnBook', ['librarian']);
         $router->post('librarian/returning/extend', 'ReturningController@extendDueDate', ['librarian']);
 
+        $router->get('superadmin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['superadmin']); 
+        $router->post('superadmin/restoreUser/restore', 'RestoreUserController@restore', ['superadmin']);             
+        $router->post('superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']); 
+
+        $router->get('superadmin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['superadmin']);
+        $router->post('superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);             
+        $router->post('superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['superadmin']);
+
+        $router->get('/superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats');
+        $router->get('/superadmin/backup/database/full', 'BackupController@initiateBackup');
+        $router->get('/superadmin/backup/secure_download/{filename}', 'BackupController@downloadBackup');
+        $router->get('/superadmin/backup/logs', 'BackupController@listBackupLogs');
 
 
         $router->get('student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);

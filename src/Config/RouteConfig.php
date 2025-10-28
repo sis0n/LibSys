@@ -202,6 +202,8 @@ class RouteConfig
         $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
         $router->post('superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
         $router->post('superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
+        $router->post('superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
+
 
         $router->get('superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
         $router->get('superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);

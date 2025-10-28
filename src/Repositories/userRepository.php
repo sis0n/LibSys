@@ -410,4 +410,33 @@ class UserRepository
     $stmt->execute(['identifier' => $identifier]);
     return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
   }
+
+  public function insertStudent(array $data): int
+  {
+    $userId = $this->insertUser([
+      'first_name' => $data['first_name'],
+      'middle_name' => $data['middle_name'] ?? null,
+      'last_name' => $data['last_name'],
+      'username' => $data['username'],
+      'role' => 'student',
+      'password' => $data['password'] ?? password_hash('defaultpassword', PASSWORD_DEFAULT),
+      'is_active' => $data['is_active'] ?? 1,
+      'created_at' => $data['created_at'] ?? date('Y-m-d H:i:s')
+    ]);
+
+    $stmt = $this->db->prepare("
+        INSERT INTO students (user_id, student_number, year_level, course, section)
+        VALUES (:user_id, :student_number, :year_level, :course, :section)
+    ");
+
+    $stmt->execute([
+      ':user_id' => $userId,
+      ':student_number' => $data['username'],
+      ':year_level' => $data['year_level'] ?? 1,
+      ':course' => $data['course'] ?? 'N/A',
+      ':section' => $data['section'] ?? 'N/A'
+    ]);
+
+    return $userId;
+  }
 }

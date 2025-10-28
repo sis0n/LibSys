@@ -47,7 +47,6 @@ class FacultyTicketRepository
     $stmt->execute([$userId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    var_dump($userId, $row); // <--- debug output
     return isset($row['faculty_id']) ? (int)$row['faculty_id'] : null;
   }
 

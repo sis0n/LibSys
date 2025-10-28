@@ -6,7 +6,7 @@
         </div>
         <div class="flex gap-2 text-sm">
             <button
-                class="inline-flex items-center bg-white font-medium border border-orange-200 justify-center px-4 py-2 rounded-lg hover:bg-gray-100 px-4 gap-2"
+                class="inline-flex items-center bg-white font-medium border border-orange-200 justify-center px-4 py-2 rounded-lg hover:bg-gray-100 gap-2"
                 id="download-report-btn">
                 <i class="ph ph-download-simple"></i>
                 Download Report
@@ -31,7 +31,7 @@
         <!-- Weekly Activity Chart -->
         <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
             <div class="mb-4">
-                 <h3 class="text-lg font-medium text-gray-800 flex items-center gap-2">
+                <h3 class="text-lg font-medium text-gray-800 flex items-center gap-2">
                     <i class="ph ph-chart-line text-blue-500"></i>
                     Weekly Activity
                 </h3>
@@ -72,7 +72,9 @@
                         <option value="year" selected>Year</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                        </svg>
                     </div>
                 </div>
             </h3>
@@ -105,7 +107,9 @@
                         <option value="year" selected>Year</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                        </svg>
                     </div>
                 </div>
             </h3>
@@ -144,4 +148,36 @@
         </div>
     </div>
 </main>
+
+<!-- Download Report Modal -->
+<div id="downloadReportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+        <!-- Close button -->
+        <button id="closeModalBtn" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+            <i class="ph ph-x-bold text-lg"></i>
+        </button>
+
+        <h3 class="text-xl font-semibold mb-4">Download Library Report</h3>
+        <p class="text-gray-600 text-sm mb-4">Select the date range for your report.</p>
+
+        <form id="downloadReportForm" class="flex flex-col gap-4">
+            <div>
+                <label for="startDate" class="block text-gray-700 mb-1 font-medium">Start Date</label>
+                <input type="date" id="startDate" name="start_date"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500">
+            </div>
+            <div>
+                <label for="endDate" class="block text-gray-700 mb-1 font-medium">End Date</label>
+                <input type="date" id="endDate" name="end_date"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500">
+            </div>
+
+            <button type="submit"
+                class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-lg transition-colors duration-200">
+                Download
+            </button>
+        </form>
+    </div>
+</div>
+
 <script src="/LibSys/public/js/superadmin/reports.js"></script>

@@ -284,6 +284,19 @@ class RouteConfig
 
 
 
+        /**
+         * ========================
+         * Report / Dashboard Data Routes
+         * ========================
+         */
+
+        $router->get('superadmin/topVisitor/getData', 'ReportController@getReportData', ['superadmin']);
+        $router->get('superadmin/topVisitor/download', 'ReportsController@downloadReportPDF', ['superadmin']);
+
+        
+
+
+
         return $router;
     }
 }

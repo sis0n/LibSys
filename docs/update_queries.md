@@ -324,3 +324,6 @@ ALTER TABLE `staff` ADD CONSTRAINT `fk_staff_deleted_by` FOREIGN KEY (`deleted_b
 ALTER TABLE borrow_transactions
 ADD COLUMN staff_id INT(11) NULL AFTER student_id;
 
+composer require dompdf/dompdf
+
+

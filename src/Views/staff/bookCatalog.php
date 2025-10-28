@@ -168,5 +168,5 @@
         </div>
     </div>
 
-    <script src="/libsys/public/js/student/bookCatalog.js" defer></script>
+    <script src="/libsys/public/js/staff/bookCatalog.js" defer></script>
 </div>        

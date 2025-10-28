@@ -82,6 +82,16 @@ class FacultyTicketController extends Controller
       exit;
     }
 
+    $profileCheck = $this->ticketRepo->checkProfileCompletion($facultyId);
+    if (!$profileCheck['complete']) {
+      http_response_code(400);
+      echo json_encode([
+        'success' => false,
+        'message' => $profileCheck['message']
+      ]);
+      exit;
+    }
+
     $input = json_decode(file_get_contents('php://input'), true);
     $selectedIds = $input['cart_ids'] ?? [];
     if (!is_array($selectedIds)) $selectedIds = [];
@@ -196,7 +206,7 @@ class FacultyTicketController extends Controller
     ];
 
     $transactionData = null;
-    $items = []; 
+    $items = [];
     $qrPath = null;
     $viewMessage = null;
     $viewError = null;
@@ -280,7 +290,7 @@ class FacultyTicketController extends Controller
       "currentPage" => "qrBorrowingTicket",
       "transaction_id" => $transactionData['transaction_id'] ?? null,
       "transaction_code" => $transactionData['transaction_code'] ?? null,
-      "items" => $items, 
+      "items" => $items,
       "qrPath" => $qrPath,
       "faculty" => $facultyInfo,
       "generated_at" => $transactionData['generated_at'] ?? null,
@@ -288,7 +298,7 @@ class FacultyTicketController extends Controller
       "message" => $viewMessage,
       "error_message" => $viewError,
       "isExpired" => $isExpired,
-      "isBorrowed" => $isBorrowed, 
+      "isBorrowed" => $isBorrowed,
     ];
 
     $this->view("faculty/qrBorrowingTicket", $viewData);

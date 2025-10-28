@@ -22,13 +22,15 @@
                 <p class="text-sm text-gray-600 mb-4">
                     Import multiple books from a CSV file or use sample data.
                 </p>
-                <label for="csvFile"
-                    class="block border-2 border-dashed border-[var(--color-border)] rounded-lg p-8 text-center cursor-pointer hover:border-[var(--color-ring)]/60 transition">
-                    <i class="ph ph-upload text-[var(--color-ring)] text-3xl mb-2 block"></i>
-                    <p class="font-medium text-[var(--color-ring)]">Drop CSV file here or click to browse</p>
-                    <p class="text-xs text-gray-500 mt-1">Expected format: accession_number,call_number,title</p>
-                    <input type="file" id="csvFile" accept=".csv" class="hidden" />
-                </label>
+                <form id="bulkImportForm" enctype="multipart/form-data">
+                    <label for="csvFile"
+                        class="block border-2 border-dashed border-[var(--color-border)] rounded-lg p-8 text-center cursor-pointer hover:border-[var(--color-ring)]/60 transition">
+                        <i class="ph ph-upload text-[var(--color-ring)] text-3xl mb-2 block"></i>
+                        <p class="font-medium text-[var(--color-ring)]">Drop CSV file here or click to browse</p>
+                        <p class="text-xs text-gray-500 mt-1">Expected format: accession_number,call_number,title</p>
+                        <input type="file" id="csvFile" accept=".csv" class="hidden" />
+                    </label>
+                </form>
                 <div class="text-center mt-4">
                     <button id="cancelImport"
                         class="mt-2 border border-[var(--color-border)] px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition">
@@ -430,6 +432,9 @@
 
         const paginationControls = document.getElementById("paginationControls");
         const paginationList = document.getElementById("paginationList");
+        const bulkImportForm = document.getElementById("bulkImportForm");
+        const fileInput = document.getElementById("csvFile");
+        const importMessage = document.getElementById("importMessage");
 
         if (!bookTableBody || !addBookModal || !editBookModal || !importModal || !searchInput || !paginationList || !resultsIndicator || !viewBookModal) {
             console.error("BookManagement Error: Core components missing.");
@@ -450,7 +455,52 @@
         const limit = 30;
         let currentPage = 1;
         let totalPages = 1;
-        let currentApiBaseUrl = ''; // Dito ilalagay ang /superadmin, /admin, etc.
+        let currentApiBaseUrl = '';
+
+
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files.length) {
+                bulkImportForm.requestSubmit();
+            }
+        });
+
+        bulkImportForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            console.log("Submit fired!");
+            console.log("Files:", fileInput.files);
+            if (!fileInput.files.length) return;
+
+            const formData = new FormData();
+            formData.append("csv_file", fileInput.files[0]);
+            console.log("Uploading file:", fileInput.files[0].name);
+
+            try {
+                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/bulkImport`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    if (importMessage) {
+                        importMessage.textContent = `Imported: ${data.imported} rows successfully!`;
+                        importMessage.classList.remove("hidden");
+                        setTimeout(() => importMessage.classList.add("hidden"), 5000);
+                    }
+
+                    fileInput.value = "";
+                    closeModal(document.getElementById("importModal"));
+
+                    if (typeof loadUsers === "function") await loadUsers();
+                } else {
+                    alert("Error: " + (data.message || "Failed to import CSV."));
+                }
+            } catch (err) {
+                console.error("Error importing CSV:", err);
+                alert("Error importing CSV.");
+            }
+        });
 
         // --- Page Memory ---
         try {

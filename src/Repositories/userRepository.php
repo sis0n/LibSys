@@ -18,44 +18,108 @@ class UserRepository
   public function findByIdentifier(string $identifier)
   {
     try {
-      // try student_number
+      // ----------- Try student first -----------
       $stmt = $this->db->prepare("
-                SELECT 
-                    u.user_id, u.username, u.password, u.first_name, u.middle_name, u.last_name, u.suffix, u.profile_picture, u.is_active, u.role,
-                    s.student_id, s.student_number, s.year_level, s.course
-                FROM students s
-                LEFT JOIN users u ON u.user_id = s.user_id
-                WHERE UPPER(s.student_number) = UPPER(:identifier)
-                AND u.deleted_at IS NULL
-                LIMIT 1
-            ");
+            SELECT 
+                u.user_id, 
+                u.username, 
+                u.password, 
+                u.first_name, 
+                u.middle_name, 
+                u.last_name, 
+                u.suffix, 
+                u.profile_picture, 
+                u.is_active, 
+                u.role,
+                u.email,
+                s.student_id, 
+                s.student_number, 
+                s.year_level, 
+                s.course,
+                s.section
+            FROM students s
+            LEFT JOIN users u ON u.user_id = s.user_id
+            WHERE UPPER(s.student_number) = UPPER(:identifier)
+            AND u.deleted_at IS NULL
+            LIMIT 1
+        ");
       $stmt->execute(['identifier' => $identifier]);
-      $student = $stmt->fetch(\PDO::FETCH_ASSOC);
+      $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
       if ($student) {
         return $student;
       }
 
-      // fallback by username
+      // ----------- Try by username fallback -----------
       $stmt = $this->db->prepare("
-                SELECT 
-                    u.user_id, u.username, u.password, u.first_name, u.middle_name, u.last_name, u.suffix, u.profile_picture, u.is_active, u.role,
-                    s.student_id, s.student_number, s.year_level, s.course
-                FROM users u
-                LEFT JOIN students s ON u.user_id = s.user_id
-                WHERE LOWER(u.username) = LOWER(:identifier)
-                AND u.deleted_at IS NULL
-                LIMIT 1
-            ");
+            SELECT 
+                u.user_id, 
+                u.username, 
+                u.password, 
+                u.first_name, 
+                u.middle_name, 
+                u.last_name, 
+                u.suffix, 
+                u.profile_picture, 
+                u.is_active, 
+                u.role,
+                u.email,
+                s.student_id, 
+                s.student_number, 
+                s.year_level, 
+                s.course,
+                s.section
+            FROM users u
+            LEFT JOIN students s ON u.user_id = s.user_id
+            WHERE LOWER(u.username) = LOWER(:identifier)
+            AND u.deleted_at IS NULL
+            LIMIT 1
+        ");
       $stmt->execute(['identifier' => $identifier]);
-      $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-      return $user ?: null;
+      if ($user) {
+        return $user;
+      }
+
+      // ----------- Try faculty table if no student found -----------
+      $stmt = $this->db->prepare("
+            SELECT 
+                u.user_id,
+                u.username,
+                u.password,
+                u.first_name,
+                u.middle_name,
+                u.last_name,
+                u.suffix,
+                u.profile_picture,
+                u.is_active,
+                u.role,
+                u.email,
+                f.faculty_id,
+                f.department
+            FROM faculty f
+            LEFT JOIN users u ON u.user_id = f.user_id
+            WHERE LOWER(u.username) = LOWER(:identifier)
+            AND u.deleted_at IS NULL
+            LIMIT 1
+        ");
+      $stmt->execute(['identifier' => $identifier]);
+      $faculty = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($faculty) {
+        $faculty['role'] = 'faculty'; // ensure role is set
+        return $faculty;
+      }
+
+      return null;
     } catch (\PDOException $e) {
       error_log("[UserRepository::findByIdentifier] " . $e->getMessage());
       return null;
     }
   }
+
+
 
   public function insertUser(array $data): int
   {
@@ -333,5 +397,17 @@ class UserRepository
       error_log("[UserRepository::updatePassword]" . $e->getMessage());
       return false;
     }
+  }
+
+  public function findFacultyByIdentifier(string $identifier): ?array
+  {
+    $stmt = $this->db->prepare("
+        SELECT * FROM faculty
+        WHERE (username = :identifier OR email = :identifier)
+        AND deleted_at IS NULL
+        LIMIT 1
+    ");
+    $stmt->execute(['identifier' => $identifier]);
+    return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
   }
 }

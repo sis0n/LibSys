@@ -18,25 +18,20 @@ class QRScannerRepository
   {
     $stmt = $this->db->prepare("
             SELECT 
-                bt.transaction_id, bt.transaction_code, bt.borrowed_at, bt.due_date, bt.status, bt.student_id, bt.faculty_id,
-                
-                -- Student Info
+                bt.transaction_id, bt.transaction_code, bt.borrowed_at, bt.due_date, bt.status,
+                bt.student_id, bt.faculty_id, bt.staff_id,
+
                 s.student_number, s.course, s.year_level, s.section, 
-                
-                -- Faculty Info
                 f.faculty_id AS f_id, f.department,
-                
-                -- User Info (linked via COALESCE to the correct user_id)
-                u.profile_picture, u.first_name, u.last_name, u.middle_name, u.suffix 
+                st.staff_id AS st_id, st.position, st.contact_number,
+                u.profile_picture, u.first_name, u.last_name, u.middle_name, u.suffix
+
             FROM borrow_transactions bt
-            
             LEFT JOIN students s ON bt.student_id = s.student_id
             LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
-            
-            -- Join users table using the user_id from either the student or faculty record
-            LEFT JOIN users u ON u.user_id = COALESCE(s.user_id, f.user_id)
-            
-            WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code) 
+            LEFT JOIN staff st ON bt.staff_id = st.staff_id
+            LEFT JOIN users u ON u.user_id = COALESCE(s.user_id, f.user_id, st.user_id)
+            WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code)
             LIMIT 1
         ");
     $stmt->execute(['code' => trim($code)]);
@@ -50,36 +45,32 @@ class QRScannerRepository
             FROM borrow_transaction_items bti
             JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
             JOIN books b ON bti.book_id = b.book_id
-            WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code) 
+            WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code)
         ");
     $stmt->execute(['code' => trim($code)]);
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
 
-  // Updated method to check borrowed count for both Student and Faculty
   public function getBorrowedCount(string $idColumn, int $idValue, string $currentTransactionCode): int
   {
-    if (!in_array($idColumn, ['student_id', 'faculty_id'])) {
-      // Failsafe: return high number to prevent borrowing if ID column is invalid
+    if (!in_array($idColumn, ['student_id', 'faculty_id', 'staff_id'])) {
       return 99999;
     }
 
-    // Use dynamic column name in the query (must be carefully sanitized/checked first)
     $query = "
             SELECT COUNT(bti.item_id)
             FROM borrow_transactions bt
             JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
             WHERE bt.{$idColumn} = :id_value
-              AND bti.status IN ('pending', 'borrowed')
+              AND bti.status IN ('pending','borrowed')
               AND bt.transaction_code != :current_code
         ";
-
     $stmt = $this->db->prepare($query);
     $stmt->execute([
       'id_value' => $idValue,
       'current_code' => $currentTransactionCode
     ]);
-    return (int) $stmt->fetchColumn();
+    return (int)$stmt->fetchColumn();
   }
 
   public function saveBorrowing(array $data)
@@ -120,7 +111,7 @@ class QRScannerRepository
     }
   }
 
-  public function processBorrowing(string $transactionCode, ?int $librarianId = null)
+  public function processBorrowing(string $transactionCode, ?int $staffId = null)
   {
     try {
       $this->db->beginTransaction();
@@ -128,7 +119,7 @@ class QRScannerRepository
       $dueDate = date('Y-m-d H:i:s', strtotime('+7 days'));
 
       $stmt = $this->db->prepare("
-                UPDATE borrow_transactions 
+                UPDATE borrow_transactions
                 SET status = 'borrowed',
                     borrowed_at = NOW(),
                     due_date = :due_date,
@@ -138,7 +129,7 @@ class QRScannerRepository
       $stmt->execute([
         'code' => $transactionCode,
         'due_date' => $dueDate,
-        'librarian_id' => $librarianId
+        'librarian_id' => $staffId
       ]);
 
       $transactionIdStmt = $this->db->prepare("SELECT transaction_id FROM borrow_transactions WHERE transaction_code = :code");
@@ -146,15 +137,14 @@ class QRScannerRepository
       $transactionId = $transactionIdStmt->fetchColumn();
 
       $stmtItemStatus = $this->db->prepare("
-                UPDATE borrow_transaction_items 
-                SET status = 'borrowed' 
+                UPDATE borrow_transaction_items
+                SET status = 'borrowed'
                 WHERE transaction_id = :transaction_id AND status = 'pending'
             ");
       $stmtItemStatus->execute(['transaction_id' => $transactionId]);
 
       $items = $this->getTransactionItems($transactionCode);
       $stmtBook = $this->db->prepare("UPDATE books SET availability = 'borrowed' WHERE book_id = :book_id");
-
       foreach ($items as $item) {
         $stmtBook->execute(['book_id' => $item['book_id']]);
       }

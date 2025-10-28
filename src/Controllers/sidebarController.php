@@ -485,7 +485,8 @@ class SidebarController extends Controller
 
     public function librarianQrScanner()
     {
-        $this->view("librarian/qrScanner", [
+        $this->view("librarian/qrScanner"
+        , [
             "title" => "Librarian QR Code Scanner",
             "currentPage" => "qrScanner"
         ]);

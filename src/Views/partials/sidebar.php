@@ -68,7 +68,7 @@ switch ($role) {
                 <i class="ph ph-house text-2xl"></i>
                 <span class="text-base">Dashboard</span>
             </a>
-                <!-- Book Catalog -->
+            <!-- Book Catalog -->
             <a href="/libsys/public/student/bookCatalog"
                 class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'bookCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-book text-2xl"></i>
@@ -157,30 +157,11 @@ switch ($role) {
                 <i class="ph ph-house text-2xl"></i>
                 <span class="text-base">Dashboard</span>
             </a>
-            <!-- Library Catalog Dropdown -->
-            <div class="sidebar-dropdown" data-pages='["bookCatalog", "equipmentCatalog"]'>
-                <button
-                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
-                    <span class="flex items-center gap-x-3">
-                        <i class="ph ph-books text-2xl"></i>
-                        <span class="text-base">Library Catalog</span>
-                    </span>
-                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
-                </button>
-                <div class="pl-5 pt-1 space-y-1 hidden">
-                    <a href="/libsys/public/faculty/bookCatalog"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'bookCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-book text-xl"></i>
-                        <span class="text-base text-sm">Book Catalog</span>
-                    </a>
-                    <a href="/libsys/public/faculty/equipmentCatalog"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'equipmentCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-desktop-tower text-xl"></i>
-                        <span class="text-base text-sm">Equipment Catalog</span>
-                    </a>
-                </div>
-            </div>
-
+            <a href="/libsys/public/faculty/bookCatalog"
+                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'bookCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-book text-2xl"></i>
+                <span class="text-base">Book Catalog</span>
+            </a>
             <!-- Borrowings Dropdown -->
             <div class="sidebar-dropdown" data-pages='["myCart", "qrBorrowingTicket"]'>
                 <button
@@ -257,29 +238,11 @@ switch ($role) {
                 <span class="text-base">Dashboard</span>
             </a>
 
-            <!-- Library Catalog Dropdown -->
-            <div class="sidebar-dropdown" data-pages='["bookCatalog", "equipmentCatalog"]'>
-                <button
-                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
-                    <span class="flex items-center gap-x-3">
-                        <i class="ph ph-books text-2xl"></i>
-                        <span class="text-base">Library Catalog</span>
-                    </span>
-                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
-                </button>
-                <div class="pl-5 pt-1 space-y-1 hidden">
-                    <a href="/libsys/public/staff/bookCatalog"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'bookCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-book text-xl"></i>
-                        <span class="text-base text-sm">Book Catalog</span>
-                    </a>
-                    <a href="/libsys/public/staff/equipmentCatalog"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'equipmentCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-desktop-tower text-xl"></i>
-                        <span class="text-base text-sm">Equipment Catalog</span>
-                    </a>
-                </div>
-            </div>
+            <a href="/libsys/public/staff/bookCatalog"
+                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'bookCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-book text-2xl"></i>
+                <span class="text-base">Book Catalog</span>
+            </a>
 
             <!-- Borrowings Dropdown -->
             <div class="sidebar-dropdown" data-pages='["myCart", "qrBorrowingTicket"]'>
@@ -357,7 +320,7 @@ switch ($role) {
             </a>
 
             <!-- Library Management Dropdown -->
-            <div class="sidebar-dropdown" data-pages='["userManagement", "bookManagement", "equipmentManagement"]'>
+            <div class="sidebar-dropdown" data-pages='["userManagement","bookManagement"]'>
                 <button
                     class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
                     <span class="flex items-center gap-x-3">
@@ -376,11 +339,6 @@ switch ($role) {
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'bookManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                         <i class="ph ph-book-open text-xl"></i>
                         <span class="text-base text-sm">Book Management</span>
-                    </a>
-                    <a href="/LibSys/public/superadmin/equipmentManagement"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'equipmentManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-desktop-tower text-xl"></i>
-                        <span class="text-base text-sm">Equipment Management</span>
                     </a>
                 </div>
             </div>
@@ -444,7 +402,7 @@ switch ($role) {
             </div>
 
             <!-- Backup & Restore Dropdown -->
-            <div class="sidebar-dropdown" data-pages='["backup", "restoreBooks", "restoreEquipment", "restoreUser"]'>
+            <div class="sidebar-dropdown" data-pages='["backup", "restoreBooks", "restoreUser"]'>
                 <button
                     class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
                     <span class="flex items-center gap-x-3">
@@ -463,11 +421,6 @@ switch ($role) {
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreBooks' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                         <i class="ph ph-book text-xl"></i>
                         <span class="text-base text-sm">Restore Books</span>
-                    </a>
-                    <a href="/LibSys/public/superadmin/restoreEquipment"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreEquipment' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-wrench text-xl"></i>
-                        <span class="text-base text-sm">Restore Equipment</span>
                     </a>
                     <a href="/LibSys/public/superadmin/restoreUser"
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -492,30 +445,11 @@ switch ($role) {
                 <i class="ph ph-house text-2xl"></i>
                 <span>Dashboard</span>
             </a>
-
-            <!-- Library Management Dropdown -->
-            <div class="sidebar-dropdown" data-pages='["bookManagement", "equipmentManagement"]'>
-                <button
-                    class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
-                    <span class="flex items-center gap-x-3">
-                        <i class="ph ph-folders text-2xl"></i>
-                        <span class="text-base">Management</span>
-                    </span>
-                    <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
-                </button>
-                <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                    <a href="/LibSys/public/<?= $roleFolder ?>/bookManagement"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'bookManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-book-open text-xl"></i>
-                        <span class="text-base text-sm">Book Management</span>
-                    </a>
-                    <a href="/LibSys/public/<?= $roleFolder ?>/equipmentManagement"
-                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'equipmentManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-desktop-tower text-xl"></i>
-                        <span class="text-base text-sm">Equipment Management</span>
-                    </a>
-                </div>
-            </div>
+            <a href="/LibSys/public/<?= $roleFolder ?>/bookManagement"
+                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'bookManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                <i class="ph ph-book-open text-2xl"></i>
+                <span class="text-base">Book Management</span>
+            </a>
 
             <!-- QR & Returning Dropdown -->
             <div class="sidebar-dropdown" data-pages='["qrScanner", "returning"]'>
@@ -538,13 +472,13 @@ switch ($role) {
                         <i class="ph ph-arrow-counter-clockwise text-xl"></i>
                         <span class="text-sm text-base">Returning</span>
                     </a>
-                    
+
                     <a href="/LibSys/public/<?= $roleFolder ?>/borrowingForm"
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'BorrowingForm' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                         <i class="ph ph-receipt text-xl"></i>
                         <span class="text-sm text-base">Borrowing Form</span>
                     </a>
-                    
+
                 </div>
             </div>
 

@@ -203,7 +203,7 @@ class ReturningRepository
                        s.student_number AS student_id, s.course, s.year_level, s.section,
                        f.faculty_id AS faculty_id, f.department AS faculty_dept,
                        st.staff_id AS staff_id, st.position AS department,
-                       u.email, COALESCE(s.contact, f.contact, st.contact_number) AS contact_number
+                       u.email, COALESCE(s.contact, f.contact, st.contact) AS contact_number
                 FROM borrow_transaction_items bti
                 JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
                 LEFT JOIN students s ON bt.student_id = s.student_id

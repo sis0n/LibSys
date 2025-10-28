@@ -13,7 +13,6 @@ class QRScannerRepository
     $this->db = Database::getInstance()->getConnection();
   }
 
-  // Updated method to handle both Student and Faculty transactions
   public function getTransactionDetailsByCode(string $code)
   {
     $stmt = $this->db->prepare("
@@ -23,7 +22,7 @@ class QRScannerRepository
 
                 s.student_number, s.course, s.year_level, s.section, 
                 f.faculty_id AS f_id, f.department,
-                st.staff_id AS st_id, st.position, st.contact_number,
+                st.staff_id AS st_id, st.position, st.contact,
                 u.profile_picture, u.first_name, u.last_name, u.middle_name, u.suffix
 
             FROM borrow_transactions bt

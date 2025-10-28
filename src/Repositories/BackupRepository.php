@@ -82,7 +82,14 @@ class BackupRepository
 
   public function getAllBackupLogs(): array
   {
-    $stmt = $this->db->query("SELECT * FROM backup_log ORDER BY created_at DESC");
+    $stmt = $this->db->query("
+            SELECT 
+                bl.*, 
+                IFNULL(CONCAT(u.first_name, ' ', u.last_name), 'Unknown User') AS created_by_name 
+            FROM backup_log bl
+            LEFT JOIN users u ON bl.created_by = u.user_id 
+            ORDER BY bl.created_at DESC
+        ");
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
 }

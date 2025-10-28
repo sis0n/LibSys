@@ -1,5 +1,5 @@
 <!-- DASHBOARD MAIN CONTENT -->
-<main class="min-h-[85vh]px-4 sm:px-6 md:px-10 flex flex-col gap-8 ">
+<main class="min-h-min px-4 sm:px-6 md:px-10 flex flex-col gap-8 ">
 
   <!-- Welcome Section -->
   <section class="py-0">
@@ -28,15 +28,15 @@
 
     <a href="bookManagement" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
       <i class="ph ph-books text-xl mr-2 align-middle"></i>
-      Book Catalog
+      Book Management
     </a>
 
-    <a href="#" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
-      <i class="ph ph-warning-circle text-xl mr-2 align-middle"></i>
+    <a href="returning" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
+     <i class="ph ph-swap text-xl mr-2 align-middle"></i>
      Returning Books
     </a>
 
-    <a href="#" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
+    <a href="topVisitor" class="flex items-center justify-center bg-white border border-gray-200 text-gray-800 font-semibold py-4 px-6 rounded-lg shadow hover:bg-orange-500 hover:text-white hover:border-orange-500 transition w-full sm:w-56">
       <i class="ph ph-activity text-xl mr-2 align-middle"></i>
       Analytics
     </a>

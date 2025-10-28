@@ -152,12 +152,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/faculty/myProfile"
+                        <a href="/libsys/public/student/myProfile"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myProfile') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-user-circle text-xl"></i>
                             <span class="text-base text-sm">Profile</span>
                         </a>
-                        <a href="/libsys/public/faculty/changePassword"
+                        <a href="/libsys/public/student/changePassword"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-key text-xl"></i>
                             <span class="text-base text-sm">Change Password</span>

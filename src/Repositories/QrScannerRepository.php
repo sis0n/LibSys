@@ -13,16 +13,29 @@ class QRScannerRepository
     $this->db = Database::getInstance()->getConnection();
   }
 
-  public function getStudentByTransactionCode(string $code)
+  // Updated method to handle both Student and Faculty transactions
+  public function getTransactionDetailsByCode(string $code)
   {
     $stmt = $this->db->prepare("
             SELECT 
-                s.student_id, s.student_number, s.course, s.year_level, s.section, s.user_id,
-                bt.transaction_code, bt.borrowed_at, bt.due_date, bt.status,
+                bt.transaction_id, bt.transaction_code, bt.borrowed_at, bt.due_date, bt.status, bt.student_id, bt.faculty_id,
+                
+                -- Student Info
+                s.student_number, s.course, s.year_level, s.section, 
+                
+                -- Faculty Info
+                f.faculty_id AS f_id, f.department,
+                
+                -- User Info (linked via COALESCE to the correct user_id)
                 u.profile_picture, u.first_name, u.last_name, u.middle_name, u.suffix 
             FROM borrow_transactions bt
-            JOIN students s ON bt.student_id = s.student_id
-            JOIN users u ON s.user_id = u.user_id
+            
+            LEFT JOIN students s ON bt.student_id = s.student_id
+            LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
+            
+            -- Join users table using the user_id from either the student or faculty record
+            LEFT JOIN users u ON u.user_id = COALESCE(s.user_id, f.user_id)
+            
             WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code) 
             LIMIT 1
         ");
@@ -43,18 +56,27 @@ class QRScannerRepository
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
 
-  public function getStudentBorrowedCount(int $studentId, string $currentTransactionCode): int
+  // Updated method to check borrowed count for both Student and Faculty
+  public function getBorrowedCount(string $idColumn, int $idValue, string $currentTransactionCode): int
   {
-    $stmt = $this->db->prepare("
+    if (!in_array($idColumn, ['student_id', 'faculty_id'])) {
+      // Failsafe: return high number to prevent borrowing if ID column is invalid
+      return 99999;
+    }
+
+    // Use dynamic column name in the query (must be carefully sanitized/checked first)
+    $query = "
             SELECT COUNT(bti.item_id)
             FROM borrow_transactions bt
             JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
-            WHERE bt.student_id = :student_id 
+            WHERE bt.{$idColumn} = :id_value
               AND bti.status IN ('pending', 'borrowed')
               AND bt.transaction_code != :current_code
-        ");
+        ";
+
+    $stmt = $this->db->prepare($query);
     $stmt->execute([
-      'student_id' => $studentId,
+      'id_value' => $idValue,
       'current_code' => $currentTransactionCode
     ]);
     return (int) $stmt->fetchColumn();
@@ -106,13 +128,13 @@ class QRScannerRepository
       $dueDate = date('Y-m-d H:i:s', strtotime('+7 days'));
 
       $stmt = $this->db->prepare("
-            UPDATE borrow_transactions 
-            SET status = 'borrowed',
-                borrowed_at = NOW(),
-                due_date = :due_date,
-                librarian_id = :librarian_id
-            WHERE transaction_code = :code AND status = 'pending'
-        ");
+                UPDATE borrow_transactions 
+                SET status = 'borrowed',
+                    borrowed_at = NOW(),
+                    due_date = :due_date,
+                    librarian_id = :librarian_id
+                WHERE transaction_code = :code AND status = 'pending'
+            ");
       $stmt->execute([
         'code' => $transactionCode,
         'due_date' => $dueDate,
@@ -124,10 +146,10 @@ class QRScannerRepository
       $transactionId = $transactionIdStmt->fetchColumn();
 
       $stmtItemStatus = $this->db->prepare("
-            UPDATE borrow_transaction_items 
-            SET status = 'borrowed' 
-            WHERE transaction_id = :transaction_id AND status = 'pending'
-        ");
+                UPDATE borrow_transaction_items 
+                SET status = 'borrowed' 
+                WHERE transaction_id = :transaction_id AND status = 'pending'
+            ");
       $stmtItemStatus->execute(['transaction_id' => $transactionId]);
 
       $items = $this->getTransactionItems($transactionCode);
@@ -151,18 +173,25 @@ class QRScannerRepository
   {
     $query = "
             SELECT 
-                s.student_number, 
+                -- Identify the user type and ID
+                COALESCE(s.student_number, f.faculty_id) AS user_identifier,
                 s.student_id, 
+                f.faculty_id,
+                
                 bt.transaction_code, 
                 bt.borrowed_at, 
                 bt.status,
                 MAX(bti.returned_at) AS returned_at,
                 COUNT(bti.book_id) AS items_borrowed,
-                u.first_name, u.last_name, u.middle_name, u.suffix
+                u.first_name, u.last_name, u.middle_name, u.suffix,
+                
+                -- Additional context fields
+                s.course, f.department
             FROM borrow_transactions bt
-            JOIN students s ON bt.student_id = s.student_id
+            LEFT JOIN students s ON bt.student_id = s.student_id
+            LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
+            LEFT JOIN users u ON u.user_id = COALESCE(s.user_id, f.user_id)
             JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
-            JOIN users u ON s.user_id = u.user_id
             WHERE 1=1
             AND bt.status IN ('borrowed', 'returned', 'pending')
         ";
@@ -170,7 +199,7 @@ class QRScannerRepository
     $params = [];
 
     if ($search) {
-      $query .= " AND (s.student_number LIKE :search OR s.student_id LIKE :search OR bt.transaction_code LIKE :search)";
+      $query .= " AND (s.student_number LIKE :search OR f.faculty_id LIKE :search OR bt.transaction_code LIKE :search)";
       $params['search'] = "%$search%";
     }
 
@@ -184,7 +213,12 @@ class QRScannerRepository
       $params['date'] = $date;
     }
 
-    $query .= " GROUP BY bt.transaction_id, s.student_number, s.student_id, bt.transaction_code, bt.borrowed_at, bt.status, u.first_name, u.last_name, u.middle_name, u.suffix ORDER BY bt.borrowed_at DESC";
+    $query .= " GROUP BY 
+            bt.transaction_id, bt.transaction_code, bt.borrowed_at, bt.status, 
+            s.student_number, s.student_id, s.course, 
+            f.faculty_id, f.department,
+            u.first_name, u.last_name, u.middle_name, u.suffix
+            ORDER BY bt.borrowed_at DESC";
 
     $stmt = $this->db->prepare($query);
     $stmt->execute($params);
@@ -200,11 +234,11 @@ class QRScannerRepository
   public function expireOldPendingTransactions(): void
   {
     $stmt = $this->db->prepare("
-        SELECT transaction_id 
-        FROM borrow_transactions
-        WHERE status = 'pending'
-          AND expires_at <= NOW()
-    ");
+            SELECT transaction_id 
+            FROM borrow_transactions
+            WHERE status = 'pending'
+              AND expires_at <= NOW()
+        ");
     $stmt->execute();
     $expiredTransactions = $stmt->fetchAll(\PDO::FETCH_COLUMN);
 
@@ -212,25 +246,25 @@ class QRScannerRepository
       $idsPlaceholders = implode(',', array_fill(0, count($expiredTransactions), '?'));
 
       $updateTrans = $this->db->prepare("
-            UPDATE borrow_transactions
-            SET status = 'expired'
-            WHERE transaction_id IN ($idsPlaceholders)
-        ");
+                UPDATE borrow_transactions
+                SET status = 'expired'
+                WHERE transaction_id IN ($idsPlaceholders)
+            ");
       $updateTrans->execute($expiredTransactions);
 
       $updateItems = $this->db->prepare("
-            UPDATE borrow_transaction_items
-            SET status = 'expired'
-            WHERE transaction_id IN ($idsPlaceholders)
-        ");
+                UPDATE borrow_transaction_items
+                SET status = 'expired'
+                WHERE transaction_id IN ($idsPlaceholders)
+            ");
       $updateItems->execute($expiredTransactions);
 
       $updateBooks = $this->db->prepare("
-            UPDATE books b
-            JOIN borrow_transaction_items bti ON b.book_id = bti.book_id
-            SET b.availability = 'available'
-            WHERE bti.transaction_id IN ($idsPlaceholders)
-        ");
+                UPDATE books b
+                JOIN borrow_transaction_items bti ON b.book_id = bti.book_id
+                SET b.availability = 'available'
+                WHERE bti.transaction_id IN ($idsPlaceholders)
+            ");
       $updateBooks->execute($expiredTransactions);
     }
   }

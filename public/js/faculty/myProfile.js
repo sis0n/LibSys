@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 editProfileBtn.classList.remove('hidden');
-                uploadLabel.classList.add('hidden'); 
+                uploadLabel.classList.add('hidden');
                 // uploadLabel.classList.remove('hidden');
             } else {
                 throw new Error(data.message || 'Could not parse profile data.');

@@ -95,6 +95,55 @@
         </div>
     </div>
 
+    <!-- Checked Out Items Section -->
+    <div id="checkedOutSection" class="space-y-6 mt-6">
+        <?php if (!empty($books) && count($books) > 0): ?>
+        <div class="p-4 border border-amber-200 bg-amber-50 rounded-lg flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="ph ph-qr-code text-2xl text-amber-600"></i>
+                <div>
+                    <h3 class="font-medium text-amber-900">Checked Out Items</h3>
+                    <p class="text-sm text-amber-700">Items included in this QR checkout ticket</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-2xl font-bold text-amber-700"><?= count($books) ?></p>
+                <p class="text-xs text-amber-600">Total Item(s)</p>
+            </div>
+        </div>
+
+        <div class="border-t border-x border-green-300 bg-green-50 rounded-xl">
+            <div class="p-4 flex items-center justify-between border-b border-green-200">
+                <h4 class="font-medium text-green-700 flex items-center gap-2">
+                    <i class="ph ph-book text-lg"></i> Books (<?= count($books) ?>)
+                </h4>
+            </div>
+
+            <?php foreach ($books as $index => $book): ?>
+            <div class="bg-white p-4 flex gap-3 rounded-b-lg border-b border-green-300 ">
+                <div class="flex items-center">
+                    <i class="ph ph-book-open text-3xl text-green-500"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium"><?= htmlspecialchars($book["title"]) ?></p>
+                    <p class="text-sm text-gray-600">by <?= htmlspecialchars($book["author"]) ?></p>
+                    <div class="flex flex-wrap gap-2 mt-2 text-xs">
+                        <span class="px-2 py-1 bg-gray-100 rounded">Accession #:
+                            <?= htmlspecialchars($book["accession_number"] ?? "N/A") ?></span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">Call #:
+                            <?= htmlspecialchars($book["call_number"] ?? "N/A") ?></span>
+                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Subject:
+                            <?= htmlspecialchars($book["subject"] ?? "N/A") ?></span>
+                    </div>
+                </div>
+                <span
+                    class="w-6 h-6 flex items-center justify-center rounded-full bg-green-600 text-white text-xs font-bold"><?= $index + 1 ?></span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
 
@@ -105,14 +154,19 @@
             const ticketCode = document.querySelector('#ticket_code span');
             const generatedDate = document.getElementById('generated_date');
             const dueDate = document.getElementById('due_date');
+            const checkedOutSection = document.getElementById('checkedOutSection'); // ✅ Added
 
             // Hide QR image
             if (qrImage) qrImage.style.display = 'none';
 
+            // Hide Checked Out Items when resetting
+            if (checkedOutSection) checkedOutSection.style.display = 'none'; // ✅ Added
+
             // Reset message
             if (ticketMessageDiv) {
                 ticketMessageDiv.innerText = "You do not currently have an active borrowing ticket.";
-                    ticketMessageDiv.classList.add('text-red-500');
+                ticketMessageDiv.classList.add('text-red-500');
+                ticketMessageDiv.style.display = 'block';
             }
 
             // Disable download button
@@ -134,12 +188,16 @@
             const generatedDate = document.getElementById('generated_date');
             const dueDate = document.getElementById('due_date');
             const ticketMessageDiv = document.getElementById('ticket-message');
+            const checkedOutSection = document.getElementById('checkedOutSection'); // ✅ Added
 
             // Hide the "no active ticket" message
             if (ticketMessageDiv) ticketMessageDiv.style.display = 'none';
 
             // Show QR image
             if (qrImage) qrImage.style.display = 'block';
+
+            // Show Checked Out Section (for pending)
+            if (checkedOutSection) checkedOutSection.style.display = 'block'; // ✅ Added
 
             // Enable download button
             if (downloadButton) {
@@ -152,6 +210,7 @@
             if (generatedDate) generatedDate.style.display = 'block';
             if (dueDate) dueDate.style.display = 'block';
         }
+
 
         let isChecking = false;
 

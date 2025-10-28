@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
     noRecordsRow.classList.remove('hidden');
     noRecordsRow.querySelector('td').innerHTML = `<i class="ph ph-spinner animate-spin text-2xl"></i> Loading...`;
 
-    const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
+    const url = new URL(`${BASE_URL}/attendance/logs/ajax`, window.location.origin);
     url.searchParams.append('period', periodToSend);
     url.searchParams.append('search', currentSearch);
     if (currentCourse !== "All Courses") {

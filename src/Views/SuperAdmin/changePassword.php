@@ -18,7 +18,7 @@
         Update your account password to keep your account secure.
       </p>
 
-      <form id="passwordForm" action="/libsys/public/change-password" method="POST" class="space-y-4">
+      <form id="passwordForm" action="<?= base_url('change-password') ?>" method="POST" class="space-y-4">
 
         <div>
           <label class="block text-gray-700 text-sm font-medium mb-1">
@@ -137,6 +137,6 @@
   </div>
 </div>
 
-<script src="/libsys/public/js/superadmin/changePassword.js" defer></script>
+<script src="<?= base_url('js/superadmin/changePassword.js') ?>" defer></script>
 
 </body>

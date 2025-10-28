@@ -1,6 +1,6 @@
 const scanResultCard = document.getElementById('scanResultCard');
 const transactionHistoryTableBody = document.getElementById('transactionHistoryTableBody');
-const defaultAvatar = `/LibSys/public/img/default_avatar.png`;
+const defaultAvatar = `${BASE_URL}/img/default_avatar.png`;
 
 const searchInput = document.getElementById('transactionSearchInput');
 const dateInput = document.getElementById('transactionDate');

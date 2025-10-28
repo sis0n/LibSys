@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tableBody.appendChild(noRecordsRow);
 
 
-    const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
+    const url = new URL(`${BASE_URL}/attendance/logs/ajax`, window.location.origin);
 
     url.searchParams.append('period', periodToSend);
     url.searchParams.append('search', currentSearch);

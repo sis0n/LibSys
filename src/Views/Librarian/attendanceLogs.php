@@ -164,5 +164,5 @@ foreach ($logs as $log) {
         </div>
     </div>
 
-    <script src="/libsys/public/js/librarian/attendanceLogs.js" defer></script>
+    <script src="<?=base_url('js/librarian/attendanceLogs.js')?>" defer></script>
 </body>

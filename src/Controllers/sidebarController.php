@@ -13,7 +13,7 @@ class SidebarController extends Controller
     {
         $this->view("student/dashboard", [
             "title" => "Student Dashboard",
-            "currentPage" => "dashboard"
+            "currentPage" => "dashboard",
         ]);
     }
 

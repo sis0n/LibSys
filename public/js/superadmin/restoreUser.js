@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchDeletedUsers() {
         showLoadingState();
         try {
-            const response = await fetch('/libsys/public/superadmin/restoreUser/fetch');
+            const response = await fetch(`${BASE_URL}/superadmin/restoreUser/fetch`);
             const data = await response.json();
 
             if (data.success && Array.isArray(data.users)) {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     restoreBtn.disabled = true;
                     restoreBtn.classList.add('opacity-50');
                     try {
-                        const response = await fetch('/libsys/public/superadmin/restoreUser/restore', {
+                        const response = await fetch(`${BASE_URL}/superadmin/restoreUser/restore`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     archiveBtn.disabled = true;
                     archiveBtn.classList.add('opacity-50');
                     try {
-                        const response = await fetch(`/libsys/public/superadmin/restoreUser/delete/${user.id}`, {
+                        const response = await fetch(`${BASE_URL}superadmin/restoreUser/delete/${user.id}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

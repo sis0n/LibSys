@@ -35,7 +35,7 @@ class BookManagementController extends Controller
         $fileName = uniqid('book_', true) . '.' . $extension;
         $targetFile = $targetDir . $fileName;
         if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-            return "/libsys/public/" . $targetFile;
+            return base_url($targetFile);
         }
         return null;
     }
@@ -145,11 +145,18 @@ class BookManagementController extends Controller
         $deletedByUserId = $_SESSION['user_id'] ?? null;
         if ($deletedByUserId === null) {
             return $this->json(['success' => false, 'message' => 'Authentication required.'], 401);
-        }
-
-        try {
-            $success = $this->bookRepo->deleteBook($id, $deletedByUserId);
-
+         }
+         
+         try {
+            $book = $this->bookRepo->findBookById($id);
+            if ($book && !empty($book['cover'])) {
+                $baseUrl = rtrim($_ENV['APP_URL'] ?? '', '/');
+                $filePath = str_replace($baseUrl, "/", '' , $book['cover']); 
+               if (file_exists($filePath)) { unlink($filePath); }
+            }
+             
+            $success = $this->bookRepo->deleteBook($id, $deletedByUserId); 
+            
             if ($success) {
                 $this->json(['success' => true, 'message' => 'Book deleted successfully!']);
             } else {

@@ -155,7 +155,8 @@ foreach ($logs as $log) {
         </div>
     </div>
 
-    <script src="/libsys/public/js/superadmin/attendanceLogs.js" defer></script>
+    <script src="<?= base_url('js/superadmin/attendanceLogs.js') ?>" defer></script>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

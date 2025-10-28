@@ -6,6 +6,18 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use App\Config\RouteConfig;
 
+if(file_exists(__DIR__ . '/../.env')){
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
+}
+
+if(!function_exists('base_url')){
+    function base_url($path = ''){
+        $base = rtrim($_ENV['APP_URL'] ?? '', '/');    
+        return $base . '/' . ltrim($path, '/');
+    }
+}
+
 // pangload lang ng routes - check mo na lang sa routeconfig.php
 $router = RouteConfig::register();
 

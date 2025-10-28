@@ -200,4 +200,4 @@
 
 <input type="hidden" id="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
-<script src="/libsys/public/js/superadmin/restoreUser.js"></script>
+<script src="<?=base_url('js/superadmin/restoreUser.js') ?>"></script>

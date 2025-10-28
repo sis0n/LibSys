@@ -340,7 +340,7 @@ class TicketController extends Controller
         'status' => 'pending',
         'transaction_code' => $pendingTransaction['transaction_code'],
         'generated_at' => $pendingTransaction['generated_at'],
-        'expires_at' => $pendingTransaction['expires_at']
+        'expires_at' => isset($pendingTransaction['expires_at']) ? $pendingTransaction['expires_at'] : null
       ]);
     } else {
       $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByStudentId($studentId);

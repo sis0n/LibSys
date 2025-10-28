@@ -244,6 +244,22 @@ class RouteConfig
         $router->post('librarian/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['librarian']); // <-- Add this
         $router->get('librarian/qrScanner/transactionHistory', 'QRScannerController@history', ['librarian']);
 
+        $router->get('superadmin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['superadmin']);
+        $router->post('superadmin/returning/checkBook', 'ReturningController@checkBookStatus', ['superadmin']);
+        $router->post('superadmin/returning/markReturned', 'ReturningController@returnBook', ['superadmin']);
+        $router->post('superadmin/returning/extend', 'ReturningController@extendDueDate', ['superadmin']);
+
+        $router->get('admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['admin']);
+        $router->post('admin/returning/checkBook', 'ReturningController@checkBookStatus', ['admin']);
+        $router->post('admin/returning/markReturned', 'ReturningController@returnBook', ['admin']);
+        $router->post('admin/returning/extend', 'ReturningController@extendDueDate', ['admin']);
+
+        $router->get('librarian/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['librarian']);
+        $router->post('librarian/returning/checkBook', 'ReturningController@checkBookStatus', ['librarian']);
+        $router->post('librarian/returning/markReturned', 'ReturningController@returnBook', ['librarian']);
+        $router->post('librarian/returning/extend', 'ReturningController@extendDueDate', ['librarian']);
+
+
 
         $router->get('student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
         $router->get('faculty/borrowingHistory/fetch', 'FacultyBorrowingHistoryController@fetchHistory', ['faculty']);

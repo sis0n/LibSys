@@ -287,6 +287,14 @@ class SidebarController extends Controller
         ]);
     }
 
+    public function borrowingForm()
+    {
+        $this->view("superadmin/borrowingForm", [
+            "title" => "Borrowing Form",
+            "currentPage" => "borrowingForm"
+        ]);
+    }
+
     public function globalLogs()
     {
         $this->view("superadmin/globalLogs", [
@@ -408,6 +416,14 @@ class SidebarController extends Controller
         ]);
     }
 
+    public function adminBorrowingForm()
+    {
+        $this->view("admin/borrowingForm", [
+            "title" => "Admin Borrowing Form",
+            "currentPage" => "borrowingForm"
+        ]);
+    }
+
     public function adminGlobalLogs()
     {
         $this->view("admin/globalLogs", [
@@ -503,6 +519,14 @@ class SidebarController extends Controller
         $this->view("librarian/returning", [
             "title" => "Librarian Returning",
             "currentPage" => "returning"
+        ]);
+    }
+
+    public function librarianBorrowingForm()
+    {
+        $this->view("librarian/borrowingForm", [
+            "title" => "Librarian Borrowing Form",
+            "currentPage" => "borrowingForm"
         ]);
     }
 

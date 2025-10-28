@@ -386,7 +386,7 @@ switch ($role) {
             </div>
 
             <!-- QR & Returning Dropdown -->
-            <div class="sidebar-dropdown" data-pages='["qrScanner", "returning"]'>
+            <div class="sidebar-dropdown" data-pages='["qrScanner", "returning", "borrowingForm"]'>
                 <button
                     class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition hover:bg-orange-100 text-orange-900">
                     <span class="flex items-center gap-x-3">
@@ -405,6 +405,11 @@ switch ($role) {
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'returning' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                         <i class="ph ph-arrow-counter-clockwise text-xl"></i>
                         <span class="text-base text-sm">Returning</span>
+                    </a>
+                    <a href="/LibSys/public/superadmin/borrowingForm"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'borrowingForm' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-receipt text-xl"></i>
+                        <span class="text-base text-sm">Borrowing Form</span>
                     </a>
                 </div>
             </div>
@@ -533,6 +538,13 @@ switch ($role) {
                         <i class="ph ph-arrow-counter-clockwise text-xl"></i>
                         <span class="text-sm text-base">Returning</span>
                     </a>
+                    
+                    <a href="/LibSys/public/<?= $roleFolder ?>/borrowingForm"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'BorrowingForm' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-receipt text-xl"></i>
+                        <span class="text-sm text-base">Borrowing Form</span>
+                    </a>
+                    
                 </div>
             </div>
 

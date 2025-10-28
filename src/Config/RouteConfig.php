@@ -183,7 +183,7 @@ class RouteConfig
 
         $router->post('faculty/cart/checkout', 'FacultyTicketController@checkout', ['faculty']);
         $router->get('faculty/qrBorrowingTicket', 'FacultyTicketController@show', ['faculty']);
-        
+
 
         //change password
         $router->post('/change-password', 'AuthController@changePassword');
@@ -259,12 +259,12 @@ class RouteConfig
         $router->post('librarian/returning/markReturned', 'ReturningController@returnBook', ['librarian']);
         $router->post('librarian/returning/extend', 'ReturningController@extendDueDate', ['librarian']);
 
-        $router->get('superadmin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['superadmin']); 
-        $router->post('superadmin/restoreUser/restore', 'RestoreUserController@restore', ['superadmin']);             
-        $router->post('superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']); 
+        $router->get('superadmin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['superadmin']);
+        $router->post('superadmin/restoreUser/restore', 'RestoreUserController@restore', ['superadmin']);
+        $router->post('superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']);
 
         $router->get('superadmin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['superadmin']);
-        $router->post('superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);             
+        $router->post('superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);
         $router->post('superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['superadmin']);
 
         $router->get('/superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats');
@@ -275,6 +275,14 @@ class RouteConfig
 
         $router->get('student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
         $router->get('faculty/borrowingHistory/fetch', 'FacultyBorrowingHistoryController@fetchHistory', ['faculty']);
+
+        $router->get('superadmin/dashboard/stats', 'App\Controllers\DashboardController@getStats', ['superadmin']);
+        $router->get('superadmin/dashboard/top-visitors', 'App\Controllers\DashboardController@getTopVisitors', ['superadmin']);
+        $router->get('superadmin/dashboard/weekly-activity', 'App\Controllers\DashboardController@getWeeklyActivity', ['superadmin']);
+
+        $router->get('superadmin/dashboard/getData', 'DashboardController@getData', ['superadmin']);
+
+
 
         return $router;
     }

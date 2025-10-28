@@ -65,18 +65,6 @@
         <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-4">
             <h3 class="text-lg font-medium mb-4 flex items-center justify-between">
                 Circulated Books
-                <div class="relative">
-                    <select
-                        class="block appearance-none bg-white border border-gray-300 text-gray-700 py-1 px-2 pr-6 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 text-sm"
-                        id="circulatedBooksFilter">
-                        <option value="month" selected>Monthly</option>
-                        <option value="year">Yearly</option> 
-                        <option value="custom">Custom Date</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-gray-700">
-                        <i class="ph ph-caret-down"></i>
-                    </div>
-                </div>
             </h3>
             <div class="overflow-x-auto rounded-lg border border-orange-200">
                 <table class="w-full text-sm border-collapse">
@@ -84,8 +72,9 @@
                         <tr>
                             <th scope="col" class="px-4 py-3 text-left">Category</th>
                             <th scope="col" class="px-4 py-3 text-center">Today</th>
-                            <th scope="col" class="px-4 py-3 text-center">Weekly</th>
-                            <th scope="col" class="px-4 py-3 text-center">Monthly</th>
+                            <th scope="col" class="px-4 py-3 text-center">Week</th>
+                            <th scope="col" class="px-4 py-3 text-center">Month</th>
+                            <th scope="col" class="px-4 py-3 text-center">Year</th>
                         </tr>
                     </thead>
                     <tbody id="circulated-books-tbody"></tbody>
@@ -100,18 +89,6 @@
         <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-4">
             <h3 class="text-lg font-medium mb-4 flex items-center justify-between">
                 Library Visit (by Course)
-                <div class="relative">
-                    <select
-                        class="block appearance-none bg-white border border-gray-300 text-gray-700 py-1 px-2 pr-6 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 text-sm"
-                        id="libraryVisitFilter">
-                        <option value="month"selected>Monthly</option>
-                        <option value="year">Yearly</option>
-                        <option value="custom">Custom Date</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-gray-700">
-                        <i class="ph ph-caret-down"></i>
-                    </div>
-                </div>
             </h3>
             <div class="overflow-x-auto rounded-lg border border-orange-200">
                 <table class="w-full text-sm border-collapse">
@@ -119,8 +96,9 @@
                         <tr>
                             <th scope="col" class="px-4 py-3 text-left">Course</th>
                             <th scope="col" class="px-4 py-3 text-center">Today</th>
-                            <th scope="col" class="px-4 py-3 text-center">Weekly</th>
-                            <th scope="col" class="px-4 py-3 text-center">Monthly</th>
+                            <th scope="col" class="px-4 py-3 text-center">Week</th>
+                            <th scope="col" class="px-4 py-3 text-center">Month</th>
+                            <th scope="col" class="px-4 py-3 text-center">Year</th>
                         </tr>
                     </thead>
                     <tbody id="library-visit-tbody"></tbody>
@@ -150,35 +128,38 @@
 
     <!-- Custom Date Modal -->
     <div id="customDateModal"
-        class="fixed inset-0 bg-black-400/20 backdrop-blur-md overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-40 mx-auto p-5 w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg leading-6 font-medium text-gray-900 text-center">Select Custom Date Range</h3>
-                <div class="mt-4 px-7 py-3">
-                    <div class="mb-4">
-                        <label for="startDate" class="block text-sm font-medium text-gray-700 text-left">Start
-                            Date</label>
-                        <input type="date" id="startDate" name="startDate"
-                            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
-                    </div>
-                    <div class="mb-4">
-                        <label for="endDate" class="block text-sm font-medium text-gray-700 text-left">End Date</label>
-                        <input type="date" id="endDate" name="endDate"
-                            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
-                    </div>
+        class="fixed inset-0 bg-black-500/20 backdrop-blur-md flex items-center justify-center h-full w-full hidden z-50">
+        <div class="relative bg-white rounded-2xl shadow-xl w-[420px] p-6 border border-gray-200">
+            <h3 class="text-base font-semibold text-gray-800 text-center">
+                Pick a date range for the data you want to download.
+            </h3>
+
+            <div class="mt-5 space-y-4">
+                <div>
+                    <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                    <input type="date" id="startDate" name="startDate"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all">
                 </div>
-                <div class="items-center px-4 py-3">
-                    <button id="confirmDateRange"
-                        class="px-4 py-2 bg-orange-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300">
-                        Confirm
-                    </button>
-                    <button id="cancelDateRange"
-                        class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                        Cancel
-                    </button>
+
+                <div>
+                    <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                    <input type="date" id="endDate" name="endDate"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all">
                 </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 mt-6">
+                <button id="confirmDateRange"
+                    class="px-6 py-2 bg-orange-500 text-white rounded-lg font-medium text-sm shadow-sm hover:bg-orange-600 focus:ring-2 focus:ring-orange-300 transition-all">
+                    Confirm
+                </button>
+                <button id="cancelDateRange"
+                    class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg font-medium text-sm hover:bg-gray-200 focus:ring-2 focus:ring-gray-300 transition-all">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
+
 </main>
 <script src="/LibSys/public/js/superadmin/reports.js"></script>

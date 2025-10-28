@@ -5,9 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const cancelDateRangeBtn = document.getElementById('cancelDateRange');
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
-    let previousCirculatedFilter = 'year'; // Default value
-    let previousLibraryVisitFilter = 'year'; // Default value for library visit
-    let activeTableFilter = null; // To track which table initiated the modal
+    const downloadReportBtn = document.getElementById('download-report-btn');
 
     // --- Library Resources ---
     const libraryResourcesData = [
@@ -33,9 +31,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Circulated Books ---
     const circulatedBooksData = [
-        { category: 'Student', y2025: '-', y2026: '-', y2027: '-' },
-        { category: 'Faculty', y2025: '-', y2026: '-', y2027: '-' },
-        { category: 'Staff', y2025: '-', y2026: '-', y2027: '-' }
+        { category: 'Student', today: '-', week: '-', month: '-', year: '-' },
+        { category: 'Faculty', today: '-', week: '-', month: '-', year: '-' },
+        { category: 'Staff', today: '-', week: '-', month: '-', year: '-' }
     ];
 
     function populateCirculatedBooks() {
@@ -48,9 +46,10 @@ document.addEventListener('DOMContentLoaded', function () {
             row.classList.add('border-b', 'border-orange-100');
             row.innerHTML = `
                 <td class="px-4 py-2 text-left font-medium text-gray-700">${data.category}</td>
-                <td class="px-4 py-2 text-center">${data.y2025}</td>
-                <td class="px-4 py-2 text-center">${data.y2026}</td>
-                <td class="px-4 py-2 text-center">${data.y2027}</td>
+                <td class="px-4 py-2 text-center">${data.today}</td>
+                <td class="px-4 py-2 text-center">${data.week}</td>
+                <td class="px-4 py-2 text-center">${data.month}</td>
+                <td class="px-4 py-2 text-center">${data.year}</td>
             `;
             tbody.appendChild(row);
         });
@@ -62,17 +61,18 @@ document.addEventListener('DOMContentLoaded', function () {
             <td class="px-4 py-2 text-center">-</td>
             <td class="px-4 py-2 text-center">-</td>
             <td class="px-4 py-2 text-center">-</td>
+            <td class="px-4 py-2 text-center">-</td>
         `;
         tbody.appendChild(totalRow);
     }
 
     // --- Library Visit by Course ---
     const libraryVisitByCourseData = [
-        { course: 'BSIT', y2025: '-', y2026: '-', y2027: '-' },
-        { course: 'BSCS', y2025: '-', y2026: '-', y2027: '-' },
-        { course: 'BSIS', y2025: '-', y2026: '-', y2027: '-' },
-        { course: 'BSCE', y2025: '-', y2026: '-', y2027: '-' },
-        { course: 'BSEE', y2025: '-', y2026: '-', y2027: '-' },
+        { course: 'BSIT', today: '-', week: '-', month: '-', year: '-' },
+        { course: 'BSCS', today: '-', week: '-', month: '-', year: '-' },
+        { course: 'BSIS', today: '-', week: '-', month: '-', year: '-' },
+        { course: 'BSCE', today: '-', week: '-', month: '-', year: '-' },
+        { course: 'BSEE', today: '-', week: '-', month: '-', year: '-' },
     ];
 
     function populateLibraryVisitByCourse() {
@@ -85,9 +85,10 @@ document.addEventListener('DOMContentLoaded', function () {
             row.classList.add('border-b', 'border-orange-100');
             row.innerHTML = `
                 <td class="px-4 py-2 text-left font-medium text-gray-700">${data.course}</td>
-                <td class="px-4 py-2 text-center">${data.y2025}</td>
-                <td class="px-4 py-2 text-center">${data.y2026}</td>
-                <td class="px-4 py-2 text-center">${data.y2027}</td>
+                <td class="px-4 py-2 text-center">${data.today}</td>
+                <td class="px-4 py-2 text-center">${data.week}</td>
+                <td class="px-4 py-2 text-center">${data.month}</td>
+                <td class="px-4 py-2 text-center">${data.year}</td>
             `;
             tbody.appendChild(row);
         });
@@ -96,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
         totalRow.classList.add('bg-orange-50', 'font-bold', 'text-gray-800');
         totalRow.innerHTML = `
             <td class="px-4 py-2 text-left">TOTAL</td>
+            <td class="px-4 py-2 text-center">-</td>
             <td class="px-4 py-2 text-center">-</td>
             <td class="px-4 py-2 text-center">-</td>
             <td class="px-4 py-2 text-center">-</td>
@@ -125,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const row = document.createElement('tr');
         row.classList.add('border-b', 'border-orange-100');
 
-        let rankColor = 'text-black font-normal'; 
+        let rankColor = 'text-black font-normal';
         if (data.rank === 1) rankColor = 'text-yellow-400 font-bold';
         else if (data.rank === 2) rankColor = 'text-gray-400 font-bold';
         else if (data.rank === 3) rankColor = 'text-orange-500 font-bold';
@@ -149,46 +151,16 @@ document.addEventListener('DOMContentLoaded', function () {
     populateLibraryVisitByCourse();
     populateTopVisitors();
 
-    // --- Dropdown Filters ---
-    const circulatedBooksFilter = document.getElementById('circulatedBooksFilter');
-    if (circulatedBooksFilter) {
-        circulatedBooksFilter.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                activeTableFilter = 'circulatedBooks';
-                if(customDateModal) customDateModal.classList.remove('hidden');
-            } else {
-                updateCirculatedBooksTableHeaders(this.value);
-                previousCirculatedFilter = this.value;
-            }
+    // --- Download Report Button ---
+    if (downloadReportBtn) {
+        downloadReportBtn.addEventListener('click', function() {
+            if (customDateModal) customDateModal.classList.remove('hidden');
         });
-        // Initialize headers on load
-        updateCirculatedBooksTableHeaders(circulatedBooksFilter.value);
-    }
-
-    const libraryVisitFilter = document.getElementById('libraryVisitFilter');
-    if (libraryVisitFilter) {
-        libraryVisitFilter.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                activeTableFilter = 'libraryVisit';
-                if(customDateModal) customDateModal.classList.remove('hidden');
-            } else {
-                updateLibraryVisitTableHeaders(this.value);
-                previousLibraryVisitFilter = this.value;
-            }
-        });
-        // Initialize headers on load
-        updateLibraryVisitTableHeaders(libraryVisitFilter.value);
     }
 
     if(customDateModal) {
         cancelDateRangeBtn.addEventListener('click', () => {
             customDateModal.classList.add('hidden');
-            if (activeTableFilter === 'circulatedBooks') {
-                circulatedBooksFilter.value = previousCirculatedFilter; // Revert to previous selection
-            } else if (activeTableFilter === 'libraryVisit') {
-                libraryVisitFilter.value = previousLibraryVisitFilter; // Revert to previous selection
-            }
-            activeTableFilter = null; // Reset active filter
         });
 
         confirmDateRangeBtn.addEventListener('click', () => {
@@ -197,134 +169,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (startDate && endDate) {
                 customDateModal.classList.add('hidden');
-                if (activeTableFilter === 'circulatedBooks') {
-                    updateCirculatedBooksTableHeaders('custom', { startDate, endDate });
-                    previousCirculatedFilter = 'custom';
-                } else if (activeTableFilter === 'libraryVisit') {
-                    updateLibraryVisitTableHeaders('custom', { startDate, endDate });
-                    previousLibraryVisitFilter = 'custom';
-                }
-                activeTableFilter = null; // Reset active filter
+                alert(`Downloading report for date range: ${startDate} to ${endDate}`);
+                // Here you would trigger the actual report download with the selected dates
             } else {
                 alert('Please select both start and end dates.');
             }
         });
-    }
-
-    function updateCirculatedBooksTableHeaders(filter, dateRange = null) {
-        const theadRow = document.querySelector('#circulated-books-tbody').previousElementSibling.querySelector('tr');
-        if (theadRow) {
-            if (filter === 'custom' && dateRange) {
-                const formattedStartDate = new Date(dateRange.startDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-                const formattedEndDate = new Date(dateRange.endDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-
-                theadRow.innerHTML = `
-                    <th scope="col" class="px-4 py-3 text-left">Category</th>
-                    <th scope="col" class="px-4 py-3 text-center">
-                        Total Borrowed
-                        <span class="block text-xs font-normal text-gray-500">(${formattedStartDate} – ${formattedEndDate})</span>
-                    </th>
-                `;
-                const tbody = document.getElementById('circulated-books-tbody');
-                tbody.innerHTML = `
-                    <tr class="border-b border-orange-100">
-                        <td class="px-4 py-2 text-left font-medium text-gray-700">Student</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                    <tr class="border-b border-orange-100">
-                        <td class="px-4 py-2 text-left font-medium text-gray-700">Faculty</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                    <tr class="border-b border-orange-100">
-                        <td class="px-4 py-2 text-left font-medium text-gray-700">Staff</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                    <tr class="bg-orange-50 font-bold">
-                        <td class="px-4 py-2 text-left">TOTAL</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                `;
-            } else {
-                 theadRow.innerHTML = `
-                    <th scope="col" class="px-4 py-3 text-left">Category</th>
-                    <th scope="col" class="px-4 py-3 text-center"></th>
-                    <th scope="col" class="px-4 py-3 text-center"></th>
-                    <th scope="col" class="px-4 py-3 text-center"></th>
-                `;
-                if (filter === 'month') {
-                    theadRow.children[1].textContent = 'Today';
-                    theadRow.children[2].textContent = 'Weekly';
-                    theadRow.children[3].textContent = 'Monthly';
-                } else if (filter === 'year') {
-                    theadRow.children[1].textContent = '2025';
-                    theadRow.children[2].textContent = '2026';
-                    theadRow.children[3].textContent = '2027';
-                }
-                populateCirculatedBooks();
-            }
-        }
-    }
-
-    function updateLibraryVisitTableHeaders(filter, dateRange = null) {
-        const theadRow = document.querySelector('#library-visit-tbody').previousElementSibling.querySelector('tr');
-        if (theadRow) {
-            if (filter === 'custom' && dateRange) {
-                const formattedStartDate = new Date(dateRange.startDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-                const formattedEndDate = new Date(dateRange.endDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-
-                theadRow.innerHTML = `
-                    <th scope="col" class="px-4 py-3 text-left">Category</th>
-                    <th scope="col" class="px-4 py-3 text-center">
-                        Total Count
-                        <span class="block text-xs font-normal text-gray-500">(${formattedStartDate} – ${formattedEndDate})</span>
-                    </th>
-                `;
-                const tbody = document.getElementById('library-visit-tbody');
-                tbody.innerHTML = `
-                    <tr class="border-b border-orange-100">
-                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSIT</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                    <tr class="border-b border-orange-100">
-                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSCS</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                    <tr class="border-b border-orange-100">
-                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSIS</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                    <tr class="border-b border-orange-100">
-                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSCE</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                    <tr class="border-b border-orange-100">
-                        <td class="px-4 py-2 text-left font-medium text-gray-700">BSEE</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                    <tr class="bg-orange-50 font-bold text-gray-800">
-                        <td class="px-4 py-2 text-left">TOTAL</td>
-                        <td class="px-4 py-2 text-center">-</td>
-                    </tr>
-                `;
-            } else {
-                 theadRow.innerHTML = `
-                    <th scope="col" class="px-4 py-3 text-left">Course</th>
-                    <th scope="col" class="px-4 py-3 text-center"></th>
-                    <th scope="col" class="px-4 py-3 text-center"></th>
-                    <th scope="col" class="px-4 py-3 text-center"></th>
-                `;
-                if (filter === 'month') {
-                    theadRow.children[1].textContent = 'Today';
-                    theadRow.children[2].textContent = 'Weekly';
-                    theadRow.children[3].textContent = 'Monthly';
-                } else if (filter === 'year') {
-                    theadRow.children[1].textContent = '2025';
-                    theadRow.children[2].textContent = '2026';
-                    theadRow.children[3].textContent = '2027';
-                }
-                populateLibraryVisitByCourse();
-            }
-        }
     }
 
     // --- Charts ---

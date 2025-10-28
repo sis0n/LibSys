@@ -47,6 +47,10 @@
                         onclick="selectRole(this, 'Librarian')">Librarian</div>
                     <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
                         onclick="selectRole(this, 'Admin')">Admin</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectRole(this, 'Faculty')">Faculty</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectRole(this, 'Staff')">Staff</div>
                 </div>
             </div>
 
@@ -190,6 +194,10 @@
                                 onclick="selectUserRole(this, 'Librarian')">Librarian</div>
                             <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                 onclick="selectUserRole(this, 'Admin')">Admin</div>
+                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                onclick="selectUserRole(this, 'Faculty')">Faculty</div>
+                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                onclick="selectUserRole(this, 'Staff')">Staff</div>
                         </div>
                     </div>
                 </div>
@@ -382,6 +390,10 @@
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditRole(this, 'Student')">Student</div>
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectEditRole(this, 'Faculty')">Faculty</div>
+                                <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectEditRole(this, 'Staff')">Staff</div>
+                                <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditRole(this, 'Librarian')">Librarian</div>
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditRole(this, 'Admin')">Admin</div>
@@ -468,7 +480,7 @@
                 </p>
 
                 <div class="grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto rounded-xl p-2">
-                   <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                         <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Archives
                         </h4>
                         <div class="space-y-1 text-sm text-gray-700">
@@ -566,4 +578,3 @@
 </div>
 
 <script src="/libsys/public/js/superadmin/userManagement.js" defer></script>
-

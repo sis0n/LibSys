@@ -8,29 +8,69 @@ class RouteConfig
 {
     public static function register(): Router
     {
+        // convert {param} style to regex
         $router = new Router();
 
+        /**
+         * ========================
+         * Landing Page Routes
+         * ========================
+         */
         $router->get('landingPage', 'GuestController@guestDisplay');
         $router->get('guest/fetchBooks', 'GuestController@fetchGuestBooks');
 
+        /**
+         * ========================
+         * auth routes
+         * ========================
+         */
         $router->get('login', 'AuthController@showLogin');
         $router->post('login', 'AuthController@login');
         $router->post('logout', 'AuthController@logout');
 
+        /**
+         * ========================
+         * forgot password route
+         * ========================
+         */
         $router->get('forgotPassword', 'AuthController@forgotPassword');
 
+        /**
+         * ========================
+         * scanner route
+         * ========================
+         */
         $router->post('scanner/scan', 'ScannerController@attendance', ['scanner']);
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
         $router->post('scanner/manual', 'ScannerController@manual', ['scanner']);
 
 
+        /**
+         * ========================
+         * dashboard routes
+         * ========================
+         */
+
+        //faculty
+        $router->get('faculty/dashboard', 'SidebarController@facultyDashboard', ['faculty']);
+        $router->get('faculty/bookCatalog', 'SidebarController@facultyBookCatalog', ['faculty']);
+        $router->get('faculty/equipmentCatalog', 'SidebarController@facultyEquipmentCatalog', ['faculty']);
+        $router->get('faculty/myCart', 'SidebarController@facultyMyCart', ['faculty']);
+        $router->get('faculty/qrBorrowingTicket', 'SidebarController@facultyQrBorrowingTicket', ['faculty']);
+        $router->get('faculty/myAttendance', 'SidebarController@facultyMyAttendance', ['faculty']);
+        $router->get('faculty/borrowingHistory', 'SidebarController@facultyBorrowingHistory', ['faculty']);
+        $router->get('faculty/attendance/get', 'AttendanceController@getMyAttendance', ['faculty']);
+        $router->get('faculty/changePassword', 'SidebarController@facultyChangePassword', ['faculty']);
+        $router->get('faculty/myProfile', 'SidebarController@facultyMyProfile', ['faculty']);
+
+        // Librarian Sidebar Page Navigation Display
         $router->get('librarian/dashboard', 'SidebarController@librarianDashboard', ['librarian']);
         $router->get('librarian/bookManagement', 'SidebarController@librarianBookManagement', ['librarian']);
         $router->get('librarian/equipmentManagement', 'SidebarController@librarianEquipmentManagement', ['librarian']);
         $router->get('librarian/qrScanner', 'SidebarController@librarianQrScanner', ['librarian']);
         $router->get('librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
         $router->get('librarian/topVisitor', 'SidebarController@librarianTopVisitor', ['librarian']);
-        $router->get('librarian/borrowingHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
+        $router->get('librarian/transactionHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
         $router->get('librarian/returning', 'SidebarController@librarianReturning', ['librarian']);
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
         $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
@@ -43,7 +83,7 @@ class RouteConfig
         $router->get('admin/qrScanner', 'SidebarController@adminQrScanner', ['admin']);
         $router->get('admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
         $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['admin']);
-        $router->get('admin/borrowingHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
+        $router->get('admin/transactionHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
         $router->get('admin/returning', 'SidebarController@adminReturning', ['admin']);
         $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
         $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
@@ -57,17 +97,19 @@ class RouteConfig
         $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
         $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
-        $router->get('superadmin/borrowingHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('superadmin/transcationHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
         $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
-        $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);
-        $router->get('superadmin/restoreBooks', 'SidebarController@restoreBooks', ['superadmin']);
-        $router->get('superadmin/restoreEquipment', 'SidebarController@restoreEquipment', ['superadmin']);
-        $router->get('superadmin/restoreUser', 'SidebarController@restoreUser', ['superadmin']);
+        $router->get('superadmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
         $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
+        $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);
+        $router->get('superadmin/restoreBooks', 'SidebarController@restoreBooks', ['superadmin']);
+        $router->get('superadmin/restoreUser', 'SidebarController@restoreUser', ['superadmin']);
+        $router->get('superadmin/restoreEquipment', 'SidebarController@restoreEquipment', ['superadmin']);
 
 
+        // Student Sidebar Page Navigation Display
         $router->get('student/dashboard', 'SidebarController@studentDashboard', ['student']);
         $router->get('student/bookCatalog', 'SidebarController@studentBookCatalog', ['student']);
         $router->get('student/equipmentCatalog', 'SidebarController@studentEquipmentCatalog', ['student']);
@@ -79,8 +121,40 @@ class RouteConfig
         $router->get('student/changePassword', 'SidebarController@studentChangePassword', ['student']);
         $router->get('student/myProfile', 'SidebarController@studentMyProfile', ['student']);
 
+
+
+        /**
+         * 
+         * ATTENDANCE ROUTES (SAMPLE LANG TO BES)
+         * $router->get('attendance', 'AttendanceController@index', ['librarian', 'admin']);
+         * $router->post('attendance/scan', 'AttendanceController@scan', ['librarian']);
+         * $router->get('attendance/logs', 'AttendanceController@logs', ['librarian', 'admin']);
+         */
+
+        // AJAX route para sa dropdown filter logs (librarian at admin)
         $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['librarian', 'admin', 'superadmin']);
 
+
+        /**
+         * ========================
+         * BOOK INVENTORY ROUTES
+         * ========================
+         */
+
+        // $router->get('books', 'BookController@index', ['librarian', 'admin']);
+        // $router->get('books/create', 'BookController@create', ['librarian', 'admin']);
+        // $router->post('books/store', 'BookController@store', ['librarian', 'admin']);
+        // $router->get('books/edit/{id}', 'BookController@edit', ['librarian', 'admin']);
+        // $router->post('books/update/{id}', 'BookController@update', ['librarian', 'admin']);
+        // $router->post('books/delete/{id}', 'BookController@destroy', ['librarian', 'admin']);
+        // $router->get('books/search', 'BookController@search', ['librarian', 'admin']);
+        // $router->get('books/filter', 'BookController@filter', ['librarian', 'admin']);
+
+        /**
+         * ========================
+         * STUDENT CART & CHECKOUT ROUTES
+         * ========================
+         */
         $router->get('student/cart', 'CartController@index', ['student']);
         $router->get('student/cart/add/{id}', 'CartController@add', ['student']);
         $router->post('student/cart/remove/{id}', 'CartController@remove', ['student']);
@@ -88,10 +162,11 @@ class RouteConfig
         $router->get('student/cart/json', 'CartController@getCartJson', ['student']);
 
 
+        // checkout routes
         $router->post('student/cart/checkout', 'TicketController@checkout', ['student']);
         $router->get('student/qrBorrowingTicket', 'TicketController@show', ['student']);
-        $router->get('student/qrBorrowingTicket/checkStatus', 'TicketController@checkStatus', ['student']);
-
+        $router->get('student/qrBorrowingTicket/checkStatus', 'TicketController@checkStatus');
+        $router->get('faculty/qrBorrowingTicket/checkStatus', 'FacultyTicketController@checkStatus');
 
 
 
@@ -99,9 +174,27 @@ class RouteConfig
         $router->get('student/bookCatalog/availableCount', 'BookCatalogController@getAvailableCount', ['student']);
         $router->get('student/bookCatalog/fetch', 'BookCatalogController@fetch', ['student']);
 
+        $router->get('faculty/bookCatalog/availableCount', 'FacultyBookCatalogController@getAvailableCount', ['faculty']);
+        $router->get('faculty/bookCatalog/fetch', 'FacultyBookCatalogController@fetch', ['faculty']);
+        $router->get('faculty/cart', 'FacultyCartController@index', ['faculty']);
+        $router->get('faculty/cart/add/{id}', 'FacultyCartController@add', ['faculty']);
+        $router->post('faculty/cart/remove/{id}', 'FacultyCartController@remove', ['faculty']);
+        $router->post('faculty/cart/clear', 'FacultyCartController@clearCart', ['faculty']);
+        $router->get('faculty/cart/json', 'FacultyCartController@getCartJson', ['faculty']);
+
+        $router->post('faculty/cart/checkout', 'FacultyTicketController@checkout', ['faculty']);
+        $router->get('faculty/qrBorrowingTicket', 'FacultyTicketController@show', ['faculty']);
+        
+
+        //change password
         $router->post('/change-password', 'AuthController@changePassword');
 
 
+        // ===============================
+        // SUPERADMIN USER MANAGEMENT ROUTES
+        // ===============================
+
+        // $router->get('superadmin/userManagement', 'UserManagementController@index', ['superadmin']);
         $router->get('superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
         $router->get('superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
         $router->get('superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
@@ -133,6 +226,9 @@ class RouteConfig
         $router->get('student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
         $router->post('student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
 
+        $router->get('faculty/myprofile/get', 'FacultyProfileController@getProfile', ['faculty']);
+        $router->post('faculty/myprofile/update', 'FacultyProfileController@updateProfile', ['faculty']);
+
 
         // Superadmin QR Scanner
         $router->post('superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
@@ -151,38 +247,6 @@ class RouteConfig
 
 
         $router->get('student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
-
-        $router->get('superadmin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['superadmin']);
-        $router->post('superadmin/returning/checkBook', 'ReturningController@checkBookStatus', ['superadmin']);
-        $router->post('superadmin/returning/markReturned', 'ReturningController@returnBook', ['superadmin']);
-        $router->post('superadmin/returning/extend', 'ReturningController@extendDueDate', ['superadmin']);
-
-        $router->get('admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['admin']);
-        $router->post('admin/returning/checkBook', 'ReturningController@checkBookStatus', ['admin']);
-        $router->post('admin/returning/markReturned', 'ReturningController@returnBook', ['admin']);
-        $router->post('admin/returning/extend', 'ReturningController@extendDueDate', ['admin']);
-
-        $router->get('librarian/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['librarian']);
-        $router->post('librarian/returning/checkBook', 'ReturningController@checkBookStatus', ['librarian']);
-        $router->post('librarian/returning/markReturned', 'ReturningController@returnBook', ['librarian']);
-        $router->post('librarian/returning/extend', 'ReturningController@extendDueDate', ['librarian']);
-
-        $router->get('superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
-        $router->get('admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['admin']);
-        $router->get('librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['librarian']);
-
-        $router->get('superadmin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['superadmin']);
-        $router->post('superadmin/restoreUser/restore', 'RestoreUserController@restore', ['superadmin']);
-        $router->post('superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']);
-
-        $router->get('superadmin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['superadmin']);
-        $router->post('superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);
-        $router->post('superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['superadmin']);
-
-        $router->get('/superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats');
-        $router->get('/superadmin/backup/database/full', 'BackupController@initiateBackup');
-        $router->get('/superadmin/backup/secure_download/{filename}', 'BackupController@downloadBackup');
-        $router->get('/superadmin/backup/logs', 'BackupController@listBackupLogs');
 
         return $router;
     }

@@ -32,12 +32,14 @@ class AuthRepository
 
       $_SESSION['user_data'] = [
         'user_id' => $user['user_id'],
+        'student_id' => $user['student_id'] ?? null,
+        'faculty_id' => $user['faculty_id'] ?? null,
+        'department' => $user['department'] ?? null,
         'username' => $user['username'] ?? $user['student_number'] ?? $username,
         'role' => !empty($user['role']) ? strtolower(trim($user['role'])) : 'guest',
         'fullname' => !empty(trim($fullName)) ? $fullName : ($_SESSION['username'] ?? 'User'),
         'profile_picture' => $user['profile_picture'] ?? null,
         'is_active' => $user['is_active'] ?? 0,
-        'student_id' => $user['student_id'] ?? null
       ];
 
       $_SESSION['user_id'] = $user['user_id'];

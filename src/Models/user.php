@@ -39,4 +39,6 @@ class User {
     public static function isStudent(array $user): bool { return ($user['role'] ?? '') === 'student'; }
     public static function isSuperadmin(array $user): bool { return ($user['role'] ?? '') === 'superadmin'; }
     public static function isScanner(array $user): bool { return ($user['role'] ?? '') === 'scanner'; }
+    public static function isFaculty(array $user): bool { return ($user['role'] ?? '') === 'faculty'; }
+    public static function isStaff(array $user): bool { return ($user['role'] ?? '') === 'staff'; }
 }

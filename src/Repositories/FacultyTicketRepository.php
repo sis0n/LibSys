@@ -43,11 +43,14 @@ class FacultyTicketRepository
   // Get faculty ID from user ID
   public function getFacultyIdByUserId(int $userId): ?int
   {
-    $stmt = $this->db->prepare("SELECT faculty_id FROM faculty WHERE user_id = :uid");
-    $stmt->execute(['uid' => $userId]);
+    $stmt = $this->db->prepare("SELECT faculty_id, user_id FROM faculty WHERE user_id = ?");
+    $stmt->execute([$userId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $row['faculty_id'] ?? null;
+
+    var_dump($userId, $row); // <--- debug output
+    return isset($row['faculty_id']) ? (int)$row['faculty_id'] : null;
   }
+
 
   public function getFacultyInfo(int $facultyId): ?array
   {

@@ -182,27 +182,25 @@ class FacultyTicketRepository
   public function getPendingTransactionByFacultyId(int $facultyId): ?array
   {
     $stmt = $this->db->prepare("
-            SELECT transaction_id, transaction_code, due_date, generated_at, expires_at
-            FROM borrow_transactions
-            WHERE faculty_id = :fid AND status = 'pending'
-            LIMIT 1
-        ");
+        SELECT transaction_id, transaction_code, due_date, generated_at, expires_at, status
+        FROM borrow_transactions
+        WHERE faculty_id = :fid AND status = 'pending'
+        LIMIT 1
+    ");
     $stmt->execute(['fid' => $facultyId]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $result ?: null;
+    return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
   }
 
   public function getBorrowedTransactionByFacultyId(int $facultyId): ?array
   {
     $stmt = $this->db->prepare("
-            SELECT transaction_id, transaction_code, due_date
-            FROM borrow_transactions
-            WHERE faculty_id = :fid AND status = 'borrowed'
-            LIMIT 1
-        ");
+        SELECT transaction_id, transaction_code, due_date, status
+        FROM borrow_transactions
+        WHERE faculty_id = :fid AND status = 'borrowed'
+        LIMIT 1
+    ");
     $stmt->execute(['fid' => $facultyId]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $result ?: null;
+    return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
   }
 
   public function countFacultyBorrowedBooks(int $facultyId): int

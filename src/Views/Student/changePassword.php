@@ -150,6 +150,5 @@
       </form>
     </div>
   </div>
-
-</div>
+</main>
 <script src="/LibSys/public/js/student/changePassword.js" defer></script>

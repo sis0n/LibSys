@@ -4,6 +4,7 @@
         <p class="text-gray-500 mt-4">Scan book barcode to process returns and manage due dates</p>
     </div>
 
+    <!-- Scanner and Manual Input -->
     <div class="bg-white rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
         <div class="flex items-center gap-3">
             <i class="ph ph-barcode text-2xl text-gray-700"></i>
@@ -12,36 +13,39 @@
         <p class="text-gray-600 mt-1 mb-6 ml-9">
             Enter or scan the book's barcode to view details and process return
         </p>
-
-        <!-- QR Scanner Section -->
-        <div class="flex justify-center mb-6">
+        <!-- Scanner -->
+        <div class="flex justify-center">
             <div class="w-full max-w-4xl bg-white border border-orange-200 rounded-lg p-8 shadow-sm text-center">
                 <div class="flex items-center justify-center gap-3 mb-6">
                     <i class="ph ph-qr-code text-3xl text-orange-600"></i>
                     <h4 class="text-xl font-semibold text-gray-800">Book QR Scanner</h4>
                 </div>
+
                 <p class="text-gray-600 mb-6">
                     Scan the book’s barcode or QR code to retrieve its details automatically.
                 </p>
-                <form id="scanner-form" class="inline-block">
+
+                <!-- QR Code Scanner Box -->
+                <form action="/libsys/public/scanner/scan" method="POST" class="inline-block">
                     <div id="qrBox"
                         class="w-40 h-40 sm:w-48 sm:h-48 mx-auto border-2 border-dashed border-orange-300 rounded-lg flex items-center justify-center bg-orange-50">
                         <i class="ph ph-qr-code text-orange-500 text-8xl sm:text-9xl"></i>
                     </div>
-                    <!-- Hidden input for QR scanner -->
-                    <input type="text" id="qrCodeValue" name="qrCodeValue" class="absolute opacity-0 pointer-events-none"
-                        autocomplete="off">
+
+                    <!-- Hidden QR input -->
+                    <input type="text" id="qrCodeValue" name="qrCodeValue"
+                        class="absolute opacity-0 pointer-events-none" tabindex="-1" autocomplete="off">
                 </form>
             </div>
         </div>
 
-        <!-- Manual Input Section -->
+        <!-- Manual -->
         <div class="flex justify-center mt-6">
             <div class="flex items-center w-full max-w-4xl gap-3">
-                <input type="text" id="accession-input" placeholder="Enter book barcode or Accession Number"
-                    class="flex-grow p-3 border border-orange-200/80 rounded-md bg-orange-50/40 placeholder-orange-800/40 text-gray-800">
+                <input type="text" placeholder="Enter book barcode or Accession Number"
+                    class="flex-grow p-3 border  border-orange-200/80 rounded-md bg-orange-50/40  placeholder-orange-800/40 text-gray-800">
                 <button id="scan-button"
-                    class="bg-orange-500 text-white px-5 py-3 rounded-md flex items-center gap-2 hover:bg-orange-600 border border-orange-500">
+                    class="bg-orange-500 text-white px-5 py-3 rounded-md flex items-center gap-2 hover:bg-orange-600  border border-orange-500">
                     <i class="ph ph-barcode"></i>
                     <span>Scan</span>
                 </button>
@@ -51,15 +55,17 @@
             <i class="ph ph-info"></i>
             Use a barcode scanner or manually enter the Barcode or Accession Number
         </p>
+
     </div>
 
-    <!-- Books Near Due Date Section -->
+    <!-- Books Near Due Date -->
     <div class="mt-8 bg-amber-50/60 border border-amber-200/80 rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
         <div class="flex items-center gap-3 mb-4">
             <i class="ph ph-warning text-2xl text-amber-500"></i>
             <h3 class="text-xl font-semibold text-gray-800">Books Near Due Date</h3>
         </div>
         <p class="text-gray-600 -mt-2 ml-9">Books that will be due soon (within 7 days)</p>
+
         <div class="mt-4 bg-white border border-gray-200/80 rounded-lg overflow-hidden">
             <table class="w-full books-near-due-table">
                 <thead class="bg-stone-50">
@@ -73,18 +79,20 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200/80">
+
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Overdue Books Section -->
+    <!-- Overdue Books -->
     <div class="mt-8 bg-red-50/60 border border-red-200/80 rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
         <div class="flex items-center gap-3 mb-4">
             <i class="ph ph-warning text-2xl text-red-500"></i>
             <h3 class="text-xl font-semibold text-gray-800">Overdue Books</h3>
         </div>
         <p class="text-gray-600 -mt-2 ml-9">Books that are past their due date</p>
+
         <div class="mt-4 bg-white border border-gray-200/80 rounded-lg overflow-hidden">
             <table class="w-full overdue-books-table">
                 <thead class="bg-stone-50">
@@ -98,15 +106,17 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200/80">
+
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- Return Modal -->
+<!-- Borrowed Modal -->
 <div id="return-modal" class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 mx-4">
+        <!-- Modal Header -->
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center gap-3">
                 <div>
@@ -119,6 +129,7 @@
             </button>
         </div>
 
+        <!-- Book Information -->
         <div class="bg-stone-50 border border-stone-200 rounded-lg p-4 mb-4">
             <div class="flex justify-between items-start mb-2">
                 <div>
@@ -126,16 +137,18 @@
                     <h4 id="modal-book-title" class="font-bold text-gray-800 text-lg"></h4>
                     <p id="modal-book-author" class="text-sm text-gray-600 mt-0.5"></p>
                 </div>
-                <span id="modal-book-status" class="bg-orange-200 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full"></span>
+                <span id="modal-book-status"
+                    class="bg-orange-200 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full"></span>
             </div>
+
             <div class="grid grid-cols-3 gap-4 mt-3">
                 <div>
                     <p class="text-xs text-gray-500">ISBN</p>
                     <p id="modal-book-isbn" class="text-sm font-medium text-gray-700"></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500">Accession Number</p>
-                    <p id="modal-book-accessionnumber" class="text-sm font-medium text-gray-700"></p>
+                    <p class="text-xs text-gray-500">Book ID</p>
+                    <p id="modal-book-id" class="text-sm font-medium text-gray-700"></p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500">Call Number</p>
@@ -144,6 +157,7 @@
             </div>
         </div>
 
+        <!-- Borrower Information -->
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <div class="flex items-center gap-2 mb-3">
                 <i class="ph ph-user text-gray-600"></i>
@@ -155,7 +169,7 @@
                     <p id="modal-borrower-name" class="font-medium text-gray-700"></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500">Student Number</p>
+                    <p class="text-xs text-gray-500">Student ID</p>
                     <p id="modal-student-id" class="font-medium text-gray-700"></p>
                 </div>
                 <div>
@@ -185,13 +199,24 @@
             </div>
         </div>
 
+        <!-- Modal Actions -->
         <div class="flex justify-end items-center gap-3 mt-6">
-            <button id="modal-cancel-button" class="text-xs px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 flex items-center gap-2">Cancel</button>
-            <button id="modal-extend-button" class="text-xs px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 flex items-center gap-2"><i class="ph ph-calendar"></i> Extend Due Date</button>
-            <button id="modal-return-button" class="text-xs px-6 py-2.5 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 flex items-center gap-2"><i class="ph ph-check-circle"></i> Mark as Returned</button>
+            <button id="modal-cancel-button"
+                class="text-xs px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 flex items-center gap-2">
+                Cancel
+            </button>
+            <button
+                class="text-xs px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 flex items-center gap-2">
+                <i class="ph ph-calendar"></i> Extend Due Date
+            </button>
+            <button
+                class="text-xs px-6 py-2.5 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 flex items-center gap-2">
+                <i class="ph ph-check-circle"></i> Mark as Returned
+            </button>
         </div>
     </div>
 </div>
+
 <!-- Available Modal -->
 <div id="available-book-modal"
     class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 hidden">
@@ -217,7 +242,7 @@
                     <h4 id="available-modal-title" class="font-bold text-gray-800 text-lg"></h4>
                     <p id="available-modal-author" class="text-sm text-gray-600 mt-0.5"></p>
                 </div>
-                <span id="available-modal-status"
+                <span id="available-modal-status" 
                     class="bg-green-200 text-green-800 text-xs font-semibold px-3 py-1 rounded-full"></span>
             </div>
 

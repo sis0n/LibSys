@@ -70,16 +70,26 @@ class RouteConfig
         $router->get('librarian/qrScanner', 'SidebarController@librarianQrScanner', ['librarian']);
         $router->get('librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
         $router->get('librarian/topVisitor', 'SidebarController@librarianTopVisitor', ['librarian']);
-        $router->get('librarian/borrowingHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
+        $router->get('librarian/transactionHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
         $router->get('librarian/returning', 'SidebarController@librarianReturning', ['librarian']);
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
         $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
         $router->get('librarian/changePassword', 'SidebarController@librarianChangePassword', ['librarian']);
         $router->get('librarian/myProfile', 'SidebarController@librarianMyProfile', ['librarian']);
 
+        $router->get('admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
+        $router->get('admin/bookManagement', 'SidebarController@adminBookManagement', ['admin']);
+        $router->get('admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['admin']);
+        $router->get('admin/qrScanner', 'SidebarController@adminQrScanner', ['admin']);
+        $router->get('admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
+        $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['admin']);
+        $router->get('admin/transactionHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
+        $router->get('admin/returning', 'SidebarController@adminReturning', ['admin']);
+        $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
+        $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
+        $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['admin']);
+        $router->get('admin/myProfile', 'SidebarController@adminMyProfile', ['admin']);
 
-
-        // Super Admin Sidebar Page Navigation Display
         $router->get('superadmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
         $router->get('superadmin/userManagement', 'SidebarController@userManagement', ['superadmin']);
         $router->get('superadmin/bookManagement', 'SidebarController@bookManagement', ['superadmin']);
@@ -87,10 +97,9 @@ class RouteConfig
         $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
         $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
-        $router->get('superadmin/borrowingHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('superadmin/transcationHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
         $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
-        $router->get('superadmin/backupAndRestore', 'SidebarController@backupAndRestore', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
         $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
         $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);

@@ -580,5 +580,8 @@
         </div>
     </div>
 </div>
+<script>
+    const BASE_URL = "<?= $_ENV['APP_URL'] ?? 'http://localhost/libsys/public' ?>";
+</script>
 
-<script src="/libsys/public/js/superadmin/userManagement.js" defer></script>
+<script src="<?=base_url('js/superadmin/userManagement.js')?>" defer></script>

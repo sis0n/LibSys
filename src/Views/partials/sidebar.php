@@ -63,7 +63,7 @@ switch ($role) {
         <nav class="flex-1 px-4 py-6 space-y-2">
             <?php if ($role === 'student'): ?>
                 <!-- Student Sidebar -->
-                <a href="/libsys/public/student/dashboard"
+                <a href="<?= base_url('student/dashboard') ?>"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'dashboard') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-house text-2xl"></i>
                     <span class="text-base">Dashboard</span>
@@ -80,12 +80,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/student/bookCatalog"
+                        <a href="<?= base_url('student/bookCatalog') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'bookCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-book text-xl"></i>
                             <span class="text-base text-sm">Book Catalog</span>
                         </a>
-                        <a href="/libsys/public/student/equipmentCatalog"
+                        <a href="<?= base_url('student/equipmentCatalog') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'equipmentCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-desktop-tower text-xl"></i>
                             <span class="text-base text-sm">Equipment Catalog</span>
@@ -104,12 +104,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/student/myCart"
+                        <a href="<?= base_url('student/myCart') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myCart') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-shopping-cart text-xl"></i>
                             <span class="text-base text-sm">Bookbag</span>
                         </a>
-                        <a href="/libsys/public/student/qrBorrowingTicket"
+                        <a href="<?= base_url('student/qrBorrowingTicket') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'qrBorrowingTicket') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-qr-code text-xl"></i>
                             <span class="text-base text-sm">QR Borrowing Ticket</span>
@@ -128,12 +128,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/student/borrowingHistory"
+                        <a href="<?= base_url('student/borrowingHistory') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'borrowingHistory') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-bookmarks text-xl"></i>
                             <span class="text-base text-sm">Borrowing History</span>
                         </a>
-                        <a href="/libsys/public/student/myAttendance"
+                        a href="<?= base_url('student/myAttendance') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myAttendance') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-calendar-check text-xl"></i>
                             <span class="text-base text-sm">Attendance</span>
@@ -152,12 +152,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/student/myProfile"
+                        <a href="<?= base_url('student/myProfile') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myProfile') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-user-circle text-xl"></i>
                             <span class="text-base text-sm">Profile</span>
                         </a>
-                        <a href="/libsys/public/student/changePassword"
+                        <a href="<?= base_url('student/changePassword') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-key text-xl"></i>
                             <span class="text-base text-sm">Change Password</span>
@@ -170,7 +170,7 @@ switch ($role) {
             <?php elseif ($role === 'faculty'): ?>
 
                 <!-- Faculty Sidebar -->
-                <a href="/libsys/public/faculty/dashboard"
+                <a href="<?= base_url('faculty/dashboard') ?>"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'dashboard') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-house text-2xl"></i>
                     <span class="text-base">Dashboard</span>
@@ -186,12 +186,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/faculty/bookCatalog"
+                        <a href="<?= base_url('faculty/bookCatalog') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'bookCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-book text-xl"></i>
                             <span class="text-base text-sm">Book Catalog</span>
                         </a>
-                        <a href="/libsys/public/faculty/equipmentCatalog"
+                        <a href="<?= base_url('faculty/equipmentCatalog') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'equipmentCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-desktop-tower text-xl"></i>
                             <span class="text-base text-sm">Equipment Catalog</span>
@@ -210,12 +210,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/faculty/myCart"
+                        <a href="<?= base_url('faculty/myCart') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myCart') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-shopping-cart text-xl"></i>
                             <span class="text-base text-sm">Bookbag</span>
                         </a>
-                        <a href="/libsys/public/faculty/qrBorrowingTicket"
+                        <a href="<?= base_url('faculty/qrBorrowingTicket') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'qrBorrowingTicket') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-qr-code text-xl"></i>
                             <span class="text-base text-sm">QR Borrowing Ticket</span>
@@ -234,7 +234,7 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/faculty/borrowingHistory"
+                        <a href="<?= base_url('faculty/borrowingHistory') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'borrowingHistory') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-bookmarks text-xl"></i>
                             <span class="text-base text-sm">Borrowing History</span>
@@ -253,12 +253,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/faculty/myProfile"
+                        <a href="<?= base_url('faculty/myProfile') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myProfile') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-user-circle text-xl"></i>
                             <span class="text-base text-sm">Profile</span>
                         </a>
-                        <a href="/libsys/public/faculty/changePassword"
+                        <a href="<?= base_url('faculty/changePassword') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-key text-xl"></i>
                             <span class="text-base text-sm">Change Password</span>
@@ -269,7 +269,7 @@ switch ($role) {
             <?php elseif ($role === 'staff'): ?>
 
                 <!-- Staff Sidebar -->
-                <a href="/libsys/public/staff/dashboard"
+                <a href="<?= base_url('staff/dashboard') ?>"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'dashboard') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-house text-2xl"></i>
                     <span class="text-base">Dashboard</span>
@@ -286,12 +286,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/staff/bookCatalog"
+                        <a href="<?= base_url('staff/bookCatalog') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'bookCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-book text-xl"></i>
                             <span class="text-base text-sm">Book Catalog</span>
                         </a>
-                        <a href="/libsys/public/staff/equipmentCatalog"
+                        <a href="<?= base_url('staff/equipmentCatalog') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'equipmentCatalog') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-desktop-tower text-xl"></i>
                             <span class="text-base text-sm">Equipment Catalog</span>
@@ -310,12 +310,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/staff/myCart"
+                        <a href="<?= base_url('staff/myCart') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myCart') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-shopping-cart text-xl"></i>
                             <span class="text-base text-sm">Bookbag</span>
                         </a>
-                        <a href="/libsys/public/staff/qrBorrowingTicket"
+                        <a href="<?= base_url('staff/qrBorrowingTicket') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'qrBorrowingTicket') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-qr-code text-xl"></i>
                             <span class="text-base text-sm">QR Borrowing Ticket</span>
@@ -334,7 +334,7 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/staff/borrowingHistory"
+                        <a href="<?= base_url('staff/borrowingHistory') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'borrowingHistory') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-bookmarks text-xl"></i>
                             <span class="text-base text-sm">Borrowing History</span>
@@ -353,12 +353,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/libsys/public/staff/myProfile"
+                        <a href="<?= base_url('staff/myProfile') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myProfile') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-user-circle text-xl"></i>
                             <span class="text-base text-sm">Profile</span>
                         </a>
-                        <a href="/libsys/public/staff/changePassword"
+                        <a href="<?=base_url('staff/changePassword')?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-key text-xl"></i>
                             <span class="text-base text-sm">Change Password</span>
@@ -368,7 +368,7 @@ switch ($role) {
 
             <?php elseif ($role === 'superadmin'): ?>
                 <!-- Super Admin Sidebar -->
-                <a href="/LibSys/public/superadmin/dashboard"
+                <a href="<?=base_url('superadmin/dashboard')?>"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'dashboard' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-house text-2xl"></i>
                     <span>Dashboard</span>
@@ -385,17 +385,17 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                        <a href="/LibSys/public/superadmin/userManagement"
+                        <a href="<?=base_url('superadmin/userManagement') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'userManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-users text-xl"></i>
                             <span class="text-base text-sm">User Management</span>
                         </a>
-                        <a href="/LibSys/public/superadmin/bookManagement"
+                        <a href="<?=base_url('superadmin/bookManagement') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'bookManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-book-open text-xl"></i>
                             <span class="text-base text-sm">Book Management</span>
                         </a>
-                        <a href="/LibSys/public/superadmin/equipmentManagement"
+                        <a href="<?=base_url('superadmin/equipmentManagement') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'equipmentManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-desktop-tower text-xl"></i>
                             <span class="text-base text-sm">Equipment Management</span>
@@ -414,12 +414,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                        <a href="/LibSys/public/superadmin/qrScanner"
+                        <a href="<?=base_url('superadmin/qrScanner') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'qrScanner' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-qr-code text-xl"></i>
                             <span class="text-base text-sm">QR Scanner</span>
                         </a>
-                        <a href="/LibSys/public/superadmin/returning"
+                        <a href="<?=base_url('superadmin/returning') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'returning' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-arrow-counter-clockwise text-xl"></i>
                             <span class="text-base text-sm">Returning</span>
@@ -438,17 +438,17 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                        <a href="/LibSys/public/superadmin/attendanceLogs"
+                        <a href="<?=base_url('superadmin/attendanceLogs') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'attendanceLogs' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-calendar-check text-xl"></i>
                             <span class="text-base text-sm">Attendance Logs</span>
                         </a>
-                        <a href="/LibSys/public/superadmin/topVisitor"
+                        <a href="<?=base_url('superadmin/topVisitor') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'topVisitor' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-chart-bar text-xl"></i>
                             <span class="text-base text-sm">Reports</span>
                         </a>
-                        <a href="/LibSys/public/superadmin/transactionHistory"
+                        <a href="<?=base_url('superadmin/transactionHistory') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'transactionHistory' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-arrows-left-right text-xl"></i>
                             <span class="text-base text-sm">Transaction History</span>
@@ -467,22 +467,22 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden">
-                        <a href="/LibSys/public/superadmin/backup"
+                        <a href="<?=base_url('superadmin/backup') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'backup' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-floppy-disk text-xl"></i>
                             <span class="text-base text-sm">Backup</span>
                         </a>
-                        <a href="/LibSys/public/superadmin/restoreBooks"
+                        <a href="<?=base_url('superadmin/restoreBooks') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreBooks' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-book text-xl"></i>
                             <span class="text-base text-sm">Restore Books</span>
                         </a>
-                        <a href="/LibSys/public/superadmin/restoreEquipment"
+                        <a href="<?=base_url('superadmin/restoreEquipment') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreEquipment' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-wrench text-xl"></i>
                             <span class="text-base text-sm">Restore Equipment</span>
                         </a>
-                        <a href="/LibSys/public/superadmin/restoreUser"
+                        <a href="<?=base_url('superadmin/restoreUser') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-user-gear text-xl"></i>
                             <span class="text-base text-sm">Restore User</span>
@@ -491,7 +491,7 @@ switch ($role) {
                 </div>
 
                 <!-- Change Password -->
-                <a href="/libsys/public/superadmin/changePassword"
+                <a href="<?=base_url('superadmin/changePassword') ?>"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-key text-2xl"></i>
                     <span class="text-base">Change Password</span>
@@ -500,7 +500,7 @@ switch ($role) {
 
             <?php elseif ($role === 'admin' || $role === 'librarian'): ?>
                 <!-- Admin/Librarian Sidebar -->
-                <a href="/LibSys/public/<?= $roleFolder ?>/dashboard"
+                <a href="<?= base_url($roleFolder . '/dashboard') ?>"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'dashboard' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-house text-2xl"></i>
                     <span>Dashboard</span>
@@ -517,12 +517,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                        <a href="/LibSys/public/<?= $roleFolder ?>/bookManagement"
+                        <a href="<?= base_url($roleFolder . '/bookManagement') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'bookManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-book-open text-xl"></i>
                             <span class="text-base text-sm">Book Management</span>
                         </a>
-                        <a href="/LibSys/public/<?= $roleFolder ?>/equipmentManagement"
+                        <a href="<?= base_url($roleFolder . '/equipmentManagement') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'equipmentManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-desktop-tower text-xl"></i>
                             <span class="text-base text-sm">Equipment Management</span>
@@ -541,12 +541,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                        <a href="/LibSys/public/<?= $roleFolder ?>/qrScanner"
+                        <a href="<?= base_url($roleFolder . '/qrScanner') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'qrScanner' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-qr-code text-xl"></i>
                             <span class="text-sm text-base">QR Scanner</span>
                         </a>
-                        <a href="/LibSys/public/<?= $roleFolder ?>/returning"
+                        <a href="<?= base_url($roleFolder . '/returning') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'returning' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-arrow-counter-clockwise text-xl"></i>
                             <span class="text-sm text-base">Returning</span>
@@ -565,17 +565,17 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                        <a href="/LibSys/public/<?= $roleFolder ?>/attendanceLogs"
+                        <a href="<?= base_url($roleFolder . '/attendanceLogs') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'attendanceLogs' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-calendar-check text-xl"></i>
                             <span class="text-base text-sm">Attendance Logs</span>
                         </a>
-                        <a href="/LibSys/public/<?= $roleFolder ?>/topVisitor"
+                        <a href="<?= base_url($roleFolder . '/topVisitor') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'topVisitor' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-chart-bar text-xl"></i>
                             <span class="text-base text-sm">Reports</span>
                         </a>
-                        <a href="/LibSys/public/<?= $roleFolder ?>/transactionHistory"
+                        <a href="<?= base_url($roleFolder . '/transactionHistory') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'transactionHistory' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-arrows-left-right text-xl"></i>
                             <span class="text-base text-sm">Transaction History</span>
@@ -594,12 +594,12 @@ switch ($role) {
                         <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
                     </button>
                     <div class="pl-5 pt-1 space-y-1 hidden ml-4">
-                        <a href="/libsys/public/<?= $roleFolder ?>/myProfile"
+                        <a href="<?= base_url($roleFolder . '/myProfile') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myProfile') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-user-circle text-xl"></i>
                             <span class="text-base text-sm">My Profile</span>
                         </a>
-                        <a href="/libsys/public/<?= $roleFolder ?>/changePassword"
+                        <a href="<?= base_url($roleFolder . '/changePassword') ?>"
                             class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                             <i class="ph ph-key text-xl"></i>
                             <span class="text-base text-sm">Change Password</span>

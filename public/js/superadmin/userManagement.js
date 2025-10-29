@@ -34,7 +34,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   fileInput.addEventListener("change", () => {
     if (fileInput.files.length) {
-      bulkImportForm.requestSubmit(); 
+      bulkImportForm.requestSubmit();
     }
   });
 
@@ -49,7 +49,7 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("Uploading file:", fileInput.files[0].name);
 
     try {
-      const res = await fetch("/LibSys/public/superadmin/userManagement/bulkImport", {
+      const res = await fetch("<?= base_url('superadmin/userManagement/bulkImport') ?>", {
         method: "POST",
         body: formData
       });
@@ -270,34 +270,34 @@ window.addEventListener("DOMContentLoaded", () => {
         </tr>
     `;
     try {
-        const res = await fetch(`${BASE_URL}/superadmin/userManagement/getAll`);
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || "Failed to fetch users");
+      const res = await fetch(`${BASE_URL}/superadmin/userManagement/getAll`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || "Failed to fetch users");
 
-        allUsers = data.users
-            .filter(u => u.role.toLowerCase() !== "superadmin")
-            .map(u => ({
-                user_id: u.user_id,
-                first_name: u.first_name,
-                middle_name: u.middle_name,
-                last_name: u.last_name,
-                name: buildFullName(u.first_name, u.middle_name, u.last_name),
-                username: u.username,
-                email: u.email,
-                role: u.role,
-                status: u.is_active == 1 ? "Active" : "Inactive",
-                joinDate: new Date(u.created_at).toLocaleDateString()
-            }));
-        applyFilters();
+      allUsers = data.users
+        .filter(u => u.role.toLowerCase() !== "superadmin")
+        .map(u => ({
+          user_id: u.user_id,
+          first_name: u.first_name,
+          middle_name: u.middle_name,
+          last_name: u.last_name,
+          name: buildFullName(u.first_name, u.middle_name, u.last_name),
+          username: u.username,
+          email: u.email,
+          role: u.role,
+          status: u.is_active == 1 ? "Active" : "Inactive",
+          joinDate: new Date(u.created_at).toLocaleDateString()
+        }));
+      applyFilters();
     } catch (err) {
-        console.error("Fetch users error:", err);
-        if (userTableBody) userTableBody.innerHTML = `
+      console.error("Fetch users error:", err);
+      if (userTableBody) userTableBody.innerHTML = `
             <tr data-placeholder="true">
                 <td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td>
             </tr>
         `;
     }
-}
+  }
 
   function renderTable(usersToRender) {
     if (!userTableBody) return;
@@ -356,16 +356,16 @@ window.addEventListener("DOMContentLoaded", () => {
       }
       try {
         const res = await fetch(`${BASE_URL}/superadmin/userManagement/add`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-        first_name: first_name,
-        middle_name: middle_name || null,
-        last_name: last_name,
-        username: username,
-        role: role
-    })
-  });
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            first_name: first_name,
+            middle_name: middle_name || null,
+            last_name: last_name,
+            username: username,
+            role: role
+          })
+        });
         const data = await res.json();
         if (data.success) {
           alert("User added successfully!");
@@ -455,7 +455,7 @@ window.addEventListener("DOMContentLoaded", () => {
           const res = await fetch(`${BASE_URL}/superadmin/userManagement/allowEdit/${userId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" }
-         });
+          });
           const data = await res.json();
           if (data.success) {
             alert(data.message || "User can now edit their profile.");

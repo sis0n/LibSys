@@ -278,6 +278,7 @@ ADD COLUMN generated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 CREATE TABLE faculty (
     faculty_id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    unique_faculty_id varchar(20),
     user_id INT(11) NULL, 
     department VARCHAR(100) NULL,
     contact VARCHAR(20) NULL,

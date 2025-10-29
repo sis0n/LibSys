@@ -22,7 +22,7 @@
         Update your account password to keep your account secure.
       </p>
 
-      <form id="passwordForm" action="/libsys/public/change-password" method="POST" class="space-y-4">
+      <form id="passwordForm" action="<?= base_url('change-password') ?>" method="POST" class="space-y-4">
 
         <!-- Current Password -->
         <div>
@@ -152,4 +152,4 @@
   </div>
 
 </div>
-<script src="/LibSys/public/js/student/changePassword.js" defer></script>
+<script src="<?=base_url('js/student/changePassword.js')?>" defer></script>

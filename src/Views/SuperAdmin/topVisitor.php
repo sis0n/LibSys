@@ -144,4 +144,4 @@
         </div>
     </div>
 </main>
-<script src="/LibSys/public/js/superadmin/reports.js"></script>
+<script src="<?=base_url('js/superadmin/reports.js')?>" ></script>

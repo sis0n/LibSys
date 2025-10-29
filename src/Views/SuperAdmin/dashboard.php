@@ -97,7 +97,7 @@ $adminName = $_SESSION['admin_name'] ?? 'Admin';
 <script>
   document.addEventListener("DOMContentLoaded", async () => {
     try {
-      const res = await fetch("/LibSys/public/superadmin/dashboard/getData");
+      const res = await fetch(`${BASE_URL}/superadmin/dashboard/getData`);
       const result = await res.json();
 
       if (!result.success) {

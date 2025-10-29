@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let topVisitorsChartInstance = null;
   let weeklyActivityChartInstance = null;
 
-  const BASE_URL = '/libsys/public';
+  const BASE_URL = '/libsys/public'; 
   const API_BASE_URL = `${BASE_URL}/superadmin/dashboard`; 
 
   async function fetchStatsData() {

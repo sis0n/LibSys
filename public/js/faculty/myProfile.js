@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Load Faculty Profile ---
     async function loadProfile() {
         try {
-            const res = await fetch('/libsys/public/faculty/myprofile/get');
+            const res = await fetch(`${BASE_URL}/faculty/myProfile/get`);
             if (!res.ok) throw new Error(`Failed to fetch profile. Status: ${res.status}`);
             const data = await res.json();
 
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (croppedBlob) formData.append('profile_image', croppedBlob, 'profile.png');
 
         try {
-            const res = await fetch('/libsys/public/faculty/myprofile/update', { method: 'POST', body: formData });
+            const res = await fetch(`${BASE_URL}/faculty/myProfile/update`, {method: 'POST', body: formData });
             const result = await res.json();
 
             if (result.success) {

@@ -475,7 +475,7 @@
             console.log("Uploading file:", fileInput.files[0].name);
 
             try {
-                const res = await fetch("/LibSys/public/superadmin/booksmanagement/bulkImport", {
+                const res = await fetch(`${BASE_URL}/superadmin/booksmanagement/bulkImport`, {
                     method: "POST",
                     body: formData
                 });

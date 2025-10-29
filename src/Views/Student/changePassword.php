@@ -151,4 +151,4 @@
     </div>
   </div>
 </main>
-<script src="/LibSys/public/js/student/changePassword.js" defer></script>
+<script src="<?=base_url('js/student/changePassword.js')?>" defer></script>

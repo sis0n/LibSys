@@ -168,5 +168,5 @@
         </div>
     </div>
 
-    <script src="/libsys/public/js/faculty/bookCatalog.js" defer></script>
+    <script src="<?= base_url('js/faculty/bookCatalog.js')?>" defer></script>
 </div>        

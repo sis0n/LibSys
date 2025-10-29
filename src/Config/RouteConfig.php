@@ -51,6 +51,18 @@ class RouteConfig
         $router->post('faculty/myprofile/update', 'FacultyProfileController@updateProfile', ['faculty']);
         $router->get('faculty/borrowingHistory/fetch', 'FacultyBorrowingHistoryController@fetchHistory', ['faculty']);
 
+        // staff
+        $router->get('staff/dashboard', 'SidebarController@staffDashboard', ['staff']);
+        $router->get('staff/bookCatalog', 'SidebarController@staffBookCatalog', ['staff']);
+        $router->get('staff/equipmentCatalog', 'SidebarController@staffEquipmentCatalog', ['staff']);
+        $router->get('staff/myCart', 'SidebarController@staffMyCart', ['staff']);
+        $router->get('staff/qrBorrowingTicket', 'SidebarController@staffQrBorrowingTicket', ['staff']);
+        $router->get('staff/myAttendance', 'SidebarController@staffMyAttendance', ['staff']);
+        $router->get('staff/borrowingHistory', 'SidebarController@staffBorrowingHistory', ['staff']);
+        $router->get('staff/attendance/get', 'AttendanceController@getMyAttendance', ['staff']);
+        $router->get('staff/changePassword', 'SidebarController@staffChangePassword', ['staff']);
+        $router->get('staff/myProfile', 'SidebarController@staffMyProfile', ['staff']);
+
 
         // --- LIBRARIAN ROUTES (Permission Controlled) ---
         $router->get('librarian/dashboard', 'SidebarController@librarianDashboard', ['dashboard']); // Default Privilege

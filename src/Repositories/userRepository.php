@@ -210,27 +210,37 @@ class UserRepository
   {
     try {
       $stmt = $this->db->query("
-                SELECT 
-                    user_id,
-                    username,
-                    first_name,
-                    middle_name,
-                    last_name,
-                    suffix,
-                    email,
-                    role,
-                    is_active,
-                    created_at
-                FROM users
-                WHERE deleted_at IS NULL
-                ORDER BY user_id DESC
-            ");
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            SELECT 
+                u.user_id,
+                u.username,
+                u.first_name,
+                u.middle_name,
+                u.last_name,
+                u.suffix,
+                u.email,
+                u.role,
+                u.is_active,
+                u.created_at,
+                GROUP_CONCAT(um.module_name) AS modules
+            FROM users u
+            LEFT JOIN user_module_permissions um ON um.user_id = u.user_id
+            WHERE u.deleted_at IS NULL
+            GROUP BY u.user_id
+            ORDER BY u.user_id DESC
+        ");
+      $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      foreach ($users as &$user) {
+        $user['modules'] = $user['modules'] ? explode(',', $user['modules']) : [];
+      }
+
+      return $users;
     } catch (PDOException $e) {
       error_log('[UserRepository::getAllUsers] ' . $e->getMessage());
       return [];
     }
   }
+
 
   public function findByStudentNumber(string $studentNumber)
   {

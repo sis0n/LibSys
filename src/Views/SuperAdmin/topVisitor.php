@@ -85,16 +85,16 @@
 
     <!-- Second Row of Tables -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <!-- Library Visit (by Course) Table -->
+        <!-- Library Visit (by Department) Table -->
         <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-4">
             <h3 class="text-lg font-medium mb-4 flex items-center justify-between">
-                Library Visit (by Course)
+                Library Visit (by Department)
             </h3>
             <div class="overflow-x-auto rounded-lg border border-orange-200">
                 <table class="w-full text-sm border-collapse">
                     <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
                         <tr>
-                            <th scope="col" class="px-4 py-3 text-left">Course</th>
+                            <th scope="col" class="px-4 py-3 text-left">Department</th>
                             <th scope="col" class="px-4 py-3 text-center">Today</th>
                             <th scope="col" class="px-4 py-3 text-center">Week</th>
                             <th scope="col" class="px-4 py-3 text-center">Month</th>

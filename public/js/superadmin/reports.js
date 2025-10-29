@@ -66,41 +66,53 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.appendChild(totalRow);
     }
 
-    // --- Library Visit by Course ---
-    const libraryVisitByCourseData = [
-        { course: 'BSIT', today: '-', week: '-', month: '-', year: '-' },
-        { course: 'BSCS', today: '-', week: '-', month: '-', year: '-' },
-        { course: 'BSIS', today: '-', week: '-', month: '-', year: '-' },
-        { course: 'BSCE', today: '-', week: '-', month: '-', year: '-' },
-        { course: 'BSEE', today: '-', week: '-', month: '-', year: '-' },
+    // --- Library Visit by Department ---
+    const libraryVisitByDepartmentData = [
+        { department: 'CBA', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'CCJE', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'CLAS', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'COE', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'COEngr', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'LAW', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'GS', today: 0, week: 0, month: 0, year: 0 },
     ];
 
-    function populateLibraryVisitByCourse() {
+    function populateLibraryVisitByDepartment() {
         const tbody = document.getElementById('library-visit-tbody');
         if (!tbody) return;
         tbody.innerHTML = ''; // Clear existing rows
 
-        libraryVisitByCourseData.forEach(data => {
+        let totalToday = 0;
+        let totalWeek = 0;
+        let totalMonth = 0;
+        let totalYear = 0;
+
+        libraryVisitByDepartmentData.forEach(data => {
             const row = document.createElement('tr');
             row.classList.add('border-b', 'border-orange-100');
             row.innerHTML = `
-                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.course}</td>
+                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.department}</td>
                 <td class="px-4 py-2 text-center">${data.today}</td>
                 <td class="px-4 py-2 text-center">${data.week}</td>
                 <td class="px-4 py-2 text-center">${data.month}</td>
                 <td class="px-4 py-2 text-center">${data.year}</td>
             `;
             tbody.appendChild(row);
+
+            totalToday += data.today;
+            totalWeek += data.week;
+            totalMonth += data.month;
+            totalYear += data.year;
         });
 
         const totalRow = document.createElement('tr');
         totalRow.classList.add('bg-orange-50', 'font-bold', 'text-gray-800');
         totalRow.innerHTML = `
             <td class="px-4 py-2 text-left">TOTAL</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
+            <td class="px-4 py-2 text-center">${totalToday}</td>
+            <td class="px-4 py-2 text-center">${totalWeek}</td>
+            <td class="px-4 py-2 text-center">${totalMonth}</td>
+            <td class="px-4 py-2 text-center">${totalYear}</td>
         `;
         tbody.appendChild(totalRow);
     }
@@ -148,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Call Functions ---
     populateCirculatedBooks();
-    populateLibraryVisitByCourse();
+    populateLibraryVisitByDepartment();
     populateTopVisitors();
 
     // --- Download Report Button ---
@@ -189,7 +201,7 @@ function initializeCharts() {
         new Chart(topCtx.getContext('2d'), {
             type: 'bar',
             data: {
-                labels: ['BSCS', 'BSIT', 'BSEMC', 'BSIS', 'BSCE'],
+                labels: ['CBA', 'CCJE', 'CLAS', 'COE', 'COEngr'],
                 datasets: [{
                     label: 'Visits',
                     data: [15, 10, 8, 12, 9],

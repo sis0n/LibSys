@@ -9,133 +9,133 @@ const statusMenu = document.getElementById("statusFilterMenu");
 const statusValue = document.getElementById("statusFilterValue");
 
 function renderScanResult(data) {
-  if (!data || !data.isValid) {
-    scanResultCard.innerHTML = `
-      <div>
-        <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
-        <p class="text-gray-500 mb-6">Review ticket details and process transaction</p>
-        <div class="text-center py-16" id="initialState">
-          <div class="flex justify-center items-center mb-4">
-            <div class="bg-orange-100 rounded-full w-20 h-20 flex items-center justify-center">
-              <i class="ph ph-x text-4xl text-orange-500"></i>
+    if (!data || !data.isValid) {
+        scanResultCard.innerHTML = `
+            <div>
+                <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
+                <p class="text-gray-500 mb-6">Review ticket details and process transaction</p>
+                <div class="text-center py-16" id="initialState">
+                    <div class="flex justify-center items-center mb-4">
+                        <div class="bg-orange-100 rounded-full w-20 h-20 flex items-center justify-center">
+                            <i class="ph ph-x text-4xl text-orange-500"></i>
+                        </div>
+                    </div>
+                    <p class="font-semibold text-gray-700">${data ? data.message : 'No ticket scanned yet'}</p>
+                    <p class="text-sm text-gray-500">Present QR code or enter ticket ID manually</p>
+                </div>
             </div>
-          </div>
-          <p class="font-semibold text-gray-700">${data ? data.message : 'No ticket scanned yet'}</p>
-          <p class="text-sm text-gray-500">Present QR code or enter ticket ID manually</p>
+        `;
+        return;
+    }
+
+    const user = data.user;
+    const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
+
+    let profilePicPath = defaultAvatar;
+    if (user.profilePicture) {
+        profilePicPath = user.profilePicture.startsWith('/') ? user.profilePicture : `/${user.profilePicture}`;
+    }
+
+    const actionButton = isBorrowed ?
+        `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>` :
+        `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
+            class="w-full bg-orange-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-orange-600 transition">
+            Confirm Borrow (${data.items.length} Items)
+        </button>`;
+
+    const itemsHtml = data.items.map((item, index) => `
+        <li class="mb-3 flex items-start gap-3">
+            <span class="text-sm font-semibold text-gray-700 w-6 text-right">${index + 1}.</span>
+            <div class="flex-1">
+                <p class="font-medium text-gray-800 leading-snug">${item.title}</p>
+                <p class="text-sm text-gray-700">${item.author}</p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-xs font-medium">Accession No: ${item.accessionNumber}</span>
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-xs font-medium">Call No: ${item.callNumber}</span>
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-xs font-medium">ISBN: ${item.isbn}</span>
+                </div>
+            </div>
+        </li>
+    `).join('');
+
+    let extraInfoHtml = '';
+    if (user.type === 'student') {
+        extraInfoHtml = `
+            <div class="flex justify-between"><span>Course:</span><span class="font-medium text-right">${user.course}</span></div>
+            <div class="flex justify-between"><span>Year & Section:</span><span class="font-medium text-right">${user.yearsection}</span></div>
+        `;
+    } else if (user.type === 'faculty') {
+        extraInfoHtml = `<div class="flex justify-between"><span>Department:</span><span class="font-medium text-right">${user.department}</span></div>`;
+    } else if (user.type === 'staff') {
+        extraInfoHtml = `
+            <div class="flex justify-between"><span>Position:</span><span class="font-medium text-right">${user.position}</span></div>
+            <div class="flex justify-between"><span>Contact:</span><span class="font-medium text-right">${user.contact}</span></div>
+        `;
+    }
+
+    scanResultCard.innerHTML = `
+        <div class="flex flex-col flex-grow">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-semibold">Scan Result</h2>
+            </div>
+            <p class="text-gray-500 mb-6">Review ticket details and process transaction</p> 
+            
+            <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-4">
+                <i class="ph ph-check-circle text-xl"></i>
+                <span>Valid ticket scanned (${isBorrowed ? 'Already Borrowed' : 'For Borrow'})</span>
+            </div>
+
+            <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-16 h-16 flex-shrink-0">
+                        <img src="${profilePicPath}" alt="User Avatar" 
+                             class="w-full h-full object-cover rounded-full border border-orange-300">
+                    </div>
+                    <div class="self-center">
+                        <p class="font-bold text-lg text-gray-800">${user.name}</p> 
+                        <p class="text-md text-gray-600">
+                            ID: <span class="font-medium text-gray-700">${user.id}</span> 
+                        </p>
+                    </div>
+                </div>
+
+                <h2 class="font-semibold text-gray-700 mb-2">Details:</h2>
+                <div class="space-y-1 text-sm text-gray-700">
+                    ${extraInfoHtml}
+                    <div class="flex justify-between"><span>Ticket:</span><span class="font-medium text-right">${data.ticket.id}</span></div>
+                    <div class="flex justify-between"><span>Status:</span><span class="font-medium text-right uppercase">${data.ticket.status}</span></div>
+                    <div class="flex justify-between"><span>Generated:</span><span class="font-medium text-right">${data.ticket.generated}</span></div>
+                    ${isBorrowed ? `<div class="flex justify-between"><span>Due Date:</span><span class="font-medium text-right text-red-600">${data.ticket.dueDate}</span></div>` : ''}
+                </div>
+            </div>
+
+            <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 overflow-y-auto max-h-64 flex-grow mb-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="ph ph-book-open text-lg text-gray-700"></i>
+                    <h3 class="font-semibold text-gray-700">Items (${data.items.length})</h3>
+                </div>
+                <hr class="border-t border-orange-200 mb-3">
+                <ul class="list-none pl-0 text-gray-700">${itemsHtml}</ul>
+            </div>
+
+            <div class="mt-auto">
+                ${actionButton}
+            </div>
         </div>
-      </div>
     `;
-    return;
-  }
 
-  const user = data.user;
-  const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
-
-  let profilePicPath = defaultAvatar;
-  if (user.profilePicture) {
-    profilePicPath = user.profilePicture.startsWith('/') ? user.profilePicture : `/${user.profilePicture}`;
-  }
-
-  const actionButton = isBorrowed ?
-    `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>` :
-    `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
-        class="w-full bg-orange-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-orange-600 transition">
-        Confirm Borrow (${data.items.length} Items)
-      </button>`;
-
-  const itemsHtml = data.items.map((item, index) => `
-    <li class="mb-3 flex items-start gap-3">
-      <span class="text-sm font-semibold text-gray-700 w-6 text-right">${index + 1}.</span>
-      <div class="flex-1">
-        <p class="font-medium text-gray-800 leading-snug">${item.title}</p>
-        <p class="text-sm text-gray-700">${item.author}</p>
-        <div class="mt-2 flex flex-wrap gap-2">
-          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-xs font-medium">Accession No: ${item.accessionNumber}</span>
-          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-xs font-medium">Call No: ${item.callNumber}</span>
-          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-xs font-medium">ISBN: ${item.isbn}</span>
-        </div>
-      </div>
-    </li>
-  `).join('');
-
-  let extraInfoHtml = '';
-  if (user.type === 'student') {
-    extraInfoHtml = `
-      <div class="flex justify-between"><span>Course:</span><span class="font-medium text-right">${user.course}</span></div>
-      <div class="flex justify-between"><span>Year & Section:</span><span class="font-medium text-right">${user.yearsection}</span></div>
-    `;
-  } else if (user.type === 'faculty') {
-    extraInfoHtml = `<div class="flex justify-between"><span>Department:</span><span class="font-medium text-right">${user.department}</span></div>`;
-  } else if (user.type === 'staff') {
-    extraInfoHtml = `
-      <div class="flex justify-between"><span>Position:</span><span class="font-medium text-right">${user.position}</span></div>
-      <div class="flex justify-between"><span>Contact:</span><span class="font-medium text-right">${user.contact}</span></div>
-    `;
-  }
-
-  scanResultCard.innerHTML = `
-    <div class="flex flex-col flex-grow">
-      <div class="flex justify-between items-center">
-        <h2 class="text-xl font-semibold">Scan Result</h2>
-      </div>
-      <p class="text-gray-500 mb-6">Review ticket details and process transaction</p> 
-      
-      <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-4">
-        <i class="ph ph-check-circle text-xl"></i>
-        <span>Valid ticket scanned (${isBorrowed ? 'Already Borrowed' : 'For Borrow'})</span>
-      </div>
-
-      <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-16 h-16 flex-shrink-0">
-            <img src="${profilePicPath}" alt="User Avatar" 
-                 class="w-full h-full object-cover rounded-full border border-orange-300">
-          </div>
-          <div class="self-center">
-            <p class="font-bold text-lg text-gray-800">${user.name}</p> 
-            <p class="text-md text-gray-600">
-              ID: <span class="font-medium text-gray-700">${user.id}</span> 
-            </p>
-          </div>
-        </div>
-
-        <h2 class="font-semibold text-gray-700 mb-2">Details:</h2>
-        <div class="space-y-1 text-sm text-gray-700">
-          ${extraInfoHtml}
-          <div class="flex justify-between"><span>Ticket:</span><span class="font-medium text-right">${data.ticket.id}</span></div>
-          <div class="flex justify-between"><span>Status:</span><span class="font-medium text-right uppercase">${data.ticket.status}</span></div>
-          <div class="flex justify-between"><span>Generated:</span><span class="font-medium text-right">${data.ticket.generated}</span></div>
-          ${isBorrowed ? `<div class="flex justify-between"><span>Due Date:</span><span class="font-medium text-right text-red-600">${data.ticket.dueDate}</span></div>` : ''}
-        </div>
-      </div>
-
-      <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 overflow-y-auto max-h-64 flex-grow mb-4">
-        <div class="flex items-center gap-2 mb-3">
-          <i class="ph ph-book-open text-lg text-gray-700"></i>
-          <h3 class="font-semibold text-gray-700">Items (${data.items.length})</h3>
-        </div>
-        <hr class="border-t border-orange-200 mb-3">
-        <ul class="list-none pl-0 text-gray-700">${itemsHtml}</ul>
-      </div>
-
-      <div class="mt-auto">
-        ${actionButton}
-      </div>
-    </div>
-  `;
-
-  const processBorrowBtn = document.getElementById('processBorrowBtn');
-  if (processBorrowBtn) {
-    processBorrowBtn.addEventListener('click', () => processTransaction(data.ticket.id, 'borrow'));
-  }
+    const processBorrowBtn = document.getElementById('processBorrowBtn');
+    if (processBorrowBtn) {
+        processBorrowBtn.addEventListener('click', () => processTransaction(data.ticket.id, 'borrow'));
+    }
 }
 
-
+// ---------------- Transaction History ----------------
 function renderTransactionHistory(transactions) {
-  if (!transactionHistoryTableBody) return;
+    if (!transactionHistoryTableBody) return;
 
-  if (!transactions || transactions.length === 0) {
-    transactionHistoryTableBody.innerHTML = `
+    if (!transactions || transactions.length === 0) {
+        transactionHistoryTableBody.innerHTML = `
             <tr>
                 <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                     <div class="flex flex-col items-center justify-center gap-3 mt-6 mb-6">
@@ -148,18 +148,18 @@ function renderTransactionHistory(transactions) {
                 </td>
             </tr>
         `;
-    return;
-  }
+        return;
+    }
 
-  let tableRowsHtml = '';
-  transactions.forEach(transaction => {
-    const statusClass = transaction.status === 'Borrowed'
-      ? 'bg-orange-100 text-orange-800'
-      : transaction.status === 'Returned'
-        ? 'bg-green-100 text-green-800'
-        : 'bg-gray-100 text-gray-800';
+    let tableRowsHtml = '';
+    transactions.forEach(transaction => {
+        const statusClass = transaction.status === 'Borrowed'
+            ? 'bg-orange-100 text-orange-800'
+            : transaction.status === 'Returned'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-gray-100 text-gray-800';
 
-    tableRowsHtml += `
+        tableRowsHtml += `
             <tr class="hover:bg-orange-50 transition">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${transaction.studentName}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${transaction.studentNumber}</td>
@@ -173,112 +173,299 @@ function renderTransactionHistory(transactions) {
                 </td>
             </tr>
         `;
-  });
+    });
 
-  transactionHistoryTableBody.innerHTML = tableRowsHtml;
+    transactionHistoryTableBody.innerHTML = tableRowsHtml;
 }
 
-function processTransaction(transactionCode, action) {
-  const actionText = 'finalize this borrowing transaction';
+// ---------------- Process Transaction ----------------
+async function processTransaction(transactionCode, action) {
+    const actionText = 'finalize this borrowing transaction';
 
-  Swal.fire({
-    title: `Borrow Transaction?`,
-    text: `Are you sure you want to ${actionText} for ticket ${transactionCode}?`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#f97316',
-    cancelButtonColor: '#6b7280',
-    confirmButtonText: `Yes, Process Borrow!`,
-  }).then((result) => {
-    if (result.isConfirmed) {
-      const url = `${BASE_AJAX_PATH}/borrowTransaction`;
-      const formData = `transaction_code=${encodeURIComponent(transactionCode)}`;
+    const confirmationResult = await Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col text-center">
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                        <i class="ph ph-question text-2xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-[17px] font-semibold text-orange-700">Confirm Borrow?</h3>
+                <p class="text-[14px] text-gray-700 mt-1">
+                    Are you sure you want to ${actionText} for ticket <span class="font-semibold">${transactionCode}</span>?
+                </p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: "Yes, Process Borrow!",
+        cancelButtonText: "Cancel",
+        customClass: {
+            popup: "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] !border-2 !border-orange-400",
+            confirmButton: "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+            cancelButton: "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+        },
+    });
 
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData
-      })
-        .then(res => res.json())
-        .then(res => {
-          if (res.success) {
-            Swal.fire('Success!', res.message, 'success');
+    if (!confirmationResult.isConfirmed) {
+        Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 2000,
+            width: "360px",
+            background: "transparent",
+            html: `
+                <div class="flex flex-col text-left">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                            <i class="ph ph-x-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[15px] font-semibold text-red-600">Cancelled</h3>
+                            <p class="text-[13px] text-gray-700 mt-0.5">Transaction was cancelled.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef]",
+            },
+        });
+        return;
+    }
+
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                <p class="text-gray-700 text-[14px]">Processing borrow...<br><span class="text-sm text-gray-500">Do not close the page.</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff]",
+        },
+    });
+
+    const url = `${BASE_AJAX_PATH}/borrowTransaction`;
+    const formData = `transaction_code=${encodeURIComponent(transactionCode)}`;
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+        });
+
+        const result = await res.json();
+        Swal.close();
+
+        if (result.success) {
+            Swal.fire({
+                toast: true,
+                position: "bottom-end",
+                showConfirmButton: false,
+                timer: 3000,
+                width: "360px",
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col text-left">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+                                <i class="ph ph-check-circle text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-semibold text-green-600">Borrow Successful!</h3>
+                                <p class="text-[13px] text-gray-700 mt-0.5">${result.message}</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5]",
+                },
+            });
             renderScanResult(null);
-
             document.getElementById('scannerInput').focus();
-          } else {
-            Swal.fire({ icon: 'error', title: 'Transaction Failed', text: res.message });
-          }
-        })
-        .catch(() => {
-          Swal.fire({ icon: 'error', title: 'Network Error', text: 'Could not connect to the server.' });
+        } else {
+            Swal.fire({
+                toast: true,
+                position: "bottom-end",
+                showConfirmButton: false,
+                timer: 3000,
+                width: "360px",
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col text-left">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                <i class="ph ph-x-circle text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-semibold text-red-600">Transaction Failed</h3>
+                                <p class="text-[13px] text-gray-700 mt-0.5">${result.message}</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef]",
+                },
+            });
+        }
+    } catch (error) {
+        Swal.close();
+        Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 3000,
+            width: "360px",
+            background: "transparent",
+            html: `
+                <div class="flex flex-col text-left">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                            <i class="ph ph-x-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                            <p class="text-[13px] text-gray-700 mt-0.5">Could not connect to the server.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef]",
+            },
         });
     }
-  });
 }
 
-
-
-function scanQRCode(transactionCode) {
-  fetch(`${BASE_AJAX_PATH}/scanTicket`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `transaction_code=${encodeURIComponent(transactionCode)}`
-  })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        renderScanResult({ isValid: true, ...res.data });
-        document.getElementById('manualTicketInput').value = '';
-      } else {
-        renderScanResult({ isValid: false, message: res.message });
-        Swal.fire({
-          icon: 'error',
-          title: 'Invalid Ticket',
-          text: res.message,
-        });
-      }
+// ---------------- Scan QR Code ----------------
+async function scanQRCode(transactionCode) {
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                <p class="text-gray-700 text-[14px]">Scanning ticket...<br><span class="text-sm text-gray-500">Just a moment.</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff]",
+        },
     });
+
+    try {
+        const res = await fetch(`${BASE_AJAX_PATH}/scanTicket`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `transaction_code=${encodeURIComponent(transactionCode)}`
+        });
+
+        const resData = await res.json();
+        Swal.close();
+
+        if (resData.success) {
+            renderScanResult({ isValid: true, ...resData.data });
+            document.getElementById('manualTicketInput').value = '';
+        } else {
+            renderScanResult({ isValid: false, message: resData.message });
+            Swal.fire({
+                toast: true,
+                position: "bottom-end",
+                showConfirmButton: false,
+                timer: 3000,
+                width: "360px",
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col text-left">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                <i class="ph ph-x-circle text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-semibold text-red-600">Invalid Ticket</h3>
+                                <p class="text-[13px] text-gray-700 mt-0.5">${resData.message}</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef]",
+                },
+            });
+        }
+    } catch (error) {
+        Swal.close();
+        Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 3000,
+            width: "360px",
+            background: "transparent",
+            html: `
+                <div class="flex flex-col text-left">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                            <i class="ph ph-x-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                            <p class="text-[13px] text-gray-700 mt-0.5">Could not connect to the server while scanning.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef]",
+            },
+        });
+    }
 }
 
+// ---------------- DOMContentLoaded ----------------
 document.addEventListener('DOMContentLoaded', () => {
 
-  if (statusBtn && statusMenu && statusValue) {
-    statusBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      statusMenu.classList.toggle("hidden");
+    if (statusBtn && statusMenu && statusValue) {
+        statusBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            statusMenu.classList.toggle("hidden");
+        });
+
+        statusMenu.querySelectorAll(".dropdown-item").forEach(item => {
+            item.addEventListener("click", () => {
+                statusValue.textContent = item.dataset.value;
+                statusMenu.classList.add("hidden");
+            });
+        });
+
+        document.addEventListener("click", e => {
+            if (!statusBtn.contains(e.target) && !statusMenu.contains(e.target)) {
+                statusMenu.classList.add("hidden");
+            }
+        });
+    }
+
+    const scannerInput = document.getElementById('scannerInput');
+    const scannerBox = document.getElementById('scannerBox');
+    const manualBtn = document.getElementById('manualTicketBtn');
+    const manualInput = document.getElementById('manualTicketInput');
+
+    if (scannerInput && scannerBox) {
+        scannerBox.addEventListener('click', () => scannerInput.focus());
+        scannerInput.focus();
+    }
+
+    manualBtn.addEventListener('click', () => {
+        const code = manualInput.value.trim();
+        if (code) scanQRCode(code);
     });
-
-    statusMenu.querySelectorAll(".dropdown-item").forEach(item => {
-      item.addEventListener("click", () => {
-        statusValue.textContent = item.dataset.value;
-        statusMenu.classList.add("hidden");
-
-      });
-    });
-
-    document.addEventListener("click", e => {
-      if (!statusBtn.contains(e.target) && !statusMenu.contains(e.target)) {
-        statusMenu.classList.add("hidden");
-      }
-    });
-  }
-
-  searchInput.addEventListener('input', () => fetchTransactionHistory());
-  dateInput.addEventListener('change', () => fetchTransactionHistory());
-
-  const scannerInput = document.getElementById('scannerInput');
-  const scannerBox = document.getElementById('scannerBox');
-  const manualBtn = document.getElementById('manualTicketBtn');
-  const manualInput = document.getElementById('manualTicketInput');
-
-  if (scannerInput && scannerBox) {
-    scannerBox.addEventListener('click', () => scannerInput.focus());
-    scannerInput.focus();
-  }
-
-  manualBtn.addEventListener('click', () => {
-    const code = manualInput.value.trim();
-    if (code) scanQRCode(code);
-  });
 });

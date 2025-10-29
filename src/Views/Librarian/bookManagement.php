@@ -474,6 +474,23 @@
             formData.append("csv_file", fileInput.files[0]);
             console.log("Uploading file:", fileInput.files[0].name);
 
+            // 🔵 Loading Animation for Bulk Import
+            Swal.fire({
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col items-center justify-center gap-2">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                        <p class="text-gray-700 text-[14px]">Importing books...<br><span class="text-sm text-gray-500">Do not close the page.</span></p>
+                    </div>
+                `,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] shadow-[0_0_8px_#3b82f670]",
+                },
+            });
+
+
             try {
                 const res = await fetch(`${getApiBaseUrl()}/booksmanagement/bulkImport`, {
                     method: "POST",
@@ -482,23 +499,95 @@
 
                 const data = await res.json();
 
+                Swal.close();
+
                 if (data.success) {
-                    if (importMessage) {
-                        importMessage.textContent = `Imported: ${data.imported} rows successfully!`;
-                        importMessage.classList.remove("hidden");
-                        setTimeout(() => importMessage.classList.add("hidden"), 5000);
-                    }
+                    // 🟢 Success Toast for Bulk Import
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+                                        <i class="ph ph-check-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-green-600">Import Successful!</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">Imported: ${data.imported} rows successfully!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] backdrop-blur-sm shadow-[0_0_8px_#22c55e70]",
+                        },
+                    });
 
                     fileInput.value = "";
                     closeModal(document.getElementById("importModal"));
 
-                    if (typeof loadUsers === "function") await loadUsers();
+                    // Assumed loadUsers is loadBooks based on context, so I changed it.
+                    if (typeof loadBooks === "function") await loadBooks(currentPage);
                 } else {
-                    alert("Error: " + (data.message || "Failed to import CSV."));
+                    // 🔴 Error Toast for Bulk Import
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                        <i class="ph ph-x-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-red-600">Import Failed</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">${data.message || "Failed to import CSV."}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                        },
+                    });
                 }
             } catch (err) {
                 console.error("Error importing CSV:", err);
-                alert("Error importing CSV.");
+                Swal.close();
+                // 🔴 Error Toast for Network/Fetch Error
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                    <i class="ph ph-x-circle text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">There was a connection issue while importing.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
             }
         });
 
@@ -589,7 +678,31 @@
             if (!file) return;
             const allowedTypes = ['image/jpeg', 'image/png'];
             if (!allowedTypes.includes(file.type)) {
-                alert('Invalid file type! Please upload only JPG or PNG files.');
+                // 🟠 Warning Toast for Invalid file type (instead of alert)
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 text-orange-600">
+                                    <i class="ph ph-warning text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-orange-600">Invalid File Type</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">Please upload only JPG or PNG files.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm shadow-[0_0_8px_#ffb34770]",
+                    },
+                });
                 input.value = '';
                 uploadText.textContent = 'Upload Image';
                 previewContainer.classList.add('hidden');
@@ -610,7 +723,31 @@
             if (!file) return;
             const allowedTypes = ['image/jpeg', 'image/png'];
             if (!allowedTypes.includes(file.type)) {
-                alert('Invalid file type! Please upload only JPG or PNG files.');
+                // 🟠 Warning Toast for Invalid file type (instead of alert)
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 text-orange-600">
+                                    <i class="ph ph-warning text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-orange-600">Invalid File Type</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">Please upload only JPG or PNG files.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm shadow-[0_0_8px_#ffb34770]",
+                    },
+                });
                 editInput.value = '';
                 editUploadText.textContent = 'Upload Image';
                 editPreviewContainer.classList.add('hidden');
@@ -900,29 +1037,148 @@
         addBookForm?.addEventListener("submit", async (e) => {
             e.preventDefault();
             const formData = new FormData(addBookForm);
+
             if (!formData.get('accession_number') || !formData.get('call_number') || !formData.get('title') || !formData.get('author')) {
-                Swal.fire('Missing Info', 'Please fill in all required fields (*).', 'warning');
+                // 🟠 Warning Toast for Missing Info (instead of simple warning)
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 text-orange-600">
+                                    <i class="ph ph-warning text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-orange-600">Missing Information</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">Please fill in all required fields (*).</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm shadow-[0_0_8px_#ffb34770]",
+                    },
+                });
                 return;
             }
+
+            // 🔵 Loading Animation for Add Book
+            Swal.fire({
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col items-center justify-center gap-2">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                        <p class="text-gray-700 text-[14px]">Adding book...<br><span class="text-sm text-gray-500">Processing request.</span></p>
+                    </div>
+                `,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] shadow-[0_0_8px_#3b82f670]",
+                },
+            });
+
             try {
                 const res = await fetch(`${getApiBaseUrl()}/booksmanagement/store`, {
                     method: "POST",
                     body: formData
                 });
+
                 const result = await res.json();
+
+                Swal.close();
+
                 if (result.success) {
-                    Swal.fire('Success!', result.message || 'Book added!', 'success');
+                    // 🟢 Success Toast for Add Book
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+                                        <i class="ph ph-check-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-green-600">Book Added!</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">${result.message || 'Book added successfully!'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] backdrop-blur-sm shadow-[0_0_8px_#22c55e70]",
+                        },
+                    });
                     closeModal(addBookModal);
                     addBookForm.reset();
                     previewContainer.classList.add('hidden');
                     uploadText.textContent = 'Upload Image';
                     loadBooks(1);
                 } else {
-                    Swal.fire('Error', result.message || 'Failed to add book.', 'error');
+                    // 🔴 Error Toast for Add Book Failure
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                        <i class="ph ph-x-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-red-600">Add Book Failed</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">${result.message || 'Failed to add book.'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                        },
+                    });
                 }
             } catch (err) {
                 console.error("Add book error:", err);
-                Swal.fire('Error', 'An error occurred.', 'error');
+                Swal.close();
+                // 🔴 Error Toast for Network/Fetch Error
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                    <i class="ph ph-x-circle text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">An error occurred while adding the book.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
             }
         });
 
@@ -959,11 +1215,59 @@
                     viewModalDescription.textContent = book.description || "No description available.";
                     openModal(viewBookModal);
                 } else {
-                    Swal.fire('Error', data.message || 'Could not find book details.', 'error');
+                    // 🔴 Error Toast for View Book Failure
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                        <i class="ph ph-x-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-red-600">Error</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">${data.message || 'Could not find book details.'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                        },
+                    });
                 }
             } catch (err) {
                 console.error("View book fetch error:", err);
-                Swal.fire('Error', 'An error occurred while fetching book data.', 'error');
+                // 🔴 Error Toast for Network/Fetch Error
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                    <i class="ph ph-x-circle text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">An error occurred while fetching book data.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
             }
         };
 
@@ -1000,11 +1304,59 @@
                     }
                     openModal(editBookModal);
                 } else {
-                    Swal.fire('Error', data.message || 'Could not find book details.', 'error');
+                    // 🔴 Error Toast for Edit Book Fetch Failure
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                        <i class="ph ph-x-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-red-600">Error</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">${data.message || 'Could not find book details for editing.'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                        },
+                    });
                 }
             } catch (err) {
                 console.error("Edit book fetch error:", err);
-                Swal.fire('Error', 'Error fetching book data.', 'error');
+                // 🔴 Error Toast for Network/Fetch Error
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                    <i class="ph ph-x-circle text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">An error occurred while fetching book data for editing.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
             }
         };
 
@@ -1012,56 +1364,319 @@
             e.preventDefault();
             if (!currentEditingBookId) return;
             const formData = new FormData(editBookForm);
+
             if (!formData.get('accession_number') || !formData.get('call_number') || !formData.get('title') || !formData.get('author')) {
-                Swal.fire('Missing Info', 'Please fill in all required fields (*).', 'warning');
+                 // 🟠 Warning Toast for Missing Info (instead of simple warning)
+                 Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 text-orange-600">
+                                    <i class="ph ph-warning text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-orange-600">Missing Information</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">Please fill in all required fields (*).</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm shadow-[0_0_8px_#ffb34770]",
+                    },
+                });
                 return;
             }
+
+            // 🔵 Loading Animation for Edit Book
+            Swal.fire({
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col items-center justify-center gap-2">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                        <p class="text-gray-700 text-[14px]">Updating book...<br><span class="text-sm text-gray-500">Processing request.</span></p>
+                    </div>
+                `,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] shadow-[0_0_8px_#3b82f670]",
+                },
+            });
+
             try {
                 const res = await fetch(`${getApiBaseUrl()}/booksmanagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
+
                 const result = await res.json();
+                
+                Swal.close();
+
                 if (result.success) {
-                    Swal.fire('Success!', result.message || 'Book updated!', 'success');
+                    // 🟢 Success Toast for Edit Book
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+                                        <i class="ph ph-check-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-green-600">Book Updated!</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">${result.message || 'Book updated successfully!'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] backdrop-blur-sm shadow-[0_0_8px_#22c55e70]",
+                        },
+                    });
                     closeModal(editBookModal);
                     loadBooks(currentPage);
                 } else {
-                    Swal.fire('Error', result.message || 'Failed to update book.', 'error');
+                    // 🔴 Error Toast for Edit Book Failure
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                        <i class="ph ph-x-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-red-600">Update Failed</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">${result.message || 'Failed to update book.'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                        },
+                    });
                 }
             } catch (err) {
                 console.error("Update book error:", err);
-                Swal.fire('Error', 'An error occurred.', 'error');
+                Swal.close();
+                // 🔴 Error Toast for Network/Fetch Error
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                    <i class="ph ph-x-circle text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">An error occurred while updating the book.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
             }
         });
 
         window.deleteBook = async (bookId, title) => {
             if (!bookId) return;
+
+            // 🟠 Confirmation Alert for Delete (ORANGE Confirmation Button)
             const result = await Swal.fire({
-                title: 'Are you sure?',
-                text: `Delete "${title}"?`,
-                icon: 'warning',
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col text-center">
+                        <div class="flex justify-center mb-3">
+                            <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                                <i class="ph ph-trash text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-[17px] font-semibold text-orange-700">Delete Book?</h3>
+                        <p class="text-[14px] text-gray-700 mt-1">
+                            Are you sure you want to permanently delete: <span class="font-semibold">"${title}"</span>?
+                        </p>
+                    </div>
+                `,
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: "Yes, Delete!",
+                cancelButtonText: "Cancel",
+                customClass: {
+                    popup:
+                        "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+                    confirmButton: // BINAGO SA ORANGE
+                        "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+                    cancelButton:
+                        "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+                },
             });
+
             if (result.isConfirmed) {
+
+                // 🔵 Loading Animation (RED theme for deletion process border/spinner)
+                Swal.fire({
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <div class="animate-spin rounded-full h-10 w-10 border-4 border-red-200 border-t-red-600"></div>
+                            <p class="text-gray-700 text-[14px]">Deleting book...<br><span class="text-sm text-gray-500">Just a moment.</span></p>
+                        </div>
+                    `,
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    customClass: {
+                        // RED THEME ang loading para ipakita ang deletion
+                        popup:
+                            "!rounded-xl !shadow-md !border-2 !border-red-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
+
                 try {
                     const res = await fetch(`${getApiBaseUrl()}/booksmanagement/delete/${bookId}`, {
                         method: "POST"
                     });
+                    
                     const result = await res.json();
+                    
+                    Swal.close();
+
                     if (result.success) {
-                        Swal.fire('Deleted!', result.message || 'Book deleted.', 'success');
+                        // 🟢 Success Toast for Delete
+                        Swal.fire({
+                            toast: true,
+                            position: "bottom-end",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            width: "360px",
+                            background: "transparent",
+                            html: `
+                                <div class="flex flex-col text-left">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+                                            <i class="ph ph-check-circle text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-[15px] font-semibold text-green-600">Deleted!</h3>
+                                            <p class="text-[13px] text-gray-700 mt-0.5">${result.message || 'Book deleted successfully!'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            customClass: {
+                                popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
+                            },
+                        });
                         loadBooks(currentPage);
                     } else {
-                        Swal.fire('Error', result.message || 'Failed to delete.', 'error');
+                        // 🔴 Error Toast for Delete Failure
+                        Swal.fire({
+                            toast: true,
+                            position: "bottom-end",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            width: "360px",
+                            background: "transparent",
+                            html: `
+                                <div class="flex flex-col text-left">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                            <i class="ph ph-x-circle text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-[15px] font-semibold text-red-600">Deletion Failed</h3>
+                                            <p class="text-[13px] text-gray-700 mt-0.5">${result.message || 'Failed to delete book.'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            customClass: {
+                                popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                            },
+                        });
                     }
                 } catch (err) {
                     console.error("Delete book error:", err);
-                    Swal.fire('Error', 'An error occurred.', 'error');
+                    Swal.close();
+                    // 🔴 Error Toast for Network/Fetch Error
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                        <i class="ph ph-x-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">An error occurred while deleting the book.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                        },
+                    });
                 }
+            } else {
+                // ❌ Cancel toast for Delete
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                    <i class="ph ph-x-circle text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-red-600">Cancelled</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">The book was not deleted.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup:
+                            "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
             }
         };
 
@@ -1071,3 +1686,5 @@
         loadBooks(currentPage); // Initial load
     });
 </script>
+
+ <script src="/libsys/public/js/librarian/bookManagement.js" defer></script>

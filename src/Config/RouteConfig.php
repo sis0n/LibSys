@@ -97,9 +97,9 @@ class RouteConfig
         $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
         $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
-        $router->get('superadmin/transcationHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('superadmin/transactionHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
-        $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
+        $router->get('superadmin/borrowingForm', 'SidebarController@borrowingForm', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
         $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
         $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);

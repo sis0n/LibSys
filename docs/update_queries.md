@@ -332,3 +332,7 @@ CREATE TABLE `user_module_permissions` (
     KEY `idx_user_id` (`user_id`),
     CONSTRAINT `fk_user_module_permissions_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE faculty
+ADD COLUMN unique_faculty_id VARCHAR(20) UNIQUE AFTER faculty_id;

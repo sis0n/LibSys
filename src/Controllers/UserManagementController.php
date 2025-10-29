@@ -22,6 +22,7 @@ class UserManagementController extends Controller
     $this->userRepo = new UserRepository();
     $this->studentRepo = new StudentRepository();
     $this->userPermissionRepo = new UserPermissionModuleRepository();
+    $this->facultyRepo = new FacultyRepository();
   }
 
   public function index()
@@ -142,8 +143,7 @@ class UserManagementController extends Controller
           break;
 
         case 'faculty':
-          $facultyRepo = new \App\Repositories\FacultyRepository();
-          $facultyRepo->insertFaculty(
+          $facultyId = $this->facultyRepo->insertFaculty(
             $userId,
             $data['department'] ?? 'N/A',
             $data['contact'] ?? 'N/A',
@@ -196,7 +196,8 @@ class UserManagementController extends Controller
       echo json_encode([
         'success' => true,
         'message' => ucfirst($role) . ' user added successfully.',
-        'user_id' => $userId
+        'user_id' => $userId,
+        'facuclty_unique_id' => $facultyId
       ]);
     } catch (\Exception $e) {
       echo json_encode([

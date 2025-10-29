@@ -28,7 +28,7 @@ class FacultyProfileRepository
                 u.profile_picture,
                 u.role,
                 u.is_active,
-                f.faculty_id,
+                f.unique_faculty_id,
                 f.department,
                 f.contact,
                 f.status,

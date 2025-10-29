@@ -15,6 +15,29 @@ window.addEventListener("DOMContentLoaded", () => {
   const bulkImportForm = document.getElementById("bulkImportForm");
   const fileInput = document.getElementById("csvFile");
   const importMessage = document.getElementById("importMessage");
+  const modulesSection = document.getElementById("modulesSection");
+  const userRoleValueEl = document.getElementById("userRoleDropdownValue");
+
+  function toggleModulesSection() {
+    const role = userRoleValueEl.textContent.trim().toLowerCase();
+    if (role === "admin" || role === "librarian") {
+      modulesSection.classList.remove("hidden");
+    } else {
+      modulesSection.classList.add("hidden");
+      // uncheck only kapag lumipat sa non-admin/librarian
+      modulesSection.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    }
+  }
+
+  // tawagin initially
+  toggleModulesSection();
+
+  // tawagin tuwing magbabago role
+  window.selectUserRole = (el, val) => {
+    if (userRoleValueEl) userRoleValueEl.textContent = val;
+    setActiveOption("userRoleDropdownMenu", el);
+    toggleModulesSection();
+  };
 
 
   if (!modal || !searchInput || !userTableBody || !addUserModal || !editUserModal) {
@@ -34,7 +57,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   fileInput.addEventListener("change", () => {
     if (fileInput.files.length) {
-      bulkImportForm.requestSubmit(); 
+      bulkImportForm.requestSubmit();
     }
   });
 
@@ -224,6 +247,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const valueEl = document.getElementById("userRoleDropdownValue");
     if (valueEl) valueEl.textContent = val;
     setActiveOption("userRoleDropdownMenu", el);
+    toggleModulesSection();
   };
 
   window.selectEditRole = (el, val) => {
@@ -344,6 +368,11 @@ window.addEventListener("DOMContentLoaded", () => {
       if (!first_name || !last_name || !username || role === "Select Role") {
         return alert("Please fill in all required fields (First Name, Last Name, Username, Role).");
       }
+
+      const checkedModules = Array.from(document.querySelectorAll('input[name="modules[]"]:checked'))
+        .map(cb => cb.value);
+
+      // console.log(checkedModules);
       try {
         const res = await fetch("/LibSys/public/superadmin/userManagement/add", {
           method: "POST",
@@ -353,7 +382,8 @@ window.addEventListener("DOMContentLoaded", () => {
             middle_name: middle_name || null,
             last_name: last_name,
             username: username,
-            role: role
+            role: role,
+            modules: checkedModules
           })
         });
         const data = await res.json();

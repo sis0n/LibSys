@@ -33,20 +33,48 @@ class Router
     }
 
     foreach ($this->routes[$method] as $route => $info) {
-      // Convert {param} into regex group
       $pattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route);
       $pattern = "#^" . trim($pattern, '/') . "$#";
 
       if (preg_match($pattern, $uri, $matches)) {
-        array_shift($matches); // remove full match
+        array_shift($matches);
 
         $controller = $info['controller'];
-        $allowedRoles = $info['roles'];
+        $allowedAccess = $info['roles'];
 
-        // role check
-        if (!empty($allowedRoles)) {
-          $userRole = $_SESSION['role'] ?? null;
-          if (!$userRole || !in_array($userRole, $allowedRoles)) {
+        if (!empty($allowedAccess)) {
+          $userRole = strtolower($_SESSION['role'] ?? '');
+          $userId = $_SESSION['user_id'] ?? null;
+
+          if (!$userId) {
+            http_response_code(403);
+            include __DIR__ . '/../Views/errors/403.php';
+            return;
+          }
+
+          $hasAccess = false;
+
+          $allowedAccessNormalized = array_map('strtolower', $allowedAccess);
+
+          if (in_array($userRole, $allowedAccessNormalized)) {
+            $hasAccess = true;
+          }
+
+          if (in_array($userRole, ['admin', 'librarian'])) {
+            $userPermissions = $_SESSION['user_permissions'] ?? [];
+
+            $normalizedUserPermissions = array_map('strtolower', $userPermissions);
+
+            $matches = array_intersect($normalizedUserPermissions, $allowedAccessNormalized);
+
+            if (count($matches) > 0) {
+              $hasAccess = true;
+            } else {
+              $hasAccess = false; 
+            }
+          }
+
+          if (!$hasAccess) {
             http_response_code(403);
             include __DIR__ . '/../Views/errors/403.php';
             return;
@@ -66,12 +94,10 @@ class Router
           throw new \Exception("Method $methodName not found in $controllerClass");
         }
 
-        // Pass dynamic params (like $id)
         return $controllerInstance->$methodName(...$matches);
       }
     }
 
-    // No route matched
     http_response_code(404);
     include __DIR__ . '/../Views/errors/404.php';
   }

@@ -97,9 +97,9 @@ class RouteConfig
         $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
         $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
-        $router->get('superadmin/transcationHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('superadmin/transactionHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
-        $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
+        $router->get('superadmin/borrowingForm', 'SidebarController@borrowingForm', ['superadmin']);
         $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
         $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
         $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);
@@ -202,12 +202,16 @@ class RouteConfig
         $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
         $router->post('superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
         $router->post('superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
+        $router->post('superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
+
 
         $router->get('superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
         $router->get('superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
         $router->post('superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
         $router->post('superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
         $router->post('superadmin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
+        $router->post('superadmin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['superadmin']);
+
 
         $router->get('admin/booksmanagement/fetch', 'BookManagementController@fetch', ['admin']);
         $router->get('admin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['admin']);

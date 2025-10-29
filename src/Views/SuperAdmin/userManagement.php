@@ -111,15 +111,19 @@
         <p class="text-sm text-gray-600 mb-4">
             Import multiple users from a CSV file or use sample data.
         </p>
-
-        <label for="csvFile"
-            class="block border-2 border-dashed border-[var(--color-border)] rounded-lg p-8 text-center cursor-pointer hover:border-[var(--color-ring)]/60 transition">
-            <i class="ph ph-upload text-[var(--color-ring)] text-3xl mb-2 block"></i>
-            <p class="font-medium text-[var(--color-ring)]">Drop CSV file here or click to browse</p>
-            <p class="text-xs text-gray-500 mt-1">Expected format: Name, Username, Role</p>
-            <input type="file" id="csvFile" accept=".csv" class="hidden" />
-        </label>
-
+        <div id="importMessage" class="text-green-600 font-medium mb-2 hidden"></div>
+        <form id="bulkImportForm" enctype="multipart/form-data">
+            <label for="csvFile"
+                class="block border-2 border-dashed border-[var(--color-border)] rounded-lg p-8 text-center cursor-pointer hover:border-[var(--color-ring)]/60 transition">
+                <i class="ph ph-upload text-[var(--color-ring)] text-3xl mb-2 block"></i>
+                <p class="font-medium text-[var(--color-ring)]">Drop CSV file here or click to browse</p>
+                <p class="text-xs text-gray-500 mt-1">Expected format: Name, Username, Role</p>
+                <input type="file" id="csvFile" name="csv_file" accept=".csv" class="hidden" />
+            </label>
+            <!-- <button type="submit" class="mt-4 bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition">
+                Import CSV
+            </button> -->
+        </form>
         <div class="text-center mt-4">
             <button id="cancelImport"
                 class="mt-2 border border-[var(--color-border)] px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition">

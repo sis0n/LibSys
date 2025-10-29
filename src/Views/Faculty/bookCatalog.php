@@ -92,14 +92,15 @@
 
     <div id="loadingSkeletons" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full">
         <?php for ($i = 0; $i < 12; $i++): ?>
-            <div class="animate-pulse bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden border border-[var(--color-border)]">
-                <div class="w-full aspect-[2/3] bg-gray-200"></div>
-                <div class="p-2 space-y-2">
-                    <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-                    <div class="h-3 bg-gray-200 rounded w-2/3"></div>
-                </div>
+        <div
+            class="animate-pulse bg-[var(--color-card)] shadow-sm rounded-xl overflow-hidden border border-[var(--color-border)]">
+            <div class="w-full aspect-[2/3] bg-gray-200"></div>
+            <div class="p-2 space-y-2">
+                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                <div class="h-3 bg-gray-200 rounded w-2/3"></div>
             </div>
+        </div>
         <?php endfor; ?>
     </div>
 

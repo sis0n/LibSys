@@ -72,10 +72,10 @@
         <table class="min-w-full divide-y divide-gray-300">
             <thead class="bg-orange-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User
                         Name</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
-                        Number</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User
+                        ID Number</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Items
                         Borrowed</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Borrowed

@@ -14,32 +14,35 @@
                 <div
                     class="w-full p-4 border border-gray-300 rounded-lg bg-white flex justify-center items-center relative min-h-[250px]">
 
-                    <div id="ticket-message-container" class="absolute inset-0 flex items-center justify-center p-4">
+                    <div id="ticket-message-container" class="flex items-center justify-center p-4">
 
                         <?php if (!empty($isExpired) && $isExpired): ?>
-                            <p id="ticket-message" class="text-red-500 font-semibold text-lg flex items-center justify-center gap-2">
-                                <i class="ph ph-x-circle text-2xl"></i>
-                                QR Code Ticket Expired
-                            </p>
+                        <p id="ticket-message"
+                            class="text-red-500 font-semibold text-lg flex items-center justify-center gap-2">
+                            <i class="ph ph-x-circle text-2xl"></i>
+                            QR Code Ticket Expired
+                        </p>
                         <?php elseif (!empty($isBorrowed) && $isBorrowed): ?>
-                            <p id="ticket-message" class="text-green-600 font-semibold text-lg flex items-center justify-center gap-2">
-                                <i class="ph ph-check-circle text-2xl"></i>
-                                QR Code Successfully Scanned!
-                            </p>
+                        <p id="ticket-message"
+                            class="text-green-600 font-semibold text-lg flex items-center justify-center gap-2">
+                            <i class="ph ph-check-circle text-2xl"></i>
+                            QR Code Successfully Scanned!
+                        </p>
                         <?php elseif (empty($qrPath) && empty($isBorrowed) && empty($isExpired)): ?>
-                            <p id="ticket-message" class="text-gray-500 font-semibold text-lg flex items-center justify-center gap-2">
-                                <i class="ph ph-info text-2xl"></i>
-                                No active borrowing ticket.
-                            </p>
+                        <p id="ticket-message"
+                            class="text-gray-500 font-semibold text-lg flex items-center justify-center gap-2">
+                            <i class="ph ph-info text-2xl"></i>
+                            No active borrowing ticket.
+                        </p>
                         <?php else: ?>
-                            <p id="ticket-message" class="hidden"></p>
+                        <p id="ticket-message" class="hidden"></p>
                         <?php endif; ?>
                     </div>
 
                     <?php if (!empty($qrPath) && empty($isExpired) && empty($isBorrowed)): ?>
-                        <img id="qr-image" src="<?= $qrPath ?>" alt="QR Code" class="w-56 h-56 object-contain relative z-10" />
+                    <img id="qr-image" src="<?= $qrPath ?>" alt="QR Code" class="w-56 h-56 object-contain" />
                     <?php else: ?>
-                        <img id="qr-image" src="" alt="QR Code" class="w-56 h-56 object-contain relative z-10 hidden" />
+                    <img id="qr-image" src="" alt="QR Code" class="w-56 h-56 object-contain hidden" />
                     <?php endif; ?>
                 </div>
             </div>
@@ -51,17 +54,20 @@
                         Ticket Code:
                         <span class="text-[var(--color-primary)]"><?= $transaction_code ?? 'N/A' ?></span>
                     </p>
-                    <p id="generated_date" class="text-[var(--font-size-xs)] text-[var(--color-gray-500)] <?= (empty($generated_at) || !empty($isBorrowed) || !empty($isExpired)) ? 'hidden' : '' ?>">
+                    <p id="generated_date"
+                        class="text-[var(--font-size-xs)] text-[var(--color-gray-500)] <?= (empty($generated_at) || !empty($isBorrowed) || !empty($isExpired)) ? 'hidden' : '' ?>">
                         Generated Time:
                         <?= !empty($generated_at) ? date("h:i:s A", strtotime($generated_at)) : "N/A" ?>
                     </p>
-                    <p id="due_date" class="text-[var(--font-size-xs)] text-red-500 font-medium <?= (empty($expires_at) || !empty($isBorrowed) || !empty($isExpired)) ? 'hidden' : '' ?>">
+                    <p id="due_date"
+                        class="text-[var(--font-size-xs)] text-red-500 font-medium <?= (empty($expires_at) || !empty($isBorrowed) || !empty($isExpired)) ? 'hidden' : '' ?>">
                         Expiration:
                         <?= !empty($expires_at) ? 'Expires at: ' . date("h:i:s A", strtotime($expires_at)) : 'N/A' ?>
                     </p>
                 </div>
 
-                <a id="download-button" href="<?= $qrPath ?? '#' ?>" download="<?= ($transaction_code ?? 'qrcode') ?>.png"
+                <a id="download-button" href="<?= $qrPath ?? '#' ?>"
+                    download="<?= ($transaction_code ?? 'qrcode') ?>.png"
                     class="mt-4 flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--radius-md)] bg-orange-500 text-[var(--color-primary-foreground)] font-medium shadow hover:bg-orange-600 transition <?= (empty($qrPath) || !empty($isExpired) || !empty($isBorrowed)) ? 'hidden opacity-50 cursor-not-allowed pointer-events-none' : '' ?>">
                     <i class="ph ph-download-simple text-xl"></i>
                     Download
@@ -79,11 +85,13 @@
             <dl class="space-y-3 text-sm flex-1">
                 <div class="flex justify-between items-center">
                     <dt class="text-amber-700 font-medium">Student Number:</dt>
-                    <dd id="detailsStudentNumber" class="text-right"><?= htmlspecialchars($student["student_number"] ?? "N/A") ?></dd>
+                    <dd id="detailsStudentNumber" class="text-right">
+                        <?= htmlspecialchars($student["student_number"] ?? "N/A") ?></dd>
                 </div>
                 <div class="flex justify-between items-center">
                     <dt class="text-amber-700 font-medium">Name:</dt>
-                    <dd id="detailsStudentName" class="text-right"><?= htmlspecialchars($student["name"] ?? "Student Name") ?></dd>
+                    <dd id="detailsStudentName" class="text-right">
+                        <?= htmlspecialchars($student["name"] ?? "Student Name") ?></dd>
                 </div>
                 <div class="flex justify-between items-center">
                     <dt class="text-amber-700 font-medium">Year & Section:</dt>
@@ -93,7 +101,8 @@
                 </div>
                 <div class="flex justify-between items-center">
                     <dt class="text-amber-700 font-medium">Course:</dt>
-                    <dd id="detailsStudentCourse" class="text-right"><?= htmlspecialchars($student["course"] ?? "N/A") ?></dd>
+                    <dd id="detailsStudentCourse" class="text-right">
+                        <?= htmlspecialchars($student["course"] ?? "N/A") ?></dd>
                 </div>
                 <div class="flex justify-between items-center">
                     <dt class="text-amber-700 font-medium">Books:</dt>
@@ -115,216 +124,241 @@
         </div>
     </div>
 
-    <!-- Book List Section (Ginamit ang $books variable) -->
-    <div id="bookListSection" class="w-full max-w-4xl mx-auto bg-[var(--color-card)] rounded-[var(--radius-lg)] shadow-md border border-[var(--color-border)] p-6 mt-6 <?= (empty($books)) ? 'hidden' : '' ?>">
-        <h3 class="text-lg font-semibold mb-4">Books Included in this Ticket (<span id="bookListCount"><?= !empty($books) ? count($books) : 0 ?></span>)</h3>
-
-        <?php if (!empty($books)): ?>
-            <ul id="bookListUL" class="divide-y divide-[var(--color-border)]">
-                <?php foreach ($books as $item): ?>
-                    <li class="py-3 flex justify-between items-center text-sm">
-                        <div>
-                            <p class="font-medium text-gray-800">
-                                <?= htmlspecialchars($item['title'] ?? 'Title Missing') ?>
-                            </p>
-                            <p class="text-xs text-gray-600">
-                                by <?= htmlspecialchars($item['author'] ?? 'Author Unknown') ?>
-                            </p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-mono text-xs text-amber-700">
-                                Accession No.: <?= htmlspecialchars($item['accession_number'] ?? 'N/A') ?>
-                            </p>
-                        </div>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php else: ?>
-            <div id="noBooksMessage" class="p-3 text-sm text-center text-gray-500 bg-gray-50 rounded">
-                No books currently associated with this ticket.
+    <!-- Checked Out Items Section  -->
+    <div id="checkedOutSection" class="space-y-6 mt-6">
+        <?php if (!empty($books) && count($books) > 0): ?>
+        <div class="p-4 border border-amber-200 bg-amber-50 rounded-lg flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="ph ph-qr-code text-2xl text-amber-600"></i>
+                <div>
+                    <h3 class="font-medium text-amber-900">Checked Out Items</h3>
+                    <p class="text-sm text-amber-700">Items included in this QR checkout ticket</p>
+                </div>
             </div>
-        <?php endif; ?>
-        <?php if (empty($books)): ?>
-            <ul id="bookListUL" class="divide-y divide-[var(--color-border)] hidden"></ul>
+            <div class="text-right">
+                <p class="text-2xl font-bold text-amber-700"><?= count($books) ?></p>
+                <p class="text-xs text-amber-600">Total Item(s)</p>
+            </div>
+        </div>
+
+        <div class="border-t border-x border-green-300 bg-green-50 rounded-xl">
+            <div class="p-4 flex items-center justify-between border-b border-green-200">
+                <h4 class="font-medium text-green-700 flex items-center gap-2">
+                    <i class="ph ph-book text-lg"></i> Books (<?= count($books) ?>)
+                </h4>
+            </div>
+
+            <?php foreach ($books as $index => $book): ?>
+            <div class="bg-white p-4 flex gap-3 rounded-b-lg border-b border-green-300 ">
+                <div class="flex items-center">
+                    <i class="ph ph-book-open text-3xl text-green-500"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium"><?= htmlspecialchars($book["title"]) ?></p>
+                    <p class="text-sm text-gray-600">by <?= htmlspecialchars($book["author"]) ?></p>
+                    <div class="flex flex-wrap gap-2 mt-2 text-xs">
+                        <span class="px-2 py-1 bg-gray-100 rounded">Accession #:
+                            <?= htmlspecialchars($book["accession_number"] ?? "N/A") ?></span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">Call #:
+                            <?= htmlspecialchars($book["call_number"] ?? "N/A") ?></span>
+                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Subject:
+                            <?= htmlspecialchars($book["subject"] ?? "N/A") ?></span>
+                    </div>
+                </div>
+                <span
+                    class="w-6 h-6 flex items-center justify-center rounded-full bg-green-600 text-white text-xs font-bold"><?= $index + 1 ?></span>
+            </div>
+            <?php endforeach; ?>
+        </div>
         <?php endif; ?>
     </div>
 
     <!-- *** INAYOS NA JAVASCRIPT PARA SA STUDENT *** -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const qrImage = document.getElementById('qr-image');
-            const ticketMessageContainer = document.getElementById('ticket-message-container');
-            const downloadButton = document.getElementById('download-button');
-            const ticketCodeSpan = document.querySelector('#ticket_code span');
-            const generatedDateP = document.getElementById('generated_date');
-            const dueDateP = document.getElementById('due_date');
+    document.addEventListener('DOMContentLoaded', function() {
+        const qrImage = document.getElementById('qr-image');
+        const ticketMessageContainer = document.getElementById('ticket-message-container');
+        const downloadButton = document.getElementById('download-button');
+        const ticketCodeSpan = document.querySelector('#ticket_code span');
+        const generatedDateP = document.getElementById('generated_date');
+        const dueDateP = document.getElementById('due_date');
 
-            // --- References sa Ticket Details Card Elements (Student Version) ---
-            const detailsStudentNumber = document.getElementById('detailsStudentNumber');
-            const detailsStudentName = document.getElementById('detailsStudentName');
-            const detailsStudentYrSec = document.getElementById('detailsStudentYrSec');
-            const detailsStudentCourse = document.getElementById('detailsStudentCourse');
-            const detailsBookCount = document.getElementById('detailsBookCount');
+        // --- References sa Ticket Details Card Elements (Student Version) ---
+        const detailsStudentNumber = document.getElementById('detailsStudentNumber');
+        const detailsStudentName = document.getElementById('detailsStudentName');
+        const detailsStudentYrSec = document.getElementById('detailsStudentYrSec');
+        const detailsStudentCourse = document.getElementById('detailsStudentCourse');
+        const detailsBookCount = document.getElementById('detailsBookCount');
 
-            // --- References sa Book List Section ---
-            const bookListSection = document.getElementById('bookListSection');
-            const bookListCount = document.getElementById('bookListCount');
-            const bookListUL = document.getElementById('bookListUL');
-            const noBooksMessage = document.getElementById('noBooksMessage');
+        // --- Checked Out Items Section ---
+        const checkedOutSection = document.getElementById('checkedOutSection');
 
+        // --- Utility function to create messages ---
+        function createMessageElement(text, classes, iconClass) {
+            const p = document.createElement('p');
+            p.id = 'ticket-message';
+            p.className = `font-semibold text-lg flex items-center justify-center gap-2 ${classes}`;
+            if (iconClass) {
+                const i = document.createElement('i');
+                i.className = `${iconClass} text-2xl`;
+                p.appendChild(i);
+            }
+            p.appendChild(document.createTextNode(text));
+            return p;
+        }
 
-            function createMessageElement(text, classes, iconClass) {
-                const p = document.createElement('p');
-                p.id = 'ticket-message';
-                p.className = `font-semibold text-lg flex items-center justify-center gap-2 ${classes}`;
-                if (iconClass) {
-                    const i = document.createElement('i');
-                    i.className = `${iconClass} text-2xl`;
-                    p.appendChild(i);
-                }
-                p.appendChild(document.createTextNode(text));
-                return p;
+        // --- Display main message ---
+        function displayMessage(text, type = 'info') {
+            ticketMessageContainer.innerHTML = '';
+            let el;
+            if (type === 'error' || type === 'expired') {
+                el = createMessageElement(text, 'text-red-500', 'ph ph-x-circle');
+            } else if (type === 'success' || type === 'borrowed') {
+                el = createMessageElement(text, 'text-green-600', 'ph ph-check-circle');
+            } else {
+                el = createMessageElement(text, 'text-gray-500', 'ph ph-info');
+            }
+            ticketMessageContainer.appendChild(el);
+
+            // Hide main interactive elements
+            if (qrImage) qrImage.classList.add('hidden');
+            if (downloadButton) downloadButton.classList.add('hidden', 'opacity-50', 'cursor-not-allowed',
+                'pointer-events-none');
+            if (generatedDateP) generatedDateP.classList.add('hidden');
+            if (dueDateP) dueDateP.classList.add('hidden');
+
+            // Reset student details
+            if (detailsStudentNumber) detailsStudentNumber.textContent = 'N/A';
+            if (detailsStudentName) detailsStudentName.textContent = 'N/A';
+            if (detailsStudentYrSec) detailsStudentYrSec.textContent = 'N/A';
+            if (detailsStudentCourse) detailsStudentCourse.textContent = 'N/A';
+            if (detailsBookCount) detailsBookCount.textContent = '0 Book(s)';
+
+            // Hide Checked Out Section when inactive
+            if (checkedOutSection) checkedOutSection.classList.add('hidden');
+        }
+
+        // --- Show QR + ticket details ---
+        function showQR(ticket) {
+            ticketMessageContainer.innerHTML = '';
+
+            if (qrImage) {
+                qrImage.src = `/libsys/public/qrcodes/${ticket.transaction_code}.png?t=${Date.now()}`;
+                qrImage.classList.remove('hidden');
             }
 
-            function displayMessage(text, type = 'info') {
-                ticketMessageContainer.innerHTML = '';
-                let el;
-                if (type === 'error' || type === 'expired') {
-                    el = createMessageElement(text, 'text-red-500', 'ph ph-x-circle');
-                } else if (type === 'success' || type === 'borrowed') {
-                    el = createMessageElement(text, 'text-green-600', 'ph ph-check-circle');
-                } else {
-                    el = createMessageElement(text, 'text-gray-500', 'ph ph-info');
-                }
-                ticketMessageContainer.appendChild(el);
-                if (qrImage) qrImage.classList.add('hidden');
-                if (downloadButton) downloadButton.classList.add('hidden', 'opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-                if (generatedDateP) generatedDateP.classList.add('hidden');
-                if (dueDateP) dueDateP.classList.add('hidden');
-
-                // --- Reset Ticket Details kapag may message ---
-                if (detailsStudentNumber) detailsStudentNumber.textContent = 'N/A';
-                if (detailsStudentName) detailsStudentName.textContent = 'N/A';
-                if (detailsStudentYrSec) detailsStudentYrSec.textContent = 'N/A';
-                if (detailsStudentCourse) detailsStudentCourse.textContent = 'N/A';
-                if (detailsBookCount) detailsBookCount.textContent = '0 Book(s)';
-
-                // --- Hide Book List Section kapag may message ---
-                if (bookListSection) bookListSection.classList.add('hidden');
+            if (downloadButton) {
+                downloadButton.href = `/libsys/public/qrcodes/${ticket.transaction_code}.png`;
+                downloadButton.download = `${ticket.transaction_code}.png`;
+                downloadButton.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed',
+                    'pointer-events-none');
             }
 
-            function showQR(ticket) {
-                ticketMessageContainer.innerHTML = '';
-                if (qrImage) {
-                    qrImage.src = `/libsys/public/qrcodes/${ticket.transaction_code}.png?t=${Date.now()}`;
-                    qrImage.classList.remove('hidden');
-                }
-                if (downloadButton) {
-                    downloadButton.href = `/libsys/public/qrcodes/${ticket.transaction_code}.png`;
-                    downloadButton.download = `${ticket.transaction_code}.png`;
-                    downloadButton.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-                }
-                if (ticketCodeSpan) ticketCodeSpan.textContent = ticket.transaction_code || 'N/A';
-                if (generatedDateP) {
-                    generatedDateP.textContent = `Generated Time: ${ticket.generated_at ? new Date(ticket.generated_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }) : 'N/A'}`;
-                    generatedDateP.classList.remove('hidden');
-                }
-                if (dueDateP && ticket.expires_at) {
-                    dueDateP.textContent = `Expiration: Expires at ${new Date(ticket.expires_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })}`;
-                    dueDateP.classList.remove('hidden');
-                } else if (dueDateP) {
-                    dueDateP.classList.add('hidden');
-                }
+            if (ticketCodeSpan) ticketCodeSpan.textContent = ticket.transaction_code || 'N/A';
 
-                // --- Restore Ticket Details (Assuming details rendered by PHP are correct for the current state) ---
-                // Note: AJAX checkStatus only returns transaction data, not student details.
-                // We rely on the initial PHP render for student details unless the entire page reloads.
-                const hasInitialDetails = <?= json_encode(!empty($student)) ?>;
-                if (hasInitialDetails) {
-                    // Restore from PHP variables if needed, otherwise assume they are still correct
-                    if (detailsStudentNumber) detailsStudentNumber.textContent = <?= json_encode($student["student_number"] ?? 'N/A') ?>;
-                    if (detailsStudentName) detailsStudentName.textContent = <?= json_encode($student["name"] ?? 'N/A') ?>;
-                    if (detailsStudentYrSec) detailsStudentYrSec.textContent = <?= json_encode((!empty($student["year_level"]) ? $student["year_level"] . ($student["section"] ?? '') : "N/A")) ?>;
-                    if (detailsStudentCourse) detailsStudentCourse.textContent = <?= json_encode($student["course"] ?? 'N/A') ?>;
-                    if (detailsBookCount) detailsBookCount.textContent = <?= json_encode((!empty($books) ? count($books) : 0) . ' Book(s)') ?>;
-                }
-
-                // --- Restore Book List Visibility ---
-                const hasInitialItems = <?= json_encode(!empty($books)) ?>;
-                if (hasInitialItems && bookListSection) {
-                    bookListSection.classList.remove('hidden');
-                } else if (bookListSection) {
-                    bookListSection.classList.add('hidden');
-                }
+            if (generatedDateP) {
+                generatedDateP.textContent =
+                    `Generated Time: ${ticket.generated_at ? new Date(ticket.generated_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }) : 'N/A'}`;
+                generatedDateP.classList.remove('hidden');
             }
 
-            function resetToDefault(message = "No active borrowing ticket.") {
-                displayMessage(message, 'info'); // displayMessage handles resetting details
+            if (dueDateP && ticket.expires_at) {
+                dueDateP.textContent =
+                    `Expiration: Expires at ${new Date(ticket.expires_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                dueDateP.classList.remove('hidden');
+            } else if (dueDateP) {
+                dueDateP.classList.add('hidden');
             }
 
+            // Restore PHP-rendered student details
+            const hasInitialDetails = <?= json_encode(!empty($student)) ?>;
+            if (hasInitialDetails) {
+                if (detailsStudentNumber) detailsStudentNumber.textContent =
+                    <?= json_encode($student["student_number"] ?? 'N/A') ?>;
+                if (detailsStudentName) detailsStudentName.textContent =
+                    <?= json_encode($student["name"] ?? 'N/A') ?>;
+                if (detailsStudentYrSec) detailsStudentYrSec.textContent =
+                    <?= json_encode((!empty($student["year_level"]) ? $student["year_level"] . ($student["section"] ?? '') : "N/A")) ?>;
+                if (detailsStudentCourse) detailsStudentCourse.textContent =
+                    <?= json_encode($student["course"] ?? 'N/A') ?>;
+                if (detailsBookCount) detailsBookCount.textContent =
+                    <?= json_encode((!empty($books) ? count($books) : 0) . ' Book(s)') ?>;
+            }
 
-            let isChecking = false;
+            // Show Checked Out Items Section for pending
+            if (checkedOutSection) checkedOutSection.classList.remove('hidden');
+        }
 
-            async function checkTicketStatus() {
-                if (isChecking) return;
-                isChecking = true;
+        // --- Reset to default (no ticket) ---
+        function resetToDefault(message = "No active borrowing ticket.") {
+            displayMessage(message, 'info');
+        }
 
-                try {
-                    // *** GAMITIN ANG STUDENT URL ***
-                    const res = await fetch('/libsys/public/student/qrBorrowingTicket/checkStatus');
-                    const data = await res.json();
+        // --- Ticket Checking ---
+        let isChecking = false;
 
-                    if (!data.success) {
-                        isChecking = false;
-                        return;
-                    }
+        async function checkTicketStatus() {
+            if (isChecking) return;
+            isChecking = true;
 
-                    // *** GAMITIN ANG STUDENT SESSION STORAGE KEY ***
-                    const lastStatus = sessionStorage.getItem('studentLastStatus');
+            try {
+                const res = await fetch('/libsys/public/student/qrBorrowingTicket/checkStatus');
+                const data = await res.json();
 
-                    console.log(`[Check] Fetched Status: ${data.status}, Last Stored: ${lastStatus}`);
-
-                    if (data.status === 'pending') {
-                        showQR({
-                            transaction_code: data.transaction_code,
-                            generated_at: data.generated_at,
-                            expires_at: data.expires_at
-                        });
-                        if (lastStatus !== 'pending') {
-                            sessionStorage.setItem('studentLastStatus', 'pending');
-                            sessionStorage.setItem('studentLastTransactionCode', data.transaction_code);
-                        }
-                    } else if (data.status === 'borrowed') {
-                        displayMessage('QR Code Successfully Scanned!', 'success');
-                        if (lastStatus !== 'borrowed') {
-                            sessionStorage.setItem('studentLastStatus', 'borrowed');
-                            sessionStorage.removeItem('studentLastTransactionCode');
-                        }
-                    } else if (data.status === 'expired') {
-                        displayMessage('QR Code Ticket Expired', 'expired');
-                        if (lastStatus !== 'expired') {
-                            sessionStorage.setItem('studentLastStatus', 'expired');
-                            sessionStorage.removeItem('studentLastTransactionCode');
-                        }
-                    } else { // 'none'
-                        resetToDefault();
-                        if (lastStatus !== 'none') {
-                            sessionStorage.setItem('studentLastStatus', 'none');
-                            sessionStorage.removeItem('studentLastTransactionCode');
-                        }
-                    }
-
-                } catch (err) {
-                    console.error('Error checking ticket status:', err);
-                } finally {
+                if (!data.success) {
                     isChecking = false;
+                    return;
                 }
+
+                const lastStatus = sessionStorage.getItem('studentLastStatus');
+                console.log(`[Check] Fetched Status: ${data.status}, Last Stored: ${lastStatus}`);
+
+                if (data.status === 'pending') {
+                    showQR({
+                        transaction_code: data.transaction_code,
+                        generated_at: data.generated_at,
+                        expires_at: data.expires_at
+                    });
+                    if (lastStatus !== 'pending') {
+                        sessionStorage.setItem('studentLastStatus', 'pending');
+                        sessionStorage.setItem('studentLastTransactionCode', data.transaction_code);
+                    }
+                } else if (data.status === 'borrowed') {
+                    displayMessage('QR Code Successfully Scanned!', 'success');
+                    if (checkedOutSection) checkedOutSection.classList.add(
+                    'hidden'); // ✅ Hide section on borrowed
+                    if (lastStatus !== 'borrowed') {
+                        sessionStorage.setItem('studentLastStatus', 'borrowed');
+                        sessionStorage.removeItem('studentLastTransactionCode');
+                    }
+                } else if (data.status === 'expired') {
+                    displayMessage('QR Code Ticket Expired', 'expired');
+                    if (checkedOutSection) checkedOutSection.classList.add(
+                    'hidden'); // ✅ Hide section on expired
+                    if (lastStatus !== 'expired') {
+                        sessionStorage.setItem('studentLastStatus', 'expired');
+                        sessionStorage.removeItem('studentLastTransactionCode');
+                    }
+                } else { // 'none'
+                    resetToDefault();
+                    if (checkedOutSection) checkedOutSection.classList.add(
+                    'hidden'); // ✅ Hide section on none
+                    if (lastStatus !== 'none') {
+                        sessionStorage.setItem('studentLastStatus', 'none');
+                        sessionStorage.removeItem('studentLastTransactionCode');
+                    }
+                }
+
+            } catch (err) {
+                console.error('Error checking ticket status:', err);
+            } finally {
+                isChecking = false;
             }
+        }
 
-
-            setInterval(checkTicketStatus, 2000);
-            checkTicketStatus(); // Initial check
-
-        });
+        setInterval(checkTicketStatus, 2000);
+        checkTicketStatus(); // Initial check
+    });
     </script>
+
 </main>

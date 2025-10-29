@@ -108,7 +108,7 @@
 
         <!-- Top 10 Visitors Table -->
         <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-4">
-            <h3 class="text-lg font-medium mb-4">Top 10 Visitors (By School Year)</h3>
+            <h3 class="text-lg font-medium mb-4">Top 10 Visitors (by Year)</h3>
             <div class="overflow-x-auto rounded-lg border border-orange-200">
                 <table class="w-full text-sm border-collapse">
                     <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">

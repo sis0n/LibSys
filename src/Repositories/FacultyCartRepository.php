@@ -16,11 +16,11 @@ class FacultyCartRepository
 
   public function addToCart(int $facultyId, int $bookId): bool
   {
-    $check = $this->db->prepare("SELECT 1 FROM faculty_carts WHERE faculty_id = ? AND book_id = ?");
+    $check = $this->db->prepare("SELECT 1 FROM faculty_carts WHERE unique_faculty_id = ? AND book_id = ?");
     $check->execute([$facultyId, $bookId]);
     if ($check->fetch()) return false;
 
-    $stmt = $this->db->prepare("INSERT INTO faculty_carts (faculty_id, book_id) VALUES (?, ?)");
+    $stmt = $this->db->prepare("INSERT INTO faculty_carts (unique_faculty_id, book_id) VALUES (?, ?)");
     return $stmt->execute([$facultyId, $bookId]);
   }
 
@@ -29,11 +29,11 @@ class FacultyCartRepository
     $sql = "SELECT fc.cart_id, b.book_id, b.title, b.author, b.accession_number, b.subject, b.call_number
             FROM faculty_carts fc
             INNER JOIN books b ON fc.book_id = b.book_id
-            WHERE fc.faculty_id = :faculty_id
+            WHERE fc.unique_faculty_id = :unique_faculty_id
             ORDER BY fc.cart_id DESC";
 
     $stmt = $this->db->prepare($sql);
-    $stmt->execute(['faculty_id' => $facultyId]);
+    $stmt->execute(['unique_faculty_id' => $facultyId]);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     return array_map(fn($row) => [
@@ -52,14 +52,14 @@ class FacultyCartRepository
 
   public function removeFromCart(int $cartId, int $facultyId): bool
   {
-    $stmt = $this->db->prepare("DELETE FROM faculty_carts WHERE cart_id = ? AND faculty_id = ?");
+    $stmt = $this->db->prepare("DELETE FROM faculty_carts WHERE cart_id = ? AND unique_faculty_id = ?");
     return $stmt->execute([$cartId, $facultyId]);
   }
 
 
   public function countCartItems(int $facultyId): int
   {
-    $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM faculty_carts WHERE faculty_id = ?");
+    $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM faculty_carts WHERE unique_faculty_id = ?");
     $stmt->execute([$facultyId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return isset($row['total']) ? (int)$row['total'] : 0;
@@ -68,18 +68,18 @@ class FacultyCartRepository
 
   public function getFacultyIdByUserId(int $userId): ?int
   {
-    $stmt = $this->db->prepare("SELECT faculty_id, user_id FROM faculty WHERE user_id = ?");
+    $stmt = $this->db->prepare("SELECT unique_faculty_id, user_id FROM faculty WHERE user_id = ?");
     $stmt->execute([$userId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return isset($row['faculty_id']) ? (int)$row['faculty_id'] : null;
+    return isset($row['unique_faculty_id']) ? (int)$row['unique_faculty_id'] : null;
   }
 
 
 
   public function clearCart(int $facultyId): bool
   {
-    $stmt = $this->db->prepare("DELETE FROM faculty_carts WHERE faculty_id = ?");
+    $stmt = $this->db->prepare("DELETE FROM faculty_carts WHERE unique_faculty_id = ?");
     return $stmt->execute([$facultyId]);
   }
 }

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Repositories\AuthRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\UserPermissionModuleRepository;
 use App\Core\Controller;
 use App\Models\User;
 
@@ -11,11 +12,13 @@ class AuthController extends Controller
 {
     private $AuthRepository;
     private $UserRepository;
+    private $UserPermissionRepo;
 
     public function __construct()
     {
         $this->AuthRepository = new AuthRepository();
         $this->UserRepository = new UserRepository();
+        $this->UserPermissionRepo = new UserPermissionModuleRepository();
     }
 
     public function showLogin()
@@ -25,29 +28,40 @@ class AuthController extends Controller
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
 
+
         if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
-            switch (strtolower($_SESSION['role'])) {
-                case 'superadmin':
-                    header("Location: /libsys/public/superadmin/dashboard");
-                    exit;
-                case 'admin':
-                    header("Location: /libsys/public/admin/dashboard");
-                    exit;
-                case 'librarian':
-                    header("Location: /libsys/public/librarian/dashboard");
-                    exit;
-                case 'student':
-                    header("Location: /libsys/public/student/dashboard");
-                    exit;
-                case 'faculty':
-                    header("Location: /libsys/public/faculty/dashboard");
-                    exit;
-                case 'staff':
-                    header("Location: /libsys/public/staff/dashboard");
-                    exit;
-                case 'scanner':
-                    header("Location: /libsys/public/scanner/attendance");
-                    exit;
+            $role = strtolower($_SESSION['role']);
+            $redirectUrl = '';
+
+            if ($role === 'admin' || $role === 'librarian') {
+                $permissions = $_SESSION['user_permissions'] ?? [];
+
+                $redirectUrl = \App\Models\User::getFirstAccessibleModuleUrl($role, $permissions);
+            } else {
+                switch ($role) {
+                    case 'superadmin':
+                        $redirectUrl = '/libsys/public/superadmin/dashboard';
+                        break;
+                    case 'student':
+                        $redirectUrl = '/libsys/public/student/dashboard';
+                        break;
+                    case 'faculty':
+                        $redirectUrl = '/libsys/public/faculty/dashboard';
+                        break;
+                    case 'staff':
+                        $redirectUrl = '/libsys/public/staff/dashboard';
+                        break;
+                    case 'scanner':
+                        $redirectUrl = '/libsys/public/scanner/attendance';
+                        break;
+                    default:
+                        return;
+                }
+            }
+
+            if (!empty($redirectUrl)) {
+                header("Location: {$redirectUrl}");
+                exit;
             }
         }
 
@@ -104,20 +118,33 @@ class AuthController extends Controller
         }
 
         if ($user) {
-            if (User::isSuperadmin($user)) {
-                $redirect = '/libsys/public/superadmin/dashboard';
-            } elseif (User::isAdmin($user)) {
-                $redirect = '/libsys/public/admin/dashboard';
-            } elseif (User::isLibrarian($user)) {
-                $redirect = '/libsys/public/librarian/dashboard';
-            } elseif (User::isStudent($user)) {
-                $redirect = '/libsys/public/student/dashboard';
-            } elseif (User::isFaculty($user)) {
-                $redirect = '/libsys/public/faculty/dashboard';
-            } elseif (User::isStaff($user)) {
-                $redirect = '/libsys/public/staff/dashboard';
-            } elseif (User::isScanner($user)) {
-                $redirect = '/libsys/public/scanner/attendance';
+            $redirect = '';
+            $userRole = strtolower($user['role'] ?? '');
+
+            if (User::isSuperadmin($user) || User::isStudent($user) || User::isFaculty($user) || User::isStaff($user) || User::isScanner($user)) {
+
+                switch ($userRole) {
+                    case 'superadmin':
+                        $redirect = '/libsys/public/superadmin/dashboard';
+                        break;
+                    case 'student':
+                        $redirect = '/libsys/public/student/dashboard';
+                        break;
+                    case 'faculty':
+                        $redirect = '/libsys/public/faculty/dashboard';
+                        break;
+                    case 'staff':
+                        $redirect = '/libsys/public/staff/dashboard';
+                        break;
+                    case 'scanner':
+                        $redirect = '/libsys/public/scanner/attendance';
+                        break;
+                }
+            }
+
+            elseif (User::isAdmin($user) || User::isLibrarian($user)) {
+                $permissions = $_SESSION['user_permissions'] ?? [];
+                $redirect = User::getFirstAccessibleModuleUrl($userRole, $permissions);
             } else {
                 echo json_encode([
                     'status' => 'error',

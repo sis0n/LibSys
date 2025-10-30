@@ -157,7 +157,7 @@ class UserManagementController extends Controller
             $userId,
             $data['employee_id'] ?? 'N/A',
             $data['position'] ?? 'N/A',
-            $data['contact_number'] ?? 'N/A',
+            $data['contact'] ?? 'N/A',
             'active'
           );
 

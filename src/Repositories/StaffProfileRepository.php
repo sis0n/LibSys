@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Core\Database;
 use PDO;
 
-class FacultyProfileRepository
+class StaffProfileRepository
 {
   private $db;
 
@@ -28,13 +28,13 @@ class FacultyProfileRepository
                 u.profile_picture,
                 u.role,
                 u.is_active,
-                f.unique_faculty_id,
-                f.department,
-                f.contact,
-                f.status,
-                f.profile_updated
+                s.employee_id,
+                s.position,
+                s.contact,
+                s.status,
+                s.profile_updated
             FROM users u
-            LEFT JOIN faculty f ON u.user_id = f.user_id
+            LEFT JOIN staff s ON u.user_id = s.user_id
             WHERE u.user_id = :userId AND u.deleted_at IS NULL
         ");
     $stmt->execute([':userId' => $userId]);
@@ -42,10 +42,10 @@ class FacultyProfileRepository
     return $result ?: null;
   }
 
-  public function updateFacultyProfile(int $userId, array $data): bool
+  public function updateStaffProfile(int $userId, array $data): bool
   {
     $allowedFields = [
-      'department',
+      'position',
       'contact',
       'profile_updated',
       'status'
@@ -63,7 +63,7 @@ class FacultyProfileRepository
 
     if (empty($sqlParts)) return true;
 
-    $sql = "UPDATE faculty SET " . implode(", ", $sqlParts) . " WHERE user_id = :user_id";
+    $sql = "UPDATE staff SET " . implode(", ", $sqlParts) . " WHERE user_id = :user_id";
     $stmt = $this->db->prepare($sql);
     return $stmt->execute($params);
   }
@@ -71,12 +71,12 @@ class FacultyProfileRepository
   public function setEditAccess(int $userId, bool $allow = true): bool
   {
     $stmt = $this->db->prepare("
-            UPDATE faculty 
+            UPDATE staff 
             SET profile_updated = :allow
             WHERE user_id = :user_id
         ");
     return $stmt->execute([
-      ':allow' => $allow ? 0 : 1,
+      ':allow' => $allow ? 0 : 1, 
       ':user_id' => $userId
     ]);
   }

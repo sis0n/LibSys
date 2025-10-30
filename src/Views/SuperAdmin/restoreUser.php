@@ -35,6 +35,10 @@
                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
                         data-value="student">Student</a>
                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
+                        data-value="faculty">Faculty</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
+                        data-value="staff">Staff</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
                         data-value="librarian">Librarian</a>
                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
                         data-value="admin">Admin</a>

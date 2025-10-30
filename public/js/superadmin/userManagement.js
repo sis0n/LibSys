@@ -108,7 +108,13 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("addUsername").value = "";
     document.getElementById("userRoleDropdownValue").textContent = "Select Role";
   }
-  if (openAddUserBtn) openAddUserBtn.addEventListener("click", () => { addUserModal.classList.remove("hidden"); document.body.classList.add("overflow-hidden"); });
+  if (openAddUserBtn) openAddUserBtn.addEventListener("click", () => {
+    addUserModal.classList.remove("hidden");
+    document.body.classList.add("overflow-hidden");
+    // Trigger the selectUserRole function to set the initial label correctly
+    const initialRole = document.getElementById("userRoleDropdownValue").textContent.trim();
+    selectUserRole(null, initialRole);
+  });
   [closeAddUserBtn, cancelAddUserBtn].forEach(btn => btn?.addEventListener("click", closeAddUserModal));
   addUserModal?.addEventListener("click", e => { if (e.target === addUserModal) closeAddUserModal(); });
 
@@ -175,6 +181,17 @@ window.addEventListener("DOMContentLoaded", () => {
     const valueEl = document.getElementById("userRoleDropdownValue");
     if (valueEl) valueEl.textContent = val;
     setActiveOption("userRoleDropdownMenu", el);
+
+    const usernameLabel = document.getElementById('addUsernameLabel');
+    const usernameInput = document.getElementById('addUsername');
+
+    if (val === 'Student') {
+        usernameLabel.innerHTML = 'Student ID <span class="text-red-500">*</span>';
+        usernameInput.placeholder = "e.g., 20230114-S";
+    } else {
+        usernameLabel.innerHTML = 'Username <span class="text-red-500">*</span>';
+    }
+    usernameInput.value = "";
   };
 
   window.selectEditRole = (el, val) => {
@@ -495,6 +512,10 @@ window.addEventListener("DOMContentLoaded", () => {
     switch (role.toLowerCase()) {
       case "student":
         return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
+      case "faculty":
+        return `<span class="bg-blue-500 text-white ${base}">${role}</span>`;
+      case "staff":
+        return `<span class="bg-purple-500 text-white ${base}">${role}</span>`;
       case "librarian":
         return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
       case "admin":

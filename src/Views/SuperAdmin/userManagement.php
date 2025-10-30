@@ -44,6 +44,10 @@
                     <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
                         onclick="selectRole(this, 'Student')">Student</div>
                     <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectRole(this, 'Faculty')">Faculty</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                        onclick="selectRole(this, 'Staff')">Staff</div>
+                    <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
                         onclick="selectRole(this, 'Librarian')">Librarian</div>
                     <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
                         onclick="selectRole(this, 'Admin')">Admin</div>
@@ -170,7 +174,7 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Username <span
+                        <label id="addUsernameLabel" class="block text-sm font-medium text-gray-700 mb-1">Username <span
                                 class="text-red-500">*</span></label>
                         <input type="text" id="addUsername" placeholder="username"
                             class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
@@ -186,6 +190,10 @@
                             class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
                             <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                 onclick="selectUserRole(this, 'Student')">Student</div>
+                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                onclick="selectUserRole(this, 'Faculty')">Faculty</div>
+                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                onclick="selectUserRole(this, 'Staff')">Staff</div>
                             <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                 onclick="selectUserRole(this, 'Librarian')">Librarian</div>
                             <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
@@ -381,6 +389,10 @@
                                 class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditRole(this, 'Student')">Student</div>
+                                <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectEditRole(this, 'Faculty')">Faculty</div>
+                                <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectEditRole(this, 'Staff')">Staff</div>
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditRole(this, 'Librarian')">Librarian</div>
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"

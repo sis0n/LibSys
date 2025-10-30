@@ -106,7 +106,9 @@
                 <div class="flex items-center gap-3">
                     <div>
                         <label class="text-sm text-gray-500" for="course">Course</label>
-                        <input type="text" id="course" name="course" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+                        <select id="course" name="course" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+                            <option value="" disabled selected>Loading courses...</option>
+                        </select>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">

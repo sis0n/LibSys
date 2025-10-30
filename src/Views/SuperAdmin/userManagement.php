@@ -95,6 +95,33 @@
 
         </table>
     </div>
+
+    <!-- Pagination -->
+    <div id="pagination-controls" class="hidden mt-6">
+        <div class="flex justify-center">
+            <nav class="flex items-center bg-white rounded-full shadow-sm p-2 text-sm font-medium text-gray-600">
+                <button class="flex items-center gap-1 px-4 py-2 hover:text-orange-600 disabled:text-gray-400">
+                    <i class="ph ph-caret-left text-base"></i>
+                    <span>Previous</span>
+                </button>
+                <div class="flex items-center gap-2 mx-2">
+                    <button
+                        class="flex items-center justify-center h-8 w-8 rounded-full bg-orange-500 text-white font-bold text-xs">1</button>
+                    <button
+                        class="flex items-center justify-center h-8 w-8 rounded-full hover:bg-orange-50 hover:text-orange-600 text-xs">2</button>
+                    <button
+                        class="flex items-center justify-center h-8 w-8 rounded-full hover:bg-orange-50 hover:text-orange-600 text-xs">3</button>
+                    <span class="px-2 text-gray-500">...</span>
+                    <button
+                        class="flex items-center justify-center h-8 w-8 rounded-full hover:bg-orange-50 hover:text-orange-600 text-xs">155</button>
+                </div>
+                <button class="flex items-center gap-1 px-4 py-2 hover:text-orange-600 disabled:text-gray-400">
+                    <span>Next</span>
+                    <i class="ph ph-caret-right text-base"></i>
+                </button>
+            </nav>
+        </div>
+    </div>
 </div>
 
 <!-- Import Modal -->

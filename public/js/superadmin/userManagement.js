@@ -292,10 +292,20 @@ window.addEventListener("DOMContentLoaded", () => {
   function renderTable(usersToRender) {
     if (!userTableBody) return;
     userTableBody.innerHTML = "";
+    const paginationControls = document.getElementById("pagination-controls");
 
     if (usersToRender.length === 0) {
       userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
+      if (paginationControls) paginationControls.classList.add("hidden");
       return;
+    }
+
+    if (paginationControls) {
+      if (usersToRender.length >= 15) {
+        paginationControls.classList.remove("hidden");
+      } else {
+        paginationControls.classList.add("hidden");
+      }
     }
 
     usersToRender.forEach((user) => {

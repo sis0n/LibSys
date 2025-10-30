@@ -75,7 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (paginationControls) {
-            if (data.length >= 15) {
+            //pang testing lang dapat 15 yan! hindi 5 :)
+            if (data.length >= 5) {
                 paginationControls.classList.remove('hidden');
             } else {
                 paginationControls.classList.add('hidden');
@@ -100,11 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
             statusCell.className = 'px-3 py-1 rounded-full font-medium text-xs';
 
             if (statusText === 'borrowed') {
-                statusCell.classList.add('bg-red-100', 'text-red-800');
+                statusCell.classList.add('bg-orange-100', 'text-orange-800');
             } else if (statusText === 'returned') {
                 statusCell.classList.add('bg-green-100', 'text-green-800');
             } else if (statusText === 'expired') {
-                statusCell.classList.add('bg-gray-100', 'text-gray-800');
+                statusCell.classList.add('bg-red-100', 'text-red-800');
             } else {
                 statusCell.classList.add('bg-gray-100', 'text-gray-500');
             }

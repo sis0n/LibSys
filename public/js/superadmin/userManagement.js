@@ -163,9 +163,7 @@ window.addEventListener("DOMContentLoaded", () => {
   window.selectEditRole = (el, val) => {
     const valueEl = document.getElementById("editRoleDropdownValue");
     if (valueEl) valueEl.textContent = val;
-    setActiveOption("editRoleDropdownMenu", el);
-
-    const editModulesContainer = document.getElementById("editModulesSection");
+    const editModulesContainer = document.getElementById("editPermissionsContainer");
     const user = users.find(u => u.user_id === currentEditingUserId);
     toggleModules(editModulesContainer, user.role, user?.modules || []);
   };
@@ -543,7 +541,7 @@ window.addEventListener("DOMContentLoaded", () => {
         document.querySelector("#editUserTitle span").textContent = user.name;
 
         // --- Modules checkboxes ---
-        const editModulesContainer = document.getElementById("editModulesSection");
+        const editModulesContainer = document.getElementById("editPermissionsContainer");
         if (editModulesContainer) {
           if (user.role.toLowerCase() === 'admin' || user.role.toLowerCase() === 'librarian') {
             editModulesContainer.classList.remove("hidden");

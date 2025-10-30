@@ -95,6 +95,8 @@ class RouteConfig
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['global logs']);
         $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['backup']);
         $router->get('librarian/restoreBooks', 'SidebarController@restoreBooks', ['restore books']);
+        $router->get('librarian/borrowingForm', 'SidebarController@borrowingForm', ['borrowing form']);
+
 
 
         // --- ADMIN ROUTES (Permission Controlled) ---
@@ -128,6 +130,8 @@ class RouteConfig
         $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['global logs']);
         $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['backup']);
         $router->get('admin/restoreBooks', 'SidebarController@restoreBooks', ['restore books']);
+        $router->get('admin/borrowingForm', 'SidebarController@borrowingForm', ['borrowing form']);
+
 
 
         // --- SUPERADMIN ROUTES ---
@@ -184,6 +188,11 @@ class RouteConfig
         $router->get('superadmin/dashboard/top-visitors', 'App\Controllers\DashboardController@getTopVisitors', ['superadmin']);
         $router->get('superadmin/dashboard/weekly-activity', 'App\Controllers\DashboardController@getWeeklyActivity', ['superadmin']);
         $router->get('superadmin/dashboard/getData', 'DashboardController@getData', ['superadmin']);
+        $router->post('superadmin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['superadmin']);
+        $router->get('superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
+        $router->get('superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
+        $router->post('superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
+        $router->post('superadmin/borrowingForm/create', 'ManualBorrowingController@create');
 
 
         // --- STUDENT ROUTES ---

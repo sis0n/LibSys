@@ -167,7 +167,7 @@ class UserManagementController extends Controller
           if (empty($data['modules']) || !is_array($data['modules'])) {
             echo json_encode([
               'success' => false,
-              'message' => 'Please select at least one module for ' . ucfirst($role) . '.'
+              'message' => 'Please select at least one module for ' . ucfirst($role) . '.',
             ]);
             return;
           }
@@ -197,7 +197,6 @@ class UserManagementController extends Controller
         'success' => true,
         'message' => ucfirst($role) . ' user added successfully.',
         'user_id' => $userId,
-        'facuclty_unique_id' => $facultyId
       ]);
     } catch (\Exception $e) {
       echo json_encode([

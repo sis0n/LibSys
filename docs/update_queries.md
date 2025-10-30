@@ -336,3 +336,40 @@ CREATE TABLE `user_module_permissions` (
 
 ALTER TABLE faculty
 ADD COLUMN unique_faculty_id VARCHAR(20) UNIQUE AFTER faculty_id;
+
+ALTER TABLE borrow_transactions
+ADD COLUMN method ENUM('manual', 'qr') NOT NULL DEFAULT 'qr' AFTER status;
+
+ALTER TABLE borrow_transactions
+ADD COLUMN unique_faculty_id VARCHAR(20) NULL AFTER faculty_id;
+
+ALTER TABLE faculty_carts
+ADD COLUMN unique_faculty_id VARCHAR(20) NULL AFTER faculty_id;
+
+ALTER TABLE faculty_carts
+DROP FOREIGN KEY faculty_carts_ibfk_1;
+
+ALTER TABLE faculty_carts
+ADD CONSTRAINT fk_faculty_carts_unique_faculty
+FOREIGN KEY (unique_faculty_id)
+REFERENCES faculty(unique_faculty_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE;
+
+CREATE TABLE guests (
+  guest_id INT AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NULL,
+  contact VARCHAR(50) NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+ALTER TABLE borrow_transactions
+ADD COLUMN collateral_id VARCHAR(100) NULL AFTER unique_faculty_id;
+
+ALTER TABLE borrow_transactions
+ADD COLUMN guest_id INT NULL AFTER unique_faculty_id,
+ADD CONSTRAINT fk_guest FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE SET NULL;

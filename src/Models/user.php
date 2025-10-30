@@ -1,18 +1,22 @@
 <?php
+
 namespace App\Models;
 
 use App\Core\Database;
 use PDO;
 use PDOException;
 
-class User {
+class User
+{
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function findByIdentifier(string $identifier): ?array{
+    public function findByIdentifier(string $identifier): ?array
+    {
         try {
             $sql = "
                 SELECT u.*, s.student_number 
@@ -33,12 +37,62 @@ class User {
         }
     }
 
+    public static function getFirstAccessibleModuleUrl(string $role, array $permissions): string
+    {
+        $role = strtolower($role);
+        $baseUrl = "/libsys/public/{$role}/";
+
+        $normalizedPermissions = array_map('strtolower', $permissions);
+
+        $orderedModules = [
+            'book management' => 'bookManagement',
+            'qr scanner' => 'qrScanner',
+            'returning' => 'returning',
+            'borrowing form' => 'borrowingForm',
+            'attendance logs' => 'attendanceLogs',
+            'reports' => 'topVisitor',
+            'transaction history' => 'transactionHistory',
+            'backup' => 'backup',
+            'restore books' => 'restoreBooks',
+            'restore user' => 'restoreUser',
+        ];
+
+        foreach ($orderedModules as $permission => $urlSegment) {
+            if (in_array($permission, $normalizedPermissions)) {
+                return "{$baseUrl}{$urlSegment}";
+            }
+        }
+
+        return "{$baseUrl}changePassword";
+    }
+
     // static role checks – secure role methods
-    public static function isAdmin(array $user): bool { return ($user['role'] ?? '') === 'admin'; }
-    public static function isLibrarian(array $user): bool { return ($user['role'] ?? '') === 'librarian'; }
-    public static function isStudent(array $user): bool { return ($user['role'] ?? '') === 'student'; }
-    public static function isSuperadmin(array $user): bool { return ($user['role'] ?? '') === 'superadmin'; }
-    public static function isScanner(array $user): bool { return ($user['role'] ?? '') === 'scanner'; }
-    public static function isFaculty(array $user): bool { return ($user['role'] ?? '') === 'faculty'; }
-    public static function isStaff(array $user): bool { return ($user['role'] ?? '') === 'staff'; }
+    public static function isAdmin(array $user): bool
+    {
+        return ($user['role'] ?? '') === 'admin';
+    }
+    public static function isLibrarian(array $user): bool
+    {
+        return ($user['role'] ?? '') === 'librarian';
+    }
+    public static function isStudent(array $user): bool
+    {
+        return ($user['role'] ?? '') === 'student';
+    }
+    public static function isSuperadmin(array $user): bool
+    {
+        return ($user['role'] ?? '') === 'superadmin';
+    }
+    public static function isScanner(array $user): bool
+    {
+        return ($user['role'] ?? '') === 'scanner';
+    }
+    public static function isFaculty(array $user): bool
+    {
+        return ($user['role'] ?? '') === 'faculty';
+    }
+    public static function isStaff(array $user): bool
+    {
+        return ($user['role'] ?? '') === 'staff';
+    }
 }

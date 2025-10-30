@@ -3,14 +3,17 @@
 namespace App\Repositories;
 
 use App\Repositories\UserRepository;
+use App\Repositories\UserPermissionModuleRepository;
 
 class AuthRepository
 {
   private UserRepository $userRepo;
+  private UserPermissionModuleRepository $userModuleRepo;
 
   public function __construct()
   {
     $this->userRepo = new UserRepository();
+    $this->userModuleRepo = new UserPermissionModuleRepository();
   }
 
   public function attemptLogin(string $username, string $password): ?array
@@ -29,6 +32,14 @@ class AuthRepository
       $lastName = $user['last_name'] ?? '';
       $suffix = $user['suffix'] ?? '';
       $fullName = implode(' ', array_filter([$firstName, $middleName, $lastName, $suffix]));
+      
+      $modules = [];
+
+      $role = strtolower(trim($user['role'] ?? 'guest'));
+
+      if(in_array($role, ['admin', 'librarian'])){
+        $modules = $this->userModuleRepo->getModulesByUserId($user['user_id']);
+      }
 
       $_SESSION['user_data'] = [
         'user_id' => $user['user_id'],
@@ -40,11 +51,13 @@ class AuthRepository
         'fullname' => !empty(trim($fullName)) ? $fullName : ($_SESSION['username'] ?? 'User'),
         'profile_picture' => $user['profile_picture'] ?? null,
         'is_active' => $user['is_active'] ?? 0,
+        'modules' => $modules,
       ];
 
       $_SESSION['user_id'] = $user['user_id'];
       $_SESSION['username'] = $_SESSION['user_data']['username'];
       $_SESSION['role'] = $_SESSION['user_data']['role'];
+      $_SESSION['user_permissions'] = $modules;
 
       return $user;
     }

@@ -390,3 +390,36 @@ CREATE TABLE `staff_carts` (
   INDEX (`book_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
+ALTER TABLE borrow_transaction_items
+MODIFY COLUMN book_id INT(11) NULL,
+ADD COLUMN equipment_id INT(11) NULL AFTER book_id;
+
+-- wag nyo muna quiery tong nasa baba
+
+ALTER TABLE borrow_transaction_items
+ADD CONSTRAINT fk_bti_book
+  FOREIGN KEY (book_id) REFERENCES books(book_id)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE;
+
+ALTER TABLE borrow_transaction_items
+ADD CONSTRAINT fk_bti_equipment
+  FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE;
+
+
+CREATE TABLE equipment (
+equipment_id INT AUTO_INCREMENT PRIMARY KEY,
+equipment_code VARCHAR(100) UNIQUE,
+equipment_name VARCHAR(255) NOT NULL,
+availability ENUM('available', 'borrowed') DEFAULT 'available',
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+deleted_at DATETIME DEFAULT NULL,
+deleted_by INT DEFAULT NULL,
+is_archived TINYINT(1) DEFAULT 0
+);
+
+

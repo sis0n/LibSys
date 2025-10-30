@@ -99,10 +99,14 @@ foreach ($logs as $log) {
                     </button>
                     <div id="courseFilterMenu"
                         class="filter-dropdown-menu absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20 text-sm">
-                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Courses">All Courses</div>
-                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSIT">BSIT</div>
-                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSCS">BSCS</div>
-                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSEMC">BSEMC</div>
+                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer"
+                            data-value="All Courses">All Courses</div>
+                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSIT">BSIT
+                        </div>
+                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSCS">BSCS
+                        </div>
+                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSEMC">BSEMC
+                        </div>
                     </div>
                 </div>
             </div>
@@ -129,7 +133,35 @@ foreach ($logs as $log) {
                 </tbody>
             </table>
         </div>
+        <!-- Pagination -->
+        <div id="pagination-controls" class="hidden mt-6">
+            <div class="flex justify-center">
+                <nav class="flex items-center bg-white rounded-full shadow-sm p-2 text-sm font-medium text-gray-600">
+                    <button class="flex items-center gap-1 px-4 py-2 hover:text-orange-600 disabled:text-gray-400">
+                        <i class="ph ph-caret-left text-base"></i>
+                        <span>Previous</span>
+                    </button>
+                    <div class="flex items-center gap-2 mx-2">
+                        <button
+                            class="flex items-center justify-center h-8 w-8 rounded-full bg-orange-500 text-white font-bold text-xs">1</button>
+                        <button
+                            class="flex items-center justify-center h-8 w-8 rounded-full hover:bg-orange-50 hover:text-orange-600 text-xs">2</button>
+                        <button
+                            class="flex items-center justify-center h-8 w-8 rounded-full hover:bg-orange-50 hover:text-orange-600 text-xs">3</button>
+                        <span class="px-2 text-gray-500">...</span>
+                        <button
+                            class="flex items-center justify-center h-8 w-8 rounded-full hover:bg-orange-50 hover:text-orange-600 text-xs">155</button>
+                    </div>
+                    <button class="flex items-center gap-1 px-4 py-2 hover:text-orange-600 disabled:text-gray-400">
+                        <span>Next</span>
+                        <i class="ph ph-caret-right text-base"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
     </div>
+
+
 
     <div id="viewCheckinsModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
         <div
@@ -158,18 +190,21 @@ foreach ($logs as $log) {
     <script src="/libsys/public/js/superadmin/attendanceLogs.js" defer></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof initializeAttendanceLogs === 'function') {
-                initializeAttendanceLogs();
-            } else {
-                console.error("AttendanceLogs Error: Initialization function not found. Check if attendanceLogs.js loaded correctly.");
-                const tableBody = document.getElementById("attendanceTableBody");
-                if (tableBody) {
-                    const errorRow = tableBody.querySelector('#noRecordsRow') || tableBody.insertRow();
-                    errorRow.innerHTML = `<td colspan="5" class="text-center text-red-600 py-10">Error initializing page. Please refresh.</td>`;
-                    errorRow.classList.remove('hidden');
-                }
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof initializeAttendanceLogs === 'function') {
+            initializeAttendanceLogs();
+        } else {
+            console.error(
+                "AttendanceLogs Error: Initialization function not found. Check if attendanceLogs.js loaded correctly."
+                );
+            const tableBody = document.getElementById("attendanceTableBody");
+            if (tableBody) {
+                const errorRow = tableBody.querySelector('#noRecordsRow') || tableBody.insertRow();
+                errorRow.innerHTML =
+                    `<td colspan="5" class="text-center text-red-600 py-10">Error initializing page. Please refresh.</td>`;
+                errorRow.classList.remove('hidden');
             }
-        });
+        }
+    });
     </script>
 </body>

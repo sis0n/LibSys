@@ -139,15 +139,26 @@ function initializeAttendanceLogs() {
           filteredData = data.filter(log => log.date === dateToFilter);
         }
 
-        tableBody.innerHTML = ''; 
-        if (filteredData.length === 0) {
+        const groupedLogs = groupLogs(filteredData);
+        const paginationControls = document.getElementById("pagination-controls");
+
+        tableBody.innerHTML = '';
+        if (groupedLogs.length === 0) {
           tableBody.appendChild(noRecordsRow);
           noRecordsRow.classList.remove('hidden');
+          if (paginationControls) paginationControls.classList.add("hidden");
           return;
         }
 
+        if (paginationControls) {
+          if (groupedLogs.length >= 15) {
+            paginationControls.classList.remove("hidden");
+          } else {
+            paginationControls.classList.add("hidden");
+          }
+        }
+
         noRecordsRow.classList.add('hidden');
-        const groupedLogs = groupLogs(filteredData);
         const fragment = document.createDocumentFragment();
 
         groupedLogs.forEach(log => {

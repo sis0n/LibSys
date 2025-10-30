@@ -45,6 +45,7 @@ class AuthRepository
         'user_id' => $user['user_id'],
         'student_id' => $user['student_id'] ?? null,
         'faculty_id' => $user['faculty_id'] ?? null,
+        'staff_id' => $user['staff_id'] ?? null,
         'department' => $user['department'] ?? null,
         'username' => $user['username'] ?? $user['student_number'] ?? $username,
         'role' => !empty($user['role']) ? strtolower(trim($user['role'])) : 'guest',

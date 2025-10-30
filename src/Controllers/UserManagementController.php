@@ -55,7 +55,7 @@ class UserManagementController extends Controller
     }
 
     $modules = [];
-    if(in_array(strtolower($user['role']), ['admin', 'librarian'])) {
+    if (in_array(strtolower($user['role']), ['admin', 'librarian'])) {
       $modules = $this->userPermissionRepo->getModulesByUserId((int)$id);
     }
     echo json_encode(['user' => $user, 'modules' => $modules]);
@@ -157,7 +157,7 @@ class UserManagementController extends Controller
             $userId,
             $data['employee_id'] ?? 'N/A',
             $data['position'] ?? 'N/A',
-            $data['contact_number'] ?? 'N/A',
+            $data['contact'] ?? 'N/A',
             'active'
           );
 
@@ -218,7 +218,15 @@ class UserManagementController extends Controller
         return;
       }
 
-      $deleted = $this->userRepo->deleteUserWithCascade((int)$id, $deletedBy, $this->studentRepo);
+      if ($this->userRepo->hasBorrowedItems((int)$id)) {
+        echo json_encode([
+          'success' => false,
+          'message' => 'Cannot delete user. The user still has borrowed books or equipment.'
+        ]);
+        return;
+      }
+
+      $deleted = $this->userRepo->deleteUserWithCascade((int)$id, $deletedBy);
 
       echo json_encode([
         'success' => $deleted,
@@ -281,7 +289,7 @@ class UserManagementController extends Controller
 
       $updated = $this->userRepo->updateUser((int)$id, $data);
 
-      if(in_array(strtolower($data['role'] ?? ''), ['admin', 'librarian']) && isset($data['modules'])){
+      if (in_array(strtolower($data['role'] ?? ''), ['admin', 'librarian']) && isset($data['modules'])) {
         $this->userPermissionRepo->assignModules((int)$id, $data['modules']);
       }
 

@@ -24,6 +24,7 @@ session_start();
 require __DIR__ . '/../vendor/autoload.php';
 
 use Dotenv\Dotenv;
+use Dotenv\Dotenv;
 use App\Config\RouteConfig;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
@@ -44,6 +45,7 @@ $router = RouteConfig::register();
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // pangdefine lang ng base path to
+$basePath = parse_url($_ENV['APP_URL'], PHP_URL_PATH) . '/';
 $basePath = parse_url($_ENV['APP_URL'], PHP_URL_PATH) . '/';
 $uri = substr($uri, strlen($basePath));
 

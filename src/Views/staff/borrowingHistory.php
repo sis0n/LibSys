@@ -1,36 +1,33 @@
-<div class="mb-3">
-    <h2 class="text-2xl font-bold mb-4">My Borrowing History</h2>
+<div class="mb-6">
+    <h2 class="text-2xl font-bold mb-2">My Borrowing History</h2>
     <p class="text-gray-700">Complete record of your library borrowing activity with detailed information.</p>
 </div>
 
+<!-- Statistics -->
 <div id="statsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
-    <div
-        class="relative bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-md p-4 border-l-4 border-l-[var(--color-primary)]">
+    <div class="relative bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-md p-4 border-l-4 border-l-[var(--color-primary)]">
         <p class="text-sm text-gray-600">Total Borrowed</p>
         <h2 id="statTotal" class="text-3xl font-bold text-[var(--color-primary)]">0</h2>
         <p class="text-xs text-gray-500">All time</p>
         <i class="ph ph-books absolute top-3 right-3 text-[var(--color-primary)] text-xl"></i>
     </div>
 
-    <div
-        class="relative bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-md p-4 border-l-4 border-l-[var(--color-green-600)]">
+    <div class="relative bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-md p-4 border-l-4 border-l-[var(--color-green-600)]">
         <p class="text-sm text-gray-600">Currently Borrowed</p>
         <h2 id="statCurrent" class="text-3xl font-bold text-[var(--color-green-600)]">0</h2>
         <p class="text-xs text-gray-500">Active books</p>
         <i class="ph ph-eye absolute top-3 right-3 text-[var(--color-green-600)] text-xl"></i>
     </div>
 
-    <div
-        class="relative bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-md p-4 border-l-4 border-l-[var(--color-destructive)]">
+    <div class="relative bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-md p-4 border-l-4 border-l-[var(--color-destructive)]">
         <p class="text-sm text-gray-600">Overdue</p>
         <h2 id="statOverdue" class="text-3xl font-bold text-[var(--color-destructive)]">0</h2>
         <p class="text-xs text-gray-500">Need attention</p>
         <i class="ph ph-warning-circle absolute top-3 right-3 text-[var(--color-destructive)] text-xl"></i>
     </div>
 
-    <div
-        class="relative bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-md p-4 border-l-4 border-l-[var(--color-accent)]">
+    <div class="relative bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-md p-4 border-l-4 border-l-[var(--color-accent)]">
         <p class="text-sm text-gray-600">Returned</p>
         <h2 id="statReturned" class="text-3xl font-bold text-[var(--color-accent)]">0</h2>
         <p class="text-xs text-gray-500">Completed</p>
@@ -39,7 +36,7 @@
 
 </div>
 
-
+<!-- Borrowing Records List -->
 <div class="bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-md p-6">
     <h3 class="text-lg font-semibold mb-1 flex items-center gap-2 text-[var(--color-foreground)]">
         <i class="ph ph-calendar text-[var(--color-primary)]"></i>
@@ -55,7 +52,7 @@
 </div>
 
 <script>
-    const CURRENT_STUDENT_ID = <?= $_SESSION['user_data']['user_id'] ?? 0 ?>;
+    const CURRENT_STAFF_ID = <?= $_SESSION['user_data']['user_id'] ?? 0 ?>;
     const BASE_URL = '/LibSys/public';
 </script>
-<script src="/LibSys/public/js/student/borrowingHistory.js" defer></script>
+<script src="/LibSys/public/js/staff/borrowingHistory.js" defer></script>

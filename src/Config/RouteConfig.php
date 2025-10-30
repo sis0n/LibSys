@@ -34,9 +34,10 @@ class RouteConfig
         $router->get('faculty/qrBorrowingTicket', 'SidebarController@facultyQrBorrowingTicket', ['faculty']);
         $router->get('faculty/myAttendance', 'SidebarController@facultyMyAttendance', ['faculty']);
         $router->get('faculty/borrowingHistory', 'SidebarController@facultyBorrowingHistory', ['faculty']);
-        $router->get('faculty/attendance/get', 'AttendanceController@getMyAttendance', ['faculty']);
         $router->get('faculty/changePassword', 'SidebarController@facultyChangePassword', ['faculty']);
         $router->get('faculty/myProfile', 'SidebarController@facultyMyProfile', ['faculty']);
+
+        $router->get('faculty/attendance/get', 'AttendanceController@getMyAttendance', ['faculty']);
         $router->get('faculty/qrBorrowingTicket/checkStatus', 'FacultyTicketController@checkStatus');
         $router->get('faculty/bookCatalog/availableCount', 'FacultyBookCatalogController@getAvailableCount', ['faculty']);
         $router->get('faculty/bookCatalog/fetch', 'FacultyBookCatalogController@fetch', ['faculty']);
@@ -59,9 +60,24 @@ class RouteConfig
         $router->get('staff/qrBorrowingTicket', 'SidebarController@staffQrBorrowingTicket', ['staff']);
         $router->get('staff/myAttendance', 'SidebarController@staffMyAttendance', ['staff']);
         $router->get('staff/borrowingHistory', 'SidebarController@staffBorrowingHistory', ['staff']);
-        $router->get('staff/attendance/get', 'AttendanceController@getMyAttendance', ['staff']);
         $router->get('staff/changePassword', 'SidebarController@staffChangePassword', ['staff']);
         $router->get('staff/myProfile', 'SidebarController@staffMyProfile', ['staff']);
+        $router->get('staff/attendance/get', 'AttendanceController@getMyAttendance', ['staff']);
+
+        $router->get('staff/attendance/get', 'AttendanceController@getMyAttendance', ['staff']);
+        $router->get('staff/qrBorrowingTicket/checkStatus', 'StaffTicketController@checkStatus', ['staff']);
+        $router->get('staff/bookCatalog/availableCount', 'StaffBookCatalogController@getAvailableCount', ['staff']);
+        $router->get('staff/bookCatalog/fetch', 'StaffBookCatalogController@fetch', ['staff']);
+        $router->get('staff/cart', 'StaffCartController@index', ['staff']);
+        $router->get('staff/cart/add/{id}', 'StaffCartController@add', ['staff']);
+        $router->post('staff/cart/remove/{id}', 'StaffCartController@remove', ['staff']);
+        $router->post('staff/cart/clear', 'StaffCartController@clearCart', ['staff']);
+        $router->get('staff/cart/json', 'StaffCartController@getCartJson', ['staff']);
+        $router->post('staff/cart/checkout', 'StaffTicketController@checkout', ['staff']);
+        $router->get('staff/qrBorrowingTicket', 'StaffTicketController@show', ['staff']);
+        $router->get('staff/myprofile/get', 'StaffProfileController@getProfile', ['staff']);
+        $router->post('staff/myprofile/update', 'StaffProfileController@updateProfile', ['staff']);
+        $router->get('staff/borrowingHistory/fetch', 'StaffBorrowingHistoryController@fetchHistory', ['staff']);
 
 
         // --- LIBRARIAN ROUTES (Permission Controlled) ---

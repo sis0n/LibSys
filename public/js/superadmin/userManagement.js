@@ -1,4 +1,88 @@
 window.addEventListener("DOMContentLoaded", () => {
+  const studentPrograms = {
+    'BSA': 'Bachelor of Science in Accountancy',
+    'BSAIS': 'Bachelor of Science in Accounting Information Systems',
+    'BSBA FMGT': 'BSBA Major in Financial Management',
+    'BSBA HRM': 'BSBA Major in Human Resource Management',
+    'BSBA MKTG': 'BSBA Major in Marketing Management',
+    'BS ENTREP': 'Bachelor of Science in Entrepreneurship',
+    'BS CRIM': 'Bachelor of Science in Criminology',
+    'BSISM': 'Bachelor of Science in Industrial Security Management',
+    'BECED': 'Bachelor of Early Childhood Education',
+    'BSE ENG': 'Bachelor of Secondary Education Major in English',
+    'BSE ENG-CHI': 'Bachelor of Secondary Education Major in English with Additional Chinese Language and Pedagogy Courses',
+    'BSE SCI': 'Bachelor of Secondary Education Major in Science',
+    'BTLED HE': 'Bachelor of Technology and Livelihood Education Major in Home Economics',
+    'CPE': 'Certificate in Professional Education',
+    'BS CPE': 'Bachelor of Science in Computer Engineering',
+    'BS ECE': 'Bachelor of Science in Electronics Engineering',
+    'BS EE': 'Bachelor of Science in Electrical Engineering',
+    'BS IE': 'Bachelor of Science in Industrial Engineering',
+    'ABBS': 'Bachelor of Arts in Behavioral Sciences',
+    'BA COMM': 'Bachelor of Arts in Communication',
+    'BA POS': 'Bachelor of Arts in Political Science',
+    'BS MATH': 'Bachelor of Science in Mathematics',
+    'BS PSY': 'Bachelor of Science in Psychology',
+    'BSIS': 'Bachelor of Science in Information Systems',
+    'BSIT': 'Bachelor of Science in Information Technology',
+    'BSCS': 'Bachelor of Science in Computer Science',
+    'BSEMC': 'Bachelor of Science in Entertainment and Multimedia Computing',
+    'BSOAD': 'Bachelor of Science in Office Administration',
+    'BSSW': 'Bachelor of Science in Social Work',
+    'BSTM': 'Bachelor of Science in Tourism Management',
+    'BSHM': 'Bachelor of Science in Hospitality Management',
+    'DPA': 'Doctor in Public Administration',
+    'BPA': 'Bachelor of Public Administration',
+    'BPA ECGE': 'Bachelor of Public Administration – Evening Class for Govt. Employees',
+    'MAED': 'Master of Arts in Education Major in Educational Management',
+    'MAT-EG': 'Master of Arts in Teaching in the Early Grades',
+    'MATS': 'Master of Arts in Teaching Science',
+    'MBA': 'Master in Business Administration',
+    'LAW': 'Bachelor of Laws / Juris Doctor'
+  };
+
+  const facultyDepartments = [
+    'College of Business and Accountancy',
+    'College of Criminal Justice Education',
+    'College of Education',
+    'College of Engineering',
+    'College of Law',
+    'College of Liberal Arts and Sciences',
+    'Graduate School'
+  ];
+
+  function updateProgramDepartmentDropdown(role, wrapperId, labelId, selectId) {
+    const wrapper = document.getElementById(wrapperId);
+    const label = document.getElementById(labelId);
+    const select = document.getElementById(selectId);
+
+    if (!wrapper || !label || !select) return;
+
+    select.innerHTML = '<option value="">Select an option</option>';
+
+    if (role.toLowerCase() === 'student') {
+      label.innerHTML = 'Program <span class="text-red-500">*</span>';
+      for (const [key, value] of Object.entries(studentPrograms)) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = `${key} - ${value}`;
+        select.appendChild(option);
+      }
+      wrapper.classList.remove('hidden');
+    } else if (role.toLowerCase() === 'faculty') {
+      label.innerHTML = 'Department <span class="text-red-500">*</span>';
+      facultyDepartments.forEach(dep => {
+        const option = document.createElement('option');
+        option.value = dep;
+        option.textContent = dep;
+        select.appendChild(option);
+      });
+      wrapper.classList.remove('hidden');
+    } else {
+      wrapper.classList.add('hidden');
+    }
+  }
+
   const modal = document.getElementById("importModal");
   const openBtn = document.getElementById("bulkImportBtn");
   const closeBtn = document.getElementById("closeImportModal");
@@ -116,6 +200,7 @@ window.addEventListener("DOMContentLoaded", () => {
             username: u.username,
             email: u.email,
             role: u.role,
+            program_department: u.program_department || null,
             status: u.is_active == 1 ? "Active" : "Inactive",
             joinDate: new Date(u.created_at).toLocaleDateString()
           }));
@@ -156,6 +241,10 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("addLastName").value = "";
     document.getElementById("addUsername").value = "";
     document.getElementById("userRoleDropdownValue").textContent = "Select Role";
+    const programWrapper = document.getElementById('addUserProgramDepartmentWrapper');
+    if (programWrapper) programWrapper.classList.add('hidden');
+    const programSelect = document.getElementById('addUserProgramDepartment');
+    if (programSelect) programSelect.value = '';
   }
   if (openAddUserBtn) openAddUserBtn.addEventListener("click", () => { addUserModal.classList.remove("hidden"); document.body.classList.add("overflow-hidden"); });
   [closeAddUserBtn, cancelAddUserBtn].forEach(btn => btn?.addEventListener("click", closeAddUserModal));
@@ -169,6 +258,10 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById('passwordFields').classList.add('hidden');
     document.getElementById('editPassword').value = '';
     document.getElementById('confirmPassword').value = '';
+    const programWrapper = document.getElementById('editUserProgramDepartmentWrapper');
+    if (programWrapper) programWrapper.classList.add('hidden');
+    const programSelect = document.getElementById('editUserProgramDepartment');
+    if (programSelect) programSelect.value = '';
   }
   [closeEditUserBtn, cancelEditUserBtn].forEach(btn => btn?.addEventListener("click", closeEditUserModal));
   editUserModal?.addEventListener("click", e => { if (e.target === editUserModal) closeEditUserModal(); });
@@ -224,12 +317,14 @@ window.addEventListener("DOMContentLoaded", () => {
     const valueEl = document.getElementById("userRoleDropdownValue");
     if (valueEl) valueEl.textContent = val;
     setActiveOption("userRoleDropdownMenu", el);
+    updateProgramDepartmentDropdown(val, 'addUserProgramDepartmentWrapper', 'addUserProgramDepartmentLabel', 'addUserProgramDepartment');
   };
 
   window.selectEditRole = (el, val) => {
     const valueEl = document.getElementById("editRoleDropdownValue");
     if (valueEl) valueEl.textContent = val;
     setActiveOption("editRoleDropdownMenu", el);
+    updateProgramDepartmentDropdown(val, 'editUserProgramDepartmentWrapper', 'editUserProgramDepartmentLabel', 'editUserProgramDepartment');
   };
 
   window.selectEditStatus = (el, val) => {
@@ -279,6 +374,7 @@ window.addEventListener("DOMContentLoaded", () => {
           username: u.username,
           email: u.email,
           role: u.role,
+          program_department: u.program_department || null,
           status: u.is_active == 1 ? "Active" : "Inactive",
           joinDate: new Date(u.created_at).toLocaleDateString()
         }));
@@ -340,10 +436,22 @@ window.addEventListener("DOMContentLoaded", () => {
       const last_name = document.getElementById("addLastName").value.trim();
       const username = document.getElementById("addUsername").value.trim();
       const role = document.getElementById("userRoleDropdownValue").textContent.trim();
+      const programDepartmentWrapper = document.getElementById('addUserProgramDepartmentWrapper');
+      const programDepartmentSelect = document.getElementById('addUserProgramDepartment');
+      let program_department = null;
 
       if (!first_name || !last_name || !username || role === "Select Role") {
         return alert("Please fill in all required fields (First Name, Last Name, Username, Role).");
       }
+
+      if (!programDepartmentWrapper.classList.contains('hidden')) {
+          program_department = programDepartmentSelect.value;
+          if (!program_department) {
+              const fieldName = role.toLowerCase() === 'student' ? 'Program' : 'Department';
+              return alert(`Please select a ${fieldName}.`);
+          }
+      }
+
       try {
         const res = await fetch("/LibSys/public/superadmin/userManagement/add", {
           method: "POST",
@@ -353,7 +461,8 @@ window.addEventListener("DOMContentLoaded", () => {
             middle_name: middle_name || null,
             last_name: last_name,
             username: username,
-            role: role
+            role: role,
+            program_department: program_department
           })
         });
         const data = await res.json();
@@ -393,6 +502,12 @@ window.addEventListener("DOMContentLoaded", () => {
         document.getElementById("editRoleDropdownValue").textContent = user.role;
         document.getElementById("editStatusDropdownValue").textContent = user.status;
         document.querySelector("#editUserTitle span").textContent = user.name;
+        
+        updateProgramDepartmentDropdown(user.role, 'editUserProgramDepartmentWrapper', 'editUserProgramDepartmentLabel', 'editUserProgramDepartment');
+        if (user.program_department) {
+            document.getElementById('editUserProgramDepartment').value = user.program_department;
+        }
+        
         editUserModal.classList.remove("hidden");
         document.body.classList.add("overflow-hidden");
       }
@@ -465,14 +580,29 @@ window.addEventListener("DOMContentLoaded", () => {
   if (saveEditBtn) {
     saveEditBtn.addEventListener("click", async () => {
       if (!currentEditingUserId) return;
+      
+      const role = document.getElementById("editRoleDropdownValue").textContent.trim();
+      const programDepartmentWrapper = document.getElementById('editUserProgramDepartmentWrapper');
+      const programDepartmentSelect = document.getElementById('editUserProgramDepartment');
+      let program_department = null;
+
+      if (!programDepartmentWrapper.classList.contains('hidden')) {
+          program_department = programDepartmentSelect.value;
+          if (!program_department) {
+              const fieldName = role.toLowerCase() === 'student' ? 'Program' : 'Department';
+              return alert(`Please select a ${fieldName}.`);
+          }
+      }
+
       const payload = {
         first_name: document.getElementById("editFirstName").value.trim(),
         middle_name: document.getElementById("editMiddleName").value.trim() || null,
         last_name: document.getElementById("editLastName").value.trim(),
         username: document.getElementById("editUsername").value.trim(),
         email: document.getElementById("editEmail").value.trim(),
-        role: document.getElementById("editRoleDropdownValue").textContent.trim(),
-        is_active: document.getElementById("editStatusDropdownValue").textContent.trim().toLowerCase() === 'active' ? 1 : 0
+        role: role,
+        is_active: document.getElementById("editStatusDropdownValue").textContent.trim().toLowerCase() === 'active' ? 1 : 0,
+        program_department: program_department
       };
 
       if (!payload.first_name || !payload.last_name || !payload.email || !payload.username) {

@@ -205,6 +205,11 @@
                         </div>
                     </div>
                 </div>
+                <div id="addUserProgramDepartmentWrapper" class="hidden">
+                    <label id="addUserProgramDepartmentLabel" class="block text-sm font-medium text-gray-700 mb-1">Program <span class="text-red-500">*</span></label>
+                    <select id="addUserProgramDepartment" required class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
+                    </select>
+                </div>
             </div>
 
             <!-- Permissions Section (TINANGGAL ANG hidden CLASS) -->
@@ -421,6 +426,11 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div id="editUserProgramDepartmentWrapper" class="hidden">
+                    <label id="editUserProgramDepartmentLabel" class="block text-sm text-gray-700 mb-1 font-medium">Program <span class="text-red-500">*</span></label>
+                    <select id="editUserProgramDepartment" required class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none">
+                    </select>
                 </div>
             </div>
 

@@ -47,10 +47,14 @@
             </button>
             <div id="statusFilterMenu"
                 class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20 text-sm">
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All Status</div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">Borrowed</div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Returned">Returned</div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Expired">Expired</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All
+                    Status</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">Borrowed
+                </div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Returned">Returned
+                </div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Expired">Expired
+                </div>
             </div>
         </div>
 
@@ -72,10 +76,10 @@
         <table class="min-w-full divide-y divide-gray-300">
             <thead class="bg-orange-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User
                         Name</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
-                        Number</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User
+                        ID Number</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Items
                         Borrowed</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Borrowed
@@ -117,33 +121,30 @@
     </div>
 
     <!-- Pagination -->
-    <div id="pagination-container" class="flex justify-center items-center mt-6">
-        <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
-            <ul class="flex items-center gap-4 text-sm">
-                <!-- Previous -->
-                <li>
-                    <a href="#" id="prev-page"
-                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
-                        <i class="ph ph-caret-left"></i>
-                        <span>Previous</span>
-                    </a>
-                </li>
-
-                <!-- Page Numbers -->
-                <div id="pagination-numbers" class="flex items-center gap-3">
-                    <!-- JS will insert page numbers here -->
+    <div id="pagination-controls" class="hidden mt-6">
+        <div class="flex justify-center">
+            <nav class="flex items-center bg-white rounded-full shadow-sm p-2 text-sm font-medium text-gray-600">
+                <button class="flex items-center gap-1 px-4 py-2 hover:text-orange-600 disabled:text-gray-400">
+                    <i class="ph ph-caret-left text-base"></i>
+                    <span>Previous</span>
+                </button>
+                <div class="flex items-center gap-2 mx-2">
+                    <button
+                        class="flex items-center justify-center h-8 w-8 rounded-full bg-orange-500 text-white font-bold text-xs">1</button>
+                    <button
+                        class="flex items-center justify-center h-8 w-8 rounded-full hover:bg-orange-50 hover:text-orange-600 text-xs">2</button>
+                    <button
+                        class="flex items-center justify-center h-8 w-8 rounded-full hover:bg-orange-50 hover:text-orange-600 text-xs">3</button>
+                    <span class="px-2 text-gray-500">...</span>
+                    <button
+                        class="flex items-center justify-center h-8 w-8 rounded-full hover:bg-orange-50 hover:text-orange-600 text-xs">155</button>
                 </div>
-
-                <!-- Next -->
-                <li>
-                    <a href="#" id="next-page"
-                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
-                        <span>Next</span>
-                        <i class="ph ph-caret-right"></i>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+                <button class="flex items-center gap-1 px-4 py-2 hover:text-orange-600 disabled:text-gray-400">
+                    <span>Next</span>
+                    <i class="ph ph-caret-right text-base"></i>
+                </button>
+            </nav>
+        </div>
     </div>
 </section>
 
@@ -251,4 +252,4 @@
 </div>
 
 
-<script src="/libsys/public/js/admin/transactionHistory.js"></script>
+<script src="/libsys/public/js/SuperAdmin/transactionHistory.js"></script>

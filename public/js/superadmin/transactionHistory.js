@@ -5,18 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.getElementById('transactionHistoryTableBody');
     const noTransactionsMessage = document.getElementById('no-transactions-found');
     const rowTemplate = document.getElementById('transaction-row-template').content;
-    const paginationContainer = document.getElementById('pagination-container');
-    const paginationNumbers = document.getElementById('pagination-numbers');
-    const prevPageBtn = document.getElementById('prev-page');
-    const nextPageBtn = document.getElementById('next-page');
     const modal = document.getElementById('transactionDetailsModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
 
     const searchInput = document.getElementById('transactionSearchInput');
     const dateInput = document.getElementById('transactionDate');
 
-    let currentPage = 1;
-    const rowsPerPage = 5;
     let allTransactions = [];
     let currentFilteredTransactions = [];
 
@@ -49,9 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return statusMatch && searchMatch && dateMatch;
         });
 
-        currentPage = 1;
-        renderTable(currentFilteredTransactions, currentPage);
-        renderPagination(currentFilteredTransactions);
+        renderTable(currentFilteredTransactions);
     }
 
     // Status dropdown toggle
@@ -72,21 +64,25 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', applyAndRenderFilters);
     dateInput.addEventListener('change', applyAndRenderFilters);
 
-    function renderTable(data, page) {
+    function renderTable(data) {
         tableBody.innerHTML = '';
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const paginatedData = data.slice(start, end);
+        const paginationControls = document.getElementById('pagination-controls');
 
-        if (paginatedData.length === 0 && page === 1) {
+        if (data.length === 0) {
             tableBody.appendChild(noTransactionsMessage.cloneNode(true));
-            paginationContainer.classList.add('hidden');
+            if (paginationControls) paginationControls.classList.add('hidden');
             return;
         }
 
-        paginationContainer.classList.remove('hidden');
+        if (paginationControls) {
+            if (data.length >= 15) {
+                paginationControls.classList.remove('hidden');
+            } else {
+                paginationControls.classList.add('hidden');
+            }
+        }
 
-        paginatedData.forEach(transaction => {
+        data.forEach(transaction => {
             const newRow = rowTemplate.cloneNode(true);
             const tr = newRow.querySelector('tr');
             tr.dataset.transactionId = transaction.transaction_id;
@@ -103,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
             statusCell.textContent = transaction.transaction_status || 'N/A';
             statusCell.className = 'px-3 py-1 rounded-full font-medium text-xs';
 
-            // Remove Pending logic
             if (statusText === 'borrowed') {
                 statusCell.classList.add('bg-red-100', 'text-red-800');
             } else if (statusText === 'returned') {
@@ -117,53 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.appendChild(newRow);
         });
     }
-
-    // Pagination
-    function renderPagination(data) {
-        paginationNumbers.innerHTML = '';
-        const pageCount = Math.ceil(data.length / rowsPerPage);
-
-        prevPageBtn.classList.toggle('text-gray-400', currentPage === 1);
-        prevPageBtn.classList.toggle('hover:text-orange-600', currentPage !== 1);
-        nextPageBtn.classList.toggle('text-gray-400', currentPage === pageCount);
-        nextPageBtn.classList.toggle('hover:text-orange-600', currentPage !== pageCount);
-
-        for (let i = 1; i <= pageCount; i++) {
-            const pageNumber = document.createElement('a');
-            pageNumber.href = '#';
-            pageNumber.textContent = i;
-            pageNumber.classList.add('px-4', 'py-1.5', 'rounded-full', 'transition', 'duration-200');
-            if (i === currentPage) pageNumber.classList.add('bg-orange-500', 'text-white', 'shadow-sm');
-            else pageNumber.classList.add('text-gray-700', 'hover:text-orange-600', 'hover:bg-orange-50');
-
-            pageNumber.addEventListener('click', e => {
-                e.preventDefault();
-                currentPage = i;
-                renderTable(currentFilteredTransactions, currentPage);
-                renderPagination(currentFilteredTransactions);
-            });
-            paginationNumbers.appendChild(pageNumber);
-        }
-    }
-
-    prevPageBtn.addEventListener('click', e => {
-        e.preventDefault();
-        if (currentPage > 1) {
-            currentPage--;
-            renderTable(currentFilteredTransactions, currentPage);
-            renderPagination(currentFilteredTransactions);
-        }
-    });
-
-    nextPageBtn.addEventListener('click', e => {
-        e.preventDefault();
-        const pageCount = Math.ceil(currentFilteredTransactions.length / rowsPerPage);
-        if (currentPage < pageCount) {
-            currentPage++;
-            renderTable(currentFilteredTransactions, currentPage);
-            renderPagination(currentFilteredTransactions);
-        }
-    });
 
     // Modal
     closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));

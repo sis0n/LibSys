@@ -24,7 +24,6 @@ session_start();
 require __DIR__ . '/../vendor/autoload.php';
 
 use Dotenv\Dotenv;
-use Dotenv\Dotenv;
 use App\Config\RouteConfig;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');

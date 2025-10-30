@@ -177,7 +177,7 @@ class UserManagementController extends Controller
             'qr scanner',
             'returning',
             'borrowing form',
-            'attendance',
+            'attendance logs',
             'reports',
             'transaction history',
             'backup',

@@ -131,6 +131,7 @@ class RouteConfig
         $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['backup']);
         $router->get('admin/restoreBooks', 'SidebarController@restoreBooks', ['restore books']);
         $router->get('admin/borrowingForm', 'SidebarController@borrowingForm', ['borrowing form']);
+        
 
 
 

@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         handleItemTypeChange('Equipment');
     });
 
-    // check user button erp
+    // check user button
     document.getElementById('check-btn').addEventListener('click', async () => {
         const userId = document.getElementById('input_user_id').value.trim();
         if (!userId) return alert('Please enter a User ID');

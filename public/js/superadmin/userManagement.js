@@ -542,8 +542,6 @@ window.addEventListener("DOMContentLoaded", () => {
         document.getElementById("editStatusDropdownValue").textContent = user.status;
         document.querySelector("#editUserTitle span").textContent = user.name;
 
-        updateProgramDepartmentDropdown(user.role, 'editUserProgramDepartmentWrapper', 'editUserProgramDepartmentLabel', 'editUserProgramDepartment', user.program_department);
-
         // --- Modules checkboxes ---
         const editModulesContainer = document.getElementById("editModulesSection");
         if (editModulesContainer) {
@@ -641,17 +639,6 @@ window.addEventListener("DOMContentLoaded", () => {
       if (!currentEditingUserId) return;
       
       const role = document.getElementById("editRoleDropdownValue").textContent.trim();
-      const programDepartmentWrapper = document.getElementById('editUserProgramDepartmentWrapper');
-      const programDepartmentSelect = document.getElementById('editUserProgramDepartment');
-      let program_department = null;
-
-      if (!programDepartmentWrapper.classList.contains('hidden')) {
-          program_department = programDepartmentSelect.value;
-          if (!program_department) {
-              const fieldName = role.toLowerCase() === 'student' ? 'Program' : 'Department';
-              return alert(`Please select a ${fieldName}.`);
-          }
-      }
 
       const payload = {
         first_name: document.getElementById("editFirstName").value.trim(),
@@ -660,8 +647,7 @@ window.addEventListener("DOMContentLoaded", () => {
         username: document.getElementById("editUsername").value.trim(),
         email: document.getElementById("editEmail").value.trim(),
         role: role,
-        is_active: document.getElementById("editStatusDropdownValue").textContent.trim().toLowerCase() === 'active' ? 1 : 0,
-        program_department: program_department
+        is_active: document.getElementById("editStatusDropdownValue").textContent.trim().toLowerCase() === 'active' ? 1 : 0
       };
 
       if (!payload.first_name || !payload.last_name || !payload.email || !payload.username) {

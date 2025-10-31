@@ -74,7 +74,8 @@
         This is your generated report based on the selected date range:
     </p>
     <br>
-    <div class="date-range">30/10/2025 - 05/11/2025</div>
+    <div class="date-range">10/30/2025 - 11/30/2025</div>
+    <div class="date-range">(sample lang to)</div>
 
     <!-- FIRST ROW -->
     <div style="display: flex; justify-content: space-between; gap: 20px;">

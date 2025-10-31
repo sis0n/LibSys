@@ -219,8 +219,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (startDate && endDate) {
                 customDateModal.classList.add('hidden');
-                alert(`Downloading report for date range: ${startDate} to ${endDate}`);
-                // Here you would trigger the actual report download with the selected dates
+                
+                const reportUrl = `/LibSys/src/Views/report_pdf_template/pdfTemplate.php?start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}`;
+                window.open(reportUrl, '_blank');
             } else {
                 alert('Please select both start and end dates.');
             }

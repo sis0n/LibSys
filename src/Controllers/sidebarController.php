@@ -170,7 +170,7 @@ class SidebarController extends Controller
             "currentPage" => "equipmentCatalog"
         ]);
     }
-    
+
     public function staffMyCart()
     {
         $this->view("staff/myCart", [
@@ -266,7 +266,7 @@ class SidebarController extends Controller
     public function topVisitor()
     {
         $this->view("superadmin/topVisitor", [
-            "title" => "Top Visitor",
+            "title" => "Reports",
             "currentPage" => "topVisitor"
         ]);
     }
@@ -295,6 +295,14 @@ class SidebarController extends Controller
         ]);
     }
 
+    public function backup()
+    {
+        $this->view("superadmin/backup", [
+            "title" => "Backup",
+            "currentPage" => "backup"
+        ]);
+    }
+
     public function globalLogs()
     {
         $this->view("superadmin/globalLogs", [
@@ -303,10 +311,9 @@ class SidebarController extends Controller
         ]);
     }
 
-
-    public function backup()
+    public function AdminBackup()
     {
-        $this->view("superadmin/backup", [
+        $this->view("admin/backup", [
             "title" => "Backup",
             "currentPage" => "backup"
         ]);
@@ -395,7 +402,7 @@ class SidebarController extends Controller
     public function adminTopVisitor()
     {
         $this->view("admin/topVisitor", [
-            "title" => "Admin Top Visitor",
+            "title" => "Admin Reports",
             "currentPage" => "topVisitor"
         ]);
     }
@@ -433,11 +440,12 @@ class SidebarController extends Controller
     }
 
 
-    public function adminBackupAndRestore()
+    public function AdminRestoreBooks()
     {
-        $this->view("admin/backupAndRestore", [
-            "title" => "Admin Backup & Restore",
-            "currentPage" => "backupAndRestore"
+        $this->view("admin/restoreBooks", [
+            "title" => "Restore Books",
+            "currentPage" => "restoreBooks",
+            "csrf_token" => $_SESSION['csrf_token']
         ]);
     }
 
@@ -485,11 +493,13 @@ class SidebarController extends Controller
 
     public function librarianQrScanner()
     {
-        $this->view("librarian/qrScanner"
-        , [
-            "title" => "Librarian QR Code Scanner",
-            "currentPage" => "qrScanner"
-        ]);
+        $this->view(
+            "librarian/qrScanner",
+            [
+                "title" => "Librarian QR Code Scanner",
+                "currentPage" => "qrScanner"
+            ]
+        );
     }
 
     public function librarianAttendanceLogs()
@@ -502,7 +512,7 @@ class SidebarController extends Controller
     public function librarianTopVisitor()
     {
         $this->view("librarian/topVisitor", [
-            "title" => "Librarian Top Visitor",
+            "title" => "Librarian Reports",
             "currentPage" => "topVisitor"
         ]);
     }
@@ -540,11 +550,12 @@ class SidebarController extends Controller
     }
 
 
-    public function librarianBackupAndRestore()
+    public function LibrarianRestoreBooks()
     {
-        $this->view("librarian/backupAndRestore", [
-            "title" => "Librarian Backup & Restore",
-            "currentPage" => "backupAndRestore"
+        $this->view("librarian/restoreBooks", [
+            "title" => "Restore Books",
+            "currentPage" => "restoreBooks",
+            "csrf_token" => $_SESSION['csrf_token']
         ]);
     }
 

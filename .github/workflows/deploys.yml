@@ -51,7 +51,6 @@ jobs:
             /node_modules/
             /vendor/
             /docs/
-            checkout_test.txt
             resetdata.php
             sandbox.php
             **/deploy.yml

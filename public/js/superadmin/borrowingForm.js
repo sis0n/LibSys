@@ -139,4 +139,137 @@ document.addEventListener('DOMContentLoaded', () => {
 
     handleItemTypeChange('Equipment');
 
+   // ✅ ComboBox logic for Equipment Name (click-to-open, stays open when empty)
+    const itemNameInput = document.getElementById('item_name');
+    const itemNameSuggestions = document.getElementById('item_name_suggestions');
+    const itemNameSuggestionsList = document.getElementById('item_name_suggestions_list');
+    const itemNameDropdownArrow = document.getElementById('item_name_dropdown_arrow');
+
+    const suggestions = [
+    'Laptop',
+    'Projector',
+    'HDMI Cable',
+    'Extension Cord',
+    'Microphone'
+    ];
+
+    let highlightedIndex = -1;
+    let wasPointerDownOnInput = false;
+
+    // --- Helper: highlight list item for keyboard nav
+    const updateHighlight = () => {
+    const items = itemNameSuggestionsList.querySelectorAll('li');
+    items.forEach((item, index) => {
+        item.classList.toggle('bg-emerald-100', index === highlightedIndex);
+    });
+    };
+
+    // --- Show dropdown ---
+    const showSuggestions = (filter = true) => {
+    const value = itemNameInput.value.toLowerCase();
+    itemNameSuggestionsList.innerHTML = '';
+    highlightedIndex = -1;
+
+    let filtered = suggestions;
+
+    // Only filter if value isn't empty
+    if (filter && value.trim() !== '') {
+        filtered = suggestions.filter(s => s.toLowerCase().includes(value));
+    }
+
+    // Don't hide if empty but no filter
+    if (filtered.length === 0 && value.trim() !== '') {
+        itemNameSuggestions.classList.add('hidden');
+        return;
+    }
+
+    filtered.forEach(suggestion => {
+        const li = document.createElement('li');
+        li.className = 'px-4 py-2 text-sm hover:bg-emerald-50 cursor-pointer';
+        li.textContent = suggestion;
+        li.addEventListener('mousedown', e => {
+        e.preventDefault();
+        itemNameInput.value = suggestion;
+        hideSuggestions();
+        });
+        itemNameSuggestionsList.appendChild(li);
+    });
+
+    itemNameSuggestions.classList.remove('hidden');
+    };
+
+    // --- Hide dropdown ---
+    const hideSuggestions = () => {
+    itemNameSuggestions.classList.add('hidden');
+    itemNameSuggestionsList.innerHTML = '';
+    highlightedIndex = -1;
+    wasPointerDownOnInput = false;
+    };
+
+    // --- Event wiring ---
+    itemNameInput.addEventListener('pointerdown', () => {
+    wasPointerDownOnInput = true;
+    });
+
+    itemNameInput.addEventListener('focus', () => {
+    if (wasPointerDownOnInput) {
+        showSuggestions(false);
+    }
+    });
+
+    itemNameInput.addEventListener('input', () => {
+    showSuggestions(true);
+    });
+
+    itemNameDropdownArrow.addEventListener('pointerdown', () => {
+    wasPointerDownOnInput = true;
+    });
+
+    itemNameDropdownArrow.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (itemNameSuggestions.classList.contains('hidden')) {
+        showSuggestions(false);
+        itemNameInput.focus();
+    } else {
+        hideSuggestions();
+    }
+    });
+
+    itemNameInput.addEventListener('keydown', e => {
+    const items = itemNameSuggestionsList.querySelectorAll('li');
+    if (items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        highlightedIndex = (highlightedIndex + 1) % items.length;
+        updateHighlight();
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
+        updateHighlight();
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (highlightedIndex > -1) {
+        itemNameInput.value = items[highlightedIndex].textContent;
+        hideSuggestions();
+        }
+    } else if (e.key === 'Escape') {
+        hideSuggestions();
+    }
+    });
+
+    // --- Click outside to hide ---
+    document.addEventListener('click', (e) => {
+    if (
+        !itemNameInput.contains(e.target) &&
+        !itemNameDropdownArrow.contains(e.target) &&
+        !itemNameSuggestions.contains(e.target)
+    ) {
+        hideSuggestions();
+    }
+    });
+
+
+
 });

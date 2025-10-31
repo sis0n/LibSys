@@ -130,9 +130,8 @@ document.addEventListener("DOMContentLoaded", () => {
     noRecordsRow.querySelector('td').innerHTML = `<i class="ph ph-spinner animate-spin text-2xl"></i> Loading...`;
 
     const endpoint = '/attendance/logs/ajax';
-    const absoluteUrl = BASE_URL_JS + endpoint;
 
-    const url_fetch = new URL(absoluteUrl);
+    const url_fetch = new URL(`${BASE_URL_JS}/attendance/logs/ajax`);
     url_fetch.searchParams.append('period', periodToSend);
     url_fetch.searchParams.append('search', currentSearch);
     if (currentCourse !== "All Courses") {

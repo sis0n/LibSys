@@ -61,7 +61,7 @@ function fetchBorrowingHistory() {
 
   recordsContainer.innerHTML = `<div class="text-center py-10 text-gray-500">Loading history...</div>`;
 
-  const url = `${BASE_URL}/staff/borrowingHistory/fetch?staff_id=${CURRENT_STAFF_ID}`;
+  const url = `${BASE_URL}api/staff/borrowingHistory/fetch?staff_id=${CURRENT_STAFF_ID}`;
 
   fetch(url)
     .then(res => res.json())

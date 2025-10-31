@@ -133,7 +133,7 @@ window.addEventListener('DOMContentLoaded', () => {
   async function fetchDeletedBooks() {
     showLoadingState();
     try {
-      const response = await fetch('restoreBooks/fetch');
+      const response = await fetch('api/admin/restoreBooks/fetch');
       const data = await response.json();
 
       if (data.success && Array.isArray(data.books)) {
@@ -268,7 +268,7 @@ window.addEventListener('DOMContentLoaded', () => {
     buttonEl.classList.add('opacity-50');
 
     try {
-      const response = await fetch('restoreBooks/restore', {
+      const response = await fetch('api/admin/restoreBooks/restore', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -299,7 +299,7 @@ window.addEventListener('DOMContentLoaded', () => {
     buttonEl.classList.add('opacity-50');
 
     try {
-      const response = await fetch(`restoreBooks/archive/${bookId}`, {
+      const response = await fetch(`api/admin/restoreBooks/archive/${bookId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (borrowedBooksPercentEl) borrowedBooksPercentEl.textContent = '';
 
     try {
-      const response = await fetch(`dashboard/stats`);
+      const response = await fetch(`api/superadmin/dashboard/stats`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
 
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     topVisitorsErrorEl.classList.add('hidden');
 
     try {
-      const response = await fetch(`dashboard/top-visitors`);
+      const response = await fetch(`api/superadmin/dashboard/top-visitors`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const result = await response.json();
 
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     weeklyActivityErrorEl.classList.add('hidden');
 
     try {
-      const response = await fetch(`dashboard/weekly-activity`);
+      const response = await fetch(`api/superadmin/dashboard/weekly-activity`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const result = await response.json();
 

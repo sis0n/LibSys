@@ -159,7 +159,7 @@
   </tr>
 </template>
 
-<script src="/libsys/public/js/admin/restoreBooks.js"></script>
+<script src="<?= BASE_URL ?>/js/admin/restoreBooks.js"></script>
 
 <!-- Book Details Modal -->
 <div id="bookDetailsModal"

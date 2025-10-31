@@ -56,21 +56,7 @@
     </div>
 </div>
 
-<script>
-    <?php
-    $requestUri = $_SERVER['REQUEST_URI'];
-    if (preg_match('/\/public\/(superadmin|admin|librarian)\/qrScanner/', $requestUri, $matches)) {
-        $rolePrefix = $matches[1];
-    } else {
-        $rolePrefix = 'superadmin';
-    }
-    // Ito ang magiging dynamic base path (e.g., /LibSys/public/admin/qrScanner)
-    $ajaxBasePath = "/LibSys/public/" . $rolePrefix . "/qrScanner";
-    ?>
-    // Itatalaga ang dynamic path sa global variable na gagamitin ng qrScanner.js
-    const BASE_AJAX_PATH = '<?= $ajaxBasePath ?>';
-</script>
-<script src="/libsys/public/js/superadmin/qrScanner.js" defer></script>
+<script src="<?= BASE_URL ?>/js/superadmin/qrScanner.js" defer></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const scannerInput = document.getElementById('scannerInput');

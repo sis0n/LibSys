@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Repositories\BorrowingRepository;
-use App\Repositories\BookRepository;
+use App\Repositories\BookCatalogRepository;
 use App\Core\Controller;
 
 class BorrowingController extends Controller
@@ -14,7 +14,7 @@ class BorrowingController extends Controller
   public function __construct()
   {
     $this->borrowingRepo = new BorrowingRepository();
-    $this->bookRepo = new BookRepository();
+    $this->bookRepo = new BookCatalogRepository();
   }
 
   public function index()

@@ -459,4 +459,4 @@
     </div>
 </div>
 
-<script src="/libsys/public/js/superadmin/userManagement.js" defer></script>
+<script src="<?= BASE_URL ?>/js/superadmin/userManagement.js" defer></script>

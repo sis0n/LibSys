@@ -145,7 +145,7 @@ class StaffCartController extends Controller
     }
 
     if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'staff') {
-      header('Location: /libsys/public/login');
+      header('Location: '. BASE_URL . '/login');
       exit;
     }
 

@@ -45,7 +45,7 @@ class FacultyProfileController extends Controller
 
     if (move_uploaded_file($file['tmp_name'], $targetFile)) {
       // Ito ang URL path na i-store sa DB o ibabalik
-      return '/libsys/public/uploads/profile_images/' . $fileName;
+      return  BASE_URL . '/uploads/profile_images/' . $fileName;
     }
 
     return null;

@@ -48,10 +48,10 @@ jobs:
           exclude: |
             */.git
             */.github
-            */node_modules/*
-            */vendor/*
-            */docs/*
-            *checkout_test.txt*
-            *resetdata.php*
-            *sandbox.php*
+            /node_modules/
+            /vendor/
+            /docs/
+            checkout_test.txt
+            resetdata.php
+            sandbox.php
             **/deploy.yml

@@ -152,26 +152,43 @@ class BookManagementRepository
         return $stmt->execute($params);
     }
 
-    public function deleteBook(int $bookId, int $deletedByUserId): bool
+    public function deleteBook(int $bookId, int $deletedByUserId): array
     {
-        try{
-            $stmt = $this->db->prepare("UPDATE books 
+        try {
+            // 1️⃣ Check if book exists
+            $stmt = $this->db->prepare("SELECT deleted_at FROM books WHERE book_id = :book_id");
+            $stmt->execute([':book_id' => $bookId]);
+            $book = $stmt->fetch();
+
+            if (!$book) {
+                return ['success' => false, 'message' => 'Book not found.'];
+            }
+
+            // 2️⃣ Check if already deleted
+            if ($book['deleted_at'] !== null) {
+                return ['success' => false, 'message' => 'Book already deleted.'];
+            }
+
+            // 3️⃣ Soft delete
+            $stmt = $this->db->prepare("
+            UPDATE books 
             SET deleted_at = CURRENT_TIMESTAMP, 
                 deleted_by = :deleted_by,
                 is_archived = 0 
-            WHERE 
-                book_id = :book_id AND deleted_at IS NULL"
-            );
-
-            $success = $stmt->execute([
+            WHERE book_id = :book_id AND deleted_at IS NULL
+        ");
+            $stmt->execute([
                 ':deleted_by' => $deletedByUserId,
                 ':book_id' => $bookId
             ]);
 
-            return $success && $stmt->rowCount() > 0;
+            if ($stmt->rowCount() > 0) {
+                return ['success' => true, 'message' => 'Book deleted successfully!'];
+            }
+
+            return ['success' => false, 'message' => 'Failed to delete book.'];
         } catch (\PDOException $e) {
-            error_log("Error preparing deleteBook statement for book $bookId: " . $e->getMessage());
-            return false;
+            return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
         }
     }
 }

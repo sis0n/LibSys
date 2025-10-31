@@ -73,7 +73,7 @@ class BackupController extends Controller
   {
     if (session_status() === PHP_SESSION_NONE) session_start();
 
-    $allowedTables = ['users', 'students', 'books', 'equipment', 'borrow_transactions'];
+    $allowedTables = ['users', 'students', 'books', 'borrow_transactions', 'deleted_books', 'deleted_students'];
     if (!in_array($tableName, $allowedTables)) {
       http_response_code(400);
       exit(json_encode(['success' => false, 'message' => "Invalid table name."]));

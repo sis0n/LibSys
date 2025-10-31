@@ -121,7 +121,8 @@ function initializeAttendanceLogs() {
       dateToFilter = null;
     }
 
-    const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
+    const url = new URL('attendance/logs/ajax', window.location.origin);
+
     url.searchParams.append('period', periodToSend);
     url.searchParams.append('search', currentSearch);
     if (currentCourse !== "All Courses") {

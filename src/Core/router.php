@@ -24,6 +24,7 @@ class Router
 
   public function resolve(string $uri, string $method)
   {
+    // Tiyakin na walang leading/trailing slash
     $uri = trim($uri, '/');
 
     if (!isset($this->routes[$method])) {
@@ -33,7 +34,11 @@ class Router
     }
 
     foreach ($this->routes[$method] as $route => $info) {
-      $pattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route);
+
+      $pattern = preg_quote($route, '#');
+
+      $pattern = preg_replace('/\\\{[^}]+\\\}/', '([^/]+)', $pattern);
+
       $pattern = "#^" . trim($pattern, '/') . "$#";
 
       if (preg_match($pattern, $uri, $matches)) {
@@ -42,6 +47,7 @@ class Router
         $controller = $info['controller'];
         $allowedAccess = $info['roles'];
 
+        // --- HYBRID AUTHORIZATION CHECK (Hayaan natin itong gumana nang tama) ---
         if (!empty($allowedAccess)) {
           $userRole = strtolower($_SESSION['role'] ?? '');
           $userId = $_SESSION['user_id'] ?? null;
@@ -53,7 +59,6 @@ class Router
           }
 
           $hasAccess = false;
-
           $allowedAccessNormalized = array_map('strtolower', $allowedAccess);
 
           if (in_array($userRole, $allowedAccessNormalized)) {
@@ -62,15 +67,14 @@ class Router
 
           if (in_array($userRole, ['admin', 'librarian'])) {
             $userPermissions = $_SESSION['user_permissions'] ?? [];
-
             $normalizedUserPermissions = array_map('strtolower', $userPermissions);
 
-            $matches = array_intersect($normalizedUserPermissions, $allowedAccessNormalized);
+            $matches_permission = array_intersect($normalizedUserPermissions, $allowedAccessNormalized);
 
-            if (count($matches) > 0) {
+            if (count($matches_permission) > 0) {
               $hasAccess = true;
             } else {
-              $hasAccess = false; 
+              $hasAccess = false;
             }
           }
 
@@ -94,10 +98,12 @@ class Router
           throw new \Exception("Method $methodName not found in $controllerClass");
         }
 
+        // Pass dynamic params (like $id)
         return $controllerInstance->$methodName(...$matches);
       }
     }
 
+    // No route matched
     http_response_code(404);
     include __DIR__ . '/../Views/errors/404.php';
   }

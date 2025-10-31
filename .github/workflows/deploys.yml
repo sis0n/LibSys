@@ -45,12 +45,13 @@ jobs:
           protocol: ftp
           local-dir: ./
           server-dir: /
+          dangerous-clean-slate: false
           exclude: |
             */.git
             */.github
-            /node_modules/
+            **/node_modules/**
+            **/vendor/**
             /checkout_test.txt/
-            /vendor/
             /docs/
             resetdata.php
             sandbox.php

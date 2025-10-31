@@ -49,6 +49,7 @@ jobs:
             */.git
             */.github
             /node_modules/
+            /checkout_test.txt/
             /vendor/
             /docs/
             resetdata.php

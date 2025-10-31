@@ -84,6 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    const paginationControls = document.getElementById("pagination-controls");
+
     if (filteredLogs.length === 0) {
       noRecordsRow.classList.remove('hidden');
       const noRecordsCell = noRecordsRow.querySelector('td');
@@ -91,7 +93,17 @@ document.addEventListener('DOMContentLoaded', () => {
                  <i class="ph ph-clipboard text-4xl block mb-2"></i>
                  No attendance records found for the selected criteria.
              `;
+      if (paginationControls) paginationControls.classList.add("hidden");
       return;
+    }
+
+    if (paginationControls) {
+      // testing lang ulet kaya naka 5 yan 
+      if (filteredLogs.length >= 5) {
+        paginationControls.classList.remove("hidden");
+      } else {
+        paginationControls.classList.add("hidden");
+      }
     }
 
     const fragment = document.createDocumentFragment();

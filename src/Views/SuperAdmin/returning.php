@@ -4,7 +4,7 @@
         <p class="text-gray-500 mt-4">Scan book barcode to process returns and manage due dates</p>
     </div>
 
-    <div class="bg-white rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
+    <div class="bg-white rounded-lg p-6 shadow-sm max-w-screen mx-auto">
         <div class="flex items-center gap-3">
             <i class="ph ph-barcode text-2xl text-gray-700"></i>
             <h3 class="text-xl font-semibold text-gray-800">Scan Book Barcode</h3>
@@ -54,7 +54,7 @@
     </div>
 
     <!-- Books Near Due Date Section -->
-    <div class="mt-8 bg-amber-50/60 border border-amber-200/80 rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
+    <div class="mt-8 bg-amber-50/60 border border-amber-200/80 rounded-lg p-6 shadow-sm max-w-screen mx-auto">
         <div class="flex items-center gap-3 mb-4">
             <i class="ph ph-warning text-2xl text-amber-500"></i>
             <h3 class="text-xl font-semibold text-gray-800">Books Near Due Date</h3>
@@ -79,7 +79,7 @@
     </div>
 
     <!-- Overdue Books Section -->
-    <div class="mt-8 bg-red-50/60 border border-red-200/80 rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
+    <div class="mt-8 bg-red-50/60 border border-red-200/80 rounded-lg p-6 shadow-smmax-w-screen mx-auto">
         <div class="flex items-center gap-3 mb-4">
             <i class="ph ph-warning text-2xl text-red-500"></i>
             <h3 class="text-xl font-semibold text-gray-800">Overdue Books</h3>

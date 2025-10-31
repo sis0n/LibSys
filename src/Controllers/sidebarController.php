@@ -266,7 +266,7 @@ class SidebarController extends Controller
     public function topVisitor()
     {
         $this->view("superadmin/topVisitor", [
-            "title" => "Top Visitor",
+            "title" => "Reports",
             "currentPage" => "topVisitor"
         ]);
     }
@@ -402,7 +402,7 @@ class SidebarController extends Controller
     public function adminTopVisitor()
     {
         $this->view("admin/topVisitor", [
-            "title" => "Admin Top Visitor",
+            "title" => "Admin Reports",
             "currentPage" => "topVisitor"
         ]);
     }
@@ -512,7 +512,7 @@ class SidebarController extends Controller
     public function librarianTopVisitor()
     {
         $this->view("librarian/topVisitor", [
-            "title" => "Librarian Top Visitor",
+            "title" => "Librarian Reports",
             "currentPage" => "topVisitor"
         ]);
     }

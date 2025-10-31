@@ -612,7 +612,9 @@ window.addEventListener("DOMContentLoaded", () => {
       case "student": return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
       case "librarian": return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
       case "admin": return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
-      case "superadmin": return `<span class="bg-red-600 text-white ${base}">${role}</span>`;
+      case "faculty" : return `<span class="bg-emerald-600 text-white ${base}">${role}</span>`;
+      case "staff": return `<span class="bg-teal-600 text-white ${base}">${role}</span>`;
+      case "superadmin": return `<span class="bg-purple-600 text-white ${base}">${role}</span>`;
       default: return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
     }
   }

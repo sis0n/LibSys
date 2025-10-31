@@ -222,9 +222,7 @@
                             'attendance logs',
                             'reports',
                             'transaction history',
-                            'backup',
                             'restore books',
-                            'restore user',
                         ];
 
                         foreach ($modules as $module):
@@ -432,9 +430,7 @@
                         'attendance logs',
                         'reports',
                         'transaction history',
-                        'backup',
                         'restore books',
-                        'restore user',
                     ];
 
                     foreach ($modules as $module):

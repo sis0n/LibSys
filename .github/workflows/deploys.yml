@@ -46,6 +46,7 @@ jobs:
           local-dir: ./
           server-dir: /
           dangerous-clean-slate: false
+          create-remote-path: true
           exclude: |
             */.git
             */.github

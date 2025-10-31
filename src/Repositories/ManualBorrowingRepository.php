@@ -170,7 +170,6 @@ class ManualBorrowingRepository
           break;
 
         case 'guest':
-          // For guest, borrower_id is actually the guest_id
           $guestId = $borrowData['borrower_id'];
           break;
 
@@ -197,19 +196,53 @@ class ManualBorrowingRepository
 
       $transactionId = $this->db->lastInsertId();
 
-      // --- Insert into borrow_transaction_items ---
-      $stmt = $this->db->prepare("
-            INSERT INTO borrow_transaction_items (transaction_id, book_id, status)
-            VALUES (:transaction_id, :book_id, 'borrowed')
-        ");
-      $stmt->execute([
-        ':transaction_id' => $transactionId,
-        ':book_id' => $borrowData['book_id']
-      ]);
+      // --- Handle book and/or equipment ---
+      $isBook = !empty($borrowData['book_id']);
+      $isEquipment = !empty($borrowData['equipment_id']);
 
-      // --- Update book availability ---
-      $stmt = $this->db->prepare("UPDATE books SET availability = 'borrowed', updated_at = NOW() WHERE book_id = ?");
-      $stmt->execute([$borrowData['book_id']]);
+      if (!$isBook && !$isEquipment) {
+        throw new Exception("Either book_id or equipment_id must be provided.");
+      }
+
+      if ($isBook) {
+        // Validate book exists
+        $stmt = $this->db->prepare("SELECT book_id FROM books WHERE book_id = ? AND deleted_at IS NULL");
+        $stmt->execute([$borrowData['book_id']]);
+        if (!$stmt->fetchColumn()) {
+          throw new Exception("Book not found.");
+        }
+
+        // Insert into borrow_transaction_items
+        $stmt = $this->db->prepare("
+                INSERT INTO borrow_transaction_items (transaction_id, book_id, status)
+                VALUES (:transaction_id, :book_id, 'borrowed')
+            ");
+        $stmt->execute([
+          ':transaction_id' => $transactionId,
+          ':book_id' => $borrowData['book_id']
+        ]);
+
+        // Update book availability
+        $stmt = $this->db->prepare("UPDATE books SET availability = 'borrowed', updated_at = NOW() WHERE book_id = ?");
+        $stmt->execute([$borrowData['book_id']]);
+      }
+
+      if ($isEquipment) {
+        $stmt = $this->db->prepare("
+                INSERT INTO borrow_transaction_items (transaction_id, equipment_id, status)
+                VALUES (:transaction_id, :equipment_id, 'borrowed')
+            ");
+        $stmt->execute([
+          ':transaction_id' => $transactionId,
+          ':equipment_id' => $borrowData['equipment_id']
+        ]);
+
+        // update equipment availability if merong db (gawin ko to future)
+        /*
+            $stmt = $this->db->prepare("UPDATE equipment SET availability = 'borrowed', updated_at = NOW() WHERE equipment_id = ?");
+            $stmt->execute([$borrowData['equipment_id']]);
+            */
+      }
 
       $this->db->commit();
 

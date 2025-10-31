@@ -19,6 +19,12 @@ switch ($role) {
     case 'superadmin':
         $roleTitle = 'Super Admin Access Module';
         break;
+    case 'staff':
+        $roleTitle = 'Staff Access Module';
+        break;
+    case 'faculty':
+        $roleTitle = 'Faculty Access Module';
+        break;
     default:
         $roleTitle = 'Guest Access';
         break;

@@ -59,9 +59,9 @@ class FacultyTicketRepository
             f.department, 
             u.first_name, 
             u.last_name,
-            u.middle_name   -- In-include ko na rin ang middle_name kung sakaling kailanganin mo
+            u.middle_name   
         FROM faculty f
-        JOIN users u ON f.user_id = u.user_id  -- Dito nag-uugnay ang users at faculty
+        JOIN users u ON f.user_id = u.user_id  
         WHERE f.faculty_id = :fid
         LIMIT 1
     ");

@@ -3,22 +3,21 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Repositories\FacultyCartRepository;
+use App\Repositories\StaffCartRepository;
 
-class FacultyCartController extends Controller
+class StaffCartController extends Controller
 {
-  private FacultyCartRepository $cartRepo;
+  private StaffCartRepository $cartRepo;
 
   public function __construct()
   {
-    $this->cartRepo = new FacultyCartRepository();
+    $this->cartRepo = new StaffCartRepository();
   }
 
-  private function getFacultyId($userId)
+  private function getStaffId($userId)
   {
-    return $this->cartRepo->getFacultyIdByUserId($userId);
+    return $this->cartRepo->getStaffIdByUserId($userId);
   }
-
 
   private function showErrorPage(int $status, string $message = "")
   {
@@ -29,14 +28,14 @@ class FacultyCartController extends Controller
 
   public function index()
   {
-    $userId = $this->ensureFaculty();
+    $userId = $this->ensureStaff();
     if (!$userId) $this->showErrorPage(401, "Access denied");
 
-    $facultyId = $this->getFacultyId($userId);
-    if (!$facultyId) $this->showErrorPage(400, "No faculty record found for this user.");
+    $staffId = $this->getStaffId($userId);
+    if (!$staffId) $this->showErrorPage(400, "No staff record found for this user.");
 
-    $cartItems = $this->cartRepo->getCartByFaculty($facultyId);
-    $this->view("faculty/cart", [
+    $cartItems = $this->cartRepo->getCartByStaff($staffId);
+    $this->view("staff/cart", [
       "cartItems" => $cartItems,
       "title" => "My Cart"
     ]);
@@ -58,28 +57,26 @@ class FacultyCartController extends Controller
       return;
     }
 
-    // Kunin ang tamang faculty_id
-    $facultyId = $this->getFacultyId($userId);
-    if (!$facultyId) {
+    $staffId = $this->getStaffId($userId);
+    if (!$staffId) {
       http_response_code(400);
       echo json_encode([
         'success' => false,
-        'message' => 'No faculty record found for this user.'
+        'message' => 'No staff record found for this user.'
       ]);
       return;
     }
 
-    // Add to cart
-    $result = $this->cartRepo->addToCart((int)$facultyId, $bookId);
+    $result = $this->cartRepo->addToCart((int)$staffId, $bookId);
     echo json_encode(['success' => $result]);
   }
 
   public function remove($cartId)
   {
-    $userId = $this->ensureFaculty();
-    $facultyId = $this->getFacultyId($userId);
+    $userId = $this->ensureStaff();
+    $staffId = $this->getStaffId($userId);
 
-    $this->cartRepo->removeFromCart($cartId, $facultyId);
+    $this->cartRepo->removeFromCart($cartId, $staffId);
 
     header('Content-Type: application/json');
     echo json_encode(["success" => true]);
@@ -87,10 +84,10 @@ class FacultyCartController extends Controller
 
   public function clearCart()
   {
-    $userId = $this->ensureFaculty();
-    $facultyId = $this->getFacultyId($userId);
+    $userId = $this->ensureStaff();
+    $staffId = $this->getStaffId($userId);
 
-    $this->cartRepo->clearCart($facultyId);
+    $this->cartRepo->clearCart($staffId);
 
     header('Content-Type: application/json');
     echo json_encode(["success" => true]);
@@ -98,10 +95,17 @@ class FacultyCartController extends Controller
 
   public function getCartJson()
   {
-    $userId = $this->ensureFaculty();
-    $facultyId = $this->getFacultyId($userId);
+    $userId = $this->ensureStaff();
+    $staffId = $this->getStaffId($userId);
+    // var_dump($staffId);
 
-    $cartItems = $this->cartRepo->getCartByFaculty($facultyId);
+
+    if (!$staffId) {
+      echo json_encode([]);
+      return;
+    }
+
+    $cartItems = $this->cartRepo->getCartByStaff($staffId);
 
     header('Content-Type: application/json');
     echo json_encode($cartItems);
@@ -109,8 +113,8 @@ class FacultyCartController extends Controller
 
   public function checkout()
   {
-    $userId = $this->ensureFaculty();
-    $facultyId = $this->getFacultyId($userId);
+    $userId = $this->ensureStaff();
+    $staffId = $this->getStaffId($userId);
 
     $data = json_decode(file_get_contents("php://input"), true);
     $cartIds = $data['cart_ids'] ?? [];
@@ -124,7 +128,7 @@ class FacultyCartController extends Controller
     $ticketId = uniqid("TICKET-");
 
     foreach ($cartIds as $cid) {
-      $this->cartRepo->removeFromCart((int)$cid, $facultyId);
+      $this->cartRepo->removeFromCart((int)$cid, $staffId);
     }
 
     header('Content-Type: application/json');
@@ -134,13 +138,13 @@ class FacultyCartController extends Controller
     ]);
   }
 
-  private function ensureFaculty()
+  private function ensureStaff()
   {
     if (session_status() === PHP_SESSION_NONE) {
       session_start();
     }
 
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'faculty') {
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'staff') {
       header('Location: /libsys/public/login');
       exit;
     }

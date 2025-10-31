@@ -97,7 +97,6 @@
     </div>
 </div>
 
-<!-- Import Modal -->
 <div id="importModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
     <div
         class="bg-[var(--color-card)] rounded-xl shadow-lg border border-[var(--color-border)] w-full max-w-md p-6 animate-fadeIn">
@@ -120,9 +119,6 @@
                 <p class="text-xs text-gray-500 mt-1">Expected format: Name, Username, Role</p>
                 <input type="file" id="csvFile" name="csv_file" accept=".csv" class="hidden" />
             </label>
-            <!-- <button type="submit" class="mt-4 bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition">
-                Import CSV
-            </button> -->
         </form>
         <div class="text-center mt-4">
             <button id="cancelImport"
@@ -133,7 +129,6 @@
     </div>
 </div>
 
-<!-- Add User Modal (INAYOS NA) -->
 <div id="addUserModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
     <div
         class="rounded-xl overflow-hidden shadow-lg border border-[var(--color-border)] bg-[var(--color-card)] w-full max-w-lg animate-fadeIn">
@@ -207,116 +202,59 @@
                 </div>
             </div>
 
-            <!-- Permissions Section (TINANGGAL ANG hidden CLASS) -->
             <div>
-                <h3 class="font-medium text-[var(--color-ring)] mb-2 flex items-center gap-2">
-                    <i class="ph ph-shield-check text-[var(--color-ring)]"></i> Permissions
-                </h3>
-                <p class="text-sm text-gray-600 mb-3">
-                    Select the functions this user should have access to.
-                </p>
+                <div id="modulesSection" class="hidden">
+                    <h3 class="font-medium text-[var(--color-ring)] mb-2 flex items-center gap-2">
+                        <i class="ph ph-shield-check text-[var(--color-ring)]"></i> Permissions
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        Select the actions this user should have access to per module.
+                    </p>
 
-                <div class="grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto rounded-xl p-2">
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Archives
-                        </h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View
-                                archives</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Add
-                                archives</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Edit
-                                archives</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Delete
-                                archives</label>
-                        </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Inventory
-                        </h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View
-                                items</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Add
-                                items</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Edit
-                                items</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Delete
-                                items</label>
-                        </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Borrowing
-                            System</h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Borrow
-                                item</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Return
-                                item</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View borrowed
-                                history</label>
-                        </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Reports
-                        </h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Generate
-                                report</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Export
-                                report</label>
-                        </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">User
-                            Management</h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View
-                                users</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Add
-                                users</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Edit
-                                users</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Delete
-                                users</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Manage
-                                roles</label>
-                        </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">System
-                            Settings</h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View
-                                settings</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Modify
-                                settings</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Manage
-                                backup</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Restore
-                                data</label>
-                        </div>
+                    <div class="grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto rounded-xl p-2">
+                        <?php
+                        // ADD USER MODULES LIST (Source for permissions)
+                        $modules = [
+                            'book management',
+                            'qr scanner',
+                            'returning',
+                            'borrowing form',
+                            'attendance logs',
+                            'reports',
+                            'transaction history',
+                            'backup',
+                            'restore books',
+                            'restore user',
+                        ];
+
+                        foreach ($modules as $module):
+                        ?>
+                            <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                                <label class="inline-flex items-center text-sm text-gray-700">
+                                    <input type="checkbox" class="mr-2 accent-orange-500" name="modules[]" value="<?= $module ?>">
+                                    <?= ucwords($module) ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
+
+                <div class="flex justify-end gap-2 mt-6">
+                    <button id="confirmAddUser"
+                        class="flex-1 bg-orange-600 text-white font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-700 transition">
+                        Add User
+                    </button>
+                    <button id="cancelAddUser"
+                        class="border border-orange-200 text-gray-800 font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-50 transition">
+                        Cancel
+                    </button>
+                </div>
+
             </div>
-
-
-            <div class="flex justify-end gap-2 mt-6">
-                <button id="confirmAddUser"
-                    class="flex-1 bg-orange-600 text-white font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-700 transition">
-                    Add User
-                </button>
-                <button id="cancelAddUser"
-                    class="border border-orange-200 text-gray-800 font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-50 transition">
-                    Cancel
-                </button>
-            </div>
-
         </div>
     </div>
 </div>
 
-<!-- Edit User Modal (INAYOS NA) -->
 <div id="editUserModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
     <div
         class="rounded-xl overflow-hidden shadow-lg border border-[var(--color-border)] bg-[var(--color-card)] w-full max-w-lg animate-fadeIn">
@@ -385,7 +323,8 @@
                         <label class="block text-sm text-gray-700 mb-1 font-medium">Role</label>
                         <div class="relative w-full">
                             <button id="editRoleDropdownBtn"
-                                class="w-full border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between hover:bg-orange-50 transition">
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-500 flex items-center justify-between bg-gray-50 cursor-not-allowed"
+                                disabled>
                                 <span id="editRoleDropdownValue">Select Role</span>
                                 <i class="ph ph-caret-down text-xs"></i>
                             </button>
@@ -474,8 +413,7 @@
                 </div>
             </div>
 
-            <!-- Permissions Section (TINANGGAL ANG hidden CLASS) -->
-            <div>
+            <div id="editPermissionsContainer" class="hidden">
                 <h3 class="font-medium text-[var(--color-ring)] mb-2 flex items-center gap-2">
                     <i class="ph ph-shield-check text-[var(--color-ring)]"></i> Permissions
                 </h3>
@@ -483,87 +421,31 @@
                     Select the functions this user should have access to.
                 </p>
 
-                <div class="grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto rounded-xl p-2">
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Archives
-                        </h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View
-                                archives</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Add
-                                archives</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Edit
-                                archives</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Delete
-                                archives</label>
+                <div id="editModulesSection" class="grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto rounded-xl p-2">
+                    <?php
+                    // MODULES LIST (GINAYA MULA SA ADD MODAL)
+                    $modules = [
+                        'book management',
+                        'qr scanner',
+                        'returning',
+                        'borrowing form',
+                        'attendance logs',
+                        'reports',
+                        'transaction history',
+                        'backup',
+                        'restore books',
+                        'restore user',
+                    ];
+
+                    foreach ($modules as $module):
+                    ?>
+                        <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                            <label class="inline-flex items-center text-sm text-gray-700">
+                                <input type="checkbox" class="mr-2 accent-orange-500" name="editModules[]" value="<?= $module ?>">
+                                <?= ucwords($module) ?>
+                            </label>
                         </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Inventory
-                        </h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View
-                                items</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Add
-                                items</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Edit
-                                items</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Delete
-                                items</label>
-                        </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Borrowing
-                            System</h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Borrow
-                                item</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Return
-                                item</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View borrowed
-                                history</label>
-                        </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">Reports
-                        </h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Generate
-                                report</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Export
-                                report</label>
-                        </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">User
-                            Management</h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View
-                                users</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Add
-                                users</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Edit
-                                users</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Delete
-                                users</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Manage
-                                roles</label>
-                        </div>
-                    </div>
-                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                        <h4 class="font-medium mb-2 text-orange-700 text-sm border-b border-orange-200 pb-1">System
-                            Settings</h4>
-                        <div class="space-y-1 text-sm text-gray-700">
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">View
-                                settings</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Modify
-                                settings</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Manage
-                                backup</label>
-                            <label class="block"><input type="checkbox" class="mr-1 accent-orange-500">Restore
-                                data</label>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
 

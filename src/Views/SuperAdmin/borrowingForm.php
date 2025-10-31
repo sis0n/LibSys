@@ -22,7 +22,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
-                            <input type="text" placeholder="Juan" name="first_name" class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm" required>
+                            <input type="text" placeholder="Juan" name="first_name" class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
@@ -30,7 +30,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
-                            <input type="text" placeholder="Cruz" name="last_name" class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm" required>
+                            <input type="text" placeholder="Cruz" name="last_name" class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Suffix</label>
@@ -38,14 +38,21 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Other Details -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                     <div>
-                        <label for="user_id" class="block text-sm font-medium text-gray-700 mb-1">User ID <span class="text-red-500">*</span></label>
-                        <input type="text" id="user_id" name="user_id" class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm" required>
+                        <label for="input_user_id" class="block text-sm font-medium text-gray-700 mb-1">User ID <span class="text-red-500">*</span></label>
+                        <input type="text" id="input_user_id" name="input_user_id" class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
                     </div>
-                    <!-- Role Custom Dropdown -->
+                    <div>
+                        <label for="contact" class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                        <input type="text" id="contact" name="contact" class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="text" id="email" name="email" class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                    </div>
                     <div>
                         <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role <span class="text-red-500">*</span></label>
                         <div class="relative">
@@ -66,11 +73,12 @@
                     </div>
                     <div>
                         <label for="collateral_id" class="block text-sm font-medium text-gray-700 mb-1">Collateral ID <span class="text-red-500">*</span></label>
-                        <input type="text" id="collateral_id" name="collateral_id" placeholder="Library ID, School ID, Valid ID ..." class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm" required>
+                        <input type="text" id="collateral_id" name="collateral_id" placeholder="Library ID, School ID, Valid ID ..." class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
                     </div>
                 </div>
             </div>
         </div>
+
 
         <!-- Item Information Section -->
         <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-6 mt-6">
@@ -99,29 +107,39 @@
                         </div>
                     </div>
                 </div>
-                <!-- Dynamic Field 2 -->
+                <div class="md:col-span-1" id="accession_number_wrapper" style="display: none;">
+                    <label for="accession_number" class="block text-sm font-medium text-gray-700 mb-1">Accession Number <span class="text-red-500">*</span></label>
+                    <input type="text" id="accession_number" name="accession_number" placeholder="Enter accession number" class="w-full px-4 py-2 rounded-lg border border-emerald-300 bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm">
+                </div>
+
+                <div class="md:col-span-1" id="book_title_wrapper" style="display: none;">
+                    <label for="book_title" class="block text-sm font-medium text-gray-700 mb-1">Book Title <span class="text-red-500">*</span></label>
+                    <input type="text" id="book_title" name="book_title" placeholder="Enter book title" class="w-full px-4 py-2 rounded-lg border border-emerald-300 bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm">
+                </div>
                 <div class="md:col-span-1">
                     <label id="item_id_label" for="item_id" class="block text-sm font-medium text-gray-700 mb-1">Equipment ID <span class="text-red-500">*</span></label>
-                    <input type="text" id="item_id" name="item_id" placeholder="Enter equipment ID" class="w-full px-4 py-2 rounded-lg border border-emerald-300 bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm" required>
+                    <input type="text" id="item_id" name="item_id" placeholder="Enter equipment ID" class="w-full px-4 py-2 rounded-lg border border-emerald-300 bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm">
                 </div>
-                <!-- Dynamic Field 1 -->
                 <div class="md:col-span-1">
                     <label id="item_name_label" for="item_name" class="block text-sm font-medium text-gray-700 mb-1">Equipment Name <span class="text-red-500">*</span></label>
-                    <input type="text" id="item_name" name="item_name" placeholder="Enter equipment name" class="w-full px-4 py-2 rounded-lg border border-emerald-300 bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm" required>
+                    <input type="text" id="item_name" name="equipment_name" placeholder="Enter equipment name" class="w-full px-4 py-2 rounded-lg border border-emerald-300 bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm">
                 </div>
             </div>
         </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-4 mt-6">
+            <button type="button" id="check-btn" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium">
+                Check User
+            </button>
+            <button type="button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm font-medium" id="clear-btn">
+                Clear
+            </button>
+            <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium">
+                TADO !
+            </button>
+        </div>
     </form>
 
-    <!-- Action Buttons -->
-    <div class="flex justify-end gap-4 mt-6">
-        <button type="button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm font-medium">
-            Clear
-        </button>
-        <button type="submit" form="main-borrow-form" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium">
-            Submit
-        </button>
-    </div>
-    
     <script src="/libsys/public/js/superadmin/borrowingForm.js" defer></script>
 </main>

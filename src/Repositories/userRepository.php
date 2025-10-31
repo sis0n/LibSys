@@ -210,27 +210,37 @@ class UserRepository
   {
     try {
       $stmt = $this->db->query("
-                SELECT 
-                    user_id,
-                    username,
-                    first_name,
-                    middle_name,
-                    last_name,
-                    suffix,
-                    email,
-                    role,
-                    is_active,
-                    created_at
-                FROM users
-                WHERE deleted_at IS NULL
-                ORDER BY user_id DESC
-            ");
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            SELECT 
+                u.user_id,
+                u.username,
+                u.first_name,
+                u.middle_name,
+                u.last_name,
+                u.suffix,
+                u.email,
+                u.role,
+                u.is_active,
+                u.created_at,
+                GROUP_CONCAT(um.module_name) AS modules
+            FROM users u
+            LEFT JOIN user_module_permissions um ON um.user_id = u.user_id
+            WHERE u.deleted_at IS NULL
+            GROUP BY u.user_id
+            ORDER BY u.user_id DESC
+        ");
+      $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      foreach ($users as &$user) {
+        $user['modules'] = $user['modules'] ? explode(',', $user['modules']) : [];
+      }
+
+      return $users;
     } catch (PDOException $e) {
       error_log('[UserRepository::getAllUsers] ' . $e->getMessage());
       return [];
     }
   }
+
 
   public function findByStudentNumber(string $studentNumber)
   {
@@ -315,6 +325,40 @@ class UserRepository
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  public function hasBorrowedItems(int $userId): bool
+  {
+    $stmt = $this->db->prepare("
+        SELECT 
+            (SELECT student_id FROM students WHERE user_id = :user_id) AS student_id,
+            (SELECT staff_id FROM staff WHERE user_id = :user_id) AS staff_id,
+            (SELECT faculty_id FROM faculty WHERE user_id = :user_id) AS faculty_id
+    ");
+    $stmt->execute([':user_id' => $userId]);
+    $ids = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    $studentId = $ids['student_id'] ?? 0;
+    $staffId = $ids['staff_id'] ?? 0;
+    $facultyId = $ids['faculty_id'] ?? 0;
+
+    $stmt = $this->db->prepare("
+        SELECT COUNT(*) 
+        FROM borrow_transactions bt
+        JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+        WHERE 
+            (bt.student_id = :student_id OR bt.staff_id = :staff_id OR bt.faculty_id = :faculty_id)
+            AND TRIM(LOWER(bti.status)) = 'borrowed'
+            AND (bti.book_id IS NOT NULL OR bti.equipment_id IS NOT NULL)
+    ");
+
+    $stmt->execute([
+      ':student_id' => $studentId,
+      ':staff_id' => $staffId,
+      ':faculty_id' => $facultyId
+    ]);
+
+    return (int)$stmt->fetchColumn() > 0;
+  }
+
   public function deleteUserWithCascade(int $userId, int $deletedBy): bool
   {
     try {
@@ -326,15 +370,14 @@ class UserRepository
 
       if (!$user) {
         $this->db->rollBack();
-        error_log("[UserRepository::deleteUserWithCascade] User $userId not found or already deleted.");
         return false;
       }
 
       $stmtUpdateUser = $this->db->prepare("
-                UPDATE users 
-                SET deleted_at = NOW(), deleted_by = :deleted_by 
-                WHERE user_id = :uid AND deleted_at IS NULL 
-            ");
+            UPDATE users 
+            SET deleted_at = NOW(), deleted_by = :deleted_by 
+            WHERE user_id = :uid AND deleted_at IS NULL
+        ");
       $stmtUpdateUser->execute([
         ':deleted_by' => $deletedBy,
         ':uid' => $userId
@@ -342,16 +385,15 @@ class UserRepository
 
       if ($stmtUpdateUser->rowCount() === 0) {
         $this->db->rollBack();
-        error_log("[UserRepository::deleteUserWithCascade] Failed to update user $userId.");
         return false;
       }
 
       if (isset($user['role']) && strtolower($user['role']) === 'student') {
         $stmtUpdateStudent = $this->db->prepare("
-                    UPDATE students 
-                    SET deleted_at = NOW(), deleted_by = :deleted_by 
-                    WHERE user_id = :uid AND deleted_at IS NULL
-                ");
+                UPDATE students 
+                SET deleted_at = NOW(), deleted_by = :deleted_by 
+                WHERE user_id = :uid AND deleted_at IS NULL
+            ");
         $stmtUpdateStudent->execute([
           ':deleted_by' => $deletedBy,
           ':uid' => $userId
@@ -360,13 +402,8 @@ class UserRepository
 
       $this->db->commit();
       return true;
-    } catch (PDOException $e) {
-      $this->db->rollBack();
-      error_log("[UserRepository::deleteUserWithCascade] PDOException: " . $e->getMessage());
-      return false;
     } catch (\Exception $e) {
       $this->db->rollBack();
-      error_log("[UserRepository::deleteUserWithCascade] Exception: " . $e->getMessage());
       return false;
     }
   }

@@ -13,7 +13,7 @@ class BookManagementController extends Controller
     {
         $this->bookRepo = new BookManagementRepository();
     }
-
+    
     private function json($data, $statusCode = 200)
     {
         http_response_code($statusCode);

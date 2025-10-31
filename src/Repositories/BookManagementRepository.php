@@ -152,73 +152,43 @@ class BookManagementRepository
         return $stmt->execute($params);
     }
 
-    public function deleteBook($id, $deleted_by_user_id)
+    public function deleteBook(int $bookId, int $deletedByUserId): array
     {
-        $this->db->beginTransaction();
-
         try {
-            $book = $this->findBookById($id);
+            // 1️⃣ Check if book exists
+            $stmt = $this->db->prepare("SELECT deleted_at FROM books WHERE book_id = :book_id");
+            $stmt->execute([':book_id' => $bookId]);
+            $book = $stmt->fetch();
+
             if (!$book) {
-                throw new \Exception("Book not found with ID: $id");
+                return ['success' => false, 'message' => 'Book not found.'];
             }
 
-            $stmtUpdate = $this->db->prepare("
-                UPDATE books 
-                SET 
-                    deleted_at = CURRENT_TIMESTAMP, 
-                    deleted_by = ?
-                WHERE 
-                    book_id = ?
-            ");
-            $stmtUpdate->execute([$deleted_by_user_id, $id]);
+            // 2️⃣ Check if already deleted
+            if ($book['deleted_at'] !== null) {
+                return ['success' => false, 'message' => 'Book already deleted.'];
+            }
 
-            $stmtGetTime = $this->db->prepare("SELECT deleted_at FROM books WHERE book_id = ?");
-            $stmtGetTime->execute([$id]);
-            $deletedTimestamp = $stmtGetTime->fetchColumn();
-
-
-            $stmtInsert = $this->db->prepare("
-                INSERT INTO deleted_books 
-                (book_id, accession_number, call_number, title, author, book_place, 
-                 book_publisher, year, book_edition, description, book_isbn, 
-                 book_supplementary, subject, created_at, availability, quantity, cover, 
-                 deleted_at, deleted_by)
-                VALUES 
-                (:book_id, :accession_number, :call_number, :title, :author, :book_place, 
-                 :book_publisher, :year, :book_edition, :description, :book_isbn, 
-                 :book_supplementary, :subject, :created_at, :availability, :quantity, :cover,
-                 :deleted_at, :deleted_by)
-            ");
-
-            $stmtInsert->execute([
-                ':book_id' => $book['book_id'],
-                ':accession_number' => $book['accession_number'],
-                ':call_number' => $book['call_number'],
-                ':title' => $book['title'],
-                ':author' => $book['author'],
-                ':book_place' => $book['book_place'],
-                ':book_publisher' => $book['book_publisher'],
-                ':year' => $book['year'],
-                ':book_edition' => $book['book_edition'],
-                ':description' => $book['description'],
-                ':book_isbn' => $book['book_isbn'],
-                ':book_supplementary' => $book['book_supplementary'],
-                ':subject' => $book['subject'],
-                ':created_at' => $book['created_at'],
-                ':availability' => $book['availability'],
-                ':quantity' => $book['quantity'],
-                ':cover' => $book['cover'],
-                ':deleted_at' => $deletedTimestamp, 
-                ':deleted_by' => $deleted_by_user_id
+            // 3️⃣ Soft delete
+            $stmt = $this->db->prepare("
+            UPDATE books 
+            SET deleted_at = CURRENT_TIMESTAMP, 
+                deleted_by = :deleted_by,
+                is_archived = 0 
+            WHERE book_id = :book_id AND deleted_at IS NULL
+        ");
+            $stmt->execute([
+                ':deleted_by' => $deletedByUserId,
+                ':book_id' => $bookId
             ]);
 
-            $this->db->commit();
-            return true;
-        } catch (\Exception $e) {
-            // 6. Kung may error, i-rollback
-            $this->db->rollBack();
-            error_log("Soft delete failed: " . $e->getMessage());
-            return false;
+            if ($stmt->rowCount() > 0) {
+                return ['success' => true, 'message' => 'Book deleted successfully!'];
+            }
+
+            return ['success' => false, 'message' => 'Failed to delete book.'];
+        } catch (\PDOException $e) {
+            return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
         }
     }
 }

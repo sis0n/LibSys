@@ -150,6 +150,5 @@
       </form>
     </div>
   </div>
-
-</div>
-<script src="/LibSys/public/js/student/changePassword.js" defer></script>
+</main>
+<script src="<?= BASE_URL ?>/js/student/changePassword.js" defer></script>

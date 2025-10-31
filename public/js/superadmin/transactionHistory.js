@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadTransactions() {
         try {
-            const response = await fetch('/libsys/public/superadmin/transactionHistory/json');
+            const response = await fetch('api/superadmin/transactionHistory/json');
             allTransactions = await response.json();
             currentFilteredTransactions = allTransactions;
             applyAndRenderFilters();

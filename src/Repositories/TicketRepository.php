@@ -178,16 +178,16 @@ class TicketRepository
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public function createTransaction(int $studentId, string $transactionCode, string $dueDate): int
+  public function createTransaction(int $studentId, string $transactionCode, int $expiryMinutes = 15): int
   {
     $stmt = $this->db->prepare("
-        INSERT INTO borrow_transactions (student_id, transaction_code, due_date)
-        VALUES (:sid, :tcode, :due_date)
+        INSERT INTO borrow_transactions (student_id, transaction_code, generated_at, expires_at)
+        VALUES (:sid, :tcode, NOW(), DATE_ADD(NOW(), INTERVAL :exp MINUTE))
     ");
     $stmt->execute([
       'sid' => $studentId,
       'tcode' => $transactionCode,
-      'due_date' => $dueDate
+      'exp' => $expiryMinutes
     ]);
 
     return (int) $this->db->lastInsertId();
@@ -206,12 +206,27 @@ class TicketRepository
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public function getPendingTransactionByStudentId(int $studentId): ?array
+  public function getPendingTransactionByStudentId(int $studentId)
+  {
+    $stmt = $this->db->prepare("
+        SELECT transaction_id, transaction_code, generated_at, expires_at
+        FROM borrow_transactions
+        WHERE student_id = :sid
+          AND status = 'pending'
+        ORDER BY generated_at DESC
+        LIMIT 1
+    ");
+    $stmt->execute(['sid' => $studentId]);
+    return $stmt->fetch(\PDO::FETCH_ASSOC);
+  }
+
+
+  public function getBorrowedTransactionByStudentId(int $studentId): ?array
   {
     $stmt = $this->db->prepare("
             SELECT transaction_id, transaction_code, due_date
             FROM borrow_transactions
-            WHERE student_id = :sid AND status = 'pending'
+            WHERE student_id = :sid AND status = 'borrowed'
             LIMIT 1
         ");
     $stmt->execute(['sid' => $studentId]);
@@ -331,6 +346,24 @@ class TicketRepository
     ");
     $stmt->execute([$minutes, $transactionId]);
   }
+
+  public function createPendingTransaction(int $studentId, string $transactionCode, string $dueDate, int $expiryMinutes = 15): int
+  {
+    $stmt = $this->db->prepare("
+        INSERT INTO borrow_transactions 
+        (student_id, transaction_code, due_date, generated_at, expires_at)
+        VALUES (:sid, :tcode, :due_date, NOW(), DATE_ADD(NOW(), INTERVAL :minutes MINUTE))
+    ");
+    $stmt->execute([
+      'sid' => $studentId,
+      'tcode' => $transactionCode,
+      'due_date' => $dueDate,
+      'minutes' => $expiryMinutes
+    ]);
+
+    return (int) $this->db->lastInsertId();
+  }
+
 
   public function beginTransaction(): void
   {

@@ -18,44 +18,108 @@ class UserRepository
   public function findByIdentifier(string $identifier)
   {
     try {
-      // try student_number
+      // ----------- Try student first -----------
       $stmt = $this->db->prepare("
-                SELECT 
-                    u.user_id, u.username, u.password, u.first_name, u.middle_name, u.last_name, u.suffix, u.profile_picture, u.is_active, u.role,
-                    s.student_id, s.student_number, s.year_level, s.course
-                FROM students s
-                LEFT JOIN users u ON u.user_id = s.user_id
-                WHERE UPPER(s.student_number) = UPPER(:identifier)
-                AND u.deleted_at IS NULL
-                LIMIT 1
-            ");
+            SELECT 
+                u.user_id, 
+                u.username, 
+                u.password, 
+                u.first_name, 
+                u.middle_name, 
+                u.last_name, 
+                u.suffix, 
+                u.profile_picture, 
+                u.is_active, 
+                u.role,
+                u.email,
+                s.student_id, 
+                s.student_number, 
+                s.year_level, 
+                s.course,
+                s.section
+            FROM students s
+            LEFT JOIN users u ON u.user_id = s.user_id
+            WHERE UPPER(s.student_number) = UPPER(:identifier)
+            AND u.deleted_at IS NULL
+            LIMIT 1
+        ");
       $stmt->execute(['identifier' => $identifier]);
-      $student = $stmt->fetch(\PDO::FETCH_ASSOC);
+      $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
       if ($student) {
         return $student;
       }
 
-      // fallback by username
+      // ----------- Try by username fallback -----------
       $stmt = $this->db->prepare("
-                SELECT 
-                    u.user_id, u.username, u.password, u.first_name, u.middle_name, u.last_name, u.suffix, u.profile_picture, u.is_active, u.role,
-                    s.student_id, s.student_number, s.year_level, s.course
-                FROM users u
-                LEFT JOIN students s ON u.user_id = s.user_id
-                WHERE LOWER(u.username) = LOWER(:identifier)
-                AND u.deleted_at IS NULL
-                LIMIT 1
-            ");
+            SELECT 
+                u.user_id, 
+                u.username, 
+                u.password, 
+                u.first_name, 
+                u.middle_name, 
+                u.last_name, 
+                u.suffix, 
+                u.profile_picture, 
+                u.is_active, 
+                u.role,
+                u.email,
+                s.student_id, 
+                s.student_number, 
+                s.year_level, 
+                s.course,
+                s.section
+            FROM users u
+            LEFT JOIN students s ON u.user_id = s.user_id
+            WHERE LOWER(u.username) = LOWER(:identifier)
+            AND u.deleted_at IS NULL
+            LIMIT 1
+        ");
       $stmt->execute(['identifier' => $identifier]);
-      $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-      return $user ?: null;
+      if ($user) {
+        return $user;
+      }
+
+      // ----------- Try faculty table if no student found -----------
+      $stmt = $this->db->prepare("
+            SELECT 
+                u.user_id,
+                u.username,
+                u.password,
+                u.first_name,
+                u.middle_name,
+                u.last_name,
+                u.suffix,
+                u.profile_picture,
+                u.is_active,
+                u.role,
+                u.email,
+                f.faculty_id,
+                f.department
+            FROM faculty f
+            LEFT JOIN users u ON u.user_id = f.user_id
+            WHERE LOWER(u.username) = LOWER(:identifier)
+            AND u.deleted_at IS NULL
+            LIMIT 1
+        ");
+      $stmt->execute(['identifier' => $identifier]);
+      $faculty = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($faculty) {
+        $faculty['role'] = 'faculty'; // ensure role is set
+        return $faculty;
+      }
+
+      return null;
     } catch (\PDOException $e) {
       error_log("[UserRepository::findByIdentifier] " . $e->getMessage());
       return null;
     }
   }
+
+
 
   public function insertUser(array $data): int
   {
@@ -146,27 +210,37 @@ class UserRepository
   {
     try {
       $stmt = $this->db->query("
-                SELECT 
-                    user_id,
-                    username,
-                    first_name,
-                    middle_name,
-                    last_name,
-                    suffix,
-                    email,
-                    role,
-                    is_active,
-                    created_at
-                FROM users
-                WHERE deleted_at IS NULL
-                ORDER BY user_id DESC
-            ");
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            SELECT 
+                u.user_id,
+                u.username,
+                u.first_name,
+                u.middle_name,
+                u.last_name,
+                u.suffix,
+                u.email,
+                u.role,
+                u.is_active,
+                u.created_at,
+                GROUP_CONCAT(um.module_name) AS modules
+            FROM users u
+            LEFT JOIN user_module_permissions um ON um.user_id = u.user_id
+            WHERE u.deleted_at IS NULL
+            GROUP BY u.user_id
+            ORDER BY u.user_id DESC
+        ");
+      $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      foreach ($users as &$user) {
+        $user['modules'] = $user['modules'] ? explode(',', $user['modules']) : [];
+      }
+
+      return $users;
     } catch (PDOException $e) {
       error_log('[UserRepository::getAllUsers] ' . $e->getMessage());
       return [];
     }
   }
+
 
   public function findByStudentNumber(string $studentNumber)
   {
@@ -251,75 +325,87 @@ class UserRepository
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public function deleteUserWithCascade(int $userId, int $deletedBy, $studentRepo): bool
+  public function hasBorrowedItems(int $userId): bool
+  {
+    $stmt = $this->db->prepare("
+        SELECT 
+            (SELECT student_id FROM students WHERE user_id = :user_id) AS student_id,
+            (SELECT staff_id FROM staff WHERE user_id = :user_id) AS staff_id,
+            (SELECT faculty_id FROM faculty WHERE user_id = :user_id) AS faculty_id
+    ");
+    $stmt->execute([':user_id' => $userId]);
+    $ids = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    $studentId = $ids['student_id'] ?? 0;
+    $staffId = $ids['staff_id'] ?? 0;
+    $facultyId = $ids['faculty_id'] ?? 0;
+
+    $stmt = $this->db->prepare("
+        SELECT COUNT(*) 
+        FROM borrow_transactions bt
+        JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+        WHERE 
+            (bt.student_id = :student_id OR bt.staff_id = :staff_id OR bt.faculty_id = :faculty_id)
+            AND TRIM(LOWER(bti.status)) = 'borrowed'
+            AND (bti.book_id IS NOT NULL OR bti.equipment_id IS NOT NULL)
+    ");
+
+    $stmt->execute([
+      ':student_id' => $studentId,
+      ':staff_id' => $staffId,
+      ':faculty_id' => $facultyId
+    ]);
+
+    return (int)$stmt->fetchColumn() > 0;
+  }
+
+  public function deleteUserWithCascade(int $userId, int $deletedBy): bool
   {
     try {
       $this->db->beginTransaction();
 
-      $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = :id");
-      $stmt->execute([':id' => $userId]);
-      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+      $stmtCheck = $this->db->prepare("SELECT role FROM users WHERE user_id = :id AND deleted_at IS NULL");
+      $stmtCheck->execute([':id' => $userId]);
+      $user = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
       if (!$user) {
-        throw new \Exception("User not found.");
+        $this->db->rollBack();
+        return false;
       }
 
-      if ($user['role'] === 'student') {
-        $stmt = $this->db->prepare("
-                    UPDATE students 
-                    SET deleted_at = NOW(), deleted_by = :deleted_by 
-                    WHERE user_id = :uid
-                ");
-        $stmt->execute([
-          ':deleted_by' => $deletedBy,
-          ':uid' => $userId
-        ]);
-
-        $stmt = $this->db->prepare("
-                    INSERT INTO deleted_students (student_id, user_id, student_number, course, year_level, section, status, deleted_by)
-                    SELECT student_id, user_id, student_number, course, year_level, section, status, :deleted_by
-                    FROM students WHERE user_id = :uid
-                ");
-        $stmt->execute([
-          ':uid' => $userId,
-          ':deleted_by' => $deletedBy
-        ]);
-      }
-
-      $stmt = $this->db->prepare("
-                UPDATE users 
-                SET deleted_at = NOW(), deleted_by = :deleted_by 
-                WHERE user_id = :uid
-            ");
-      $stmt->execute([
+      $stmtUpdateUser = $this->db->prepare("
+            UPDATE users 
+            SET deleted_at = NOW(), deleted_by = :deleted_by 
+            WHERE user_id = :uid AND deleted_at IS NULL
+        ");
+      $stmtUpdateUser->execute([
         ':deleted_by' => $deletedBy,
         ':uid' => $userId
       ]);
 
-      $stmt = $this->db->prepare("
-                INSERT INTO deleted_users (user_id, username, first_name, middle_name, last_name, suffix, email, role, deleted_by)
-                SELECT user_id, username, first_name, middle_name, last_name, suffix, email, role, :deleted_by
-                FROM users WHERE user_id = :uid
+      if ($stmtUpdateUser->rowCount() === 0) {
+        $this->db->rollBack();
+        return false;
+      }
+
+      if (isset($user['role']) && strtolower($user['role']) === 'student') {
+        $stmtUpdateStudent = $this->db->prepare("
+                UPDATE students 
+                SET deleted_at = NOW(), deleted_by = :deleted_by 
+                WHERE user_id = :uid AND deleted_at IS NULL
             ");
-      $stmt->execute([
-        ':uid' => $userId,
-        ':deleted_by' => $deletedBy
-      ]);
+        $stmtUpdateStudent->execute([
+          ':deleted_by' => $deletedBy,
+          ':uid' => $userId
+        ]);
+      }
 
       $this->db->commit();
       return true;
     } catch (\Exception $e) {
       $this->db->rollBack();
-      error_log("[UserRepository::deleteUserWithCascade] " . $e->getMessage());
-      throw $e;
+      return false;
     }
-  }
-
-  public function usernameExists(string $username): bool
-  {
-    $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE username = :username AND deleted_at IS NULL");
-    $stmt->execute([':username' => $username]);
-    return $stmt->fetchColumn() > 0;
   }
 
   public function toggleUserStatus(int $userId): bool
@@ -348,5 +434,46 @@ class UserRepository
       error_log("[UserRepository::updatePassword]" . $e->getMessage());
       return false;
     }
+  }
+
+  public function findFacultyByIdentifier(string $identifier): ?array
+  {
+    $stmt = $this->db->prepare("
+        SELECT * FROM faculty
+        WHERE (username = :identifier OR email = :identifier)
+        AND deleted_at IS NULL
+        LIMIT 1
+    ");
+    $stmt->execute(['identifier' => $identifier]);
+    return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+  }
+
+  public function insertStudent(array $data): int
+  {
+    $userId = $this->insertUser([
+      'first_name' => $data['first_name'],
+      'middle_name' => $data['middle_name'] ?? null,
+      'last_name' => $data['last_name'],
+      'username' => $data['username'],
+      'role' => 'student',
+      'password' => $data['password'] ?? password_hash('defaultpassword', PASSWORD_DEFAULT),
+      'is_active' => $data['is_active'] ?? 1,
+      'created_at' => $data['created_at'] ?? date('Y-m-d H:i:s')
+    ]);
+
+    $stmt = $this->db->prepare("
+        INSERT INTO students (user_id, student_number, year_level, course, section)
+        VALUES (:user_id, :student_number, :year_level, :course, :section)
+    ");
+
+    $stmt->execute([
+      ':user_id' => $userId,
+      ':student_number' => $data['username'],
+      ':year_level' => $data['year_level'] ?? 1,
+      ':course' => $data['course'] ?? 'N/A',
+      ':section' => $data['section'] ?? 'N/A'
+    ]);
+
+    return $userId;
   }
 }

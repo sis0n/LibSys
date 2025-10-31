@@ -3,7 +3,7 @@ let checkedMap = {};
 
 async function loadCart() {
     try {
-        const res = await fetch("/libsys/public/student/cart/json");
+        const res = await fetch("api/student/cart/json");
         if (!res.ok) throw new Error("Failed to load cart");
         cart = await res.json();
         renderCart();
@@ -23,7 +23,7 @@ async function checkoutCart() {
     }
 
     try {
-        const res = await fetch("/libsys/public/student/cart/checkout", {
+        const res = await fetch("api/student/cart/checkout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ cart_ids: selectedIds })
@@ -62,7 +62,7 @@ async function checkoutCart() {
 
 async function clearCart() {
     try {
-        const res = await fetch("/libsys/public/student/cart/clear", {
+        const res = await fetch("api/student/cart/clear", {
             method: "POST"
         });
         if (!res.ok) throw new Error("Failed to clear cart");
@@ -76,7 +76,7 @@ async function clearCart() {
 
 async function removeFromCart(cartId) {
     try {
-        const res = await fetch(`/libsys/public/student/cart/remove/${cartId}`, {
+        const res = await fetch(`api/student/cart/remove/${cartId}`, {
             method: "POST"
         });
         if (!res.ok) throw new Error("Failed to remove item");

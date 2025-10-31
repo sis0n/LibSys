@@ -246,7 +246,180 @@ ALTER TABLE borrow_transaction_items
 MODIFY COLUMN status ENUM('pending', 'borrowed', 'returned', 'overdue') NOT NULL DEFAULT 'pending';
 
 
+ALTER TABLE `borrow_transactions` CHANGE `staff_id` `librarian_id` INT(11) NULL DEFAULT NULL;
+
+ALTER TABLE deleted_users 
+ADD COLUMN suffix DATETIME NULL AFTER last_name;
 
 
+ALTER TABLE deleted_students 
+ADD COLUMN section DATETIME NULL AFTER year_level;
+
+
+ALTER TABLE `users` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `deleted_by`;
+
+ALTER TABLE users DROP INDEX username;
+ALTER TABLE students DROP INDEX student_number;
+
+ALTER TABLE `books` ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `deleted_by`;
+
+CREATE TABLE backup_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_name VARCHAR(255) NOT NULL,
+    file_type VARCHAR(50) NOT NULL,
+    type VARCHAR(50) NOT NULL,        
+    size DECIMAL(10,2) DEFAULT 0,  
+    created_by VARCHAR(50) NOT NULL, 
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE borrow_transactions
+ADD COLUMN generated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TABLE faculty (
+    faculty_id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    user_id INT(11) NULL, 
+    department VARCHAR(100) NULL,
+    contact VARCHAR(20) NULL,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    profile_updated TINYINT(1) NOT NULL DEFAULT 0,
+    deleted_at TIMESTAMP NULL,
+    deleted_by INT(11) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+ALTER TABLE carts
+ADD COLUMN faculty_id INT NULL AFTER student_id,
+ADD CONSTRAINT fk_faculty_id FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id);
+
+
+
+
+
+ALTER TABLE `users` CHANGE `role` `role` ENUM('superadmin','admin','librarian','student','scanner','faculty','staff') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE borrow_transactions
+MODIFY student_id INT(11) NULL;
+
+CREATE TABLE `staff` (
+  `staff_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NULL,
+  `employee_id` VARCHAR(50) NULL UNIQUE,
+  `position` VARCHAR(100) NOT NULL,
+  `contact_number` VARCHAR(20) NULL,
+  `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_by` INT NULL DEFAULT NULL,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  INDEX `idx_staff_status` (`status`),
+  INDEX `idx_staff_position` (`position`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE `staff` ADD CONSTRAINT `fk_staff_deleted_by` FOREIGN KEY (`deleted_by`) REFERENCES `users`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+
+CREATE TABLE `user_module_permissions` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `user_id` INT(11) NOT NULL,
+    `module_name` VARCHAR(50) NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_user_id` (`user_id`),
+    CONSTRAINT `fk_user_module_permissions_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE faculty
+ADD COLUMN unique_faculty_id VARCHAR(20) UNIQUE AFTER faculty_id;
+
+ALTER TABLE borrow_transactions
+ADD COLUMN method ENUM('manual', 'qr') NOT NULL DEFAULT 'qr' AFTER status;
+
+ALTER TABLE borrow_transactions
+ADD COLUMN unique_faculty_id VARCHAR(20) NULL AFTER faculty_id;
+
+ALTER TABLE faculty_carts
+ADD COLUMN unique_faculty_id VARCHAR(20) NULL AFTER faculty_id;
+
+ALTER TABLE faculty_carts
+DROP FOREIGN KEY faculty_carts_ibfk_1;
+
+ALTER TABLE faculty_carts
+ADD CONSTRAINT fk_faculty_carts_unique_faculty
+FOREIGN KEY (unique_faculty_id)
+REFERENCES faculty(unique_faculty_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE;
+
+CREATE TABLE guests (
+  guest_id INT AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NULL,
+  contact VARCHAR(50) NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+ALTER TABLE borrow_transactions
+ADD COLUMN collateral_id VARCHAR(100) NULL AFTER unique_faculty_id;
+
+ALTER TABLE borrow_transactions
+ADD COLUMN guest_id INT NULL AFTER unique_faculty_id,
+ADD CONSTRAINT fk_guest FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE SET NULL;
+
+alter table staff add column profile_updated tinyint(1) after status;
+
+
+OCT - 30
+
+CREATE TABLE `staff_carts` (
+  `cart_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `staff_id` INT(11) DEFAULT NULL,
+  `book_id` INT(11) NOT NULL,
+  `added_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `checkout_token` VARCHAR(255) DEFAULT NULL,
+  `checked_out_at` DATETIME DEFAULT NULL,
+  INDEX (`staff_id`),
+  INDEX (`book_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+ALTER TABLE borrow_transaction_items
+MODIFY COLUMN book_id INT(11) NULL,
+ADD COLUMN equipment_id INT(11) NULL AFTER book_id;
+
+-- wag nyo muna quiery tong nasa baba
+
+ALTER TABLE borrow_transaction_items
+ADD CONSTRAINT fk_bti_book
+  FOREIGN KEY (book_id) REFERENCES books(book_id)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE;
+
+ALTER TABLE borrow_transaction_items
+ADD CONSTRAINT fk_bti_equipment
+  FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE;
+
+
+CREATE TABLE equipment (
+equipment_id INT AUTO_INCREMENT PRIMARY KEY,
+equipment_code VARCHAR(100) UNIQUE,
+equipment_name VARCHAR(255) NOT NULL,
+availability ENUM('available', 'borrowed') DEFAULT 'available',
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+deleted_at DATETIME DEFAULT NULL,
+deleted_by INT DEFAULT NULL,
+is_archived TINYINT(1) DEFAULT 0
+);
 
 

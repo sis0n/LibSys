@@ -15,17 +15,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const availableModalCloseButton = document.getElementById('available-modal-close-button');
     const availableModalCloseAction = document.getElementById('available-modal-close-action');
 
-    // --- Input Elements ---
     const accessionInput = document.getElementById('accession-input');
     const scanButton = document.getElementById('scan-button');
     const qrCodeValueInput = document.getElementById('qrCodeValue');
 
-    // =================================================================
-    // INITIAL DATA LOADING
-    // =================================================================
     async function fetchTableData() {
         try {
-            const response = await fetch('/libsys/public/superadmin/returning/getTableData');
+            const response = await fetch('api/superadmin/returning/getTableData');
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
@@ -52,25 +48,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         data.forEach(book => {
             const row = `
-            <tr class="align-middle">
-                <td class="px-6 py-4 align-middle">
-                    <div class="font-semibold text-gray-800">${book.student_name}</div>
-                    <div class="text-gray-500 text-xs">${book.student_id}</div>
-                    <div class="text-gray-500 text-xs">${book.student_course}</div>
-                </td>
-                <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
-                <td class="px-6 py-4 align-middle">
-                    <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100">
-                        <i class="ph ph-phone text-base mr-1"></i> Contact
-                    </a>
-                </td>
-            </tr>`;
+        <tr class="align-middle">
+            <td class="px-6 py-4 align-middle">
+                <div class="font-semibold text-gray-800">${book.user_name}</div>
+                <div class="text-gray-500 text-xs">${book.user_id}</div>
+                <div class="text-gray-500 text-xs">${book.department_or_course}</div>
+            </td>
+            <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
+            <td class="px-6 py-4 align-middle">
+                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100">
+                    <i class="ph ph-phone text-base mr-1"></i> Contact
+                </a>
+            </td>
+        </tr>`;
             booksNearDueTableBody.insertAdjacentHTML('beforeend', row);
         });
     }
+
 
     function renderOverdueBooksTable(data) {
         overdueBooksTableBody.innerHTML = '';
@@ -80,25 +77,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         data.forEach(book => {
             const row = `
-            <tr class="align-middle">
-                <td class="px-6 py-4 align-middle">
-                    <div class="font-semibold text-gray-800">${book.student_name}</div>
-                    <div class="text-gray-500 text-xs">${book.student_id}</div>
-                    <div class="text-gray-500 text-xs">${book.student_course}</div>
-                </td>
-                <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
-                <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
-                <td class="px-6 py-4 align-middle">
-                    <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
-                        <i class="ph ph-phone text-base mr-1"></i> Contact
-                    </a>
-                </td>
-            </tr>`;
+        <tr class="align-middle">
+            <td class="px-6 py-4 align-middle">
+                <div class="font-semibold text-gray-800">${book.user_name}</div>
+                <div class="text-gray-500 text-xs">${book.user_id}</div>
+                <div class="text-gray-500 text-xs">${book.department_or_course}</div>
+            </td>
+            <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
+            <td class="px-6 py-4 align-middle">
+                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
+                    <i class="ph ph-phone text-base mr-1"></i> Contact
+                </a>
+            </td>
+        </tr>`;
             overdueBooksTableBody.insertAdjacentHTML('beforeend', row);
         });
     }
+
 
     // =================================================================
     // HANDLE BOOK CHECK
@@ -113,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('accession_number', accessionNumber);
 
-            const response = await fetch('/libsys/public/superadmin/returning/checkBook', {
+            const response = await fetch('api/superadmin/returning/checkBook', {
                 method: 'POST',
                 body: formData
             });
@@ -135,21 +133,14 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire('Error', 'Could not connect to the server.', 'error');
         }
 
-        // Clear inputs
         if (accessionInput) accessionInput.value = '';
         if (qrCodeValueInput) qrCodeValueInput.value = '';
 
-        // Restore focus to QR scanner
         if (qrCodeValueInput) qrCodeValueInput.focus();
 
         scanInProgress = false;
     }
 
-    // =================================================================
-    // MODAL HANDLERS
-    // =================================================================
-    // --- Update Return Modal ---
-    // --- Update Return Modal ---
     const openReturnModal = (bookData) => {
         const setText = (id, value) => {
             const el = document.getElementById(id);
@@ -159,19 +150,20 @@ document.addEventListener('DOMContentLoaded', function () {
         // Book info
         setText('modal-book-title', bookData.title);
         setText('modal-book-author', bookData.author);
-        setText('modal-book-status', bookData.status);
+        setText('modal-book-status', bookData.availability);
         setText('modal-book-isbn', bookData.isbn);
-        setText('modal-book-accessionnumber', bookData.accession_number); // dito ang mahalaga
+        setText('modal-book-accessionnumber', bookData.accession_number);
         setText('modal-book-callnumber', bookData.call_number);
 
         // Borrower info
-        setText('modal-borrower-name', bookData.student_name);
-        setText('modal-student-id', bookData.student_id);
+        setText('modal-borrower-name', bookData.borrower_name);
+        setText('modal-student-id', bookData.id_number);
+
         const courseParts = (bookData.student_course || ' - ').split(' - ');
-        setText('modal-borrower-course', courseParts[0]);
-        setText('modal-borrower-year-section', courseParts[1]);
-        setText('modal-borrower-email', bookData.email);
-        setText('modal-borrower-contact', bookData.contact);
+        setText('modal-borrower-course', courseParts[0] || 'N/A');
+        setText('modal-borrower-year-section', courseParts[1] || 'N/A');
+        setText('modal-borrower-email', bookData.email || 'N/A');
+        setText('modal-borrower-contact', bookData.contact || 'N/A');
         setText('modal-borrow-date', bookData.date_borrowed);
         setText('modal-due-date', bookData.due_date);
 
@@ -195,17 +187,27 @@ document.addEventListener('DOMContentLoaded', function () {
         // Book basic info
         setText('available-modal-title', bookData.title);
         setText('available-modal-author', bookData.author);
-        setText('available-modal-isbn', bookData.isbn);
+        setText('available-modal-isbn', bookData.book_isbn);
         setText('available-modal-accession', bookData.accession_number);
         setText('available-modal-call-number', bookData.call_number);
 
         // Status
         const statusEl = document.getElementById('available-modal-status');
-        const displayStatus = status || 'Unknown';
-        statusEl.textContent = displayStatus;
-        statusEl.className = displayStatus === 'available'
-            ? 'bg-green-200 text-green-800 text-xs font-semibold px-3 py-1 rounded-full'
-            : 'bg-gray-200 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full';
+        const displayStatus = status || bookData.availability || 'Unknown';
+        if (statusEl) {
+            statusEl.textContent = displayStatus;
+            statusEl.className = displayStatus.toLowerCase() === 'available'
+                ? 'bg-green-200 text-green-800 text-xs font-semibold px-3 py-1 rounded-full'
+                : 'bg-gray-200 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full';
+        }
+
+        // Borrower info
+        setText('available-modal-borrower-name', bookData.borrower_name);
+        setText('available-modal-borrower-id', bookData.id_number);
+        setText('available-modal-borrower-course', bookData.course_or_department);
+        setText('available-modal-borrower-contact', bookData.contact);
+        setText('available-modal-date-borrowed', bookData.date_borrowed);
+        setText('available-modal-due-date', bookData.due_date);
 
         // Additional Book Details
         setText('available-modal-subject', bookData.subject);
@@ -223,12 +225,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+
     const closeReturnModal = () => { if (returnModal) returnModal.classList.add('hidden'); };
     const closeAvailableModal = () => { if (availableBookModal) availableBookModal.classList.add('hidden'); };
 
-    // =================================================================
-    // EVENT LISTENERS
-    // =================================================================
     fetchTableData();
 
     // --- QR Scanner input ---
@@ -256,9 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Always keep QR scanner input focused when clicking anywhere
         document.addEventListener('click', (e) => {
-            // Optional: huwag i-focus kapag nagta-type sa manual input
             if (e.target !== accessionInput) {
                 setTimeout(() => qrCodeValueInput.focus(), 10);
             }
@@ -287,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const formData = new FormData();
                 formData.append('borrowing_id', borrowingId);
 
-                const response = await fetch('/libsys/public/superadmin/returning/markReturned', {
+                const response = await fetch('api/superadmin/returning/markReturned', {
                     method: 'POST',
                     body: formData
                 });
@@ -297,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (result.success) {
                     Swal.fire('Success', 'Book marked as returned successfully.', 'success');
                     closeReturnModal();
-                    fetchTableData(); // refresh the tables
+                    fetchTableData(); 
                 } else {
                     Swal.fire('Error', result.message || 'Could not mark as returned.', 'error');
                 }
@@ -309,10 +307,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    // --- Manual Scan button ---
     if (scanButton) scanButton.addEventListener('click', () => handleBookCheck(accessionInput.value.trim()));
 
-    // --- Close modals ---
     if (closeButton) closeButton.addEventListener('click', closeReturnModal);
     if (cancelButton) cancelButton.addEventListener('click', closeReturnModal);
     if (returnModal) returnModal.addEventListener('click', e => { if (e.target === returnModal) closeReturnModal(); });

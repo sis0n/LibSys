@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Repositories\AuthRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\UserPermissionModuleRepository;
 use App\Core\Controller;
 use App\Models\User;
 
@@ -11,39 +12,30 @@ class AuthController extends Controller
 {
     private $AuthRepository;
     private $UserRepository;
+    private $UserPermissionRepo;
 
     public function __construct()
     {
         $this->AuthRepository = new AuthRepository();
         $this->UserRepository = new UserRepository();
+        $this->UserPermissionRepo = new UserPermissionModuleRepository();
     }
 
     public function showLogin()
     {
-
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
 
+        // === [BINAGO DITO] ===
+        // Imbes na mag-check ng roles, i-redirect na lang lahat sa generic dashboard.
+        // Ang ViewController@handleDashboard na ang bahala mag-sort kung saan sila dapat mapunta.
         if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
-            switch (strtolower($_SESSION['role'])) {
-                case 'superadmin':
-                    header("Location: /libsys/public/superadmin/dashboard");
-                    exit;
-                case 'admin':
-                    header("Location: /libsys/public/admin/dashboard");
-                    exit;
-                case 'librarian':
-                    header("Location: /libsys/public/librarian/dashboard");
-                    exit;
-                case 'student':
-                    header("Location: /libsys/public/student/dashboard");
-                    exit;
-                case 'scanner':
-                    header("Location: /libsys/public/scanner/attendance");
-                    exit;
-            }
+            header("Location: " . BASE_URL . "/dashboard"); // Palaging generic dashboard
+            exit;
         }
+        // === [WAKAS NG PAGBABAGO] ===
+
 
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -98,23 +90,13 @@ class AuthController extends Controller
         }
 
         if ($user) {
-            if (User::isSuperadmin($user)) {
-                $redirect = '/libsys/public/superadmin/dashboard';
-            } elseif (User::isAdmin($user)) {
-                $redirect = '/libsys/public/admin/dashboard';
-            } elseif (User::isLibrarian($user)) {
-                $redirect = '/libsys/public/librarian/dashboard';
-            } elseif (User::isStudent($user)) {
-                $redirect = '/libsys/public/student/dashboard';
-            } elseif (User::isScanner($user)) {
-                $redirect = '/libsys/public/scanner/attendance';
-            } else {
-                echo json_encode([
-                    'status' => 'error',
-                    'message' => 'Role not recognized.'
-                ]);
-                return;
-            }
+            // === [BINAGO DITO] ===
+            // Imbes na mag-switch case o tumawag ng getFirstAccessibleModuleUrl,
+            // ang redirect ay palaging sa generic dashboard.
+
+            $redirect = BASE_URL . '/dashboard';
+
+            // === [WAKAS NG PAGBABAGO] ===
 
             echo json_encode([
                 'status' => 'success',
@@ -134,7 +116,10 @@ class AuthController extends Controller
     {
         session_start();
         $this->AuthRepository->logout();
-        header("Location: /libsys/public/login");
+
+        // === [BINAGO DITO] ===
+        // Gumamit ng BASE_URL para sa tamang redirect path
+        header("Location: " . BASE_URL . "/login");
     }
 
     public function forgotPassword()

@@ -137,6 +137,6 @@
   </div>
 </div>
 
-<script src="/libsys/public/js/superadmin/changePassword.js" defer></script>
+<script src="<?= BASE_URL ?>/js/superadmin/changePassword.js" defer></script>
 
 </body>

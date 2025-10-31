@@ -3,226 +3,173 @@
 namespace App\Config;
 
 use App\Core\Router;
+use App\Controllers\ViewController; // Siguraduhin na na-import
 
 class RouteConfig
 {
     public static function register(): Router
     {
-        // convert {param} style to regex
         $router = new Router();
 
-        /**
-         * ========================
-         * Landing Page Routes
-         * ========================
-         */
+        // --- VIEW ROUTES (Walang API prefix) ---
         $router->get('landingPage', 'GuestController@guestDisplay');
-        $router->get('guest/fetchBooks', 'GuestController@fetchGuestBooks');
-
-        /**
-         * ========================
-         * auth routes
-         * ========================
-         */
         $router->get('login', 'AuthController@showLogin');
+        $router->get('forgotPassword', 'AuthController@forgotPassword');
+        $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
+
+        // --- API / DATA ROUTES (Lahat ay may 'api/' prefix) ---
+
+        // Auth API
         $router->post('login', 'AuthController@login');
         $router->post('logout', 'AuthController@logout');
+        $router->post('api/change-password', 'AuthController@changePassword', ['change password']);
 
-        /**
-         * ========================
-         * forgot password route
-         * ========================
-         */
-        $router->get('forgotPassword', 'AuthController@forgotPassword');
+        // Scanner API
+        $router->post('api/scanner/scan', 'ScannerController@attendance', ['scanner']);
+        $router->post('api/scanner/manual', 'ScannerController@manual', ['scanner']);
 
-        /**
-         * ========================
-         * scanner route
-         * ========================
-         */
-        $router->post('scanner/scan', 'ScannerController@attendance', ['scanner']);
-        $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
-        $router->post('scanner/manual', 'ScannerController@manual', ['scanner']);
+        // Guest API
+        $router->get('api/guest/fetchBooks', 'GuestController@fetchGuestBooks');
 
+        // --- FACULTY (AJAX/Data Routes) ---
+        $router->get('api/faculty/attendance/get', 'AttendanceController@getMyAttendance', ['faculty']);
+        $router->get('api/faculty/qrBorrowingTicket/checkStatus', 'FacultyTicketController@checkStatus');
+        $router->get('api/faculty/bookCatalog/availableCount', 'FacultyBookCatalogController@getAvailableCount', ['faculty']);
+        $router->get('api/faculty/bookCatalog/fetch', 'FacultyBookCatalogController@fetch', ['faculty']);
+        $router->get('api/faculty/cart', 'FacultyCartController@index', ['faculty']);
+        $router->get('api/faculty/cart/add/{id}', 'FacultyCartController@add', ['faculty']);
+        $router->post('api/faculty/cart/remove/{id}', 'FacultyCartController@remove', ['faculty']);
+        $router->post('api/faculty/cart/clear', 'FacultyCartController@clearCart', ['faculty']);
+        $router->get('api/faculty/cart/json', 'FacultyCartController@getCartJson', ['faculty']);
+        $router->post('api/faculty/cart/checkout', 'FacultyTicketController@checkout', ['faculty']);
+        $router->get('api/faculty/qrBorrowingTicket', 'FacultyTicketController@show', ['faculty']);
+        $router->get('api/faculty/myprofile/get', 'FacultyProfileController@getProfile', ['faculty']);
+        $router->post('api/faculty/myprofile/update', 'FacultyProfileController@updateProfile', ['faculty']);
+        $router->get('api/faculty/borrowingHistory/fetch', 'FacultyBorrowingHistoryController@fetchHistory', ['faculty']);
 
-        /**
-         * ========================
-         * dashboard routes
-         * ========================
-         */
-        // Librarian Sidebar Page Navigation Display
-        $router->get('librarian/dashboard', 'SidebarController@librarianDashboard', ['librarian']);
-        $router->get('librarian/bookManagement', 'SidebarController@librarianBookManagement', ['librarian']);
-        $router->get('librarian/equipmentManagement', 'SidebarController@librarianEquipmentManagement', ['librarian']);
-        $router->get('librarian/qrScanner', 'SidebarController@librarianQrScanner', ['librarian']);
-        $router->get('librarian/attendanceLogs', 'SidebarController@librarianAttendanceLogs', ['librarian']);
-        $router->get('librarian/topVisitor', 'SidebarController@librarianTopVisitor', ['librarian']);
-        $router->get('librarian/transactionHistory', 'SidebarController@librarianBorrowingHistory', ['librarian']);
-        $router->get('librarian/returning', 'SidebarController@librarianReturning', ['librarian']);
-        $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['librarian']);
-        $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['librarian']);
-        $router->get('librarian/changePassword', 'SidebarController@librarianChangePassword', ['librarian']);
-        $router->get('librarian/myProfile', 'SidebarController@librarianMyProfile', ['librarian']);
+        // --- STAFF (AJAX/Data Routes) ---
+        $router->get('api/staff/attendance/get', 'AttendanceController@getMyAttendance', ['staff']);
+        $router->get('api/staff/qrBorrowingTicket/checkStatus', 'StaffTicketController@checkStatus', ['staff']);
+        $router->get('api/staff/bookCatalog/availableCount', 'StaffBookCatalogController@getAvailableCount', ['staff']);
+        $router->get('api/staff/bookCatalog/fetch', 'StaffBookCatalogController@fetch', ['staff']);
+        $router->get('api/staff/cart', 'StaffCartController@index', ['staff']);
+        $router->get('api/staff/cart/add/{id}', 'StaffCartController@add', ['staff']);
+        $router->post('api/staff/cart/remove/{id}', 'StaffCartController@remove', ['staff']);
+        $router->post('api/staff/cart/clear', 'StaffCartController@clearCart', ['staff']);
+        $router->get('api/staff/cart/json', 'StaffCartController@getCartJson', ['staff']);
+        $router->post('api/staff/cart/checkout', 'StaffTicketController@checkout', ['staff']);
+        $router->get('api/staff/qrBorrowingTicket', 'StaffTicketController@show', ['staff']);
+        $router->get('api/staff/myprofile/get', 'StaffProfileController@getProfile', ['staff']);
+        $router->post('api/staff/myprofile/update', 'StaffProfileController@updateProfile', ['staff']);
+        $router->get('api/staff/borrowingHistory/fetch', 'StaffBorrowingHistoryController@fetchHistory', ['staff']);
 
+        // --- LIBRARIAN (AJAX/Data Routes) ---
+        $router->get('api/librarian/booksmanagement/fetch', 'BookManagementController@fetch', ['book management']);
+        $router->get('api/librarian/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['book management']);
+        $router->post('api/librarian/booksmanagement/store', 'BookManagementController@store', ['book management']);
+        $router->post('api/librarian/booksmanagement/update/{id}', 'BookManagementController@update', ['book management']);
+        $router->post('api/librarian/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
+        $router->post('api/librarian/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
+        $router->post('api/librarian/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
+        $router->get('api/librarian/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);
+        $router->post('api/librarian/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
+        $router->post('api/librarian/returning/markReturned', 'ReturningController@returnBook', ['returning']);
+        $router->post('api/librarian/returning/extend', 'ReturningController@extendDueDate', ['returning']);
 
-        // Admin Sidebar Page Navigation Display
-        $router->get('admin/dashboard', 'SidebarController@adminDashboard', ['admin']);
-        $router->get('admin/bookManagement', 'SidebarController@adminBookManagement', ['admin']);
-        $router->get('admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['admin']);
-        $router->get('admin/qrScanner', 'SidebarController@adminQrScanner', ['admin']);
-        $router->get('admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['admin']);
-        $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['admin']);
-        $router->get('admin/transactionHistory', 'SidebarController@adminBorrowingHistory', ['admin']);
-        $router->get('admin/returning', 'SidebarController@adminReturning', ['admin']);
-        $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['admin']);
-        $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['admin']);
-        $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['admin']);
-        $router->get('admin/myProfile', 'SidebarController@adminMyProfile', ['admin']);
+        // --- ADMIN (AJAX/Data Routes) ---
+        $router->get('api/admin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['restore books']);
+        $router->post('api/admin/restoreBooks/restore', 'RestoreBookController@restore', ['restore books']);
+        $router->post('api/admin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['restore books']);
+        $router->get('api/admin/bookManagement/fetch', 'BookManagementController@fetch', ['book management']);
+        $router->get('api/admin/bookManagement/get/{id}', 'BookManagementController@getDetails', ['book management']);
+        $router->post('api/admin/bookManagement/store', 'BookManagementController@store', ['book management']);
+        $router->post('api/admin/bookManagement/update/{id}', 'BookManagementController@update', ['book management']);
+        $router->post('api/admin/bookManagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
+        $router->post('api/admin/bookManagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
+        $router->post('api/admin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
+        $router->post('api/admin/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
+        $router->post('api/admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
+        $router->get('api/admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);
+        $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
+        $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
+        $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
 
+        // --- SUPERADMIN (AJAX/Data Routes) ---
+        $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
+        $router->get('api/superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
+        $router->get('api/superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
+        $router->post('api/superadmin/userManagement/add', 'UserManagementController@addUser', ['superadmin']);
+        $router->post('api/superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
+        $router->post('api/superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
+        $router->post('api/superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
+        $router->post('api/superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
+        $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
+        $router->get('api/superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
+        $router->get('api/superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
+        $router->post('api/superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
+        $router->post('api/superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
+        $router->post('api/superadmin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
+        $router->post('api/superadmin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['superadmin']);
+        $router->post('api/superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
+        $router->post('api/superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']);
+        $router->get('api/superadmin/qrScanner/transactionHistory', 'QRScannerController@history', ['superadmin']);
+        $router->get('api/superadmin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['superadmin']);
+        $router->post('api/superadmin/returning/checkBook', 'ReturningController@checkBookStatus', ['superadmin']);
+        $router->post('api/superadmin/returning/markReturned', 'ReturningController@returnBook', ['superadmin']);
+        $router->post('api/superadmin/returning/extend', 'ReturningController@extendDueDate', ['superadmin']);
+        $router->get('api/superadmin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['superadmin']);
+        $router->post('api/superadmin/restoreUser/restore', 'RestoreUserController@restore', ['superadmin']);
+        $router->post('api/superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']);
+        $router->get('api/superadmin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['superadmin']);
+        $router->post('api/superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);
+        $router->post('api/superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['superadmin']);
+        $router->get('api/superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats', ['superadmin']);
+        $router->get('api/superadmin/backup/database/full', 'BackupController@initiateBackup', ['superadmin']);
+        $router->get('api/superadmin/backup/secure_download/{filename}', 'BackupController@downloadBackup', ['superadmin']);
+        $router->get('api/superadmin/backup/logs', 'BackupController@listBackupLogs', ['superadmin']);
+        $router->get('api/superadmin/dashboard/stats', 'App\Controllers\DashboardController@getStats', ['superadmin']);
+        $router->get('api/superadmin/dashboard/top-visitors', 'App\Controllers\DashboardController@getTopVisitors', ['superadmin']);
+        $router->get('api/superadmin/dashboard/weekly-activity', 'App\Controllers\DashboardController@getWeeklyActivity', ['superadmin']);
+        $router->get('api/superadmin/dashboard/getData', 'DashboardController@getData', ['superadmin']);
+        $router->post('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['superadmin']);
+        $router->get('api/superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
+        $router->get('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
+        $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
+        $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
 
-        // Super Admin Sidebar Page Navigation Display
-        $router->get('superadmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
-        $router->get('superadmin/userManagement', 'SidebarController@userManagement', ['superadmin']);
-        $router->get('superadmin/bookManagement', 'SidebarController@bookManagement', ['superadmin']);
-        $router->get('superadmin/equipmentManagement', 'SidebarController@equipmentManagement', ['superadmin']);
-        $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
-        $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
-        $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
-        $router->get('superadmin/transactionHistory', 'SidebarController@borrowingHistory', ['superadmin']);
-        $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
-        $router->get('superadmin/globalLogs', 'SidebarController@globalLogs', ['superadmin']);
-        $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);
-        $router->get('superadmin/restoreBooks', 'SidebarController@restoreBooks', ['superadmin']);
-        $router->get('superadmin/restoreEquipment', 'SidebarController@restoreEquipment', ['superadmin']);
-        $router->get('superadmin/restoreUser', 'SidebarController@restoreUser', ['superadmin']);
-        $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
-        $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
+        // --- STUDENT (AJAX/Data Routes) ---
+        $router->get('api/student/attendance/get', 'AttendanceController@getMyAttendance', ['student']);
+        $router->get('api/student/cart', 'CartController@index', ['student']);
+        $router->get('api/student/cart/add/{id}', 'CartController@add', ['student']);
+        $router->post('api/student/cart/remove/{id}', 'CartController@remove', ['student']);
+        $router->post('api/student/cart/clear', 'CartController@clearCart', ['student']);
+        $router->get('api/student/cart/json', 'CartController@getCartJson', ['student']);
+        $router->post('api/student/cart/checkout', 'TicketController@checkout', ['student']);
+        $router->get('api/student/qrBorrowingTicket/checkStatus', 'TicketController@checkStatus');
+        $router->get('api/student/bookCatalog/availableCount', 'BookCatalogController@getAvailableCount', ['student']);
+        $router->get('api/student/bookCatalog/fetch', 'BookCatalogController@fetch', ['student']);
+        $router->get('api/student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
+        $router->get('api/student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
+        $router->post('api/student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
 
-
-        // Student Sidebar Page Navigation Display
-        $router->get('student/dashboard', 'SidebarController@studentDashboard', ['student']);
-        $router->get('student/bookCatalog', 'SidebarController@studentBookCatalog', ['student']);
-        $router->get('student/equipmentCatalog', 'SidebarController@studentEquipmentCatalog', ['student']);
-        $router->get('student/myCart', 'SidebarController@studentMyCart', ['student']);
-        $router->get('student/qrBorrowingTicket', 'SidebarController@studentQrBorrowingTicket', ['student']);
-        $router->get('student/myAttendance', 'SidebarController@studentMyAttendance', ['student']);
-        $router->get('student/borrowingHistory', 'SidebarController@studentBorrowingHistory', ['student']);
-        $router->get('student/attendance/get', 'AttendanceController@getMyAttendance', ['student']);
-        $router->get('student/changePassword', 'SidebarController@studentChangePassword', ['student']);
-        $router->get('student/myProfile', 'SidebarController@studentMyProfile', ['student']);
-
-
-
-        /**
-         * 
-         * ATTENDANCE ROUTES (SAMPLE LANG TO BES)
-         * $router->get('attendance', 'AttendanceController@index', ['librarian', 'admin']);
-         * $router->post('attendance/scan', 'AttendanceController@scan', ['librarian']);
-         * $router->get('attendance/logs', 'AttendanceController@logs', ['librarian', 'admin']);
-         */
-
-        // AJAX route para sa dropdown filter logs (librarian at admin)
-        $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['librarian', 'admin', 'superadmin']);
-
-        /**
-         * ========================
-         * STUDENT CART & CHECKOUT ROUTES
-         * ========================
-         */
-        $router->get('student/cart', 'CartController@index', ['student']);
-        $router->get('student/cart/add/{id}', 'CartController@add', ['student']);
-        $router->post('student/cart/remove/{id}', 'CartController@remove', ['student']);
-        $router->post('student/cart/clear', 'CartController@clearCart', ['student']);
-        $router->get('student/cart/json', 'CartController@getCartJson', ['student']);
-
-
-        // checkout routes
-        $router->post('student/cart/checkout', 'TicketController@checkout', ['student']);
-        $router->get('student/qrBorrowingTicket', 'TicketController@show', ['student']);
-
-
-
-        $router->get('student/bookCatalog/availableCount', 'BookCatalogController@getAvailableCount', ['student']);
-        $router->get('student/bookCatalog/fetch', 'BookCatalogController@fetch', ['student']);
-
-        //change password
-        $router->post('/change-password', 'AuthController@changePassword');
-
-
-        // ===============================
-        // SUPERADMIN USER MANAGEMENT ROUTES
-        // ===============================
-
-        // $router->get('superadmin/userManagement', 'UserManagementController@index', ['superadmin']);
-        $router->get('superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
-        $router->get('superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
-        $router->get('superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
-        $router->post('superadmin/userManagement/add', 'UserManagementController@addUser');
-        $router->post('superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
-        $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
-        $router->post('superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
-        $router->post('superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
-
-        $router->get('superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
-        $router->get('superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
-        $router->post('superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
-        $router->post('superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
-        $router->post('superadmin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
-
-        $router->get('admin/booksmanagement/fetch', 'BookManagementController@fetch', ['admin']);
-        $router->get('admin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['admin']);
-        $router->post('admin/booksmanagement/store', 'BookManagementController@store', ['admin']);
-        $router->post('admin/booksmanagement/update/{id}', 'BookManagementController@update', ['admin']);
-        $router->post('admin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['admin']);
-
-        $router->get('librarian/booksmanagement/fetch', 'BookManagementController@fetch', ['librarian']);
-        $router->get('librarian/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['librarian']);
-        $router->post('librarian/booksmanagement/store', 'BookManagementController@store', ['librarian']);
-        $router->post('librarian/booksmanagement/update/{id}', 'BookManagementController@update', ['librarian']);
-        $router->post('librarian/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['librarian']);
-
-        //student profile routes
-        $router->get('student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
-        $router->post('student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
+        // General AJAX routes
+        $router->get('api/attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['attendance logs', 'superadmin']);
 
 
-        // Superadmin QR Scanner
-        $router->post('superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
-        $router->post('superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']); // <-- Add this
-        $router->get('superadmin/qrScanner/transactionHistory', 'QRScannerController@history', ['superadmin']);
+        // ----------------------------------------------------------------------
+        // --- BAGONG GENERIC VIEW ROUTES (Fully Generic Plan) ---
+        // ----------------------------------------------------------------------
 
-        // Admin QR Scanner
-        $router->post('admin/qrScanner/scanTicket', 'QRScannerController@scan', ['admin']);
-        $router->post('admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['admin']); // <-- Add this
-        $router->get('admin/qrScanner/transactionHistory', 'QRScannerController@history', ['admin']);
+        // 1. GENERIC DASHBOARD ROUTE (Para sa login redirect)
+        $router->get('dashboard', 'ViewController@handleDashboard');
 
-        // Librarian QR Scanner
-        $router->post('librarian/qrScanner/scanTicket', 'QRScannerController@scan', ['librarian']);
-        $router->post('librarian/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['librarian']); // <-- Add this
-        $router->get('librarian/qrScanner/transactionHistory', 'QRScannerController@history', ['librarian']);
+        // 2. DYNAMIC VIEW ROUTES (Pumapalit sa lahat ng SidebarController)
+        // Hahawakan nito ang /myProfile, /bookManagement, atbp.
+        $router->get('{action}', 'ViewController@handleGenericPage');
+        $router->get('{action}/{id}', 'ViewController@handleGenericPage');
 
-
-        $router->get('student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
-
-        $router->get('superadmin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['superadmin']);
-        $router->post('superadmin/returning/checkBook', 'ReturningController@checkBookStatus', ['superadmin']);
-        $router->post('superadmin/returning/markReturned', 'ReturningController@returnBook', ['superadmin']);
-        $router->post('superadmin/returning/extend', 'ReturningController@extendDueDate', ['superadmin']);
-
-        $router->get('admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['admin']);
-        $router->post('admin/returning/checkBook', 'ReturningController@checkBookStatus', ['admin']);
-        $router->post('admin/returning/markReturned', 'ReturningController@returnBook', ['admin']);
-        $router->post('admin/returning/extend', 'ReturningController@extendDueDate', ['admin']);
-
-        $router->get('librarian/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['librarian']);
-        $router->post('librarian/returning/checkBook', 'ReturningController@checkBookStatus', ['librarian']);
-        $router->post('librarian/returning/markReturned', 'ReturningController@returnBook', ['librarian']);
-        $router->post('librarian/returning/extend', 'ReturningController@extendDueDate', ['librarian']);
-
-        $router->get('superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
-        $router->get('admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['admin']);
-        $router->get('librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['librarian']);
-
+        // (Magdagdag ng POST kung kailangan mong mag-submit ng form papunta sa view)
+        // $router->post('{action}', 'ViewController@handleGenericPage');
 
         return $router;
     }

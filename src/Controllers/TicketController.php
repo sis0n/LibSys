@@ -46,7 +46,7 @@ class TicketController extends Controller
       $result = $builder->build();
       $result->saveToFile($qrPath);
 
-      return "/libsys/public/qrcodes/{$transactionCode}.png";
+      return BASE_URL . "/qrcodes/{$transactionCode}.png";
     } catch (\Exception $e) {
       error_log("QR Code Generation Error for code '$transactionCode': " . $e->getMessage());
       return '';
@@ -78,7 +78,7 @@ class TicketController extends Controller
     if (!$profileCheck['complete']) {
       http_response_code(400);
       echo json_encode(["success" => false, "message" => $profileCheck['message']]);
-      return;
+      exit;
     }
 
     $input = json_decode(file_get_contents('php://input'), true);
@@ -88,8 +88,10 @@ class TicketController extends Controller
     try {
       $this->ticketRepo->beginTransaction();
 
+      // Expire old pending transactions
       $this->ticketRepo->expireOldPendingTransactions();
 
+      // Get cart items
       $cartItems = !empty($selectedIds)
         ? $this->ticketRepo->getCartItemsByIds($studentId, $selectedIds)
         : $this->ticketRepo->getCartItems($studentId);
@@ -100,6 +102,7 @@ class TicketController extends Controller
         exit;
       }
 
+      // Check availability
       $bookIds = array_column($cartItems, 'book_id');
       $unavailableBooks = $this->ticketRepo->areBooksAvailable($bookIds);
       if (!empty($unavailableBooks)) {
@@ -113,6 +116,7 @@ class TicketController extends Controller
         exit;
       }
 
+      // Check weekly borrowing limit
       $borrowedThisWeek = $this->ticketRepo->countBorrowedBooksThisWeek($studentId);
       $newItemsCount = count($cartItems);
       if ($borrowedThisWeek + $newItemsCount > $MAX_BOOKS_PER_WEEK) {
@@ -125,6 +129,7 @@ class TicketController extends Controller
         exit;
       }
 
+      // Check if a pending transaction already exists
       $existingTransaction = $this->ticketRepo->getPendingTransactionByStudentId($studentId);
 
       if ($existingTransaction) {
@@ -132,25 +137,24 @@ class TicketController extends Controller
         $transactionCode = $existingTransaction['transaction_code'];
         $message = 'Checkout successful! Items added to your pending ticket.';
       } else {
+        // Create new pending transaction
         $transactionCode = strtoupper(uniqid());
-        $transactionId = $this->ticketRepo->createTransaction(
-          $studentId,
-          $transactionCode,
-          date("Y-m-d H:i:s", strtotime("+7 days"))
-        );
-
-        $this->ticketRepo->setTransactionExpiry($transactionId, 15);
+        $dueDate = date("Y-m-d H:i:s", strtotime("+7 days")); // default due date
+        $transactionId = $this->ticketRepo->createPendingTransaction($studentId, $transactionCode, $dueDate, 15);
 
         $message = 'Checkout successful! A new Borrowing Ticket has been created.';
       }
 
+      // Add items to transaction
       $this->ticketRepo->addTransactionItems($transactionId, $cartItems);
 
+      // Remove items from cart
       $cartItemIdsToRemove = array_column($cartItems, 'cart_id');
       if (!empty($cartItemIdsToRemove)) {
         $this->ticketRepo->removeCartItemsByIds($studentId, $cartItemIdsToRemove);
       }
 
+      // Generate QR code
       $_SESSION['last_ticket_code'] = $transactionCode;
       $qrPath = $this->generateQr($transactionCode);
 
@@ -175,16 +179,14 @@ class TicketController extends Controller
     }
   }
 
+
+
   public function show(string $transactionCode = null)
   {
-    if (session_status() === PHP_SESSION_NONE) {
-      session_start();
-    }
-
     $userId = $_SESSION['user_id'] ?? null;
     if (!$userId) {
       $_SESSION['error_message'] = "Please login to view your ticket.";
-      header("Location: /libsys/public/login");
+      header("Location: " . BASE_URL . "/login");
       exit;
     }
 
@@ -296,9 +298,9 @@ class TicketController extends Controller
       "transaction_code" => $transactionData['transaction_code'] ?? null,
       "books" => $books,
       "qrPath" => $qrPath,
-      "due_date" => $transactionData['due_date'] ?? null,
       "student" => $studentInfo,
-      "borrowed_at" => $transactionData['borrowed_at'] ?? null,
+      "generated_at" => $transactionData['generated_at'] ?? null,
+      "expires_at" => $transactionData['expires_at'] ?? null,
       "message" => $viewMessage,
       "error_message" => $viewError,
       "isExpired" => $isExpired
@@ -332,13 +334,25 @@ class TicketController extends Controller
       echo json_encode([
         'success' => true,
         'status' => 'pending',
-        'transaction_code' => $pendingTransaction['transaction_code']
+        'transaction_code' => $pendingTransaction['transaction_code'],
+        'generated_at' => $pendingTransaction['generated_at'],
+        'expires_at' => isset($pendingTransaction['expires_at']) ? $pendingTransaction['expires_at'] : null
       ]);
     } else {
-      echo json_encode([
-        'success' => true,
-        'status' => 'expired'
-      ]);
+      $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByStudentId($studentId);
+      if ($borrowedTransaction) {
+        echo json_encode([
+          'success' => true,
+          'status' => 'borrowed',
+          'transaction_code' => $borrowedTransaction['transaction_code'],
+          'due_date' => $borrowedTransaction['due_date']
+        ]);
+      } else {
+        echo json_encode([
+          'success' => true,
+          'status' => 'expired'
+        ]);
+      }
     }
   }
 }

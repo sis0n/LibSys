@@ -287,4 +287,4 @@
     </div>
 </div>
 
-<script src="/libsys/public/js/superadmin/returning.js"></script>
+<script src="<?= BASE_URL ?>/js/superadmin/returning.js" defer></script>

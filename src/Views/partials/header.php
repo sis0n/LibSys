@@ -19,6 +19,12 @@ switch ($role) {
     case 'superadmin':
         $roleTitle = 'Super Admin Access Module';
         break;
+    case 'staff':
+        $roleTitle = 'Staff Access Module';
+        break;
+    case 'faculty':
+        $roleTitle = 'Faculty Access Module';
+        break;
     default:
         $roleTitle = 'Guest Access';
         break;
@@ -53,7 +59,7 @@ switch ($role) {
             </div>
         </div>
 
-        <form method="POST" action="/LibSys/public/logout" id="logoutForm">
+        <form method="POST" action="<?= BASE_URL ?>/logout" id="logoutForm">
             <button type="submit" class="p-2 rounded hover:bg-gray-100">
                 <i class="ph ph-sign-out"></i>
             </button>

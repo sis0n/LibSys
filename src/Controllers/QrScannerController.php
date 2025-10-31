@@ -8,7 +8,9 @@ use App\Core\Controller;
 class QRScannerController extends Controller
 {
   protected $qrScannerRepository;
-  const MAX_BORROW_LIMIT = 5;
+  const MAX_BORROW_LIMIT_STUDENT = 5;
+  const MAX_BORROW_LIMIT_FACULTY = 10;
+  const MAX_BORROW_LIMIT_STAFF = 7;
 
   public function __construct()
   {
@@ -23,47 +25,73 @@ class QRScannerController extends Controller
 
     $this->qrScannerRepository->expireOldPendingTransactions();
 
-    $transaction = $this->qrScannerRepository->getStudentByTransactionCode($transactionCode);
+    $transaction = $this->qrScannerRepository->getTransactionDetailsByCode($transactionCode);
 
     if (!$transaction) {
       return ['success' => false, 'message' => 'Invalid ticket code or transaction not found.'];
     }
 
-    if (strtolower($transaction['status']) === 'expired') {
-      return ['success' => false, 'message' => 'QR Code Ticket Expired'];
+    if (in_array(strtolower($transaction['status']), ['expired', 'borrowed', 'returned'])) {
+      return ['success' => false, 'message' => 'This ticket is already processed or expired.'];
     }
 
-    if (strtolower($transaction['status']) === 'borrowed' || strtolower($transaction['status']) === 'returned') {
-      return ['success' => false, 'message' => 'This ticket is already processed. Please use the Return Scanner.'];
+    // Determine user type
+    if (!empty($transaction['faculty_id'])) {
+      $userType = 'faculty';
+      $idColumn = 'faculty_id';
+      $idValue = (int) $transaction['faculty_id'];
+      $MAX_LIMIT = self::MAX_BORROW_LIMIT_FACULTY;
+    } elseif (!empty($transaction['staff_id'])) {
+      $userType = 'staff';
+      $idColumn = 'staff_id';
+      $idValue = (int) $transaction['staff_id'];
+      $MAX_LIMIT = self::MAX_BORROW_LIMIT_STAFF;
+    } else {
+      $userType = 'student';
+      $idColumn = 'student_id';
+      $idValue = (int) $transaction['student_id'];
+      $MAX_LIMIT = self::MAX_BORROW_LIMIT_STUDENT;
     }
 
-    $currentBorrowed = $this->qrScannerRepository->getStudentBorrowedCount(
-      (int) $transaction['student_id'],
-      $transactionCode
-    );
-
+    $currentBorrowed = $this->qrScannerRepository->getBorrowedCount($idColumn, $idValue, $transactionCode);
     $itemsInTicket = count($this->qrScannerRepository->getTransactionItems($transactionCode));
     $projectedTotal = $currentBorrowed + $itemsInTicket;
 
-    if ($projectedTotal > self::MAX_BORROW_LIMIT) {
-      return ['success' => false, 'message' => "Borrowing limit exceeded. Student currently has {$currentBorrowed} items. Cannot borrow {$itemsInTicket} more (Limit: " . self::MAX_BORROW_LIMIT . " books)."];
+    if ($projectedTotal > $MAX_LIMIT) {
+      return [
+        'success' => false,
+        'message' => ucfirst($userType) . " borrowing limit exceeded. Has {$currentBorrowed} items. Cannot borrow {$itemsInTicket} more (Limit: {$MAX_LIMIT})."
+      ];
     }
 
     $items = $this->qrScannerRepository->getTransactionItems($transactionCode);
 
+    // Build unified user info
     $middleInitial = !empty($transaction['middle_name']) ? strtoupper(substr($transaction['middle_name'], 0, 1)) . '. ' : '';
     $suffix = !empty($transaction['suffix']) ? ' ' . $transaction['suffix'] : '';
     $fullName = trim("{$transaction['first_name']} {$middleInitial}{$transaction['last_name']}{$suffix}");
 
+    $userInfo = [
+      'type' => $userType,
+      'name' => $fullName,
+      'profilePicture' => $transaction['profile_picture'] ?? null
+    ];
+
+    if ($userType === 'student') {
+      $userInfo['id'] = $transaction['student_number'];
+      $userInfo['course'] = $transaction['course'];
+      $userInfo['yearsection'] = $transaction['year_level'] . '-' . $transaction['section'];
+    } elseif ($userType === 'faculty') {
+      $userInfo['id'] = $transaction['f_id'];
+      $userInfo['department'] = $transaction['department'];
+    } else {
+      $userInfo['id'] = $transaction['st_id'];
+      $userInfo['position'] = $transaction['position'];
+      $userInfo['contact'] = $transaction['contact'];
+    }
 
     $responseData = [
-      'student' => [
-        'name' => $fullName,
-        'id' => $transaction['student_number'],
-        'course' => $transaction['course'],
-        'yearsection' => $transaction['year_level'] . '-' . $transaction['section'],
-        'profilePicture' => $transaction['profile_picture']
-      ],
+      'user' => $userInfo,
       'ticket' => [
         'id' => $transaction['transaction_code'],
         'generated' => $transaction['borrowed_at'],
@@ -89,7 +117,6 @@ class QRScannerController extends Controller
   {
     header('Content-Type: application/json');
     $transactionCode = trim($_POST['transaction_code'] ?? '');
-
     $result = $this->processTicketLookup($transactionCode);
 
     if ($result['success']) {
@@ -115,37 +142,51 @@ class QRScannerController extends Controller
   public function borrowTransaction()
   {
     header('Content-Type: application/json');
-
     $transactionCode = trim($_POST['transaction_code'] ?? '');
     $staffId = $_SESSION['user_id'] ?? null;
 
     if (!$staffId) {
-      echo json_encode(['success' => false, 'message' => 'Unauthorized access. Staff not logged in.']);
+      echo json_encode(['success' => false, 'message' => 'Unauthorized. Staff not logged in.']);
       return;
     }
 
-    $transaction = $this->qrScannerRepository->getStudentByTransactionCode($transactionCode);
+    $transaction = $this->qrScannerRepository->getTransactionDetailsByCode($transactionCode);
 
     if (!$transaction || strtolower($transaction['status']) !== 'pending') {
       echo json_encode(['success' => false, 'message' => 'Transaction is not in PENDING state.']);
       return;
     }
 
-    $currentBorrowed = $this->qrScannerRepository->getStudentBorrowedCount(
-      (int) $transaction['student_id'],
-      $transactionCode
-    );
+    // Determine user type and limits
+    if (!empty($transaction['faculty_id'])) {
+      $idColumn = 'faculty_id';
+      $idValue = $transaction['faculty_id'];
+      $MAX_LIMIT = self::MAX_BORROW_LIMIT_FACULTY;
+      $userType = 'faculty';
+    } elseif (!empty($transaction['staff_id'])) {
+      $idColumn = 'staff_id';
+      $idValue = $transaction['staff_id'];
+      $MAX_LIMIT = self::MAX_BORROW_LIMIT_STAFF;
+      $userType = 'staff';
+    } else {
+      $idColumn = 'student_id';
+      $idValue = $transaction['student_id'];
+      $MAX_LIMIT = self::MAX_BORROW_LIMIT_STUDENT;
+      $userType = 'student';
+    }
 
-    if ($currentBorrowed >= self::MAX_BORROW_LIMIT) {
-      echo json_encode(['success' => false, 'message' => "Borrowing limit check failed. Student already has maximum borrowed books."]);
+    $currentBorrowed = $this->qrScannerRepository->getBorrowedCount($idColumn, $idValue, $transactionCode);
+
+    if ($currentBorrowed >= $MAX_LIMIT) {
+      echo json_encode(['success' => false, 'message' => "Borrowing limit reached for {$userType}."]);
       return;
     }
 
-    $result = $this->qrScannerRepository->processBorrowing($transactionCode, $staffId);
+    $success = $this->qrScannerRepository->processBorrowing($transactionCode, $staffId);
 
-    if ($result) {
+    if ($success) {
       unset($_SESSION['last_scanned_ticket']);
-      echo json_encode(['success' => true, 'message' => 'Borrow transaction successfully processed. Staff ID recorded.']);
+      echo json_encode(['success' => true, 'message' => 'Borrow transaction successfully processed.']);
     } else {
       echo json_encode(['success' => false, 'message' => 'Failed to finalize borrow transaction.']);
     }
@@ -164,6 +205,8 @@ class QRScannerController extends Controller
 
     $formattedHistory = array_map(function ($h) {
 
+      $isFaculty = !empty($h['faculty_id']);
+
       $middleInitial = !empty($h['middle_name']) ? strtoupper(substr($h['middle_name'], 0, 1)) . '. ' : '';
       $suffix = !empty($h['suffix']) ? ' ' . $h['suffix'] : '';
       $fullName = trim("{$h['first_name']} {$middleInitial}{$h['last_name']}{$suffix}");
@@ -177,8 +220,9 @@ class QRScannerController extends Controller
         : 'Not yet returned';
 
       return [
-        'studentName' => $fullName,
-        'studentNumber' => $h['student_number'],
+        'userName' => $fullName,
+        'userId' => $isFaculty ? $h['faculty_id'] : $h['user_identifier'], // user_identifier holds student_number or faculty_id
+        'userType' => $isFaculty ? 'Faculty' : 'Student',
         'itemsBorrowed' => (int) $h['items_borrowed'],
         'status' => ucfirst($h['status']),
         'borrowedDateTime' => $borrowedDateTime,

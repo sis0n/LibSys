@@ -6,7 +6,7 @@ const statCurrent = document.getElementById('statCurrent');
 const statOverdue = document.getElementById('statOverdue');
 const statReturned = document.getElementById('statReturned');
 
-const BASE_AJAX_PATH = `${BASE_URL}/student/borrowingHistory/fetch`;
+const BASE_AJAX_PATH = `${BASE_URL}/api/student/borrowingHistory/fetch`;
 
 function renderRecords(records) {
   if (records.length === 0) {
@@ -47,7 +47,7 @@ function renderRecords(records) {
                     </div>
                     <div class="bg-[var(--color-gray-100)] p-2 rounded text-sm">
                         <i class="ph ph-user text-gray-600 mr-1"></i>
-                        Staff<br><span class="font-medium">${record.staffName || 'N/A'}</span>
+                        Librarian<br><span class="font-medium">${record.librarianName || 'N/A'}</span>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@ function fetchBorrowingHistory() {
 
   recordsContainer.innerHTML = `<div class="text-center py-10 text-gray-500" id="loadingIndicator">Loading history...</div>`;
 
-  const url = `${BASE_URL}/student/borrowingHistory/fetch?student_id=${CURRENT_STUDENT_ID}`;
+  const url = `${BASE_URL}/api/student/borrowingHistory/fetch?student_id=${CURRENT_STUDENT_ID}`;
 
   fetch(url)
     .then(res => res.json())

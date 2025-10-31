@@ -56,21 +56,7 @@
     </div>
 </div>
 
-<script>
-    <?php
-    $requestUri = $_SERVER['REQUEST_URI'];
-    if (preg_match('/\/public\/(superadmin|admin|librarian)\/qrScanner/', $requestUri, $matches)) {
-        $rolePrefix = $matches[1];
-    } else {
-        $rolePrefix = 'superadmin';
-    }
-    // Ito ang magiging dynamic base path (e.g., /LibSys/public/admin/qrScanner)
-    $ajaxBasePath = "/LibSys/public/" . $rolePrefix . "/qrScanner";
-    ?>
-    // Itatalaga ang dynamic path sa global variable na gagamitin ng qrScanner.js
-    const BASE_AJAX_PATH = '<?= $ajaxBasePath ?>';
-</script>
-<script src="/libsys/public/js/superadmin/qrScanner.js" defer></script>
+<script src="<?= BASE_URL ?>/js/superadmin/qrScanner.js" defer></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const scannerInput = document.getElementById('scannerInput');
@@ -78,27 +64,29 @@
         const manualBtn = document.getElementById('manualTicketBtn');
         const manualInput = document.getElementById('manualTicketInput');
 
-        scannerInput.focus();
+        if (scannerInput && scannerBox && manualBtn && manualInput) {
+            scannerBox.addEventListener('click', () => scannerInput.focus());
 
-        scannerBox.addEventListener('click', () => scannerInput.focus());
-
-        scannerInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-                e.preventDefault();
-
-                const code = scannerInput.value.trim();
-
-                if (code) {
-                    scanQRCode(code);
+            scannerInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    const code = scannerInput.value.trim();
+                    if (code) scanQRCode(code);
                     scannerInput.value = '';
                 }
-            }
-        });
+            });
 
-
-        manualBtn.addEventListener('click', () => {
-            const code = manualInput.value.trim();
-            if (code) scanQRCode(code);
-        });
+            manualBtn.addEventListener('click', () => {
+                const code = manualInput.value.trim();
+                if (code) scanQRCode(code);
+            });
+        } else {
+            console.error("QR Scanner elements not found:", {
+                scannerInput,
+                scannerBox,
+                manualBtn,
+                manualInput
+            });
+        }
     });
 </script>

@@ -223,18 +223,17 @@
 
                     <div class="grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto rounded-xl p-2">
                         <?php
-                $modules = [
-                    'book management',
-                    'qr scanner',
-                    'returning',
-                    'borrowing form',
-                    'attendance logs',
-                    'reports',
-                    'transaction history',
-                    'backup',
-                    'restore books',
-                    'restore user',
-                ];
+                        // ADD USER MODULES LIST (Source for permissions)
+                        $modules = [
+                            'book management',
+                            'qr scanner',
+                            'returning',
+                            'borrowing form',
+                            'attendance logs',
+                            'reports',
+                            'transaction history',
+                            'restore books',
+                        ];
 
                 foreach ($modules as $module):
                 ?>
@@ -444,9 +443,7 @@
                         'attendance logs',
                         'reports',
                         'transaction history',
-                        'backup',
                         'restore books',
-                        'restore user',
                     ];
 
                     foreach ($modules as $module):

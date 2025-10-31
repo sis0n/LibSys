@@ -129,14 +129,17 @@ document.addEventListener("DOMContentLoaded", () => {
     noRecordsRow.classList.remove('hidden');
     noRecordsRow.querySelector('td').innerHTML = `<i class="ph ph-spinner animate-spin text-2xl"></i> Loading...`;
 
-    const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
-    url.searchParams.append('period', periodToSend);
-    url.searchParams.append('search', currentSearch);
+    const endpoint = '/attendance/logs/ajax';
+    const absoluteUrl = BASE_URL_JS + endpoint;
+
+    const url_fetch = new URL(absoluteUrl);
+    url_fetch.searchParams.append('period', periodToSend);
+    url_fetch.searchParams.append('search', currentSearch);
     if (currentCourse !== "All Courses") {
-      url.searchParams.append('course', currentCourse);
+      url_fetch.searchParams.append('course', currentCourse);
     }
 
-    fetch(url)
+    fetch(url_fetch)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
         return res.json();

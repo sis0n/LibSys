@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // --- Modal Elements ---
+    const customDateModal = document.getElementById('customDateModal');
+    const confirmDateRangeBtn = document.getElementById('confirmDateRange');
+    const cancelDateRangeBtn = document.getElementById('cancelDateRange');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const downloadReportBtn = document.getElementById('download-report-btn');
+
     // --- Library Resources ---
     const libraryResourcesData = [
         { year: 2025, title: '-', volume: '-', processed: '-' },
@@ -23,23 +31,62 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Circulated Books ---
     const circulatedBooksData = [
-        { category: 'Student', y2025: '-', y2026: '-', y2027: '-' },
-        { category: 'Faculty', y2025: '-', y2026: '-', y2027: '-' },
-        { category: 'Staff', y2025: '-', y2026: '-', y2027: '-' }
+        { category: 'Student', today: '-', week: '-', month: '-', year: '-' },
+        { category: 'Faculty', today: '-', week: '-', month: '-', year: '-' },
+        { category: 'Staff', today: '-', week: '-', month: '-', year: '-' }
     ];
 
     function populateCirculatedBooks() {
         const tbody = document.getElementById('circulated-books-tbody');
         if (!tbody) return;
+        tbody.innerHTML = ''; // Clear existing rows
 
         circulatedBooksData.forEach(data => {
             const row = document.createElement('tr');
             row.classList.add('border-b', 'border-orange-100');
             row.innerHTML = `
                 <td class="px-4 py-2 text-left font-medium text-gray-700">${data.category}</td>
-                <td class="px-4 py-2 text-center">${data.y2025}</td>
-                <td class="px-4 py-2 text-center">${data.y2026}</td>
-                <td class="px-4 py-2 text-center">${data.y2027}</td>
+                <td class="px-4 py-2 text-center">${data.today}</td>
+                <td class="px-4 py-2 text-center">${data.week}</td>
+                <td class="px-4 py-2 text-center">${data.month}</td>
+                <td class="px-4 py-2 text-center">${data.year}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        const totalRow = document.createElement('tr');
+        totalRow.classList.add('bg-orange-50', 'font-bold');
+        totalRow.innerHTML = `
+            <td class="px-4 py-2 text-left">TOTAL</td>
+            <td class="px-4 py-2 text-center">-</td>
+            <td class="px-4 py-2 text-center">-</td>
+            <td class="px-4 py-2 text-center">-</td>
+            <td class="px-4 py-2 text-center">-</td>
+        `;
+        tbody.appendChild(totalRow);
+    }
+
+
+    // --- Deleted Books ---
+    const deletedBooksData = [
+        { count: '-', today: '-', month: '-', year: '-' },
+        { count: '-', today: '-', month: '-', year: '-' },
+        { count: '-', today: '-', month: '-', year: '-' }
+    ];
+
+    function populateDeletedBooks() {
+        const tbody = document.getElementById('deleted-books-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = ''; // Clear existing rows
+
+        deletedBooksData.forEach(data => {
+            const row = document.createElement('tr');
+            row.classList.add('border-b', 'border-orange-100');
+            row.innerHTML = `
+                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.count}</td>
+                <td class="px-4 py-2 text-center">${data.today}</td>
+                <td class="px-4 py-2 text-center">${data.month}</td>
+                <td class="px-4 py-2 text-center">${data.year}</td>
             `;
             tbody.appendChild(row);
         });
@@ -55,38 +102,53 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.appendChild(totalRow);
     }
 
-    // --- Library Visit by Course ---
-    const libraryVisitByCourseData = [
-        { course: 'BSIT', y2025: '-', y2026: '-', y2027: '-' },
-        { course: 'BSCS', y2025: '-', y2026: '-', y2027: '-' },
-        { course: 'BSIS', y2025: '-', y2026: '-', y2027: '-' },
-        { course: 'BSCE', y2025: '-', y2026: '-', y2027: '-' },
-        { course: 'BSEE', y2025: '-', y2026: '-', y2027: '-' },
+    // --- Library Visit by Department ---
+    const libraryVisitByDepartmentData = [
+        { department: 'CBA', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'CCJE', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'CLAS', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'COE', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'COEngr', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'LAW', today: 0, week: 0, month: 0, year: 0 },
+        { department: 'GS', today: 0, week: 0, month: 0, year: 0 },
     ];
 
-    function populateLibraryVisitByCourse() {
+    function populateLibraryVisitByDepartment() {
         const tbody = document.getElementById('library-visit-tbody');
         if (!tbody) return;
+        tbody.innerHTML = ''; // Clear existing rows
 
-        libraryVisitByCourseData.forEach(data => {
+        let totalToday = 0;
+        let totalWeek = 0;
+        let totalMonth = 0;
+        let totalYear = 0;
+
+        libraryVisitByDepartmentData.forEach(data => {
             const row = document.createElement('tr');
             row.classList.add('border-b', 'border-orange-100');
             row.innerHTML = `
-                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.course}</td>
-                <td class="px-4 py-2 text-center">${data.y2025}</td>
-                <td class="px-4 py-2 text-center">${data.y2026}</td>
-                <td class="px-4 py-2 text-center">${data.y2027}</td>
+                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.department}</td>
+                <td class="px-4 py-2 text-center">${data.today}</td>
+                <td class="px-4 py-2 text-center">${data.week}</td>
+                <td class="px-4 py-2 text-center">${data.month}</td>
+                <td class="px-4 py-2 text-center">${data.year}</td>
             `;
             tbody.appendChild(row);
+
+            totalToday += data.today;
+            totalWeek += data.week;
+            totalMonth += data.month;
+            totalYear += data.year;
         });
 
         const totalRow = document.createElement('tr');
         totalRow.classList.add('bg-orange-50', 'font-bold', 'text-gray-800');
         totalRow.innerHTML = `
             <td class="px-4 py-2 text-left">TOTAL</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
+            <td class="px-4 py-2 text-center">${totalToday}</td>
+            <td class="px-4 py-2 text-center">${totalWeek}</td>
+            <td class="px-4 py-2 text-center">${totalMonth}</td>
+            <td class="px-4 py-2 text-center">${totalYear}</td>
         `;
         tbody.appendChild(totalRow);
     }
@@ -113,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const row = document.createElement('tr');
         row.classList.add('border-b', 'border-orange-100');
 
-        let rankColor = 'text-black font-normal'; 
+        let rankColor = 'text-black font-normal';
         if (data.rank === 1) rankColor = 'text-yellow-400 font-bold';
         else if (data.rank === 2) rankColor = 'text-gray-400 font-bold';
         else if (data.rank === 3) rankColor = 'text-orange-500 font-bold';
@@ -134,64 +196,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Call Functions ---
     populateCirculatedBooks();
-    populateLibraryVisitByCourse();
+    populateDeletedBooks();
+    populateLibraryVisitByDepartment();
     populateTopVisitors();
+    
 
-    // --- Dropdown Filters ---
-    const circulatedBooksFilter = document.getElementById('circulatedBooksFilter');
-    if (circulatedBooksFilter) {
-        circulatedBooksFilter.addEventListener('change', function() {
-            updateCirculatedBooksTableHeaders(this.value);
+    // --- Download Report Button ---
+    if (downloadReportBtn) {
+        downloadReportBtn.addEventListener('click', function() {
+            if (customDateModal) customDateModal.classList.remove('hidden');
         });
-        // Initialize headers on load
-        updateCirculatedBooksTableHeaders(circulatedBooksFilter.value);
     }
 
-    const libraryVisitFilter = document.getElementById('libraryVisitFilter');
-    if (libraryVisitFilter) {
-        libraryVisitFilter.addEventListener('change', function() {
-            updateLibraryVisitTableHeaders(this.value);
+    if(customDateModal) {
+        cancelDateRangeBtn.addEventListener('click', () => {
+            customDateModal.classList.add('hidden');
         });
-        // Initialize headers on load
-        updateLibraryVisitTableHeaders(libraryVisitFilter.value);
-    }
 
-    function updateCirculatedBooksTableHeaders(filter) {
-        const theadRow = document.querySelector('#circulated-books-tbody').previousElementSibling.querySelector('tr');
-        if (theadRow) {
-            if (filter === 'month') {
-                theadRow.children[1].textContent = 'Today';
-                theadRow.children[2].textContent = 'Week';
-                theadRow.children[3].textContent = 'Month';
-            } else if (filter === 'semester') {
-                theadRow.children[1].textContent = '1st Sem';
-                theadRow.children[2].textContent = '2nd Sem';
-                theadRow.children[3].textContent = 'All Sem';
-            } else if (filter === 'year') {
-                theadRow.children[1].textContent = '2025';
-                theadRow.children[2].textContent = '2026';
-                theadRow.children[3].textContent = '2027';
-            }
-        }
-    }
+        confirmDateRangeBtn.addEventListener('click', () => {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
 
-    function updateLibraryVisitTableHeaders(filter) {
-        const theadRow = document.querySelector('#library-visit-tbody').previousElementSibling.querySelector('tr');
-        if (theadRow) {
-            if (filter === 'month') {
-                theadRow.children[1].textContent = 'Today';
-                theadRow.children[2].textContent = 'Week';
-                theadRow.children[3].textContent = 'Month';
-            } else if (filter === 'semester') {
-                theadRow.children[1].textContent = '1st Sem';
-                theadRow.children[2].textContent = '2nd Sem';
-                theadRow.children[3].textContent = 'All Sem';
-            } else if (filter === 'year') {
-                theadRow.children[1].textContent = '2025';
-                theadRow.children[2].textContent = '2026';
-                theadRow.children[3].textContent = '2027';
+            if (startDate && endDate) {
+                customDateModal.classList.add('hidden');
+                
+                const reportUrl = `/LibSys/src/Views/report_pdf_template/pdfTemplate.php?start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}`;
+                window.open(reportUrl, '_blank');
+            } else {
+                alert('Please select both start and end dates.');
             }
-        }
+        });
     }
 
     // --- Charts ---
@@ -206,7 +240,7 @@ function initializeCharts() {
         new Chart(topCtx.getContext('2d'), {
             type: 'bar',
             data: {
-                labels: ['BSCS', 'BSIT', 'BSEMC', 'BSIS', 'BSCE'],
+                labels: ['CBA', 'CCJE', 'CLAS', 'COE', 'COEngr'],
                 datasets: [{
                     label: 'Visits',
                     data: [15, 10, 8, 12, 9],

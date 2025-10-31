@@ -243,6 +243,19 @@ class RouteConfig
         // General AJAX routes
         $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['attendance logs', 'superadmin']);
 
+        /**
+         * ========================
+         * Report / Dashboard Data Routes
+         * ========================
+         */
+
+        $router->get('superadmin/topVisitor/getData', 'ReportController@getReportData', ['superadmin']);
+        $router->get('superadmin/topVisitor/download', 'ReportsController@downloadReportPDF', ['superadmin']);
+
+        
+
+
+
         return $router;
     }
 }

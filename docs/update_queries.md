@@ -423,3 +423,6 @@ is_archived TINYINT(1) DEFAULT 0
 );
 
 
+composer require dompdf/dompdf
+
+

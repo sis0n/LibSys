@@ -49,8 +49,8 @@ jobs:
           exclude: |
             */.git
             */.github
-            */node_modules/*
-            */vendor/*
+            **/node_modules/**
+            **/vendor/**
             /checkout_test.txt/
             /docs/
             resetdata.php

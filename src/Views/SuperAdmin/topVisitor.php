@@ -44,7 +44,7 @@
    <!-- First Row of Tables -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
     <!-- Library Resources Table -->
-    <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-10 flex flex-col scale-[1.02]">
+    <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-2 flex flex-col scale-[1.02]">
         <h3 class="text-lg font-medium mb-4 text-center mt-2">Library Resources</h3>
         <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
             <table class="w-full text-sm border-collapse">
@@ -62,7 +62,7 @@
     </div>
 
     <!-- Circulated Books Table -->
-    <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-10 flex flex-col scale-[1.02]">
+    <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-2 flex flex-col scale-[1.02]">
         <h3 class="text-lg font-medium mb-4 text-center mt-2">Circulated Books</h3>
         <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
             <table class="w-full text-sm border-collapse">
@@ -81,7 +81,7 @@
     </div>
 
     <!-- Deleted Books Table -->
-    <div class="bg-white border-orange-200 rounded-lg shadow-sm p-10 flex flex-col scale-[1.02]">
+    <div class="bg-white border-orange-200 rounded-lg shadow-sm p-2 flex flex-col scale-[1.02]">
         <h3 class="text-lg font-medium mb-4 text-center mt-2">Deleted Books</h3>
         <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
             <table class="w-full text-sm border-collapse">
@@ -94,19 +94,10 @@
                     </tr>
                 </thead>
                 <tbody id="deleted-books-tbody"></tbody>
-                <tbody id="deleted-books-tbody" class="text-center">
-                <tr class="border-b border-orange-100 hover:bg-orange-50 transition-colors">
-                    <td class="px-4 py-3">-</td>
-                    <td class="px-4 py-3">-</td>
-                    <td class="px-4 py-3">-</td>
-                    <td class="px-4 py-3">-</td>
-                </tr>
             </table>
         </div>
     </div>
 </div>
-
-
 
     <!-- Second Row of Tables -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">

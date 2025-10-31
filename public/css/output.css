@@ -417,6 +417,9 @@
   .pointer-events-none {
     pointer-events: none;
   }
+  .visible {
+    visibility: visible;
+  }
   .absolute {
     position: absolute;
   }
@@ -929,6 +932,9 @@
     --tw-scale-y: 100%;
     --tw-scale-z: 100%;
     scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
+  .scale-\[1\.02\] {
+    scale: 1.02;
   }
   .rotate-180 {
     rotate: 180deg;
@@ -1641,6 +1647,9 @@
   .p-8 {
     padding: calc(var(--spacing) * 8);
   }
+  .p-10 {
+    padding: calc(var(--spacing) * 10);
+  }
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
   }
@@ -1736,9 +1745,6 @@
   }
   .pr-10 {
     padding-right: calc(var(--spacing) * 10);
-  }
-  .pb-1 {
-    padding-bottom: calc(var(--spacing) * 1);
   }
   .pl-0 {
     padding-left: calc(var(--spacing) * 0);
@@ -2952,15 +2958,6 @@
   .\[\&\:\:-webkit-scrollbar\]\:w-0 {
     &::-webkit-scrollbar {
       width: calc(var(--spacing) * 0);
-    }
-  }
-  .hover\:\[\&\:\:-webkit-scrollbar\]\:w-2 {
-    &:hover {
-      @media (hover: hover) {
-        &::-webkit-scrollbar {
-          width: calc(var(--spacing) * 2);
-        }
-      }
     }
   }
   .hover\:\[\&\:\:-webkit-scrollbar-thumb\]\:rounded {

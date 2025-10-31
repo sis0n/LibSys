@@ -66,6 +66,42 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.appendChild(totalRow);
     }
 
+
+    // --- Deleted Books ---
+    const deletedBooksData = [
+        { count: '-', today: '-', month: '-', year: '-' },
+        { count: '-', today: '-', month: '-', year: '-' },
+        { count: '-', today: '-', month: '-', year: '-' }
+    ];
+
+    function populateDeletedBooks() {
+        const tbody = document.getElementById('deleted-books-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = ''; // Clear existing rows
+
+        deletedBooksData.forEach(data => {
+            const row = document.createElement('tr');
+            row.classList.add('border-b', 'border-orange-100');
+            row.innerHTML = `
+                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.count}</td>
+                <td class="px-4 py-2 text-center">${data.today}</td>
+                <td class="px-4 py-2 text-center">${data.month}</td>
+                <td class="px-4 py-2 text-center">${data.year}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        const totalRow = document.createElement('tr');
+        totalRow.classList.add('bg-orange-50', 'font-bold');
+        totalRow.innerHTML = `
+            <td class="px-4 py-2 text-left">TOTAL</td>
+            <td class="px-4 py-2 text-center">-</td>
+            <td class="px-4 py-2 text-center">-</td>
+            <td class="px-4 py-2 text-center">-</td>
+        `;
+        tbody.appendChild(totalRow);
+    }
+
     // --- Library Visit by Department ---
     const libraryVisitByDepartmentData = [
         { department: 'CBA', today: 0, week: 0, month: 0, year: 0 },
@@ -160,8 +196,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Call Functions ---
     populateCirculatedBooks();
+    populateDeletedBooks();
     populateLibraryVisitByDepartment();
     populateTopVisitors();
+    
 
     // --- Download Report Button ---
     if (downloadReportBtn) {

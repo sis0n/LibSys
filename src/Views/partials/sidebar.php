@@ -12,6 +12,8 @@ $normalizedPermissions = array_map(function($p) {
     return trim(strtolower($p));
 }, $userPermissions);
 
+// var_dump($userPermissions, $normalizedPermissions);
+
 
 $hasPermission = function ($code) use ($normalizedPermissions, $isSuperAdmin) {
     if ($isSuperAdmin) {
@@ -488,7 +490,7 @@ switch ($role) {
             <?php endif; ?>
             
             <?php if ($hasPermission('reports')): ?>
-            <a href="<?= BASE_URL ?>public/<?= $roleFolder ?>/topVisitor"
+            <a href="<?= BASE_URL ?>/<?= $roleFolder ?>/topVisitor"
                 class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'topVisitor' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-chart-bar text-2xl"></i>
                 <span class="text-base">Reports</span>
@@ -503,14 +505,6 @@ switch ($role) {
             </a>
             <?php endif; ?>
 
-            <?php if ($hasPermission('backup')): ?>
-            <a href="<?= BASE_URL ?>/<?= $roleFolder ?>/backup"
-                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'backup' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-floppy-disk text-2xl"></i>
-                <span class="text-base">Backup</span>
-            </a>
-            <?php endif; ?>
-            
             <?php if ($hasPermission('restore books')): ?>
             <a href="<?= BASE_URL ?>/<?= $roleFolder ?>/restoreBooks"
                 class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreBooks' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -519,15 +513,6 @@ switch ($role) {
             </a>
             <?php endif; ?>
             
-            <?php if ($hasPermission('restore user')): ?>
-            <a href="<?= BASE_URL ?>/<?= $roleFolder ?>/restoreUser"
-                class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                <i class="ph ph-user-gear text-2xl"></i>
-                <span class="text-base">Restore User</span>
-            </a>
-            <?php endif; ?>
-
-
             <a href="<?= BASE_URL ?>/<?= $roleFolder ?>/changePassword"
                 class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                 <i class="ph ph-key text-2xl"></i>

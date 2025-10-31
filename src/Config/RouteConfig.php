@@ -87,6 +87,7 @@ class RouteConfig
 
         // Modules
         $router->get('librarian/bookManagement', 'SidebarController@librarianBookManagement', ['book management']);
+
         $router->get('librarian/booksmanagement/fetch', 'BookManagementController@fetch', ['book management']);
         $router->get('librarian/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['book management']);
         $router->post('librarian/booksmanagement/store', 'BookManagementController@store', ['book management']);
@@ -109,24 +110,26 @@ class RouteConfig
         $router->get('librarian/topVisitor', 'SidebarController@librarianTopVisitor', ['reports']);
         $router->get('librarian/transactionHistory', 'SidebarController@librarianBorrowingHistory', ['transaction history']);
         $router->get('librarian/globalLogs', 'SidebarController@librarianGlobalLogs', ['global logs']);
-        $router->get('librarian/backupAndRestore', 'SidebarController@librarianBackupAndRestore', ['backup']);
-        $router->get('librarian/restoreBooks', 'SidebarController@restoreBooks', ['restore books']);
-        $router->get('librarian/borrowingForm', 'SidebarController@borrowingForm', ['borrowing form']);
+        $router->get('librarian/restoreBooks', 'SidebarController@librarianRestoreBooks', ['restore books']);
+        $router->get('librarian/borrowingForm', 'SidebarController@librarianBorrowingForm', ['borrowing form']);
 
 
 
-        // --- ADMIN ROUTES (Permission Controlled) ---
-        $router->get('admin/dashboard', 'SidebarController@adminDashboard', ['dashboard']); // Default Privilege
-        $router->get('admin/myProfile', 'SidebarController@adminMyProfile', ['my profile']); // Default Privilege
-        $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['change password']); // Default Privilege
+        $router->get('admin/changePassword', 'SidebarController@adminChangePassword', ['change password']); 
+
+        $router->get('admin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['restore books']);
+        $router->post('admin/restoreBooks/restore', 'RestoreBookController@restore', ['restore books']);
+        $router->post('admin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['restore books']);
 
         // Modules
         $router->get('admin/bookManagement', 'SidebarController@adminBookManagement', ['book management']);
-        $router->get('admin/booksmanagement/fetch', 'BookManagementController@fetch', ['book management']);
-        $router->get('admin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['book management']);
-        $router->post('admin/booksmanagement/store', 'BookManagementController@store', ['book management']);
-        $router->post('admin/booksmanagement/update/{id}', 'BookManagementController@update', ['book management']);
-        $router->post('admin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
+        $router->get('admin/bookManagement/fetch', 'BookManagementController@fetch', ['book management']);
+        $router->get('admin/bookManagement/get/{id}', 'BookManagementController@getDetails', ['book management']);
+        $router->post('admin/bookManagement/store', 'BookManagementController@store', ['book management']);
+        $router->post('admin/bookManagement/update/{id}', 'BookManagementController@update', ['book management']);
+        $router->post('admin/bookManagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
+        $router->post('admin/bookManagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
+        $router->post('admin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
 
         $router->get('admin/equipmentManagement', 'SidebarController@adminEquipmentManagement', ['equipment management']);
 
@@ -144,9 +147,9 @@ class RouteConfig
         $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['reports']);
         $router->get('admin/transactionHistory', 'SidebarController@adminBorrowingHistory', ['transaction history']);
         $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['global logs']);
-        $router->get('admin/backupAndRestore', 'SidebarController@adminBackupAndRestore', ['backup']);
-        $router->get('admin/restoreBooks', 'SidebarController@restoreBooks', ['restore books']);
+        $router->get('admin/restoreBooks', 'SidebarController@AdminRestoreBooks', ['restore books']);
         $router->get('admin/borrowingForm', 'SidebarController@borrowingForm', ['borrowing form']);
+
         
 
 
@@ -190,17 +193,17 @@ class RouteConfig
         $router->get('superadmin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['superadmin']);
         $router->post('superadmin/returning/checkBook', 'ReturningController@checkBookStatus', ['superadmin']);
         $router->post('superadmin/returning/markReturned', 'ReturningController@returnBook', ['superadmin']);
-        $router->post('superadmin/returning/extend', 'ReturningController@extendDueDate', ['superadmin']);
+        $router->post('superadmin/returning/extend', 'ReturningConadmin/backuptroller@extendDueDate', ['superadmin']);
         $router->get('superadmin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['superadmin']);
         $router->post('superadmin/restoreUser/restore', 'RestoreUserController@restore', ['superadmin']);
         $router->post('superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']);
         $router->get('superadmin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['superadmin']);
         $router->post('superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);
         $router->post('superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['superadmin']);
-        $router->get('/superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats', ['superadmin']);
-        $router->get('/superadmin/backup/database/full', 'BackupController@initiateBackup', ['superadmin']);
-        $router->get('/superadmin/backup/secure_download/{filename}', 'BackupController@downloadBackup', ['superadmin']);
-        $router->get('/superadmin/backup/logs', 'BackupController@listBackupLogs', ['superadmin']);
+        $router->get('superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats', ['superadmin']);
+        $router->get('superadmin/backup/database/full', 'BackupController@initiateBackup', ['superadmin']);
+        $router->get('superadmin/backup/secure_download/{filename}', 'BackupController@downloadBackup', ['superadmin']);
+        $router->get('superadmin/backup/logs', 'BackupController@listBackupLogs', ['superadmin']);
         $router->get('superadmin/dashboard/stats', 'App\Controllers\DashboardController@getStats', ['superadmin']);
         $router->get('superadmin/dashboard/top-visitors', 'App\Controllers\DashboardController@getTopVisitors', ['superadmin']);
         $router->get('superadmin/dashboard/weekly-activity', 'App\Controllers\DashboardController@getWeeklyActivity', ['superadmin']);
@@ -238,7 +241,7 @@ class RouteConfig
 
 
         // General AJAX routes
-        $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['attendance logs', 'reports', 'superadmin']);
+        $router->get('attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['attendance logs', 'superadmin']);
 
         return $router;
     }

@@ -18,52 +18,45 @@
         </div>
         <p class="text-gray-600 mb-6">Choose the type and format for the data export.</p>
 
-        <!-- FORM: Ginagamit ito para mag-set ng type bago mag-download -->
         <form id="backupForm" method="GET" action="/libsys/public/backup/export/csv">
-            <!-- Hidden input para malaman ng JS kung anong table ang i-export -->
             <input type="hidden" name="type" id="backupType" value="">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Full SQL Backup Card -->
                 <button type="button" data-type="full_sql"
                     class="backup-btn group flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg shadow-sm 
                             hover:bg-amber-500 hover:border-orange-500 hover:shadow-md transition-all duration-200 cursor-pointer">
                     <i class="ph ph-database text-3xl text-purple-500 group-hover:text-white transition-colors"></i>
                     <span class="text-base font-semibold text-gray-700 group-hover:text-white mt-2">Full Backup</span>
-                    <span class="text-sm text-gray-700 group-hover:text-white">All Tables (.sql)</span>
+                    <span class="text-sm text-gray-700 group-hover:text-white">All Tables</span>
                 </button>
 
-                <!-- Users Only Card -->
                 <button type="button" data-type="users"
                     class="backup-btn group flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg shadow-sm 
                             hover:bg-amber-500 hover:border-orange-500 hover:shadow-md transition-all duration-200 cursor-pointer">
                     <i class="ph ph-users text-3xl text-orange-500 group-hover:text-white transition-colors"></i>
                     <span class="text-base font-semibold text-gray-700 group-hover:text-white mt-2">Users Only</span>
-                    <span class="text-sm text-gray-700 group-hover:text-white">User accounts (.csv)</span>
+                    <span class="text-sm text-gray-700 group-hover:text-white">User accounts</span>
                 </button>
 
-                <!-- Books Only Card -->
                 <button type="button" data-type="books"
                     class="backup-btn group flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg shadow-sm 
                             hover:bg-amber-500 hover:border-orange-500 hover:shadow-md transition-all duration-200 cursor-pointer">
                     <i class="ph ph-book text-3xl text-green-500 group-hover:text-white transition-colors"></i>
                     <span class="text-base font-semibold text-gray-700 group-hover:text-white mt-2">Books Only</span>
-                    <span class="text-sm text-gray-700 group-hover:text-white">Book catalog (.csv)</span>
+                    <span class="text-sm text-gray-700 group-hover:text-white">Book catalog</span>
                 </button>
 
-                <!-- Equipment Only Card -->
                 <button type="button" data-type="equipment"
                     class="backup-btn group flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg shadow-sm 
                             hover:bg-amber-500 hover:border-orange-500 hover:shadow-md transition-all duration-200 cursor-pointer">
                     <i class="ph ph-desktop-tower text-3xl text-red-500 group-hover:text-white transition-colors"></i>
                     <span class="text-base font-semibold text-gray-700 group-hover:text-white mt-2">Equipment Only</span>
-                    <span class="text-sm text-gray-700 group-hover:text-white">Equipment data (.csv)</span>
+                    <span class="text-sm text-gray-700 group-hover:text-white">Equipment data</span>
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Backup Files Section -->
     <div class="bg-white shadow-sm border border-gray-200 rounded-lg p-6">
         <div class="flex items-center gap-2 mb-4">
             <i class="ph ph-folder-open text-xl text-orange-700"></i>

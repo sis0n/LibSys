@@ -13,7 +13,7 @@ class BookManagementController extends Controller
     {
         $this->bookRepo = new BookManagementRepository();
     }
-    
+
     private function json($data, $statusCode = 200)
     {
         http_response_code($statusCode);
@@ -141,25 +141,41 @@ class BookManagementController extends Controller
 
     public function destroy($id)
     {
-        // $this->auth(['superadmin']);
+        $bookId = (int)$id;
         $deletedByUserId = $_SESSION['user_id'] ?? null;
+
         if ($deletedByUserId === null) {
             return $this->json(['success' => false, 'message' => 'Authentication required.'], 401);
         }
 
         try {
-            $success = $this->bookRepo->deleteBook($id, $deletedByUserId);
+            $result = $this->bookRepo->deleteBook($bookId, $deletedByUserId);
 
-            if ($success) {
-                $this->json(['success' => true, 'message' => 'Book deleted successfully!']);
-            } else {
-                $this->json(['success' => false, 'message' => 'Failed to delete book.'], 500);
-            }
-        } catch (\Exception $e) {
+            // Map message to proper HTTP status
+            $status = 200;
+            if ($result['message'] === 'Book not found.') $status = 404;
+            if ($result['message'] === 'Book already deleted.') $status = 409;
+            if (!$result['success'] && $status === 200) $status = 400;
+
+            return $this->json($result, $status);
+        } catch (\PDOException $e) {
+            // Foreign key constraint
             if (str_contains($e->getMessage(), 'foreign key constraint')) {
-                return $this->json(['success' => false, 'message' => 'Cannot delete book. It is linked to borrowing records.'], 409);
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Cannot delete book. It is linked to active borrowing records.'
+                ], 409);
             }
-            $this->json(['success' => false, 'message' => $e->getMessage()], 500);
+
+            return $this->json([
+                'success' => false,
+                'message' => 'Internal server error during database operation.'
+            ], 500);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

@@ -144,7 +144,7 @@
                 </div>
 
                 <!-- Email -->
-                <div class="sm:col-span-3">
+                <div class="sm:col-span-2">
                     <label class="text-sm text-gray-500" for="email">Email</label>
                     <input type="email" id="email" name="email"
                         class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"

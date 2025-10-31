@@ -107,6 +107,22 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!accessionNumber || scanInProgress) return;
         scanInProgress = true;
 
+        // 🔵 Loading Alert for Book Check
+        Swal.fire({
+            background: "transparent",
+            html: `
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                    <p class="text-gray-700 text-[14px]">Checking book status...<br><span class="text-sm text-gray-500">Processing request.</span></p>
+                </div>
+            `,
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] shadow-[0_0_8px_#3b82f670]",
+            },
+        });
+
         try {
             const formData = new FormData();
             formData.append('accession_number', accessionNumber);
@@ -117,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const result = await response.json();
+            Swal.close(); // Close loading after response
 
             if (result.success) {
                 const data = result.data;
@@ -124,13 +141,88 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (data.status === 'borrowed' && data.details) openReturnModal(data.details);
                 else if (data.status === 'available' && data.details) openAvailableModal(data.details, data.status);
-                else Swal.fire('Not Found', 'No book found with that Accession Number.', 'warning');
+                else {
+                    // 🟠 Warning Toast for Not Found/Invalid Status
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 text-orange-600">
+                                        <i class="ph ph-warning text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-orange-600">Book Not Found</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">No borrowed book found with that Accession Number.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm shadow-[0_0_8px_#ffb34770]",
+                        },
+                    });
+                }
             } else {
-                Swal.fire('Error', result.message || 'An error occurred.', 'error');
+                // 🔴 Error Toast for Server Message
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                    <i class="ph ph-x-circle text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-red-600">Scan Failed</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">${result.message || 'An unknown error occurred on the server.'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
             }
         } catch (error) {
             console.error('Error checking book:', error);
-            Swal.fire('Error', 'Could not connect to the server.', 'error');
+            Swal.close();
+            // 🔴 Error Toast for Network Error
+            Swal.fire({
+                toast: true,
+                position: "bottom-end",
+                showConfirmButton: false,
+                timer: 3000,
+                width: "360px",
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col text-left">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                <i class="ph ph-x-circle text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                                <p class="text-[13px] text-gray-700 mt-0.5">Could not connect to server.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                },
+            });
         }
 
         if (accessionInput) accessionInput.value = '';
@@ -147,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (el) el.textContent = value || 'N/A';
         };
 
-        // Book info
+        // Book info (assuming bookData structure matches librarian context)
         setText('modal-book-title', bookData.title);
         setText('modal-book-author', bookData.author);
         setText('modal-book-status', bookData.availability);
@@ -158,7 +250,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Borrower info
         setText('modal-borrower-name', bookData.borrower_name);
         setText('modal-student-id', bookData.id_number);
-
         const courseParts = (bookData.student_course || ' - ').split(' - ');
         setText('modal-borrower-course', courseParts[0] || 'N/A');
         setText('modal-borrower-year-section', courseParts[1] || 'N/A');
@@ -176,7 +267,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
 
-    // --- Update Available Modal ---
     // --- Update Available Modal ---
     const openAvailableModal = (bookData, status) => {
         const setText = (id, value) => {
@@ -201,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 : 'bg-gray-200 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full';
         }
 
-        // Borrower info
+        // Borrower info (Last borrowed details if applicable)
         setText('available-modal-borrower-name', bookData.borrower_name);
         setText('available-modal-borrower-id', bookData.id_number);
         setText('available-modal-borrower-course', bookData.course_or_department);
@@ -281,6 +371,22 @@ document.addEventListener('DOMContentLoaded', function () {
             const borrowingId = modalReturnButton.dataset.borrowingId;
             if (!borrowingId) return;
 
+            // 🔵 Loading Alert for Return Processing
+            Swal.fire({
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col items-center justify-center gap-2">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                        <p class="text-gray-700 text-[14px]">Marking book as returned...<br><span class="text-sm text-gray-500">Processing request.</span></p>
+                    </div>
+                `,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] shadow-[0_0_8px_#3b82f670]",
+                },
+            });
+
             try {
                 const formData = new FormData();
                 formData.append('borrowing_id', borrowingId);
@@ -291,17 +397,91 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 const result = await response.json();
+                Swal.close(); // Close loading
 
                 if (result.success) {
-                    Swal.fire('Success', 'Book marked as returned successfully.', 'success');
+                    // 🟢 Success Toast
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+                                        <i class="ph ph-check-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-green-600">Return Successful!</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">Book marked as returned successfully.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
+                        },
+                    });
                     closeReturnModal();
-                    fetchTableData();
+                    fetchTableData(); // refresh the tables
                 } else {
-                    Swal.fire('Error', result.message || 'Could not mark as returned.', 'error');
+                    // 🔴 Error Toast
+                    Swal.fire({
+                        toast: true,
+                        position: "bottom-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        width: "360px",
+                        background: "transparent",
+                        html: `
+                            <div class="flex flex-col text-left">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                        <i class="ph ph-x-circle text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-[15px] font-semibold text-red-600">Return Failed</h3>
+                                        <p class="text-[13px] text-gray-700 mt-0.5">${result.message || 'Could not mark as returned.'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        customClass: {
+                            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                        },
+                    });
                 }
             } catch (error) {
                 console.error('Error marking book as returned:', error);
-                Swal.fire('Error', 'Could not connect to server.', 'error');
+                Swal.close();
+                // 🔴 Error Toast for Network Error
+                Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                    <i class="ph ph-x-circle text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">Could not connect to server during return.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
             }
         });
     }

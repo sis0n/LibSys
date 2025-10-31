@@ -19,7 +19,7 @@ class FacultyRepository
     $uniqueId = $this->generateUniqueFacultyId();
 
     $stmt = $this->db->prepare("
-        INSERT INTO faculty (user_id, unique_faculty_id, department, contact, status, created_at)
+        INSERT INTO faculty (user_id, faculty_id, department, contact, status, created_at)
         VALUES (:user_id, :unique_id, :department, :contact, :status, NOW())
     ");
     $stmt->execute([
@@ -46,7 +46,7 @@ class FacultyRepository
     $prefix = 'FAC';
     $year = date('Y');
 
-    $stmt = $this->db->query("SELECT unique_faculty_id FROM faculty ORDER BY faculty_id DESC LIMIT 1");
+    $stmt = $this->db->query("SELECT faculty_id FROM faculty ORDER BY faculty_id DESC LIMIT 1");
     $lastId = $stmt->fetchColumn();
 
     if ($lastId) {

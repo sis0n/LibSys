@@ -21,7 +21,7 @@ class QRScannerRepository
                 bt.student_id, bt.faculty_id, bt.staff_id,
 
                 s.student_number, s.course, s.year_level, s.section, 
-                f.unique_faculty_id AS f_id, f.department,
+                f.faculty_id AS f_id, f.department,
                 st.staff_id AS st_id, st.position, st.contact,
                 u.profile_picture, u.first_name, u.last_name, u.middle_name, u.suffix
 

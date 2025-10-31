@@ -24,6 +24,7 @@ class Router
 
   public function resolve(string $uri, string $method)
   {
+    // Tiyakin na walang leading/trailing slash
     $uri = trim($uri, '/');
 
     if (!isset($this->routes[$method])) {
@@ -33,20 +34,51 @@ class Router
     }
 
     foreach ($this->routes[$method] as $route => $info) {
-      // Convert {param} into regex group
-      $pattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route);
+
+      $pattern = preg_quote($route, '#');
+
+      $pattern = preg_replace('/\\\{[^}]+\\\}/', '([^/]+)', $pattern);
+
       $pattern = "#^" . trim($pattern, '/') . "$#";
 
       if (preg_match($pattern, $uri, $matches)) {
-        array_shift($matches); // remove full match
+        array_shift($matches);
 
         $controller = $info['controller'];
-        $allowedRoles = $info['roles'];
+        $allowedAccess = $info['roles'];
 
-        // role check
-        if (!empty($allowedRoles)) {
-          $userRole = $_SESSION['role'] ?? null;
-          if (!$userRole || !in_array($userRole, $allowedRoles)) {
+        // --- HYBRID AUTHORIZATION CHECK (Hayaan natin itong gumana nang tama) ---
+        if (!empty($allowedAccess)) {
+          $userRole = strtolower($_SESSION['role'] ?? '');
+          $userId = $_SESSION['user_id'] ?? null;
+
+          if (!$userId) {
+            http_response_code(403);
+            include __DIR__ . '/../Views/errors/403.php';
+            return;
+          }
+
+          $hasAccess = false;
+          $allowedAccessNormalized = array_map('strtolower', $allowedAccess);
+
+          if (in_array($userRole, $allowedAccessNormalized)) {
+            $hasAccess = true;
+          }
+
+          if (in_array($userRole, ['admin', 'librarian'])) {
+            $userPermissions = $_SESSION['user_permissions'] ?? [];
+            $normalizedUserPermissions = array_map('strtolower', $userPermissions);
+
+            $matches_permission = array_intersect($normalizedUserPermissions, $allowedAccessNormalized);
+
+            if (count($matches_permission) > 0) {
+              $hasAccess = true;
+            } else {
+              $hasAccess = false;
+            }
+          }
+
+          if (!$hasAccess) {
             http_response_code(403);
             include __DIR__ . '/../Views/errors/403.php';
             return;

@@ -28,7 +28,7 @@ class FacultyProfileRepository
                 u.profile_picture,
                 u.role,
                 u.is_active,
-                f.faculty_id,
+                f.unique_faculty_id,
                 f.department,
                 f.contact,
                 f.status,
@@ -76,7 +76,7 @@ class FacultyProfileRepository
             WHERE user_id = :user_id
         ");
     return $stmt->execute([
-      ':allow' => $allow ? 0 : 1, // 0 = can edit, 1 = locked
+      ':allow' => $allow ? 0 : 1,
       ':user_id' => $userId
     ]);
   }

@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Load Faculty Profile ---
     async function loadProfile() {
         try {
-            const res = await fetch('/libsys/public/faculty/myprofile/get');
+            const res = await fetch('myprofile/get');
             if (!res.ok) throw new Error(`Failed to fetch profile. Status: ${res.status}`);
             const data = await res.json();
 
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         .filter(Boolean).join(' ') || 'Faculty Name';
 
                 profileName.textContent = fullName;
-                profileFacultyId.textContent = profile.faculty_id || 'Faculty ID';
+                profileFacultyId.textContent = profile.unique_faculty_id || 'Faculty ID';
 
                 document.getElementById('firstName').value = profile.first_name || '';
                 document.getElementById('middleName').value = profile.middle_name || '';
@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('department').value = profile.department || '';
                 document.getElementById('email').value = profile.email || '';
                 document.getElementById('contact').value = profile.contact || '';
+                document.getElementById('facultyId').value = profile.unique_faculty_id || '';
 
                 if (profile.profile_picture) {
                     profilePreview.src = profile.profile_picture;
@@ -123,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (croppedBlob) formData.append('profile_image', croppedBlob, 'profile.png');
 
         try {
-            const res = await fetch('/libsys/public/faculty/myprofile/update', { method: 'POST', body: formData });
+            const res = await fetch('myprofile/update', { method: 'POST', body: formData });
             const result = await res.json();
 
             if (result.success) {

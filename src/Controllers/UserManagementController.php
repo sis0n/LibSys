@@ -5,16 +5,24 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Repositories\StudentRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\UserPermissionModuleRepository;
+use App\Repositories\FacultyRepository;
+use App\Repositories\StaffRepository;
 
 class UserManagementController extends Controller
 {
   private UserRepository $userRepo;
   private StudentRepository $studentRepo;
+  private UserPermissionModuleRepository $userPermissionRepo;
+  private FacultyRepository $facultyRepo;
+  private StaffRepository $staffRepo;
 
   public function __construct()
   {
     $this->userRepo = new UserRepository();
     $this->studentRepo = new StudentRepository();
+    $this->userPermissionRepo = new UserPermissionModuleRepository();
+    $this->facultyRepo = new FacultyRepository();
   }
 
   public function index()
@@ -45,7 +53,12 @@ class UserManagementController extends Controller
       echo json_encode(['error' => 'User not found']);
       return;
     }
-    echo json_encode($user);
+
+    $modules = [];
+    if (in_array(strtolower($user['role']), ['admin', 'librarian'])) {
+      $modules = $this->userPermissionRepo->getModulesByUserId((int)$id);
+    }
+    echo json_encode(['user' => $user, 'modules' => $modules]);
   }
 
   public function search()
@@ -117,7 +130,7 @@ class UserManagementController extends Controller
 
       $userId = $this->userRepo->insertUser($userData);
 
-      // --- Insert to specific tables based on role ---
+      // roles based
       switch ($role) {
         case 'student':
           $this->studentRepo->insertStudent(
@@ -130,8 +143,7 @@ class UserManagementController extends Controller
           break;
 
         case 'faculty':
-          $facultyRepo = new \App\Repositories\FacultyRepository();
-          $facultyRepo->insertFaculty(
+          $facultyId = $this->facultyRepo->insertFaculty(
             $userId,
             $data['department'] ?? 'N/A',
             $data['contact'] ?? 'N/A',
@@ -145,9 +157,34 @@ class UserManagementController extends Controller
             $userId,
             $data['employee_id'] ?? 'N/A',
             $data['position'] ?? 'N/A',
-            $data['contact_number'] ?? 'N/A',
+            $data['contact'] ?? 'N/A',
             'active'
           );
+
+          break;
+        case 'admin':
+        case 'librarian':
+          if (empty($data['modules']) || !is_array($data['modules'])) {
+            echo json_encode([
+              'success' => false,
+              'message' => 'Please select at least one module for ' . ucfirst($role) . '.',
+            ]);
+            return;
+          }
+
+          $validModules = [
+            'book management',
+            'qr scanner',
+            'returning',
+            'borrowing form',
+            'attendance logs',
+            'reports',
+            'transaction history',
+            'restore books'
+          ];
+          $modules = array_filter($data['modules'], fn($m) => in_array($m, $validModules));
+
+          $this->userPermissionRepo->assignModules($userId, $modules);
           break;
 
         default:
@@ -158,7 +195,7 @@ class UserManagementController extends Controller
       echo json_encode([
         'success' => true,
         'message' => ucfirst($role) . ' user added successfully.',
-        'user_id' => $userId
+        'user_id' => $userId,
       ]);
     } catch (\Exception $e) {
       echo json_encode([
@@ -180,7 +217,15 @@ class UserManagementController extends Controller
         return;
       }
 
-      $deleted = $this->userRepo->deleteUserWithCascade((int)$id, $deletedBy, $this->studentRepo);
+      if ($this->userRepo->hasBorrowedItems((int)$id)) {
+        echo json_encode([
+          'success' => false,
+          'message' => 'Cannot delete user. The user still has borrowed books or equipment.'
+        ]);
+        return;
+      }
+
+      $deleted = $this->userRepo->deleteUserWithCascade((int)$id, $deletedBy);
 
       echo json_encode([
         'success' => $deleted,
@@ -243,6 +288,10 @@ class UserManagementController extends Controller
 
       $updated = $this->userRepo->updateUser((int)$id, $data);
 
+      if (in_array(strtolower($data['role'] ?? ''), ['admin', 'librarian']) && isset($data['modules'])) {
+        $this->userPermissionRepo->assignModules((int)$id, $data['modules']);
+      }
+
       if ($updated) {
         echo json_encode([
           'success' => true,
@@ -278,5 +327,92 @@ class UserManagementController extends Controller
     } catch (\Exception $e) {
       echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
+  }
+
+  public function bulkImport()
+  {
+    header('Content-Type: application/json');
+
+    $imported = 0;
+    $errors = [];
+
+    if (!isset($_FILES['csv_file'])) {
+      echo json_encode(['success' => false, 'message' => 'No file uploaded.']);
+      exit;
+    }
+
+    $file = $_FILES['csv_file']['tmp_name'];
+
+    if (!file_exists($file) || !is_readable($file)) {
+      echo json_encode(['success' => false, 'message' => 'Uploaded file not readable.']);
+      exit;
+    }
+
+    $userRepo = new \App\Repositories\UserRepository();
+
+    if (($handle = fopen($file, 'r')) !== false) {
+      $header = fgetcsv($handle);
+      $rowNumber = 2;
+
+      while (($row = fgetcsv($handle)) !== false) {
+        $firstName = trim($row[0] ?? '');
+        $middleName = trim($row[1] ?? '');
+        $lastName = trim($row[2] ?? '');
+        $username = trim($row[3] ?? '');
+        $role = trim($row[4] ?? '');
+
+        if (!$firstName || !$lastName || !$username || !$role) {
+          $errors[] = "Row $rowNumber missing required fields";
+          $rowNumber++;
+          continue;
+        }
+
+        $existingUser = $userRepo->findByIdentifier($username);
+        if ($existingUser) {
+          $errors[] = "Row $rowNumber: Username '$username' already exists";
+          $rowNumber++;
+          continue;
+        }
+
+        try {
+          if (strtolower($role) === 'student') {
+            $userRepo->insertStudent([
+              'first_name' => $firstName,
+              'middle_name' => $middleName ?: null,
+              'last_name' => $lastName,
+              'username' => $username,
+              'role' => 'student',
+              'password' => password_hash('defaultpassword', PASSWORD_DEFAULT),
+              'is_active' => 1
+            ]);
+          } else {
+            $userRepo->insertUser([
+              'first_name' => $firstName,
+              'middle_name' => $middleName ?: null,
+              'last_name' => $lastName,
+              'username' => $username,
+              'role' => $role,
+              'password' => password_hash('defaultpassword', PASSWORD_DEFAULT),
+              'is_active' => 1,
+              'created_at' => date('Y-m-d H:i:s')
+            ]);
+          }
+
+          $imported++;
+        } catch (\Exception $e) {
+          $errors[] = "Row $rowNumber: " . $e->getMessage();
+        }
+
+        $rowNumber++;
+      }
+
+      fclose($handle);
+    }
+
+    echo json_encode([
+      'success' => true,
+      'imported' => $imported,
+      'errors' => $errors
+    ]);
   }
 }

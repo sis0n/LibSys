@@ -74,11 +74,6 @@ class FacultyCartController extends Controller
     echo json_encode(['success' => $result]);
   }
 
-
-
-
-
-
   public function remove($cartId)
   {
     $userId = $this->ensureFaculty();

@@ -141,25 +141,119 @@ class BookManagementController extends Controller
 
     public function destroy($id)
     {
-        // $this->auth(['superadmin']);
+        $bookId = (int)$id;
         $deletedByUserId = $_SESSION['user_id'] ?? null;
+
         if ($deletedByUserId === null) {
             return $this->json(['success' => false, 'message' => 'Authentication required.'], 401);
         }
 
         try {
-            $success = $this->bookRepo->deleteBook($id, $deletedByUserId);
+            $result = $this->bookRepo->deleteBook($bookId, $deletedByUserId);
 
-            if ($success) {
-                $this->json(['success' => true, 'message' => 'Book deleted successfully!']);
-            } else {
-                $this->json(['success' => false, 'message' => 'Failed to delete book.'], 500);
-            }
-        } catch (\Exception $e) {
+            // Map message to proper HTTP status
+            $status = 200;
+            if ($result['message'] === 'Book not found.') $status = 404;
+            if ($result['message'] === 'Book already deleted.') $status = 409;
+            if (!$result['success'] && $status === 200) $status = 400;
+
+            return $this->json($result, $status);
+        } catch (\PDOException $e) {
+            // Foreign key constraint
             if (str_contains($e->getMessage(), 'foreign key constraint')) {
-                return $this->json(['success' => false, 'message' => 'Cannot delete book. It is linked to borrowing records.'], 409);
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Cannot delete book. It is linked to active borrowing records.'
+                ], 409);
             }
-            $this->json(['success' => false, 'message' => $e->getMessage()], 500);
+
+            return $this->json([
+                'success' => false,
+                'message' => 'Internal server error during database operation.'
+            ], 500);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
+    }
+
+    public function bulkImport()
+    {
+        header('Content-Type: application/json');
+
+        $imported = 0;
+        $errors = [];
+
+        if (!isset($_FILES['csv_file'])) {
+            echo json_encode(['success' => false, 'message' => 'No file uploaded.']);
+            exit;
+        }
+
+        $file = $_FILES['csv_file']['tmp_name'];
+
+        if (!file_exists($file) || !is_readable($file)) {
+            echo json_encode(['success' => false, 'message' => 'Uploaded file not readable.']);
+            exit;
+        }
+
+        $bookRepo = new \App\Repositories\BookManagementRepository();
+
+        if (($handle = fopen($file, 'r')) !== false) {
+            $header = fgetcsv($handle); // skip header
+            $rowNumber = 2; // header is row 1
+
+            while (($row = fgetcsv($handle)) !== false) {
+                $accessionNumber = trim($row[0] ?? '');
+                $callNumber      = trim($row[1] ?? '');
+                $title           = trim($row[2] ?? '');
+                $author          = trim($row[3] ?? '');
+                $bookPlace       = trim($row[4] ?? '');
+                $bookPublisher   = trim($row[5] ?? '');
+                $year            = trim($row[6] ?? '');
+                $bookEdition     = trim($row[7] ?? '');
+                $description     = trim($row[8] ?? '');
+                $bookISBN        = trim($row[9] ?? '');
+                $bookSupplementary = trim($row[10] ?? '');
+                $subject         = trim($row[11] ?? '');
+
+                if (!$accessionNumber) {
+                    $errors[] = "Row $rowNumber: Missing required field accession_number.";
+                    $rowNumber++;
+                    continue;
+                }
+
+                try {
+                    $bookRepo->createBook([
+                        'accession_number'   => $accessionNumber,
+                        'call_number'        => $callNumber ?: null,
+                        'title'              => $title ?: null,
+                        'author'             => $author ?: null,
+                        'book_place'         => $bookPlace ?: null,
+                        'book_publisher'     => $bookPublisher ?: null,
+                        'year'               => $year ?: null,
+                        'book_edition'       => $bookEdition ?: null,
+                        'description'        => $description ?: null,
+                        'book_isbn'          => $bookISBN ?: null,
+                        'book_supplementary' => $bookSupplementary ?: null,
+                        'subject'            => $subject ?: null,
+                        'availability'       => 'available', // default
+                    ]);
+                    $imported++;
+                } catch (\Exception $e) {
+                    $errors[] = "Row $rowNumber: " . $e->getMessage();
+                }
+
+                $rowNumber++;
+            }
+            fclose($handle);
+        }
+
+        echo json_encode([
+            'success'  => true,
+            'imported' => $imported,
+            'errors'   => $errors
+        ]);
     }
 }

@@ -15,9 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let topVisitorsChartInstance = null;
   let weeklyActivityChartInstance = null;
 
-  const BASE_URL = '/libsys/public';
-  const API_BASE_URL = `${BASE_URL}/superadmin/dashboard`; 
-
   async function fetchStatsData() {
     if (totalUsersEl) totalUsersEl.textContent = '...';
     if (totalUsersChangeEl) totalUsersChangeEl.textContent = '';
@@ -28,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (borrowedBooksPercentEl) borrowedBooksPercentEl.textContent = '';
 
     try {
-      const response = await fetch(`${API_BASE_URL}/stats`);
+      const response = await fetch(`dashboard/stats`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
 
@@ -87,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     topVisitorsErrorEl.classList.add('hidden');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/top-visitors`);
+      const response = await fetch(`dashboard/top-visitors`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const result = await response.json();
 
@@ -136,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     weeklyActivityErrorEl.classList.add('hidden');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/weekly-activity`);
+      const response = await fetch(`dashboard/weekly-activity`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const result = await response.json();
 

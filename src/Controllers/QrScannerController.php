@@ -87,7 +87,7 @@ class QRScannerController extends Controller
     } else {
       $userInfo['id'] = $transaction['st_id'];
       $userInfo['position'] = $transaction['position'];
-      $userInfo['contact'] = $transaction['contact_number'];
+      $userInfo['contact'] = $transaction['contact'];
     }
 
     $responseData = [

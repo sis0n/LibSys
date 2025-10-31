@@ -22,13 +22,15 @@
                 <p class="text-sm text-gray-600 mb-4">
                     Import multiple books from a CSV file or use sample data.
                 </p>
-                <label for="csvFile"
-                    class="block border-2 border-dashed border-[var(--color-border)] rounded-lg p-8 text-center cursor-pointer hover:border-[var(--color-ring)]/60 transition">
-                    <i class="ph ph-upload text-[var(--color-ring)] text-3xl mb-2 block"></i>
-                    <p class="font-medium text-[var(--color-ring)]">Drop CSV file here or click to browse</p>
-                    <p class="text-xs text-gray-500 mt-1">Expected format: accession_number,call_number,title</p>
-                    <input type="file" id="csvFile" accept=".csv" class="hidden" />
-                </label>
+                <form id="bulkImportForm" enctype="multipart/form-data">
+                    <label for="csvFile"
+                        class="block border-2 border-dashed border-[var(--color-border)] rounded-lg p-8 text-center cursor-pointer hover:border-[var(--color-ring)]/60 transition">
+                        <i class="ph ph-upload text-[var(--color-ring)] text-3xl mb-2 block"></i>
+                        <p class="font-medium text-[var(--color-ring)]">Drop CSV file here or click to browse</p>
+                        <p class="text-xs text-gray-500 mt-1">Expected format: accession_number,call_number,title</p>
+                        <input type="file" id="csvFile" accept=".csv" class="hidden" />
+                    </label>
+                </form>
                 <div class="text-center mt-4">
                     <button id="cancelImport"
                         class="mt-2 border border-[var(--color-border)] px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition">
@@ -430,6 +432,9 @@
 
         const paginationControls = document.getElementById("paginationControls");
         const paginationList = document.getElementById("paginationList");
+        const bulkImportForm = document.getElementById("bulkImportForm");
+        const fileInput = document.getElementById("csvFile");
+        const importMessage = document.getElementById("importMessage");
 
         if (!bookTableBody || !addBookModal || !editBookModal || !importModal || !searchInput || !paginationList || !resultsIndicator || !viewBookModal) {
             console.error("BookManagement Error: Core components missing.");
@@ -450,7 +455,52 @@
         const limit = 30;
         let currentPage = 1;
         let totalPages = 1;
-        let currentApiBaseUrl = ''; // Dito ilalagay ang /superadmin, /admin, etc.
+        let currentApiBaseUrl = '';
+
+
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files.length) {
+                bulkImportForm.requestSubmit();
+            }
+        });
+
+        bulkImportForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            console.log("Submit fired!");
+            console.log("Files:", fileInput.files);
+            if (!fileInput.files.length) return;
+
+            const formData = new FormData();
+            formData.append("csv_file", fileInput.files[0]);
+            console.log("Uploading file:", fileInput.files[0].name);
+
+            try {
+                const res = await fetch(`bookManagement/bulkImport`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    if (importMessage) {
+                        importMessage.textContent = `Imported: ${data.imported} rows successfully!`;
+                        importMessage.classList.remove("hidden");
+                        setTimeout(() => importMessage.classList.add("hidden"), 5000);
+                    }
+
+                    fileInput.value = "";
+                    closeModal(document.getElementById("importModal"));
+
+                    if (typeof loadUsers === "function") await loadUsers();
+                } else {
+                    alert("Error: " + (data.message || "Failed to import CSV."));
+                }
+            } catch (err) {
+                console.error("Error importing CSV:", err);
+                alert("Error importing CSV.");
+            }
+        });
 
         // --- Page Memory ---
         try {
@@ -468,23 +518,23 @@
         // ==========================
         // DYNAMIC URL HELPER
         // ==========================
-        function getApiBaseUrl() {
-            if (currentApiBaseUrl) return currentApiBaseUrl;
+        // function getApiBaseUrl() {
+        //     if (currentApiBaseUrl) return currentApiBaseUrl;
 
-            const path = window.location.pathname;
+        //     const path = window.location.pathname;
 
-            if (path.includes('/superadmin/')) {
-                currentApiBaseUrl = '/libsys/public/superadmin';
-            } else if (path.includes('/admin/')) {
-                currentApiBaseUrl = '/libsys/public/admin';
-            } else if (path.includes('/librarian/')) {
-                currentApiBaseUrl = '/libsys/public/librarian';
-            } else {
-                console.error("CRITICAL: Cannot determine user role from URL path.");
-                currentApiBaseUrl = '/libsys/public/superadmin'; // Fallback
-            }
-            return currentApiBaseUrl;
-        }
+        //     if (path.includes('/superadmin/')) {
+        //         currentApiBaseUrl = '/libsys/public/superadmin';
+        //     } else if (path.includes('/admin/')) {
+        //         currentApiBaseUrl = '/libsys/public/admin';
+        //     } else if (path.includes('/librarian/')) {
+        //         currentApiBaseUrl = '/libsys/public/librarian';
+        //     } else {
+        //         console.error("CRITICAL: Cannot determine user role from URL path.");
+        //         currentApiBaseUrl = '/libsys/public/superadmin';
+        //     }
+        //     return currentApiBaseUrl;
+        // }
 
         // ==========================
         // MODAL HELPERS & LISTENERS
@@ -652,7 +702,7 @@
             paginationControls.classList.add('hidden');
             resultsIndicator.textContent = 'Loading...';
             const offset = (page - 1) * limit;
-            const apiBaseUrl = getApiBaseUrl(); // Kunin ang tamang role prefix
+            // const apiBaseUrl = getApiBaseUrl();
 
             try {
                 const params = new URLSearchParams({
@@ -663,7 +713,7 @@
                     offset: offset
                 });
 
-                const res = await fetch(`${apiBaseUrl}/booksmanagement/fetch?${params.toString()}`);
+                const res = await fetch(`bookManagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
 
@@ -855,7 +905,7 @@
                 return;
             }
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/store`, {
+                const res = await fetch(`bookManagement/store`, {
                     method: "POST",
                     body: formData
                 });
@@ -879,7 +929,7 @@
         window.viewBook = async (bookId) => {
             if (!bookId) return;
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/get/${bookId}`);
+                const res = await fetch(`bookManagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
 
                 const data = await res.json();
@@ -921,7 +971,7 @@
             if (!bookId) return;
             currentEditingBookId = bookId;
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/get/${bookId}`);
+                const res = await fetch(`bookManagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
                 const data = await res.json();
                 if (data.success && data.book) {
@@ -967,7 +1017,7 @@
                 return;
             }
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/update/${currentEditingBookId}`, {
+                const res = await fetch(`bookManagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
@@ -998,7 +1048,7 @@
             });
             if (result.isConfirmed) {
                 try {
-                    const res = await fetch(`${getApiBaseUrl()}/booksmanagement/delete/${bookId}`, {
+                    const res = await fetch(`bookManagement/delete/${bookId}`, {
                         method: "POST"
                     });
                     const result = await res.json();

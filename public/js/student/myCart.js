@@ -99,6 +99,24 @@ async function checkoutCart() {
         return;
     }
 
+    // 🔵 Loading
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                <p class="text-gray-700 text-[14px]">Processing...<br><span class="text-sm text-gray-500">Do not close the page.</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] shadow-[0_0_8px_#3b82f670]",
+        },
+    });
+
+
+    // 🟢 Proceed with checkout logic
     try {
         const res = await fetch("api/student/cart/checkout", {
             method: "POST",
@@ -207,13 +225,85 @@ async function checkoutCart() {
 }
 
 
-
-
 async function clearCart() {
     try {
-        const res = await fetch("api/student/cart/clear", {
-            method: "POST"
+        // 🟠 SweetAlert Confirmation
+        const confirmation = await Swal.fire({
+            background: "transparent",
+            html: `
+                <div class="flex flex-col text-center">
+                    <div class="flex justify-center mb-3">
+                        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                            <i class="ph ph-trash text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-[17px] font-semibold text-orange-700">Clear Cart?</h3>
+                    <p class="text-[14px] text-gray-700 mt-1">
+                        Are you sure you want to remove all items from your cart?
+                    </p>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: "Yes, Clear!",
+            cancelButtonText: "Cancel",
+            customClass: {
+                popup:
+                    "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+                confirmButton:
+                    "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+                cancelButton:
+                    "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+            },
         });
+
+        if (!confirmation.isConfirmed) {
+            // ❌ Cancel toast
+            Swal.fire({
+                toast: true,
+                position: "bottom-end",
+                showConfirmButton: false,
+                timer: 2000,
+                width: "360px",
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col text-left">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                <i class="ph ph-x-circle text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-semibold text-red-600">Cancelled</h3>
+                                <p class="text-[13px] text-gray-700 mt-0.5">The cart was not cleared.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                customClass: {
+                    popup:
+                        "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                },
+            });
+            return;
+        }
+
+        // 🔵 Loading Animation
+        Swal.fire({
+            background: "transparent",
+            html: `
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                    <p class="text-gray-700 text-[14px]">Clearing cart...<br><span class="text-sm text-gray-500">Just a moment.</span></p>
+                </div>
+            `,
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            customClass: {
+                popup:
+                    "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+            },
+        });
+
+        const res = await fetch("api/student/cart/clear", { method: "POST" });
         if (!res.ok) throw new Error("Failed to clear cart");
         cart = [];
 
@@ -284,6 +374,77 @@ async function clearCart() {
 
 
 async function removeFromCart(cartId) {
+    // 🟠 SweetAlert Confirmation
+    const confirmation = await Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col text-center">
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                        <i class="ph ph-trash text-2xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-[17px] font-semibold text-orange-700">Remove Item?</h3>
+                <p class="text-[14px] text-gray-700 mt-1">
+                    Are you sure you want to remove this item from your cart?
+                </p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: "Yes, Remove!",
+        cancelButtonText: "Cancel",
+        customClass: {
+            popup: "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+            confirmButton: "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+            cancelButton: "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+        },
+    });
+
+    if (!confirmation.isConfirmed) {
+        // ❌ Cancel toast
+        Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 2000,
+            width: "360px",
+            background: "transparent",
+            html: `
+                <div class="flex flex-col text-left">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                            <i class="ph ph-x-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[15px] font-semibold text-red-600">Cancelled</h3>
+                            <p class="text-[13px] text-gray-700 mt-0.5">The item was not removed from the cart.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+            },
+        });
+        return;
+    }
+
+    // 🔵 Loading Animation
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                <p class="text-gray-700 text-[14px]">Removing item...<br><span class="text-sm text-gray-500">Just a moment.</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+        },
+    });
+
     try {
         const res = await fetch(`api/student/cart/remove/${cartId}`, {
             method: "POST"

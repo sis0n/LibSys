@@ -255,7 +255,7 @@
         isChecking = true;
 
         try {
-          const res = await fetch('<?= BASE_URL ?>/faculty/qrBorrowingTicket/checkStatus');
+          const res = await fetch('<?= BASE_URL ?>/api/faculty/qrBorrowingTicket/checkStatus');
           const data = await res.json();
 
           if (!data.success) {

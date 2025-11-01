@@ -55,6 +55,6 @@
 </div>
 
 <script>
-    const CURRENT_STUDENT_ID = <?= $_SESSION['user_data']['user_id'] ?? 0 ?>;
+    const CURRENT_STUDENT_ID = <?= $_SESSION['user_data']['student_id'] ?? 0 ?>;
 </script>
 <script src="<?= BASE_URL ?>/js/student/borrowingHistory.js" defer></script>

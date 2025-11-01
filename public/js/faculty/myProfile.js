@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const departments = [
+        "College of Business and Accountancy",
+        "College of Criminal Justice Education",
+        "College of Education",
+        "College of Engineering",
+        "College of Law",
+        "College of Liberal Arts and Sciences",
+        "Graduate School"
+    ];
+
     const uploadInput = document.getElementById('uploadProfile');
     const profilePreview = document.getElementById('profilePreview');
     const profileIcon = document.getElementById('profileIcon');
@@ -20,16 +30,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileFacultyId = document.getElementById('profileFacultyId');
     const uploadLabel = document.getElementById('uploadLabel');
 
-    const allInputs = profileForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"]');
+    const allInputs = profileForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select');
     const editableInputs = Array.from(allInputs).filter(input => input.id !== 'facultyId');
 
     const MAX_FILE_SIZE = 1 * 1024 * 1024;
     let originalProfileData = {};
 
+    function populateDepartments() {
+        const select = document.getElementById('department');
+        if (!select) return;
+        const currentValue = select.value;
+        select.innerHTML = '';
+        const defaultOption = new Option('Select a Department', '');
+        select.add(defaultOption);
+
+        departments.forEach(dept => {
+            const option = new Option(dept, dept);
+            select.add(option);
+        });
+        select.value = currentValue;
+    }
+
     // --- Load Faculty Profile ---
     async function loadProfile() {
         try {
-            const res = await fetch('myprofile/get');
+            const res = await fetch('api/faculty/myprofile/get');
             if (!res.ok) throw new Error(`Failed to fetch profile. Status: ${res.status}`);
             const data = await res.json();
 
@@ -116,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const email = formData.get('email');
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (!/^[^S@]+@[^S@]+\.[^S@]+$/.test(email)) {
             alert('Please enter a valid email address.');
             return;
         }
@@ -124,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (croppedBlob) formData.append('profile_image', croppedBlob, 'profile.png');
 
         try {
-            const res = await fetch('myprofile/update', { method: 'POST', body: formData });
+            const res = await fetch('api/faculty/myprofile/update', { method: 'POST', body: formData });
             const result = await res.json();
 
             if (result.success) {
@@ -189,5 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cropper.destroy();
     });
 
+    populateDepartments();
     loadProfile();
 });

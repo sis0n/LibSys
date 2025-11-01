@@ -191,7 +191,7 @@ function processTransaction(transactionCode, action) {
     confirmButtonText: `Yes, Process Borrow!`,
   }).then((result) => {
     if (result.isConfirmed) {
-      const url = `${BASE_AJAX_PATH}/borrowTransaction`;
+      const url = `api/superadmin/qrScanner/borrowTransaction`;
       const formData = `transaction_code=${encodeURIComponent(transactionCode)}`;
 
       fetch(url, {
@@ -220,7 +220,7 @@ function processTransaction(transactionCode, action) {
 
 
 function scanQRCode(transactionCode) {
-  fetch(`${BASE_AJAX_PATH}/scanTicket`, {
+  fetch(`api/superadmin/qrScanner/scanTicket`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: `transaction_code=${encodeURIComponent(transactionCode)}`

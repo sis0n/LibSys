@@ -107,10 +107,12 @@
             <input type="text" id="facultyId" name="faculty_id" class="font-medium text-gray-800 bg-gray-100 border-gray-300 border rounded-md px-2 py-1 w-full" disabled>
           </div>
         </div>
-        <div class="flex items-center gap-3">
-          <div>
+        <div class="flex items-center gap-3 sm:col-span-2">
+          <div class="w-full">
             <label class="text-sm text-gray-500" for="department">Department</label>
-            <input type="text" id="department" name="department" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+            <select id="department" name="department" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+                <option value="" disabled selected>Loading departments...</option>
+            </select>
           </div>
         </div>
         <div class="flex items-center gap-3">

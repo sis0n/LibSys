@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchTableData() {
         try {
-            const response = await fetch('admin/returning/getTableData');
+            const response = await fetch('api/admin/returning/getTableData');
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('accession_number', accessionNumber);
 
-            const response = await fetch('returning/checkBook', {
+            const response = await fetch('api/admin/returning/checkBook', {
                 method: 'POST',
                 body: formData
             });
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const formData = new FormData();
                 formData.append('borrowing_id', borrowingId);
 
-                const response = await fetch('returning/markReturned', {
+                const response = await fetch('api/admin/returning/markReturned', {
                     method: 'POST',
                     body: formData
                 });

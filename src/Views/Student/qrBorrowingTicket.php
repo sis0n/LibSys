@@ -302,7 +302,7 @@
             isChecking = true;
 
             try {
-                const res = await fetch('/libsys/public/student/qrBorrowingTicket/checkStatus');
+                const res = await fetch(`${BASE_URL_JS}/api/student/qrBorrowingTicket/checkStatus`);
                 const data = await res.json();
 
                 if (!data.success) {

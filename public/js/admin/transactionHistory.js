@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadTransactions() {
         try {
-            const response = await fetch('transactionHistory/json');
+            const response = await fetch('api/admin/transactionHistory/json');
             allTransactions = await response.json();
             currentFilteredTransactions = allTransactions;
             applyAndRenderFilters();

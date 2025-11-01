@@ -43,7 +43,8 @@ class StudentProfileController extends Controller
     $targetFile = $uploadDir . $fileName;
 
     if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-      return "/libsys/public/" . $targetFile;
+      return BASE_URL . $targetFile;
+      
     }
     return null;
   }

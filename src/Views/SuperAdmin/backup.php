@@ -136,7 +136,7 @@
     </div>
 </main>
 
-<script src="/libsys/public/js/superadmin/backup.js"></script>
+<script src="<?= BASE_URL ?>/js/superadmin/backup.js"></script>
 
 <template id="backup-file-row-template">
     <tr>

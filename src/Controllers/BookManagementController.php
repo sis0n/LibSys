@@ -35,7 +35,7 @@ class BookManagementController extends Controller
         $fileName = uniqid('book_', true) . '.' . $extension;
         $targetFile = $targetDir . $fileName;
         if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-            return "/libsys/public/" . $targetFile;
+            return BASE_URL . $targetFile;
         }
         return null;
     }

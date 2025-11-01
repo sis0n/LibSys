@@ -46,7 +46,7 @@ class TicketController extends Controller
       $result = $builder->build();
       $result->saveToFile($qrPath);
 
-      return "/libsys/public/qrcodes/{$transactionCode}.png";
+      return BASE_URL . "/qrcodes/{$transactionCode}.png";
     } catch (\Exception $e) {
       error_log("QR Code Generation Error for code '$transactionCode': " . $e->getMessage());
       return '';
@@ -183,14 +183,10 @@ class TicketController extends Controller
 
   public function show(string $transactionCode = null)
   {
-    if (session_status() === PHP_SESSION_NONE) {
-      session_start();
-    }
-
     $userId = $_SESSION['user_id'] ?? null;
     if (!$userId) {
       $_SESSION['error_message'] = "Please login to view your ticket.";
-      header("Location: /libsys/public/login");
+      header("Location: " . BASE_URL . "/login");
       exit;
     }
 

@@ -193,7 +193,7 @@ window.addEventListener("DOMContentLoaded", () => {
     formData.append("csv_file", fileInput.files[0]);
 
     try {
-      const res = await fetch("userManagement/bulkImport", {
+      const res = await fetch("api/superadmin/userManagement/bulkImport", {
         method: "POST",
         body: formData
       });
@@ -224,7 +224,7 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
     try {
-      const res = await fetch(`userManagement/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`api/superadmin/userManagement/search?q=${encodeURIComponent(query)}`);
       if (!res.ok) throw new Error(`Search request failed with status ${res.status}`);
       const data = await res.json();
 
@@ -385,7 +385,7 @@ window.addEventListener("DOMContentLoaded", () => {
   async function loadUsers() {
     if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading users...</td></tr>`;
     try {
-      const res = await fetch('userManagement/getAll');
+      const res = await fetch('api/superadmin/userManagement/getAll');
       const data = await res.json();
       if (!data.success) throw new Error(data.message || "Failed to fetch users");
 
@@ -485,7 +485,7 @@ window.addEventListener("DOMContentLoaded", () => {
         .map(cb => cb.value);
 
       try {
-        const res = await fetch("userManagement/add", {
+        const res = await fetch("api/superadmin/userManagement/add", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -567,7 +567,7 @@ window.addEventListener("DOMContentLoaded", () => {
       if (e.target.closest(".deleteUserBtn")) {
         if (!confirm(`Delete user "${user.name}" (${user.role})?`)) return;
         try {
-          const res = await fetch(`userManagement/delete/${user.user_id}`, {
+          const res = await fetch(`api/superadmin/userManagement/delete/${user.user_id}`, {
             method: "POST"
           });
           const data = await res.json();
@@ -589,7 +589,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const confirmMsg = user.status === 'Active' ? `Deactivate ${user.name}?` : `Activate ${user.name}?`;
         if (!confirm(confirmMsg)) return;
         try {
-          const res = await fetch(`userManagement/toggleStatus/${user.user_id}`, {
+          const res = await fetch(`api/superadmin/userManagement/toggleStatus/${user.user_id}`, {
             method: "POST"
           });
           const data = await res.json();
@@ -611,7 +611,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!confirm(`Allow "${user.name}" to edit their profile?`)) return;
 
         try {
-          const res = await fetch(`userManagement/allowEdit/${userId}`, {
+          const res = await fetch(`api/superadmin/userManagement/allowEdit/${userId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" }
           });
@@ -668,7 +668,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const res = await fetch(`userManagement/update/${currentEditingUserId}`, {
+        const res = await fetch(`api/superadmin/userManagement/update/${currentEditingUserId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)

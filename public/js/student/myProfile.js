@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadProfile() {
         try {
-            const res = await fetch('myprofile/get');
+            const res = await fetch('api/student/myprofile/get');
             if (!res.ok) {
                 const errData = await res.json().catch(() => null);
                 throw new Error(errData?.message || `Failed to fetch profile. Status: ${res.status}`);
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const res = await fetch('myprofile/update', {
+            const res = await fetch('api/student/myprofile/update', {
                 method: 'POST',
                 body: formData
             });

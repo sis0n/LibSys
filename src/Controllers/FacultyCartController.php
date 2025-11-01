@@ -141,7 +141,7 @@ class FacultyCartController extends Controller
     }
 
     if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'faculty') {
-      header('Location: /libsys/public/login');
+      header('Location: ' . BASE_URL . '/login');
       exit;
     }
 

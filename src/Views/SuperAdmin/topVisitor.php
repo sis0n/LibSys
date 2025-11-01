@@ -68,7 +68,7 @@
             <table class="w-full text-sm border-collapse">
                 <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
                     <tr>
-                        <th scope="col" class="px-4 py-3 text-center">Category</th>
+                        <th scope="col" class="px-4 py-3 text-left">Category</th>
                         <th scope="col" class="px-4 py-3 text-center">Today</th>
                         <th scope="col" class="px-4 py-3 text-center">Week</th>
                         <th scope="col" class="px-4 py-3 text-center">Month</th>
@@ -87,10 +87,10 @@
             <table class="w-full text-sm border-collapse">
                 <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
                     <tr>
-                        <th scope="col" class="px-4 py-3 text-center">Count</th>
-                        <th scope="col" class="px-4 py-3 text-center">Today</th>
+                        <th scope="col" class="px-4 py-3 text-left">Year</th>
                         <th scope="col" class="px-4 py-3 text-center">Month</th>
-                        <th scope="col" class="px-4 py-3 text-center">Year</th>
+                        <th scope="col" class="px-4 py-3 text-center">Today</th>
+                        <th scope="col" class="px-4 py-3 text-center">Count</th>
                     </tr>
                 </thead>
                 <tbody id="deleted-books-tbody"></tbody>

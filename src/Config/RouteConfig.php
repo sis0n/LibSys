@@ -137,6 +137,7 @@ class RouteConfig
         $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
         $router->get('api/superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);    
         $router->get('api/superadmin/reports/top-visitors', 'ReportController@getTopVisitors', ['superadmin']);
+        $router->get('api/superadmin/reports/deleted-books', 'ReportController@getDeletedBooks', ['superadmin']);
 
         // --- STUDENT (AJAX/Data Routes) ---
         $router->get('api/student/attendance/get', 'AttendanceController@getMyAttendance', ['student']);

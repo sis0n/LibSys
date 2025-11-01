@@ -22,4 +22,48 @@ class ReportController extends Controller
         header('Content-Type: application/json');
         echo json_encode(['success' => true, 'data' => $data]);
     }
+
+    public function getDeletedBooks()
+    {
+        $repository = new ReportRepository();
+        $dbData = $repository->getDeletedBooksReport();
+
+        $statsByYear = [];
+        foreach ($dbData as $row) {
+            $statsByYear[$row['year']] = [
+                'month' => (int)$row['month'],
+                'today' => (int)$row['today'],
+                'count' => (int)$row['count'
+            ]];
+        }
+
+        $years = [2025, 2026, 2027];
+        $reportData = [];
+        $totalCount = 0;
+        $totalMonth = 0;
+        $totalToday = 0;
+
+        foreach ($years as $year) {
+            $stats = $statsByYear[$year] ?? ['month' => 0, 'today' => 0, 'count' => 0];
+            $reportData[] = [
+                "year" => (string)$year,
+                "month" => $stats['month'],
+                "today" => $stats['today'],
+                "count" => $stats['count']
+            ];
+            $totalCount += $stats['count'];
+            $totalMonth += $stats['month'];
+            $totalToday += $stats['today'];
+        }
+
+        $reportData[] = [
+            "year" => "TOTAL",
+            "month" => $totalMonth,
+            "today" => $totalToday,
+            "count" => $totalCount
+        ];
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'data' => $reportData]);
+    }
 }

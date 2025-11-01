@@ -74,38 +74,45 @@ document.addEventListener('DOMContentLoaded', function () {
     
     
         // --- Deleted Books ---
-        const deletedBooksData = [
-            { count: '-', today: '-', month: '-', year: '-' },
-            { count: '-', today: '-', month: '-', year: '-' },
-            { count: '-', today: '-', month: '-', year: '-' }
-        ];
-    
-        function populateDeletedBooks() {
+        async function populateDeletedBooks() {
             const tbody = document.getElementById('deleted-books-tbody');
             if (!tbody) return;
-            tbody.innerHTML = ''; // Clear existing rows
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">Loading...</td></tr>';
     
-            deletedBooksData.forEach(data => {
-                const row = document.createElement('tr');
-                row.classList.add('border-b', 'border-orange-100');
-                row.innerHTML = `
-                    <td class="px-4 py-2 text-left font-medium text-gray-700">${data.count}</td>
-                    <td class="px-4 py-2 text-center">${data.today}</td>
-                    <td class="px-4 py-2 text-center">${data.month}</td>
-                    <td class="px-4 py-2 text-center">${data.year}</td>
-                `;
-                tbody.appendChild(row);
-            });
+            try {
+                const response = await fetch(`${BASE_URL}/api/superadmin/reports/deleted-books`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                tbody.innerHTML = ''; // Clear loading message
     
-            const totalRow = document.createElement('tr');
-            totalRow.classList.add('bg-orange-50', 'font-bold');
-            totalRow.innerHTML = `
-                <td class="px-4 py-2 text-left">TOTAL</td>
-                <td class="px-4 py-2 text-center">-</td>
-                <td class="px-4 py-2 text-center">-</td>
-                <td class="px-4 py-2 text-center">-</td>
-            `;
-            tbody.appendChild(totalRow);
+                if (result.success && result.data && result.data.length > 0) {
+                    result.data.forEach(row => {
+                        const isTotalRow = row.year === 'TOTAL';
+                        const tr = document.createElement('tr');
+    
+                        if (isTotalRow) {
+                            tr.classList.add('bg-orange-50', 'font-bold');
+                        } else {
+                            tr.classList.add('border-b', 'border-orange-100');
+                        }
+    
+                        tr.innerHTML = `
+                            <td class="px-4 py-2 text-left">${row.year}</td>
+                            <td class="px-4 py-2 text-center">${row.month}</td>
+                            <td class="px-4 py-2 text-center">${row.today}</td>
+                            <td class="px-4 py-2 text-center font-medium text-gray-700">${row.count}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">No data available.</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading deleted books report:', error);
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-red-500">Failed to load report.</td></tr>';
+            }
         }
     
         // --- Library Visit by Department ---

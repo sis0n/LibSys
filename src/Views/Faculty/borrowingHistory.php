@@ -53,6 +53,6 @@
 
 <script>
   const CURRENT_FACULTY_ID = <?= $_SESSION['user_data']['user_id'] ?? 0 ?>;
-  const BASE_URL = '/LibSys/public';
+  const BASE_URL = '<?= BASE_URL ?>';
 </script>
-<script src="/LibSys/public/js/faculty/borrowingHistory.js" defer></script>
+<script src="<?= BASE_URL ?>/js/faculty/borrowingHistory.js" defer></script>

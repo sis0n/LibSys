@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchBackupFiles = async () => {
         showLoadingState();
         try {
-            const res = await fetch('/libsys/public/superadmin/backup/logs');
+            const res = await fetch('api/superadmin/backup/logs');
             const data = await res.json();
 
             if (data.success && Array.isArray(data.logs)) {
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // *** AYOS DITO: Kunin ang pangalan mula sa response ***
                     createdByName: log.created_by_name, // Assume backend sends this
                     // createdBy: log.created_by, // Keep ID if needed elsewhere
-                    downloadLink: `/libsys/public/superadmin/backup/secure_download/${encodeURIComponent(log.file_name)}`
+                    downloadLink: `backup/secure_download/${encodeURIComponent(log.file_name)}`
                 }));
 
                 goToPage(1);
@@ -171,8 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('opacity-70');
 
             const exportUrl = type === 'full_sql'
-                ? '/libsys/public/superadmin/backup/database/full'
-                : `/libsys/public/superadmin/backup/export/zip/${type}`;
+                ? 'backup/database/full'
+                : `backup/export/zip/${type}`;
 
             try {
                 const exportRes = await fetch(exportUrl);
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exportData = await exportRes.json();
                 if (!exportData.success || !exportData.filename) throw new Error(exportData.message || 'Failed to create backup.');
 
-                const downloadUrl = `/libsys/public/superadmin/backup/secure_download/${encodeURIComponent(exportData.filename)}`;
+                const downloadUrl = `backup/secure_download/${encodeURIComponent(exportData.filename)}`;
                 await secureDownload(downloadUrl, exportData.filename);
 
 

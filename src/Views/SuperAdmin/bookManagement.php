@@ -492,7 +492,7 @@
 
 
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/bulkImport`, {
+                const res = await fetch(`api/superadmin/booksmanagement/bulkImport`, {
                     method: "POST",
                     body: formData
                 });
@@ -603,31 +603,7 @@
             console.error("SessionStorage Error:", e);
             currentPage = 1;
         }
-
-        // ==========================
-        // DYNAMIC URL HELPER
-        // ==========================
-        function getApiBaseUrl() {
-            if (currentApiBaseUrl) return currentApiBaseUrl;
-
-            const path = window.location.pathname;
-
-            if (path.includes('/superadmin/')) {
-                currentApiBaseUrl = '/libsys/public/superadmin';
-            } else if (path.includes('/admin/')) {
-                currentApiBaseUrl = '/libsys/public/admin';
-            } else if (path.includes('/librarian/')) {
-                currentApiBaseUrl = '/libsys/public/librarian';
-            } else {
-                console.error("CRITICAL: Cannot determine user role from URL path.");
-                currentApiBaseUrl = '/libsys/public/superadmin'; // Fallback
-            }
-            return currentApiBaseUrl;
-        }
-
-        // ==========================
-        // MODAL HELPERS & LISTENERS
-        // ==========================
+        
         function openModal(modal) {
             if (modal) {
                 modal.classList.remove("hidden");
@@ -839,7 +815,7 @@
             paginationControls.classList.add('hidden');
             resultsIndicator.textContent = 'Loading...';
             const offset = (page - 1) * limit;
-            const apiBaseUrl = getApiBaseUrl(); // Kunin ang tamang role prefix
+            // const apiBaseUrl = getApiBaseUrl();
 
             try {
                 const params = new URLSearchParams({
@@ -850,7 +826,7 @@
                     offset: offset
                 });
 
-                const res = await fetch(`${apiBaseUrl}/booksmanagement/fetch?${params.toString()}`);
+                const res = await fetch(`api/superadmin/booksmanagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
 
@@ -1084,7 +1060,7 @@
             });
 
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/store`, {
+                const res = await fetch(`api/superadmin/booksmanagement/store`, {
                     method: "POST",
                     body: formData
                 });
@@ -1186,7 +1162,7 @@
             if (!bookId) return;
             // No SweetAlert needed, since a custom modal is used for viewing.
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/get/${bookId}`);
+                const res = await fetch(`api/superadmin/booksmanagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
 
                 const data = await res.json();
@@ -1276,7 +1252,7 @@
             if (!bookId) return;
             currentEditingBookId = bookId;
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/get/${bookId}`);
+                const res = await fetch(`api/superadmin/booksmanagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
                 const data = await res.json();
                 if (data.success && data.book) {
@@ -1412,7 +1388,7 @@
             });
 
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/update/${currentEditingBookId}`, {
+                const res = await fetch(`api/superadmin/booksmanagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
@@ -1560,7 +1536,7 @@
                 });
 
                 try {
-                    const res = await fetch(`${getApiBaseUrl()}/booksmanagement/delete/${bookId}`, {
+                    const res = await fetch(`api/superadmin/booksmanagement/delete/${bookId}`, {
                         method: "POST"
                     });
                     

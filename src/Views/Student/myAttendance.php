@@ -93,6 +93,6 @@ $attendanceJSData = json_encode($allLogs, JSON_THROW_ON_ERROR | JSON_HEX_TAG | J
     const allAttendanceLogs = <?= $attendanceJSData ?>;
     </script>
 
-    <script src="/libsys/public/js/student/myAttendance.js" defer></script>
+    <script src="<?= BASE_URL ?>/js/student/myAttendance.js" defer></script>
 
 </div>

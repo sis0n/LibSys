@@ -108,17 +108,17 @@ window.addEventListener("DOMContentLoaded", () => {
         if (sortMenu && sortBtn && !sortBtn.contains(e.target) && !sortMenu.contains(e.target)) sortMenu.classList.add("hidden");
     });
 
-    async function loadCart() {
-        try {
-            const r = await fetch("/libsys/public/student/cart/json");
-            if (!r.ok) throw Error();
-            cart = await r.json();
-            updateCartBadge();
-        } catch (e) {
-            cart = [];
-            updateCartBadge();
-        }
+  async function loadCart() {
+    try {
+      const r = await fetch("api/student/cart/json");
+      if (!r.ok) throw Error();
+      cart = await r.json();
+      updateCartBadge();
+    } catch (e) {
+      cart = [];
+      updateCartBadge();
     }
+  }
 
     async function updateCartBadge() {
         if (!cartCount) return;
@@ -130,428 +130,158 @@ window.addEventListener("DOMContentLoaded", () => {
         cartCount.appendChild(document.createTextNode(`${c} item(s)`));
     }
 
-    async function addToCart(id) {
-        if (!id) return;
-        try {
-            const r = await fetch(`/libsys/public/student/cart/add/${id}`);
-            if (!r.ok) throw Error((await r.json()).message || `Err ${r.status}`);
-            const d = await r.json();
-
-            if (d.success) {
-                cart = d.cart || [];
-                updateCartBadge();
-            }
-
-            if (typeof Swal != "undefined") {
-                const isSuccess = d.success;
-                const mainTitle = isSuccess ? "Added to Cart" : "Already in Cart";
-                const bodyText = isSuccess
-                    ? "The book has been successfully added to your request cart."
-                    : "This book is already in your cart or not available for request.";
-                const icon = isSuccess ? "ph-check-circle" : "ph-warning";
-
-                const accentColor = isSuccess ? "text-green-600" : "text-orange-600";
-                const accentBg = isSuccess ? "bg-green-100" : "bg-orange-100";
-                
-                // --- CUSTOM BORDER/SHADOW LOGIC (SUCCESS vs WARNING) ---
-                const borderColor = isSuccess ? "!border-green-400" : "!border-orange-400";
-                const popupBgGradient = isSuccess ? "!to-[#f0fff5]" : "!to-[#fff6ef]";
-                const shadowColor = isSuccess ? "shadow-[0_0_8px_#22c55e70]" : "shadow-[0_0_8px_#ffb34770]";
-                // --------------------------------------------------------
-
-                const duration = 3000;
-
-                // 🟢/🟠 Custom Toast Alert 
-                Swal.fire({
-                    toast: true,
-                    position: "bottom-end",
-                    showConfirmButton: false,
-                    timer: duration,
-                    width: "360px", 
-                    background: "transparent",
-                    html: `
-                        <div class="flex flex-col text-left">
-                            <div class="flex items-center gap-3 mb-2">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full ${accentBg} ${accentColor}">
-                                    <i class="ph ${icon} text-lg"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-[15px] font-semibold ${accentColor}">${mainTitle}</h3>
-                                    <p class="text-[13px] text-gray-700 mt-0.5">${bodyText}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `,
-                    customClass: {
-                        // Apply all custom classes here
-                        popup: `!rounded-xl !shadow-md !border-2 ${borderColor} !p-4 !bg-gradient-to-b !from-[#fffdfb] ${popupBgGradient} backdrop-blur-sm ${shadowColor}`,
-                    },
-                });
-
-                if (typeof closeModal === "function") closeModal();
-
-            } else {
-                alert(d.message || (d.success ? "Added to Cart!" : "Already in Cart / Not Available"));
-                if (typeof closeModal === "function") closeModal(); 
-            }
-
-        } catch (e) {
-            console.error("Add cart err:", e);
-            if (typeof Swal != "undefined") {
-                // 🔴 Error Toast (Network or generic failure)
-                Swal.fire({
-                    toast: true,
-                    position: "bottom-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    background: "transparent",
-                    width: "360px", 
-                    html: `
-                        <div class="flex flex-col text-left">
-                            <div class="flex items-center gap-3 mb-2">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
-                                    <i class="ph ph-x-circle text-lg"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-[15px] font-semibold text-red-600">Failed to Add Book</h3>
-                                    <p class="text-[13px] text-gray-700 mt-0.5">Please try again later or check your connection.</p>
-                                </div>
-                            </div>
-                        </div>
-                    `,
-                    customClass: {
-                        // --- CUSTOM BORDER/SHADOW LOGIC (ERROR) ---
-                        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
-                        // ------------------------------------------
-                    },
-                });
-            }
-        }
+  async function addToCart(id) {
+    if (!id) return;
+    try {
+      const r = await fetch(`api/student/cart/add/${id}`);
+      if (!r.ok) throw Error((await r.json()).message || `Err ${r.status}`);
+      const d = await r.json();
+      if (d.success) {
+        cart = d.cart || [];
+        updateCartBadge();
+      }
+      if (typeof Swal != 'undefined') Swal.fire({
+        toast: !0,
+        position: "bottom-end",
+        icon: d.success ? "success" : "warning",
+        title: d.message || (d.success ? "Added" : "Already in Cart"),
+        showConfirmButton: !1,
+        timer: 2500,
+        timerProgressBar: !0
+      });
+      else alert(d.message || (d.success ? "Added" : "Already in Cart"));
+    } catch (e) {
+      console.error("Add cart err:", e);
     }
-
-
-    async function removeFromCart(id) {
-        if (!id) return;
-
-        // 🔵 Loading Animation
-        Swal.fire({
-            background: "transparent",
-            html: `
-                <div class="flex flex-col items-center justify-center gap-2">
-                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
-                    <p class="text-gray-700 text-[14px]">Removing item...<br><span class="text-sm text-gray-500">Just a moment.</span></p>
-                </div>
-            `,
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            customClass: {
-                popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
-            },
-        });
-
-        try {
-            const r = await fetch(`/libsys/public/student/cart/remove/${id}`, {
-                method: "POST"
-            });
-            if (!r.ok) throw Error("Failed to remove item");
-            cart = cart.filter(i => i.book_id != id);
-            updateCartBadge();
-
-            // Slight delay before closing for smooth transition
-            await new Promise((resolve) => setTimeout(resolve, 300));
-            Swal.close();
-
-            if (typeof Swal != 'undefined') {
-                // 🟢 Success Toast 
-                Swal.fire({
-                    toast: true,
-                    position: "bottom-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    width: "360px", 
-                    background: "transparent",
-                    html: `
-                        <div class="flex flex-col text-left">
-                            <div class="flex items-center gap-3 mb-2">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
-                                    <i class="ph ph-check-circle text-lg"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-[15px] font-semibold text-green-600">Removed!</h3>
-                                    <p class="text-[13px] text-gray-700 mt-0.5">Item removed from cart.</p>
-                                </div>
-                            </div>
-                        </div>
-                    `,
-                    customClass: {
-                        // --- CUSTOM BORDER/SHADOW LOGIC (SUCCESS) ---
-                        popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
-                        // ------------------------------------------
-                    },
-                });
-            } else alert("Removed.");
-        } catch (e) {
-            console.error("Remove cart err:", e);
-            Swal.close();
-            // 🔴 Error Toast 
-            Swal.fire({
-                toast: true,
-                position: "bottom-end",
-                showConfirmButton: false,
-                timer: 3000,
-                width: "360px", 
-                background: "transparent",
-                html: `
-                    <div class="flex flex-col text-left">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
-                                <i class="ph ph-x-circle text-lg"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-[15px] font-semibold text-red-600">Removal Failed</h3>
-                                <p class="text-[13px] text-gray-700 mt-0.5">An error occurred while removing the item.</p>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                customClass: {
-                    // --- CUSTOM BORDER/SHADOW LOGIC (ERROR) ---
-                    popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
-                    // ------------------------------------------
-                },
-            });
-        }
+  }
+  async function removeFromCart(id) {
+    if (!id) return;
+    try {
+      const r = await fetch(`api/student/cart/remove/${id}`, {
+        method: "POST"
+      });
+      if (!r.ok) throw Error(`Err ${r.status}`);
+      cart = cart.filter(i => i.cart_id != id);
+      updateCartBadge();
+      if (typeof Swal != 'undefined') Swal.fire({
+        toast: !0,
+        position: "bottom-end",
+        icon: "success",
+        title: "Removed",
+        showConfirmButton: !1,
+        timer: 2000,
+        timerProgressBar: !0
+      });
+      else alert("Removed.");
+    } catch (e) {
+      console.error("Remove cart err:", e);
     }
-
-    async function clearCart() {
-        if (typeof Swal != 'undefined') {
-            // 🟠 Confirmation Alert (Modal)
-            const confirmationResult = await Swal.fire({
-                background: "transparent",
-                html: `
-                    <div class="flex flex-col text-center">
-                        <div class="flex justify-center mb-3">
-                            <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
-                                <i class="ph ph-trash text-2xl"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-[17px] font-semibold text-orange-700">Clear Cart?</h3>
-                        <p class="text-[14px] text-gray-700 mt-1">
-                            Are you sure you want to remove all items from your cart?
-                        </p>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: "Yes, Clear!",
-                cancelButtonText: "Cancel",
-                customClass: {
-                    popup:
-                        "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
-                    confirmButton:
-                        "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
-                    cancelButton:
-                        "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
-                },
-            });
-
-            if (confirmationResult.isConfirmed) await performClearCart();
-            else {
-                // ❌ Cancel toast 
-                Swal.fire({
-                    toast: true,
-                    position: "bottom-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    width: "360px", 
-                    background: "transparent",
-                    html: `
-                        <div class="flex flex-col text-left">
-                            <div class="flex items-center gap-3 mb-2">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
-                                    <i class="ph ph-x-circle text-lg"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-[15px] font-semibold text-red-600">Cancelled</h3>
-                                    <p class="text-[13px] text-gray-700 mt-0.5">The cart was not cleared.</p>
-                                </div>
-                            </div>
-                        </div>
-                    `,
-                    customClass: {
-                        // --- CUSTOM BORDER/SHADOW LOGIC (CANCELLED) ---
-                        popup:
-                            "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
-                        // ----------------------------------------------
-                    },
-                });
-            }
-        }
-        else {
-            if (confirm("Clear cart?")) await performClearCart();
-        }
-    }
-
-    async function performClearCart() {
-        // 🔵 Loading Animation
-        Swal.fire({
-            background: "transparent",
-            html: `
-                <div class="flex flex-col items-center justify-center gap-2">
-                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
-                    <p class="text-gray-700 text-[14px]">Clearing cart...<br><span class="text-sm text-gray-500">Just a moment.</span></p>
-                </div>
-            `,
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            customClass: {
-                popup:
-                    "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
-            },
-        });
-
-        try {
-            const r = await fetch("/libsys/public/student/cart/clear", {
-                method: "POST"
-            });
-            if (!r.ok) throw Error("Failed to clear cart");
-
-            // Simulate delay
-            await new Promise((resolve) => setTimeout(resolve, 300));
-            Swal.close();
-
-            cart = [];
-            updateCartBadge();
-
-            if (typeof Swal != 'undefined') {
-                // 🟢 Success Toast 
-                Swal.fire({
-                    toast: true,
-                    position: "bottom-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    width: "360px", 
-                    background: "transparent",
-                    html: `
-                        <div class="flex flex-col text-left">
-                            <div class="flex items-center gap-3 mb-2">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
-                                    <i class="ph ph-check-circle text-lg"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-[15px] font-semibold text-green-600">Cart Cleared!</h3>
-                                    <p class="text-[13px] text-gray-700 mt-0.5">All items removed successfully.</p>
-                                </div>
-                            </div>
-                        </div>
-                    `,
-                    customClass: {
-                        // --- CUSTOM BORDER/SHADOW LOGIC (SUCCESS) ---
-                        popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
-                        // ------------------------------------------
-                    },
-                });
-            } else alert("Cleared!");
-        } catch (e) {
-            console.error("Clear cart err:", e);
-            Swal.close();
-            // 🔴 Error Toast 
-            Swal.fire({
-                toast: true,
-                position: "bottom-end",
-                showConfirmButton: false,
-                timer: 3000,
-                width: "360px", 
-                background: "transparent",
-                html: `
-                    <div class="flex flex-col text-left">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
-                                <i class="ph ph-x-circle text-lg"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-[15px] font-semibold text-red-600">Clear Failed</h3>
-                                <p class="text-[13px] text-gray-700 mt-0.5">There was an issue clearing the cart.</p>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                customClass: {
-                    // --- CUSTOM BORDER/SHADOW LOGIC (ERROR) ---
-                    popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
-                    // ------------------------------------------
-                },
-            });
-        }
-    }
-
-    if (addToCartBtn) addToCartBtn.addEventListener("click", () => {
-        const id = addToCartBtn.dataset.id;
-        if (id) addToCart(id);
+  }
+  async function clearCart() {
+    if (typeof Swal != 'undefined') Swal.fire({
+      title: 'Clear Cart?',
+      text: "Remove all?",
+      icon: 'warning',
+      showCancelButton: !0,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes'
+    }).then(async (r) => {
+      if (r.isConfirmed) await performClearCart();
     });
-
-    async function loadBooks(page = 1) {
-        if (isLoading || typeof page !== 'number' || page < 1) return;
-        isLoading = true;
-        currentPage = page;
-        grid.innerHTML = "";
-        noBooksFound.classList.add("hidden");
-        skeletons.style.display = "grid";
-        paginationControls.style.display = "none";
-        resultsIndicator.textContent = 'Loading...';
-        const start = Date.now();
-        const offset = (page - 1) * limit;
-        try {
-            const params = new URLSearchParams({
-                limit,
-                offset,
-                search: searchValue
-            });
-            if (statusValueFilter !== "All Status") params.set('status', statusValueFilter.toLowerCase());
-            if (sortValueFilter !== "default") params.set('sort', sortValueFilter); // Send sort
-            const res = await fetch(`/libsys/public/student/bookCatalog/fetch?${params.toString()}`);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            let books;
-            if (data?.books && Array.isArray(data.books) && typeof data.totalCount === 'number') {
-                books = data.books;
-                totalCount = data.totalCount;
-            } else {
-                console.error("Bad response:", data);
-                books = [];
-                totalCount = 0;
-                noBooksFound.textContent = "Invalid data.";
-                noBooksFound.classList.remove("hidden");
-            }
-            totalPages = Math.ceil(totalCount / limit) || 1;
-            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-            const elapsed = Date.now() - start;
-            if (elapsed < 300) await new Promise(r => setTimeout(r, 300 - elapsed));
-            skeletons.style.display = "none";
-            if (!books || books.length === 0) {
-                noBooksFound.classList.add("hidden");
-                updateResultsIndicator(0, totalCount);
-            } else {
-                noBooksFound.classList.add("hidden");
-                renderBooks(books);
-                updateResultsIndicator(books.length, totalCount);
-            }
-            renderPagination(totalPages, currentPage);
-            try {
-                sessionStorage.setItem('bookCatalogPage', currentPage);
-            } catch (e) { }
-        } catch (err) {
-            console.error("LoadBooks error:", err);
-            skeletons.style.display = "none";
-            noBooksFound.classList.remove("hidden");
-            noBooksFound.textContent = "Error loading.";
-            resultsIndicator.textContent = 'Error!';
-            try {
-                sessionStorage.removeItem('bookCatalogPage');
-            } catch (e) { }
-        } finally {
-            isLoading = false;
-        }
+    else {
+      if (confirm("Clear cart?")) await performClearCart();
     }
+  }
+  async function performClearCart() {
+    try {
+      const r = await fetch("api/student/cart/clear", {
+        method: "POST"
+      });
+      if (!r.ok) throw Error("Failed");
+      cart = [];
+      updateCartBadge();
+      if (typeof Swal != 'undefined') Swal.fire({
+        toast: !0,
+        position: 'bottom-end',
+        icon: 'success',
+        title: 'Cleared!',
+        showConfirmButton: !1,
+        timer: 2000
+      });
+      else alert("Cleared!");
+    } catch (e) {
+      console.error("Clear cart err:", e);
+    }
+  }
+  if (addToCartBtn) addToCartBtn.addEventListener("click", () => {
+    const id = addToCartBtn.dataset.id;
+    if (id) addToCart(id);
+  });
+
+  async function loadBooks(page = 1) {
+    if (isLoading || typeof page !== 'number' || page < 1) return;
+    isLoading = true;
+    currentPage = page;
+    grid.innerHTML = "";
+    noBooksFound.classList.add("hidden");
+    skeletons.style.display = "grid";
+    paginationControls.style.display = "none";
+    resultsIndicator.textContent = 'Loading...';
+    const start = Date.now();
+    const offset = (page - 1) * limit;
+    try {
+      const params = new URLSearchParams({
+        limit,
+        offset,
+        search: searchValue
+      });
+      if (statusValueFilter !== "All Status") params.set('status', statusValueFilter.toLowerCase());
+      if (sortValueFilter !== "default") params.set('sort', sortValueFilter); // Send sort
+      const res = await fetch(`api/student/bookCatalog/fetch?${params.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      let books;
+      if (data?.books && Array.isArray(data.books) && typeof data.totalCount === 'number') {
+        books = data.books;
+        totalCount = data.totalCount;
+      } else {
+        console.error("Bad response:", data);
+        books = [];
+        totalCount = 0;
+        noBooksFound.textContent = "Invalid data.";
+        noBooksFound.classList.remove("hidden");
+      }
+      totalPages = Math.ceil(totalCount / limit) || 1;
+      if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+      const elapsed = Date.now() - start;
+      if (elapsed < 300) await new Promise(r => setTimeout(r, 300 - elapsed));
+      skeletons.style.display = "none";
+      if (!books || books.length === 0) {
+        noBooksFound.classList.remove("hidden");
+        updateResultsIndicator(0, totalCount);
+      } else {
+        noBooksFound.classList.add("hidden");
+        renderBooks(books);
+        updateResultsIndicator(books.length, totalCount);
+      }
+      renderPagination(totalPages, currentPage);
+      try {
+        sessionStorage.setItem('bookCatalogPage', currentPage);
+      } catch (e) { }
+    } catch (err) {
+      console.error("LoadBooks error:", err);
+      skeletons.style.display = "none";
+      noBooksFound.classList.remove("hidden");
+      noBooksFound.textContent = "Error loading.";
+      resultsIndicator.textContent = 'Error!';
+      try {
+        sessionStorage.removeItem('bookCatalogPage');
+      } catch (e) { }
+    } finally {
+      isLoading = false;
+    }
+  }
 
     function updateResultsIndicator(booksLength, currentTotal) {
         if (typeof currentTotal !== 'number') currentTotal = 0;
@@ -641,25 +371,25 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    async function loadAvailableCount() {
-        try {
-            const r = await fetch("/libsys/public/student/bookCatalog/availableCount");
-            if (!r.ok) throw Error();
-            const d = await r.json();
-            const el = document.getElementById("availableCount");
-            if (el) {
-                while (el.firstChild) el.removeChild(el.firstChild);
-                const i = document.createElement('i');
-                i.className = 'ph ph-check-circle mr-1';
-                el.appendChild(i);
-                el.appendChild(document.createTextNode(` Available: ${d.available || 0}`));
-            }
-        } catch (e) {
-            console.error("Err count:", e);
-            const el = document.getElementById("availableCount");
-            if (el) el.textContent = 'Available: Error';
-        }
+  async function loadAvailableCount() {
+    try {
+      const r = await fetch("api/student/bookCatalog/availableCount");
+      if (!r.ok) throw Error();
+      const d = await r.json();
+      const el = document.getElementById("availableCount");
+      if (el) {
+        while (el.firstChild) el.removeChild(el.firstChild);
+        const i = document.createElement('i');
+        i.className = 'ph ph-check-circle mr-1';
+        el.appendChild(i);
+        el.appendChild(document.createTextNode(` Available: ${d.available || 0}`));
+      }
+    } catch (e) {
+      console.error("Err count:", e);
+      const el = document.getElementById("availableCount");
+      if (el) el.textContent = 'Available: Error';
     }
+  }
 
     function renderBooks(books) {
         grid.innerHTML = '';

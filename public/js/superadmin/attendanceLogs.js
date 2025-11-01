@@ -121,12 +121,18 @@ function initializeAttendanceLogs() {
       dateToFilter = null;
     }
 
-    const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
-    url.searchParams.append('period', periodToSend);
-    url.searchParams.append('search', currentSearch);
+    let url = `${BASE_URL_JS}/api/attendance/logs/ajax?`;
+    url += `period=${periodToSend}&search=${currentSearch}`;
+
     if (currentCourse !== "All Courses") {
-      url.searchParams.append('course', currentCourse);
+        url += `&course=${currentCourse}`;
     }
+    // const url = new URL('api/attendance/logs/ajax', BASE_URL_JS);
+    // url.searchParams.append('period', periodToSend);
+    // url.searchParams.append('search', currentSearch);
+    // if (currentCourse !== "All Courses") {
+    //   url.searchParams.append('course', currentCourse);
+    // }
 
     fetch(url)
       .then(res => {

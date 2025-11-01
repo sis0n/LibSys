@@ -129,11 +129,13 @@ document.addEventListener("DOMContentLoaded", () => {
     noRecordsRow.classList.remove('hidden');
     noRecordsRow.querySelector('td').innerHTML = `<i class="ph ph-spinner animate-spin text-2xl"></i> Loading...`;
 
-    const url = new URL('/libsys/public/attendance/logs/ajax', window.location.origin);
-    url.searchParams.append('period', periodToSend);
-    url.searchParams.append('search', currentSearch);
+    const endpoint = '/attendance/logs/ajax';
+
+    let url = `${BASE_URL_JS}/api/attendance/logs/ajax?`;
+    url += `period=${periodToSend}&search=${currentSearch}`;
+
     if (currentCourse !== "All Courses") {
-      url.searchParams.append('course', currentCourse);
+        url += `&course=${currentCourse}`;
     }
 
     fetch(url)

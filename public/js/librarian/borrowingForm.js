@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         try {
-            const res = await fetch(`/LibSys/public/librarian/borrowingForm/checkUser`, {
+            const res = await fetch(`api/librarian/borrowingForm/checkUser`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ input_user_id: userId })
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         try {
-            const res = await fetch(`/LibSys/public/librarian/borrowingForm/create`, {
+            const res = await fetch(`api/librarian/borrowingForm/create`, {
                 method: 'POST',
                 body: formData
             });

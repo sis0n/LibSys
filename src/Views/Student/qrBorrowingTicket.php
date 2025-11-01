@@ -243,12 +243,12 @@
             ticketMessageContainer.innerHTML = '';
 
             if (qrImage) {
-                qrImage.src = `/libsys/public/qrcodes/${ticket.transaction_code}.png?t=${Date.now()}`;
+                qrImage.src = `<?= BASE_URL ?>/qrcodes/${ticket.transaction_code}.png?t=${Date.now()}`;
                 qrImage.classList.remove('hidden');
             }
 
             if (downloadButton) {
-                downloadButton.href = `/libsys/public/qrcodes/${ticket.transaction_code}.png`;
+                downloadButton.href = `<?= BASE_URL ?>/qrcodes/${ticket.transaction_code}.png`;
                 downloadButton.download = `${ticket.transaction_code}.png`;
                 downloadButton.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed',
                     'pointer-events-none');
@@ -302,7 +302,7 @@
             isChecking = true;
 
             try {
-                const res = await fetch('/libsys/public/student/qrBorrowingTicket/checkStatus');
+                const res = await fetch(`${BASE_URL_JS}/api/student/qrBorrowingTicket/checkStatus`);
                 const data = await res.json();
 
                 if (!data.success) {

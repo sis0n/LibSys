@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchTableData() {
         try {
-            const response = await fetch('/libsys/public/librarian/returning/getTableData');
+            const response = await fetch('api/librarian/returning/getTableData');
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('accession_number', accessionNumber);
 
-            const response = await fetch('/libsys/public/librarian/returning/checkBook', {
+            const response = await fetch('api/librarian/returning/checkBook', {
                 method: 'POST',
                 body: formData
             });
@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const formData = new FormData();
                 formData.append('borrowing_id', borrowingId);
 
-                const response = await fetch('/libsys/public/librarian/returning/markReturned', {
+                const response = await fetch('api/librarian/returning/markReturned', {
                     method: 'POST',
                     body: formData
                 });

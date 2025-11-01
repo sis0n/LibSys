@@ -44,7 +44,7 @@ class StaffProfileController extends Controller
     $targetFile = $uploadDir . $fileName;
 
     if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-      return '/libsys/public/uploads/profile_images/' . $fileName;
+      return BASE_URL . '/uploads/profile_images/' . $fileName;
     }
 
     return null;

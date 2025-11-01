@@ -114,7 +114,7 @@ foreach ($allLogs as $log) {
             <p class="text-sm text-gray-600 mb-4">Common tasks</p>
 
             <div class="space-y-3">
-                <a href="/libsys/public/faculty/bookCatalog"
+                <a href="<?= BASE_URL ?>/faculty/bookCatalog"
                     class="flex items-start gap-3 bg-[var(--color-orange-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-orange-100)] transition">
                     <i class="ph ph-magnifying-glass text-lg mt-0.5"></i>
                     <span>
@@ -123,7 +123,7 @@ foreach ($allLogs as $log) {
                     </span>
                 </a>
 
-                <a href="/libsys/public/faculty/qrBorrowingTicket"
+                <a href="<?= BASE_URL ?>/faculty/qrBorrowingTicket"
                     class="flex items-start gap-3 bg-[var(--color-green-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-green-100)] transition">
                     <i class="ph ph-qr-code text-lg mt-0.5"></i>
                     <span>
@@ -132,7 +132,7 @@ foreach ($allLogs as $log) {
                     </span>
                 </a>
 
-                <a href="/libsys/public/faculty/borrowingHistory"
+                <a href="<?= BASE_URL ?>/faculty/borrowingHistory"
                     class="flex items-start gap-3 bg-[var(--color-amber-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-amber-100)] transition">
                     <i class="ph ph-clock-counter-clockwise text-lg mt-0.5"></i>
                     <span>
@@ -141,7 +141,7 @@ foreach ($allLogs as $log) {
                     </span>
                 </a>
 
-                <a href="/libsys/public/faculty/myAttendance"
+                <a href="<?= BASE_URL ?>/faculty/myAttendance"
                     class="flex items-start gap-3 bg-[var(--color-green-100)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-green-200)] transition">
                     <i class="ph ph-user-check text-lg mt-0.5"></i>
                     <span>

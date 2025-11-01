@@ -251,4 +251,4 @@
 </div>
 
 
-<script src="/libsys/public/js/admin/transactionHistory.js"></script>
+<script src="<?= BASE_URL ?>/js/admin/transactionHistory.js"></script>

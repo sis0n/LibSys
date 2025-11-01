@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!userId) return alert('Please enter a User ID');
 
         try {
-            const res = await fetch(`/LibSys/public/admin/borrowingForm/checkUser`, {
+            const res = await fetch(`api/admin/borrowingForm/checkUser`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ input_user_id: userId })
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!formData.get('equipment_type')) formData.set('equipment_type', formData.get('item_type'));
 
         try {
-            const res = await fetch(`/LibSys/public/admin/borrowingForm/create`, {
+            const res = await fetch(`api/admin/borrowingForm/create`, {
                 method: 'POST',
                 body: formData
             });

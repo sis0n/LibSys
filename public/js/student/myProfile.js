@@ -1,4 +1,46 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const courses = {
+        "BSA": "Bachelor of Science in Accountancy",
+        "BSAIS": "Bachelor of Science in Accounting Information Systems",
+        "BSBA FMGT": "BSBA Major in Financial Management",
+        "BSBA HRM": "BSBA Major in Human Resource Management",
+        "BSBA MKTG": "BSBA Major in Marketing Management",
+        "BS ENTREP": "Bachelor of Science in Entrepreneurship",
+        "BS CRIM": "Bachelor of Science in Criminology",
+        "BSISM": "Bachelor of Science in Industrial Security Management",
+        "BECED": "Bachelor of Early Childhood Education",
+        "BSE ENG": "Bachelor of Secondary Education Major in English",
+        "BSE ENG-CHI": "Bachelor of Secondary Education Major in English with Additional Chinese Language and Pedagogy Courses",
+        "BSE SCI": "Bachelor of Secondary Education Major in Science",
+        "BTLED HE": "Bachelor of Technology and Livelihood Education Major in Home Economics",
+        "CPE": "Certificate in Professional Education",
+        "BS CPE": "Bachelor of Science in Computer Engineering",
+        "BS ECE": "Bachelor of Science in Electronics Engineering",
+        "BS EE": "Bachelor of Science in Electrical Engineering",
+        "BS IE": "Bachelor of Science in Industrial Engineering",
+        "ABBS": "Bachelor of Arts in Behavioral Sciences",
+        "BA COMM": "Bachelor of Arts in Communication",
+        "BA POS": "Bachelor of Arts in Political Science",
+        "BS MATH": "Bachelor of Science in Mathematics",
+        "BS PSY": "Bachelor of Science in Psychology",
+        "BSIS": "Bachelor of Science in Information Systems",
+        "BSIT": "Bachelor of Science in Information Technology",
+        "BSCS": "Bachelor of Science in Computer Science",
+        "BSEMC": "Bachelor of Science in Entertainment and Multimedia Computing",
+        "BSOAD": "Bachelor of Science in Office Administration",
+        "BSSW": "Bachelor of Science in Social Work",
+        "BSTM": "Bachelor of Science in Tourism Management",
+        "BSHM": "Bachelor of Science in Hospitality Management",
+        "DPA": "Doctor in Public Administration",
+        "BPA": "Bachelor of Public Administration",
+        "BPA ECGE": "Bachelor of Public Administration – Evening Class for Govt. Employees",
+        "MAED": "Master of Arts in Education Major in Educational Management",
+        "MAT-EG": "Master of Arts in Teaching in the Early Grades",
+        "MATS": "Master of Arts in Teaching Science",
+        "MBA": "Master in Business Administration",
+        "LAW": "Bachelor of Laws / Juris Doctor"
+    };
+
     const uploadInput = document.getElementById('uploadProfile');
     const profilePreview = document.getElementById('profilePreview');
     const profileIcon = document.getElementById('profileIcon');
@@ -25,36 +67,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadLabel = document.getElementById('uploadLabel');
     const profileLockedInfo = document.getElementById('profileLockedInfo');
 
-    const allInputs = profileForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"]');
+    const allInputs = profileForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select');
     const editableInputs = Array.from(allInputs).filter(input => input.id !== 'studentNumber');
 
     const MAX_FILE_SIZE = 1 * 1024 * 1024;
     let originalProfileData = {};
 
-    // 🔸 Common SweetAlert Style
-    function showAlert({ icon = 'info', title = '', text = '', html = '', confirmText = 'OK' }) {
-        Swal.fire({
-            background: "transparent",
-            html: html || `
-                <div class="flex flex-col items-center text-center">
-                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600 mb-3">
-                        <i class="ph ${icon === 'error' ? 'ph-warning' : icon === 'success' ? 'ph-check-circle' : icon === 'warning' ? 'ph-warning' : 'ph-info'} text-3xl"></i>
-                    </div>
-                    <h2 class="text-lg font-semibold text-gray-800">${title}</h2>
-                    <p class="text-sm text-gray-600 mt-1">${text}</p>
-                </div>
-            `,
-            confirmButtonText: confirmText,
-            customClass: {
-                popup: "!rounded-xl !shadow-lg !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
-                confirmButton: "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
-            },
-        });
+    function populateCourses() {
+        const select = document.getElementById('course');
+        if (!select) return;
+        const currentValue = select.value;
+        select.innerHTML = '';
+        const defaultOption = new Option('Select a Course', '');
+        select.add(defaultOption);
+
+        for (const [abbr, name] of Object.entries(courses)) {
+            const option = new Option(`${abbr} - ${name}`, abbr);
+            select.add(option);
+        }
+        select.value = currentValue;
     }
 
     async function loadProfile() {
         try {
-            const res = await fetch('/libsys/public/student/myprofile/get');
+            const res = await fetch('api/student/myprofile/get');
             if (!res.ok) {
                 const errData = await res.json().catch(() => null);
                 throw new Error(errData?.message || `Failed to fetch profile. Status: ${res.status}`);
@@ -194,8 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const email = formData.get('email');
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            showAlert({ icon: 'warning', title: 'Invalid Email', text: 'Please enter a valid email address.' });
+        if (!/^[^ -- -퟿豈-﷏ﷰ-￯]+@[^ -- -퟿豈-﷏ﷰ-￯]+\.[^ -- -퟿豈-﷏ﷰ-￯]+$/.test(email)) {
+            Swal.fire('Invalid Email', 'Please enter a valid email address.', 'warning');
             return;
         }
 
@@ -248,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const res = await fetch('/libsys/public/student/myprofile/update', {
+            const res = await fetch('api/student/myprofile/update', {
                 method: 'POST',
                 body: formData
             });
@@ -391,5 +427,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(modal) { if (modal) { modal.classList.remove("hidden"); document.body.classList.add("overflow-hidden"); } }
     function closeModal(modal) { if (modal) { modal.classList.add("hidden"); document.body.classList.remove("overflow-hidden"); } }
 
+    populateCourses();
     loadProfile();
 });

@@ -492,7 +492,7 @@
 
 
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/bulkImport`, {
+                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/bulkImport`, {
                     method: "POST",
                     body: formData
                 });
@@ -850,7 +850,7 @@
                     offset: offset
                 });
 
-                const res = await fetch(`${apiBaseUrl}/booksmanagement/fetch?${params.toString()}`);
+                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
 
@@ -1084,7 +1084,7 @@
             });
 
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/store`, {
+                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/store`, {
                     method: "POST",
                     body: formData
                 });
@@ -1185,7 +1185,7 @@
         window.viewBook = async (bookId) => {
             if (!bookId) return;
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/get/${bookId}`);
+                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
 
                 const data = await res.json();
@@ -1275,7 +1275,7 @@
             if (!bookId) return;
             currentEditingBookId = bookId;
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/get/${bookId}`);
+                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
                 const data = await res.json();
                 if (data.success && data.book) {
@@ -1411,7 +1411,7 @@
             });
 
             try {
-                const res = await fetch(`${getApiBaseUrl()}/booksmanagement/update/${currentEditingBookId}`, {
+                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
@@ -1559,7 +1559,7 @@
                 });
 
                 try {
-                    const res = await fetch(`${getApiBaseUrl()}/booksmanagement/delete/${bookId}`, {
+                    const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/delete/${bookId}`, {
                         method: "POST"
                     });
                     

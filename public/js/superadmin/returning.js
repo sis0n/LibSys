@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchTableData() {
         try {
-            const response = await fetch('/libsys/public/superadmin/returning/getTableData');
+            const response = await fetch('api/superadmin/returning/getTableData');
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('accession_number', accessionNumber);
 
-            const response = await fetch('/libsys/public/superadmin/returning/checkBook', {
+            const response = await fetch('api/superadmin/returning/checkBook', {
                 method: 'POST',
                 body: formData
             });
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const formData = new FormData();
                 formData.append('borrowing_id', borrowingId);
 
-                const response = await fetch('/libsys/public/superadmin/returning/markReturned', {
+                const response = await fetch('api/superadmin/returning/markReturned', {
                     method: 'POST',
                     body: formData
                 });

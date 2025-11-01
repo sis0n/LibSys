@@ -178,80 +178,21 @@ function renderTransactionHistory(transactions) {
     transactionHistoryTableBody.innerHTML = tableRowsHtml;
 }
 
-// ---------------- Process Transaction ----------------
-async function processTransaction(transactionCode, action) {
-    const actionText = 'finalize this borrowing transaction';
+function processTransaction(transactionCode, action) {
+  const actionText = 'finalize this borrowing transaction';
 
-    const confirmationResult = await Swal.fire({
-        background: "transparent",
-        html: `
-            <div class="flex flex-col text-center">
-                <div class="flex justify-center mb-3">
-                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
-                        <i class="ph ph-question text-2xl"></i>
-                    </div>
-                </div>
-                <h3 class="text-[17px] font-semibold text-orange-700">Confirm Borrow?</h3>
-                <p class="text-[14px] text-gray-700 mt-1">
-                    Are you sure you want to ${actionText} for ticket <span class="font-semibold">${transactionCode}</span>?
-                </p>
-            </div>
-        `,
-        showCancelButton: true,
-        confirmButtonText: "Yes, Process Borrow!",
-        cancelButtonText: "Cancel",
-        customClass: {
-            popup: "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff] !border-2 !border-orange-400",
-            confirmButton: "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
-            cancelButton: "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
-        },
-    });
-
-    if (!confirmationResult.isConfirmed) {
-        Swal.fire({
-            toast: true,
-            position: "bottom-end",
-            showConfirmButton: false,
-            timer: 2000,
-            width: "360px",
-            background: "transparent",
-            html: `
-                <div class="flex flex-col text-left">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
-                            <i class="ph ph-x-circle text-lg"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-[15px] font-semibold text-red-600">Cancelled</h3>
-                            <p class="text-[13px] text-gray-700 mt-0.5">Transaction was cancelled.</p>
-                        </div>
-                    </div>
-                </div>
-            `,
-            customClass: {
-                popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef]",
-            },
-        });
-        return;
-    }
-
-    Swal.fire({
-        background: "transparent",
-        html: `
-            <div class="flex flex-col items-center justify-center gap-2">
-                <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
-                <p class="text-gray-700 text-[14px]">Processing borrow...<br><span class="text-sm text-gray-500">Do not close the page.</span></p>
-            </div>
-        `,
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        customClass: {
-            popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff]",
-        },
-    });
-
-    const url = `${BASE_AJAX_PATH}/borrowTransaction`;
-    const formData = `transaction_code=${encodeURIComponent(transactionCode)}`;
+  Swal.fire({
+    title: `Borrow Transaction?`,
+    text: `Are you sure you want to ${actionText} for ticket ${transactionCode}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#f97316',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: `Yes, Process Borrow!`,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const url = `api/superadmin/qrScanner/borrowTransaction`;
+      const formData = `transaction_code=${encodeURIComponent(transactionCode)}`;
 
     try {
         const res = await fetch(url, {
@@ -290,120 +231,32 @@ async function processTransaction(transactionCode, action) {
             });
             renderScanResult(null);
             document.getElementById('scannerInput').focus();
-        } else {
-            Swal.fire({
-                toast: true,
-                position: "bottom-end",
-                showConfirmButton: false,
-                timer: 3000,
-                width: "360px",
-                background: "transparent",
-                html: `
-                    <div class="flex flex-col text-left">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
-                                <i class="ph ph-x-circle text-lg"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-[15px] font-semibold text-red-600">Transaction Failed</h3>
-                                <p class="text-[13px] text-gray-700 mt-0.5">${result.message}</p>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                customClass: {
-                    popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef]",
-                },
-            });
-        }
-    } catch (error) {
-        Swal.close();
-        Swal.fire({
-            toast: true,
-            position: "bottom-end",
-            showConfirmButton: false,
-            timer: 3000,
-            width: "360px",
-            background: "transparent",
-            html: `
-                <div class="flex flex-col text-left">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
-                            <i class="ph ph-x-circle text-lg"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-[15px] font-semibold text-red-600">Network Error</h3>
-                            <p class="text-[13px] text-gray-700 mt-0.5">Could not connect to the server.</p>
-                        </div>
-                    </div>
-                </div>
-            `,
-            customClass: {
-                popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef]",
-            },
+          } else {
+            Swal.fire({ icon: 'error', title: 'Transaction Failed', text: res.message });
+          }
+        })
+        .catch(() => {
+          Swal.fire({ icon: 'error', title: 'Network Error', text: 'Could not connect to the server.' });
         });
     }
+  });
 }
 
-// ---------------- Scan QR Code ----------------
-async function scanQRCode(transactionCode) {
-    Swal.fire({
-        background: "transparent",
-        html: `
-            <div class="flex flex-col items-center justify-center gap-2">
-                <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
-                <p class="text-gray-700 text-[14px]">Scanning ticket...<br><span class="text-sm text-gray-500">Just a moment.</span></p>
-            </div>
-        `,
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        customClass: {
-            popup: "!rounded-xl !shadow-md !border-2 !border-blue-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#eef6ff]",
-        },
-    });
 
-    try {
-        const res = await fetch(`${BASE_AJAX_PATH}/scanTicket`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `transaction_code=${encodeURIComponent(transactionCode)}`
-        });
 
-        const resData = await res.json();
-        Swal.close();
-
-        if (resData.success) {
-            renderScanResult({ isValid: true, ...resData.data });
-            document.getElementById('manualTicketInput').value = '';
-        } else {
-            renderScanResult({ isValid: false, message: resData.message });
-            Swal.fire({
-                toast: true,
-                position: "bottom-end",
-                showConfirmButton: false,
-                timer: 3000,
-                width: "360px",
-                background: "transparent",
-                html: `
-                    <div class="flex flex-col text-left">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
-                                <i class="ph ph-x-circle text-lg"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-[15px] font-semibold text-red-600">Invalid Ticket</h3>
-                                <p class="text-[13px] text-gray-700 mt-0.5">${resData.message}</p>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                customClass: {
-                    popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef]",
-                },
-            });
-        }
-    } catch (error) {
-        Swal.close();
+function scanQRCode(transactionCode) {
+  fetch(`api/superadmin/qrScanner/scanTicket`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `transaction_code=${encodeURIComponent(transactionCode)}`
+  })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        renderScanResult({ isValid: true, ...res.data });
+        document.getElementById('manualTicketInput').value = '';
+      } else {
+        renderScanResult({ isValid: false, message: res.message });
         Swal.fire({
             toast: true,
             position: "bottom-end",

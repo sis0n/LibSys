@@ -101,10 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const profile = data.profile;
                 originalProfileData = profile;
 
-                console.log("profile_updated:", profile.profile_updated);
-                console.log("allow_edit:", profile.allow_edit);
-                console.log("Edit button element:", editProfileBtn);
-
                 const fullName = profile.full_name ||
                     [profile.first_name, profile.middle_name, profile.last_name, profile.suffix]
                         .filter(Boolean).join(' ') || 'Student Name';
@@ -140,10 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (profile.profile_updated == 0 || profile.can_edit_profile == 1) {
-                    editProfileBtn.classList.remove('hidden');  
+                    editProfileBtn.classList.remove('hidden');
                     profileLockedInfo.classList.add('hidden');
                 } else {
-                    editProfileBtn.classList.add('hidden');      
+                    editProfileBtn.classList.add('hidden');
                     profileLockedInfo.classList.remove('hidden');
                 }
 
@@ -152,8 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             console.error("Load profile error:", err);
-            if (typeof Swal !== 'undefined') Swal.fire('Error', 'Could not load your profile. ' + err.message, 'error');
-            else alert('Could not load your profile. ' + err.message);
+            showAlert({
+                icon: 'error',
+                title: 'Error Loading Profile',
+                text: `Could not load your profile.<br>${err.message}`
+            });
         }
     }
 
@@ -206,9 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         const formData = new FormData(profileForm);
-
         const requiredFields = ['first_name', 'last_name', 'course', 'year_level', 'section', 'email', 'contact'];
         let missingFields = [];
+
         for (const field of requiredFields) {
             if (!formData.get(field) || formData.get(field).trim() === '') {
                 missingFields.push(field);
@@ -216,13 +215,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (missingFields.length > 0) {
-            Swal.fire('Missing Info', `Please fill in all required fields. Middle Name and Suffix are optional. (Missing: ${missingFields.join(', ')})`, 'warning');
+            showAlert({
+                icon: 'warning',
+                title: 'Missing Info',
+                text: `Please fill in all required fields. Missing: ${missingFields.join(', ')}`
+            });
             return;
         }
 
         const contact = formData.get('contact');
         if (!/^\d{11}$/.test(contact)) {
-            Swal.fire('Invalid Contact', 'Contact number must be numeric and 11 digits.', 'warning');
+            showAlert({ icon: 'warning', title: 'Invalid Contact', text: 'Contact number must be numeric and 11 digits.' });
             return;
         }
 
@@ -235,27 +238,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const profileImage = formData.get('profile_image');
         const hasProfilePic = profilePreview.src && !profilePreview.classList.contains('hidden');
         if (!hasProfilePic && (!profileImage || profileImage.size === 0)) {
-            Swal.fire('Missing Profile Picture', 'Profile picture is required.', 'warning');
+            showAlert({ icon: 'warning', title: 'Missing Profile Picture', text: 'Profile picture is required.' });
             return;
         }
 
         const regForm = formData.get('reg_form');
         const hasRegForm = viewRegForm.href && !viewRegForm.classList.contains('hidden');
         if (!hasRegForm && (!regForm || regForm.size === 0)) {
-            Swal.fire('Missing Registration Form', 'Registration form is required.', 'warning');
+            showAlert({ icon: 'warning', title: 'Missing Registration Form', text: 'Registration form is required.' });
             return;
         }
 
-        const confirm = await Swal.fire({
-            title: 'Confirm Changes',
-            text: "Are you sure? You can only do this once.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, save it!'
-        });
-
+      const confirm = await Swal.fire({
+  background: "transparent",
+  html: `
+    <div class="flex flex-col text-center">
+      <div class="flex justify-center mb-3">
+        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+          <i class="ph ph-warning text-2xl"></i>
+        </div>
+      </div>
+      <h3 class="text-[17px] font-semibold text-orange-700">Confirm Changes</h3>
+      <p class="text-[14px] text-gray-700 mt-1">
+        Are you sure you want to save these changes?<br>
+        You can only do this once.
+      </p>
+    </div>
+  `,
+  showCancelButton: true,
+  confirmButtonText: "Yes, save it!",
+  cancelButtonText: "Cancel",
+  customClass: {
+    popup:
+      "!rounded-xl !shadow-md !p-6 !w-[21rem] !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+    confirmButton:
+      "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+    cancelButton:
+      "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+  },
+});
         if (!confirm.isConfirmed) return;
 
         if (croppedBlob) {
@@ -270,7 +291,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await res.json();
 
             if (result.success) {
-                await Swal.fire('Saved!', 'Your profile has been updated.', 'success');
+                await Swal.fire({
+  background: "transparent",
+  html: `
+    <div class="flex flex-col text-center">
+      <div class="flex justify-center mb-3">
+        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+          <i class="ph ph-check-circle text-2xl"></i>
+        </div>
+      </div>
+      <h3 class="text-[17px] font-semibold text-orange-700">Saved!</h3>
+      <p class="text-[14px] text-gray-700 mt-1">
+        Your profile has been updated.
+      </p>
+    </div>
+  `,
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+  customClass: {
+    popup:
+      "!rounded-xl !shadow-md !p-6 !w-[20rem] !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+    timerProgressBar: "!bg-gradient-to-r !from-orange-400 !to-orange-500",
+  },
+  didOpen: () => {
+    const progressBar = Swal.getTimerProgressBar();
+    if (progressBar) {
+      progressBar.style.height = "5px";
+      progressBar.style.borderRadius = "0 0 12px 12px";
+      progressBar.style.background = "linear-gradient(to right, #ff9f43, #ff6b00)";
+      progressBar.style.boxShadow = "0 0 4px #ffb347aa";
+    }
+  }
+});
                 originalProfileData.profile_updated = 1;
 
                 const headerFullname = document.getElementById('headerFullname');
@@ -302,15 +355,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             console.error("Save profile error:", err);
-            Swal.fire('Error', 'Could not save profile. ' + err.message, 'error');
+            showAlert({ icon: 'error', title: 'Error', text: 'Could not save profile.<br>' + err.message });
         }
     });
 
     uploadInput?.addEventListener('change', (e) => {
         const file = e.target.files[0]; if (!file) return;
         if (file.size > MAX_FILE_SIZE) {
-            alert("Image size must be less than 1MB. Please choose a smaller file.");
-            uploadInput.value = ""; return;
+            showAlert({ icon: 'warning', title: 'File Too Large', text: 'Image size must be less than 1MB.' });
+            uploadInput.value = "";
+            return;
         }
         const reader = new FileReader();
         reader.onload = () => {
@@ -360,8 +414,9 @@ document.addEventListener('DOMContentLoaded', () => {
     regFormUpload?.addEventListener('change', (e) => {
         const file = e.target.files[0]; if (!file) return;
         if (file.type !== 'application/pdf') {
-            alert('Please upload a valid PDF file.');
-            regFormUpload.value = ''; return;
+            showAlert({ icon: 'warning', title: 'Invalid File', text: 'Please upload a valid PDF file.' });
+            regFormUpload.value = '';
+            return;
         }
         const fileURL = URL.createObjectURL(file);
         viewRegForm.href = fileURL;
@@ -374,5 +429,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     populateCourses();
     loadProfile();
-
 });

@@ -14,4 +14,12 @@ class ReportController extends Controller
         header('Content-Type: application/json');
         echo json_encode(['data' => $data]);
     }
+
+    public function getTopVisitors()
+    {
+        $repository = new ReportRepository();
+        $data = $repository->getTopVisitorsByYear();
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'data' => $data]);
+    }
 }

@@ -63,4 +63,29 @@ class ReportRepository
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getTopVisitorsByYear()
+    {
+        $sql = "
+            SELECT 
+                MAX(full_name) as full_name, 
+                MAX(student_number) as student_number, 
+                MAX(course) as course, 
+                COUNT(user_id) AS visits
+            FROM 
+                attendance_logs
+            WHERE 
+                YEAR(timestamp) = YEAR(CURDATE())
+                AND user_id IS NOT NULL
+            GROUP BY 
+                user_id
+            ORDER BY 
+                visits DESC
+            LIMIT 10;
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

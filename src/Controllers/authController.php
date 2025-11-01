@@ -27,15 +27,10 @@ class AuthController extends Controller
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
 
-        // === [BINAGO DITO] ===
-        // Imbes na mag-check ng roles, i-redirect na lang lahat sa generic dashboard.
-        // Ang ViewController@handleDashboard na ang bahala mag-sort kung saan sila dapat mapunta.
         if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
-            header("Location: " . BASE_URL . "/dashboard"); // Palaging generic dashboard
+            header("Location: " . BASE_URL . "/dashboard"); 
             exit;
         }
-        // === [WAKAS NG PAGBABAGO] ===
-
 
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

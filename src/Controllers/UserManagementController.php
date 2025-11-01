@@ -89,6 +89,7 @@ class UserManagementController extends Controller
     $last_name = trim($data['last_name'] ?? '');
     $username = trim($data['username'] ?? '');
     $role = strtolower(trim($data['role'] ?? ''));
+    $contact = $data['contact'] ?? 'N/A';
 
     if (!$first_name || !$last_name || !$username || !$role) {
       echo json_encode([
@@ -101,15 +102,9 @@ class UserManagementController extends Controller
     try {
       if ($role === 'student') {
         $studentNumber = $username;
-
-        if (!$studentNumber) {
-          echo json_encode(['success' => false, 'message' => 'Student Number (Username) is required for students.']);
-          return;
-        }
-
         if ($this->studentRepo->studentNumberExists($studentNumber)) {
           echo json_encode(['success' => false, 'message' => 'Student Number already exists.']);
-          return;
+          exit;
         }
       }
 
@@ -133,19 +128,32 @@ class UserManagementController extends Controller
       // roles based
       switch ($role) {
         case 'student':
+          $studentNumber = $username;
+          $courseId = filter_var($data['course_id'] ?? null, FILTER_VALIDATE_INT);
+          if (!$courseId) {
+            echo json_encode(['success' => false, 'message' => 'Course/Program selection is required']);
+            return;
+          }
           $this->studentRepo->insertStudent(
             $userId,
             $username,
-            $data['course'] ?? 'N/A',
+            $courseId,
             $data['year_level'] ?? 1,
             'enrolled'
           );
           break;
 
         case 'faculty':
-          $facultyId = $this->facultyRepo->insertFaculty(
+          $collegeId = filter_var($data['college_id'] ?? null, FILTER_VALIDATE_INT);
+
+          if (!$collegeId) {
+            echo json_encode(['success' => false, 'message' => 'Department is required!']);
+            return;
+          }
+          $this->facultyRepo->insertFaculty(
             $userId,
-            $data['department'] ?? 'N/A',
+            $collegeId,
+            $contact,
             $data['contact'] ?? 'N/A',
             'active'
           );
@@ -157,7 +165,7 @@ class UserManagementController extends Controller
             $userId,
             $data['employee_id'] ?? 'N/A',
             $data['position'] ?? 'N/A',
-            $data['contact'] ?? 'N/A',
+            $contact,
             'active'
           );
 

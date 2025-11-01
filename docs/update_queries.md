@@ -423,3 +423,5 @@ is_archived TINYINT(1) DEFAULT 0
 );
 
 
+ALTER TABLE faculty
+CHANGE COLUMN department college_id INT(11) NULL;

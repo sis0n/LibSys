@@ -154,7 +154,6 @@ foreach ($logs as $log) {
             </div>
         </div>
     </div>
-    <script>const BASE_URL_JS = '<?= BASE_URL ?>';</script>
 
     <script src="<?= BASE_URL ?>/js/superadmin/attendanceLogs.js" defer></script>
 

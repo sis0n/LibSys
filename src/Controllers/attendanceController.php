@@ -78,6 +78,14 @@ class AttendanceController extends Controller
         }
 
         $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search);
+    //     header('Content-Type: text/plain'); // Palitan ang JSON ng Plain Text
+    // echo "DEBUG INFO:\n";
+    // echo "search Term: {$search}\n";
+    // echo "start Date: {$start}\n";
+    // echo "end Date: {$end}\n";
+    // echo "total Logs Found (db): " . count($logs) . "\n\n";
+    // print_r($logs);
+    // exit;
         // var_dump($logs);
         // exit;
 

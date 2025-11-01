@@ -1,6 +1,6 @@
 <?php
 // dashboard.php
-$adminName = $_SESSION['admin_name'] ?? 'Admin';
+$fullName = $_SESSION['user_data']['fullname'] ?? $_SESSION['role'] ?? 'Admin';
 ?>
 
 <main class="min-h-min px-4 sm:px-6 md:px-10 flex flex-col gap-8">
@@ -8,7 +8,7 @@ $adminName = $_SESSION['admin_name'] ?? 'Admin';
   <!-- Welcome Section -->
   <section class="py-0">
     <h2 class="text-2xl font-bold text-gray-900">
-      Welcome back, <span id="adminName"><?= htmlspecialchars($adminName) ?></span>!
+      Welcome back, <span id="adminName"><?= htmlspecialchars($fullName) ?></span>!
     </h2>
     <p class="text-gray-600 mt-1 text-sm md:text-base">Here's your library system overview.</p>
   </section>

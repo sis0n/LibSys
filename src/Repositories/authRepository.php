@@ -32,12 +32,13 @@ class AuthRepository
       $lastName = $user['last_name'] ?? '';
       $suffix = $user['suffix'] ?? '';
       $fullName = implode(' ', array_filter([$firstName, $middleName, $lastName, $suffix]));
-      
+
       $modules = [];
 
       $role = strtolower(trim($user['role'] ?? 'guest'));
 
-      if(in_array($role, ['admin', 'librarian'])){
+      if (in_array($role, ['admin', 'librarian', 'superadmin'])) {
+        // Superadmin added to fetch all modules for full access on top of standard
         $modules = $this->userModuleRepo->getModulesByUserId($user['user_id']);
       }
 

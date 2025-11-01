@@ -30,40 +30,46 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- Circulated Books ---
-    const circulatedBooksData = [
-        { category: 'Student', today: '-', week: '-', month: '-', year: '-' },
-        { category: 'Faculty', today: '-', week: '-', month: '-', year: '-' },
-        { category: 'Staff', today: '-', week: '-', month: '-', year: '-' }
-    ];
-
-    function populateCirculatedBooks() {
+    async function populateCirculatedBooks() {
         const tbody = document.getElementById('circulated-books-tbody');
         if (!tbody) return;
-        tbody.innerHTML = ''; // Clear existing rows
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Loading...</td></tr>';
 
-        circulatedBooksData.forEach(data => {
-            const row = document.createElement('tr');
-            row.classList.add('border-b', 'border-orange-100');
-            row.innerHTML = `
-                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.category}</td>
-                <td class="px-4 py-2 text-center">${data.today}</td>
-                <td class="px-4 py-2 text-center">${data.week}</td>
-                <td class="px-4 py-2 text-center">${data.month}</td>
-                <td class="px-4 py-2 text-center">${data.year}</td>
-            `;
-            tbody.appendChild(row);
-        });
+        try {
+            const response = await fetch('/LibSys/public/report/circulated-books-report');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            tbody.innerHTML = ''; // Clear loading message
 
-        const totalRow = document.createElement('tr');
-        totalRow.classList.add('bg-orange-50', 'font-bold');
-        totalRow.innerHTML = `
-            <td class="px-4 py-2 text-left">TOTAL</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-        `;
-        tbody.appendChild(totalRow);
+            if (result.data && result.data.length > 0) {
+                result.data.forEach(row => {
+                    const isTotalRow = row.category === 'TOTAL';
+                    const tr = document.createElement('tr');
+                    
+                    if (isTotalRow) {
+                        tr.classList.add('bg-orange-50', 'font-bold');
+                    } else {
+                        tr.classList.add('border-b', 'border-orange-100');
+                    }
+
+                    tr.innerHTML = `
+                        <td class="px-4 py-2 text-left ${isTotalRow ? 'font-bold' : 'font-medium text-gray-700'}">${row.category}</td>
+                        <td class="px-4 py-2 text-center">${row.today || 0}</td>
+                        <td class="px-4 py-2 text-center">${row.week || 0}</td>
+                        <td class="px-4 py-2 text-center">${row.month || 0}</td>
+                        <td class="px-4 py-2 text-center">${row.year || 0}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">No data available.</td></tr>';
+            }
+        } catch (error) {
+            console.error('Error loading circulated books report:', error);
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-red-500">Failed to load report. Check console for details.</td></tr>';
+        }
     }
 
 

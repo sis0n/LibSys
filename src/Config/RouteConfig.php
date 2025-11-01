@@ -94,48 +94,77 @@ class RouteConfig
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
 
-        // --- SUPERADMIN (AJAX/Data Routes) ---
-        $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
-        $router->get('api/superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
-        $router->get('api/superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
-        $router->post('api/superadmin/userManagement/add', 'UserManagementController@addUser', ['superadmin']);
-        $router->post('api/superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
-        $router->post('api/superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
-        $router->post('api/superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
-        $router->post('api/superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
-        $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
-        $router->get('api/superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
-        $router->get('api/superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
-        $router->post('api/superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
-        $router->post('api/superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
-        $router->post('api/superadmin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
-        $router->post('api/superadmin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['superadmin']);
-        $router->post('api/superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
-        $router->post('api/superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']);
-        $router->get('api/superadmin/qrScanner/transactionHistory', 'QRScannerController@history', ['superadmin']);
-        $router->get('api/superadmin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['superadmin']);
-        $router->post('api/superadmin/returning/checkBook', 'ReturningController@checkBookStatus', ['superadmin']);
-        $router->post('api/superadmin/returning/markReturned', 'ReturningController@returnBook', ['superadmin']);
-        $router->post('api/superadmin/returning/extend', 'ReturningController@extendDueDate', ['superadmin']);
-        $router->get('api/superadmin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['superadmin']);
-        $router->post('api/superadmin/restoreUser/restore', 'RestoreUserController@restore', ['superadmin']);
-        $router->post('api/superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']);
-        $router->get('api/superadmin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['superadmin']);
-        $router->post('api/superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);
-        $router->post('api/superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['superadmin']);
-        $router->get('api/superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats', ['superadmin']);
-        $router->get('api/superadmin/backup/database/full', 'BackupController@initiateBackup', ['superadmin']);
-        $router->get('api/superadmin/backup/secure_download/{filename}', 'BackupController@downloadBackup', ['superadmin']);
-        $router->get('api/superadmin/backup/logs', 'BackupController@listBackupLogs', ['superadmin']);
-        $router->get('api/superadmin/dashboard/stats', 'App\Controllers\DashboardController@getStats', ['superadmin']);
-        $router->get('api/superadmin/dashboard/top-visitors', 'App\Controllers\DashboardController@getTopVisitors', ['superadmin']);
-        $router->get('api/superadmin/dashboard/weekly-activity', 'App\Controllers\DashboardController@getWeeklyActivity', ['superadmin']);
-        $router->get('api/superadmin/dashboard/getData', 'DashboardController@getData', ['superadmin']);
-        $router->post('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['superadmin']);
-        $router->get('api/superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
-        $router->get('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
-        $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
-        $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
+        $router->get('admin/attendanceLogs', 'SidebarController@adminAttendanceLogs', ['attendance logs']);
+        $router->get('admin/topVisitor', 'SidebarController@adminTopVisitor', ['reports']);
+        $router->get('admin/transactionHistory', 'SidebarController@adminBorrowingHistory', ['transaction history']);
+        $router->get('admin/globalLogs', 'SidebarController@adminGlobalLogs', ['global logs']);
+        $router->get('admin/restoreBooks', 'SidebarController@AdminRestoreBooks', ['restore books']);
+        $router->get('admin/borrowingForm', 'SidebarController@borrowingForm', ['borrowing form']);
+
+        
+
+
+
+        // --- SUPERADMIN ROUTES ---
+        $router->get('superadmin/dashboard', 'SidebarController@superAdminDashboard', ['superadmin']);
+        $router->get('superadmin/userManagement', 'SidebarController@userManagement', ['superadmin']);
+        $router->get('superadmin/bookManagement', 'SidebarController@bookManagement', ['superadmin']);
+        $router->get('superadmin/equipmentManagement', 'SidebarController@equipmentManagement', ['superadmin']);
+        $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
+        $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
+        $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
+        $router->get('report/circulated-books-report', 'ReportController@getCirculatedBooksReport', ['superadmin']);
+        $router->get('superadmin/transactionHistory', 'SidebarController@borrowingHistory', ['superadmin']);
+        $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
+        $router->get('superadmin/borrowingForm', 'SidebarController@borrowingForm', ['superadmin']);
+        $router->get('superadmin/changePassword', 'SidebarController@changePassword', ['superadmin']);
+        $router->get('superadmin/myProfile', 'SidebarController@superadminMyProfile', ['superadmin']);
+        $router->get('superadmin/backup', 'SidebarController@backup', ['superadmin']);
+        $router->get('superadmin/restoreBooks', 'SidebarController@restoreBooks', ['superadmin']);
+        $router->get('superadmin/restoreUser', 'SidebarController@restoreUser', ['superadmin']);
+        $router->get('superadmin/restoreEquipment', 'SidebarController@restoreEquipment', ['superadmin']);
+
+        $router->get('superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
+        $router->get('superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
+        $router->get('superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
+        $router->post('superadmin/userManagement/add', 'UserManagementController@addUser', ['superadmin']);
+        $router->post('superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
+        $router->post('superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
+        $router->post('superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
+        $router->post('superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
+        $router->post('superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
+        $router->get('superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
+        $router->get('superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
+        $router->post('superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
+        $router->post('superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
+        $router->post('superadmin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
+        $router->post('superadmin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['superadmin']);
+        $router->post('superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
+        $router->post('superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']);
+        $router->get('superadmin/qrScanner/transactionHistory', 'QRScannerController@history', ['superadmin']);
+        $router->get('superadmin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['superadmin']);
+        $router->post('superadmin/returning/checkBook', 'ReturningController@checkBookStatus', ['superadmin']);
+        $router->post('superadmin/returning/markReturned', 'ReturningController@returnBook', ['superadmin']);
+        $router->post('superadmin/returning/extend', 'ReturningConadmin/backuptroller@extendDueDate', ['superadmin']);
+        $router->get('superadmin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['superadmin']);
+        $router->post('superadmin/restoreUser/restore', 'RestoreUserController@restore', ['superadmin']);
+        $router->post('superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']);
+        $router->get('superadmin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['superadmin']);
+        $router->post('superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);
+        $router->post('superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['superadmin']);
+        $router->get('superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats', ['superadmin']);
+        $router->get('superadmin/backup/database/full', 'BackupController@initiateBackup', ['superadmin']);
+        $router->get('superadmin/backup/secure_download/{filename}', 'BackupController@downloadBackup', ['superadmin']);
+        $router->get('superadmin/backup/logs', 'BackupController@listBackupLogs', ['superadmin']);
+        $router->get('superadmin/dashboard/stats', 'App\Controllers\DashboardController@getStats', ['superadmin']);
+        $router->get('superadmin/dashboard/top-visitors', 'App\Controllers\DashboardController@getTopVisitors', ['superadmin']);
+        $router->get('superadmin/dashboard/weekly-activity', 'App\Controllers\DashboardController@getWeeklyActivity', ['superadmin']);
+        $router->get('superadmin/dashboard/getData', 'DashboardController@getData', ['superadmin']);
+        $router->post('superadmin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['superadmin']);
+        $router->get('superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
+        $router->get('superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
+        $router->post('superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
+        $router->post('superadmin/borrowingForm/create', 'ManualBorrowingController@create');
 
         // --- STUDENT (AJAX/Data Routes) ---
         $router->get('api/student/attendance/get', 'AttendanceController@getMyAttendance', ['student']);

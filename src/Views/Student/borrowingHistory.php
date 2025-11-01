@@ -56,6 +56,5 @@
 
 <script>
     const CURRENT_STUDENT_ID = <?= $_SESSION['user_data']['user_id'] ?? 0 ?>;
-    const BASE_URL = '/LibSys/public';
 </script>
 <script src="<?= BASE_URL ?>/js/student/borrowingHistory.js" defer></script>

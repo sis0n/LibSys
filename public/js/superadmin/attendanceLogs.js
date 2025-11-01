@@ -121,7 +121,7 @@ function initializeAttendanceLogs() {
       dateToFilter = null;
     }
 
-    const url = new URL('api/superadmin/attendance/logs/ajax', window.location.origin);
+    const url = new URL('api/attendance/logs/ajax', BASE_URL_JS);
     url.searchParams.append('period', periodToSend);
     url.searchParams.append('search', currentSearch);
     if (currentCourse !== "All Courses") {

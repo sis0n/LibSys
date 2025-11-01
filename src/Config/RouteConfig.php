@@ -86,7 +86,6 @@ class RouteConfig
         $router->post('api/admin/bookManagement/update/{id}', 'BookManagementController@update', ['book management']);
         $router->post('api/admin/bookManagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
         $router->post('api/admin/bookManagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
-        $router->post('api/admin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
         $router->post('api/admin/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
         $router->get('api/admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);

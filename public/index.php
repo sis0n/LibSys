@@ -39,3 +39,5 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 // resolve
 $router->resolve($uri, $method);
+
+

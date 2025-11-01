@@ -90,13 +90,21 @@ class AuthController extends Controller
         }
 
         if ($user) {
-            // === [BINAGO DITO] ===
-            // Imbes na mag-switch case o tumawag ng getFirstAccessibleModuleUrl,
-            // ang redirect ay palaging sa generic dashboard.
-
+            $redirect = '';
+            $userRole = strtolower($user['role'] ?? '');
             $redirect = BASE_URL . '/dashboard';
 
-            // === [WAKAS NG PAGBABAGO] ===
+            if (User::isAdmin($user) || User::isLibrarian($user)) {
+                $permissions = $_SESSION['user_permissions'] ?? [];
+                $redirect = User::getFirstAccessibleModuleUrl($userRole, $permissions);
+            } elseif (User::isSuperadmin($user) || User::isStudent($user) || User::isFaculty($user) || User::isStaff($user) || User::isScanner($user)) {
+                $redirect = BASE_URL . '/dashboard';
+            }
+
+            if (empty($redirect)) {
+                echo json_encode(['status' => 'error', 'message' => 'Role not recognized or no accessible module.']);
+                return;
+            }
 
             echo json_encode([
                 'status' => 'success',

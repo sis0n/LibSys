@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchBackupFiles = async () => {
         showLoadingState();
         try {
-            const res = await fetch('backup/logs');
+            const res = await fetch('api/superadmin/backup/logs');
             const data = await res.json();
 
             if (data.success && Array.isArray(data.logs)) {

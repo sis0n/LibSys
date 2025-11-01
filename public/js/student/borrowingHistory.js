@@ -6,7 +6,7 @@ const statCurrent = document.getElementById('statCurrent');
 const statOverdue = document.getElementById('statOverdue');
 const statReturned = document.getElementById('statReturned');
 
-const BASE_AJAX_PATH = `${BASE_URL}/student/borrowingHistory/fetch`;
+const BASE_AJAX_PATH = `${BASE_URL}/api/student/borrowingHistory/fetch`;
 
 function renderRecords(records) {
   if (records.length === 0) {
@@ -66,7 +66,7 @@ function fetchBorrowingHistory() {
 
   recordsContainer.innerHTML = `<div class="text-center py-10 text-gray-500" id="loadingIndicator">Loading history...</div>`;
 
-  const url = `${BASE_URL}/student/borrowingHistory/fetch?student_id=${CURRENT_STUDENT_ID}`;
+  const url = `${BASE_URL}/api/student/borrowingHistory/fetch?student_id=${CURRENT_STUDENT_ID}`;
 
   fetch(url)
     .then(res => res.json())

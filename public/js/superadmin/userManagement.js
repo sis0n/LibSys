@@ -1,4 +1,56 @@
 window.addEventListener("DOMContentLoaded", () => {
+  const programs = {
+    "BSA": "Bachelor of Science in Accountancy",
+    "BSAIS": "Bachelor of Science in Accounting Information Systems",
+    "BSBA FMGT": "BSBA Major in Financial Management",
+    "BSBA HRM": "BSBA Major in Human Resource Management",
+    "BSBA MKTG": "BSBA Major in Marketing Management",
+    "BS ENTREP": "Bachelor of Science in Entrepreneurship",
+    "BS CRIM": "Bachelor of Science in Criminology",
+    "BSISM": "Bachelor of Science in Industrial Security Management",
+    "BECED": "Bachelor of Early Childhood Education",
+    "BSE ENG": "Bachelor of Secondary Education Major in English",
+    "BSE ENG-CHI": "Bachelor of Secondary Education Major in English with Additional Chinese Language and Pedagogy Courses",
+    "BSE SCI": "Bachelor of Secondary Education Major in Science",
+    "BTLED HE": "Bachelor of Technology and Livelihood Education Major in Home Economics",
+    "CPE": "Certificate in Professional Education",
+    "BS CPE": "Bachelor of Science in Computer Engineering",
+    "BS ECE": "Bachelor of Science in Electronics Engineering",
+    "BS EE": "Bachelor of Science in Electrical Engineering",
+    "BS IE": "Bachelor of Science in Industrial Engineering",
+    "ABBS": "Bachelor of Arts in Behavioral Sciences",
+    "BA COMM": "Bachelor of Arts in Communication",
+    "BA POS": "Bachelor of Arts in Political Science",
+    "BS MATH": "Bachelor of Science in Mathematics",
+    "BS PSY": "Bachelor of Science in Psychology",
+    "BSIS": "Bachelor of Science in Information Systems",
+    "BSIT": "Bachelor of Science in Information Technology",
+    "BSCS": "Bachelor of Science in Computer Science",
+    "BSEMC": "Bachelor of Science in Entertainment and Multimedia Computing",
+    "BSOAD": "Bachelor of Science in Office Administration",
+    "BSSW": "Bachelor of Science in Social Work",
+    "BSTM": "Bachelor of Science in Tourism Management",
+    "BSHM": "Bachelor of Science in Hospitality Management",
+    "DPA": "Doctor in Public Administration",
+    "BPA": "Bachelor of Public Administration",
+    "BPA ECGE": "Bachelor of Public Administration – Evening Class for Govt. Employees",
+    "MAED": "Master of Arts in Education Major in Educational Management",
+    "MAT-EG": "Master of Arts in Teaching in the Early Grades",
+    "MATS": "Master of Arts in Teaching Science",
+    "MBA": "Master in Business Administration",
+    "LAW": "Bachelor of Laws / Juris Doctor"
+  };
+
+  const departments = [
+    "College of Business and Accountancy",
+    "College of Criminal Justice Education",
+    "College of Education",
+    "College of Engineering",
+    "College of Law",
+    "College of Liberal Arts and Sciences",
+    "Graduate School"
+  ];
+
   // --- DOM Elements (may optional chaining kung wala) ---
   const modal = document.getElementById("importModal");
   const openBtn = document.getElementById("bulkImportBtn");
@@ -27,6 +79,51 @@ window.addEventListener("DOMContentLoaded", () => {
   let currentEditingUserId = null;
 
   // --- Helper functions ---
+  function updateProgramDepartmentDropdown(role, wrapperId, labelId, selectId, selectedValue = null) {
+    const wrapper = document.getElementById(wrapperId);
+    const label = document.getElementById(labelId);
+    const select = document.getElementById(selectId);
+
+    if (!wrapper || !label || !select) return;
+
+    const normalizedRole = (role || "").trim().toLowerCase();
+
+    if (normalizedRole === 'student' || normalizedRole === 'faculty') {
+      wrapper.classList.remove('hidden');
+      select.innerHTML = ''; // Clear previous options
+
+      let options;
+      if (normalizedRole === 'student') {
+        label.innerHTML = 'Program <span class="text-red-500">*</span>';
+        options = programs;
+        const defaultOption = new Option("Select a Program", "");
+        select.add(defaultOption);
+        for (const [abbr, name] of Object.entries(options)) {
+            const option = new Option(`${abbr} - ${name}`, abbr);
+            select.add(option);
+        }
+      } else { // faculty
+        label.innerHTML = 'Department <span class="text-red-500">*</span>';
+        options = departments;
+        const defaultOption = new Option("Select a Department", "");
+        select.add(defaultOption);
+        options.forEach(dept => {
+            const option = new Option(dept, dept);
+            select.add(option);
+        });
+      }
+      
+      if (selectedValue) {
+        select.value = selectedValue;
+      }
+
+    } else {
+      wrapper.classList.add('hidden');
+      select.innerHTML = '';
+      select.value = '';
+    }
+  }
+
   function closeModal(modalEl) {
     if (!modalEl) return;
     modalEl.classList.add("hidden");
@@ -60,14 +157,13 @@ window.addEventListener("DOMContentLoaded", () => {
     if (userRoleValueEl) userRoleValueEl.textContent = val;
     setActiveOption("userRoleDropdownMenu", el);
     toggleModules(modulesSection, val.trim());
+    updateProgramDepartmentDropdown(val, 'addUserProgramDepartmentWrapper', 'addUserProgramDepartmentLabel', 'addUserProgramDepartment');
   };
 
   window.selectEditRole = (el, val) => {
     const valueEl = document.getElementById("editRoleDropdownValue");
     if (valueEl) valueEl.textContent = val;
-    setActiveOption("editRoleDropdownMenu", el);
-
-    const editModulesContainer = document.getElementById("editModulesSection");
+    const editModulesContainer = document.getElementById("editPermissionsContainer");
     const user = users.find(u => u.user_id === currentEditingUserId);
     toggleModules(editModulesContainer, user.role, user?.modules || []);
   };
@@ -97,7 +193,7 @@ window.addEventListener("DOMContentLoaded", () => {
     formData.append("csv_file", fileInput.files[0]);
 
     try {
-      const res = await fetch("userManagement/bulkImport", {
+      const res = await fetch("api/superadmin/userManagement/bulkImport", {
         method: "POST",
         body: formData
       });
@@ -128,7 +224,7 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
     try {
-      const res = await fetch(`userManagement/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`api/superadmin/userManagement/search?q=${encodeURIComponent(query)}`);
       if (!res.ok) throw new Error(`Search request failed with status ${res.status}`);
       const data = await res.json();
 
@@ -145,6 +241,7 @@ window.addEventListener("DOMContentLoaded", () => {
             username: u.username,
             email: u.email,
             role: u.role,
+            program_department: u.program_department || null,
             status: u.is_active == 1 ? "Active" : "Inactive",
             joinDate: new Date(u.created_at).toLocaleDateString(),
             modules: u.modules || []
@@ -288,7 +385,7 @@ window.addEventListener("DOMContentLoaded", () => {
   async function loadUsers() {
     if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading users...</td></tr>`;
     try {
-      const res = await fetch('userManagement/getAll');
+      const res = await fetch('api/superadmin/userManagement/getAll');
       const data = await res.json();
       if (!data.success) throw new Error(data.message || "Failed to fetch users");
 
@@ -303,6 +400,7 @@ window.addEventListener("DOMContentLoaded", () => {
           username: u.username,
           email: u.email,
           role: u.role,
+          program_department: u.program_department || null,
           status: u.is_active == 1 ? "Active" : "Inactive",
           joinDate: new Date(u.created_at).toLocaleDateString(),
           modules: u.modules || []
@@ -367,16 +465,27 @@ window.addEventListener("DOMContentLoaded", () => {
       const last_name = document.getElementById("addLastName").value.trim();
       const username = document.getElementById("addUsername").value.trim();
       const role = document.getElementById("userRoleDropdownValue").textContent.trim();
+      const programDepartmentWrapper = document.getElementById('addUserProgramDepartmentWrapper');
+      const programDepartmentSelect = document.getElementById('addUserProgramDepartment');
+      let program_department = null;
 
       if (!first_name || !last_name || !username || role === "Select Role") {
         return alert("Please fill in all required fields (First Name, Last Name, Username, Role).");
+      }
+
+      if (!programDepartmentWrapper.classList.contains('hidden')) {
+        program_department = programDepartmentSelect.value;
+        if (!program_department) {
+            const fieldName = role.toLowerCase() === 'student' ? 'Program' : 'Department';
+            return alert(`Please select a ${fieldName}.`);
+        }
       }
 
       const checkedModules = Array.from(document.querySelectorAll('input[name="modules[]"]:checked'))
         .map(cb => cb.value);
 
       try {
-        const res = await fetch("userManagement/add", {
+        const res = await fetch("api/superadmin/userManagement/add", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -385,6 +494,7 @@ window.addEventListener("DOMContentLoaded", () => {
             last_name: last_name,
             username: username,
             role: role,
+            program_department: program_department,
             modules: checkedModules
           })
         });
@@ -431,7 +541,7 @@ window.addEventListener("DOMContentLoaded", () => {
         document.querySelector("#editUserTitle span").textContent = user.name;
 
         // --- Modules checkboxes ---
-        const editModulesContainer = document.getElementById("editModulesSection");
+        const editModulesContainer = document.getElementById("editPermissionsContainer");
         if (editModulesContainer) {
           if (user.role.toLowerCase() === 'admin' || user.role.toLowerCase() === 'librarian') {
             editModulesContainer.classList.remove("hidden");
@@ -457,7 +567,7 @@ window.addEventListener("DOMContentLoaded", () => {
       if (e.target.closest(".deleteUserBtn")) {
         if (!confirm(`Delete user "${user.name}" (${user.role})?`)) return;
         try {
-          const res = await fetch(`userManagement/delete/${user.user_id}`, {
+          const res = await fetch(`api/superadmin/userManagement/delete/${user.user_id}`, {
             method: "POST"
           });
           const data = await res.json();
@@ -479,7 +589,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const confirmMsg = user.status === 'Active' ? `Deactivate ${user.name}?` : `Activate ${user.name}?`;
         if (!confirm(confirmMsg)) return;
         try {
-          const res = await fetch(`userManagement/toggleStatus/${user.user_id}`, {
+          const res = await fetch(`api/superadmin/userManagement/toggleStatus/${user.user_id}`, {
             method: "POST"
           });
           const data = await res.json();
@@ -501,7 +611,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!confirm(`Allow "${user.name}" to edit their profile?`)) return;
 
         try {
-          const res = await fetch(`userManagement/allowEdit/${userId}`, {
+          const res = await fetch(`api/superadmin/userManagement/allowEdit/${userId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" }
           });
@@ -525,13 +635,16 @@ window.addEventListener("DOMContentLoaded", () => {
   if (saveEditBtn) {
     saveEditBtn.addEventListener("click", async () => {
       if (!currentEditingUserId) return;
+      
+      const role = document.getElementById("editRoleDropdownValue").textContent.trim();
+
       const payload = {
         first_name: document.getElementById("editFirstName").value.trim(),
         middle_name: document.getElementById("editMiddleName").value.trim() || null,
         last_name: document.getElementById("editLastName").value.trim(),
         username: document.getElementById("editUsername").value.trim(),
         email: document.getElementById("editEmail").value.trim(),
-        role: document.getElementById("editRoleDropdownValue").textContent.trim(),
+        role: role,
         is_active: document.getElementById("editStatusDropdownValue").textContent.trim().toLowerCase() === 'active' ? 1 : 0
       };
 
@@ -555,7 +668,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const res = await fetch(`userManagement/update/${currentEditingUserId}`, {
+        const res = await fetch(`api/superadmin/userManagement/update/${currentEditingUserId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)

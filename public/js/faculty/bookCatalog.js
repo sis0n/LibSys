@@ -110,7 +110,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function loadCart() {
     try {
-      const r = await fetch("faculty/cart/json");
+      const r = await fetch("api/faculty/cart/json");
       if (!r.ok) throw Error();
       cart = await r.json();
       updateCartBadge();
@@ -133,7 +133,7 @@ window.addEventListener("DOMContentLoaded", () => {
   async function addToCart(id) {
     if (!id) return;
     try {
-      const r = await fetch(`faculty/cart/add/${id}`);
+      const r = await fetch(`api/faculty/cart/add/${id}`);
       if (!r.ok) throw Error((await r.json()).message || `Err ${r.status}`);
       const d = await r.json();
       if (d.success) {

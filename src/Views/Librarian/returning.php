@@ -287,4 +287,4 @@
     </div>
 </div>
 
-<script src="/libsys/public/js/librarian/returning.js" defer></script>
+<script src="<?= BASE_URL ?>/js/librarian/returning.js" defer></script>

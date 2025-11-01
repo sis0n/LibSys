@@ -178,4 +178,4 @@
     </div>
 
 </main>
-<script src="/LibSys/public/js/superadmin/reports.js"></script>
+<script src="<?= BASE_URL ?>/js/superadmin/reports.js"></script>

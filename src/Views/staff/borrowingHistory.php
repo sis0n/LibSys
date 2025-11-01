@@ -55,4 +55,4 @@
     const CURRENT_STAFF_ID = <?= $_SESSION['user_data']['user_id'] ?? 0 ?>;
     const BASE_URL = '/LibSys/public';
 </script>
-<script src="/LibSys/public/js/staff/borrowingHistory.js" defer></script>
+<script src="<?= BASE_URL ?>/js/staff/borrowingHistory.js" defer></script>

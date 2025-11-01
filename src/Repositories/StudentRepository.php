@@ -28,17 +28,17 @@ class StudentRepository
     return (bool) $stmt->fetch();
   }
 
-  public function insertStudent(int $userId, string $studentNumber, string $course, int $yearLevel, string $status): int
+  public function insertStudent(int $userId, string $studentNumber, int $courseId, int $yearLevel, string $status): int
   {
     $stmt = $this->db->prepare("
-    INSERT INTO students (user_id, student_number, course, year_level, status)
-    VALUES (:user_id, :student_number, :course, :year_level, :status)
+    INSERT INTO students (user_id, student_number, course_id, year_level, status)
+    VALUES (:user_id, :student_number, :course_id, :year_level, :status)
   ");
 
     $stmt->execute([
       ':user_id' => $userId,
       ':student_number' => $studentNumber,
-      ':course' => $course,
+      ':course_id' => $courseId, 
       ':year_level' => $yearLevel,
       ':status' => $status
     ]);

@@ -35,7 +35,7 @@ class UserRepository
                 s.student_id, 
                 s.student_number, 
                 s.year_level, 
-                s.course,
+                s.course_id,
                 s.section
             FROM students s
             LEFT JOIN users u ON u.user_id = s.user_id
@@ -67,7 +67,7 @@ class UserRepository
                 s.student_id, 
                 s.student_number, 
                 s.year_level, 
-                s.course,
+                s.course_id,
                 s.section
             FROM users u
             LEFT JOIN students s ON u.user_id = s.user_id
@@ -97,7 +97,7 @@ class UserRepository
                 u.role,
                 u.email,
                 f.faculty_id,
-                f.department
+                f.college_id
             FROM faculty f
             LEFT JOIN users u ON u.user_id = f.user_id
             WHERE LOWER(u.username) = LOWER(:identifier)

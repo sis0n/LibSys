@@ -249,104 +249,85 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Define initializeCharts function outside DOMContentLoaded
-function initializeCharts() {
+async function initializeCharts() {
     // Top Visitors Chart
-    const topCtx = document.getElementById('topVisitorsChart');
-    if (topCtx) {
-        new Chart(topCtx.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: ['CBA', 'CCJE', 'CLAS', 'COE', 'COEngr'],
-                datasets: [{
-                    label: 'Visits',
-                    data: [15, 10, 8, 12, 9],
-                    backgroundColor: '#22c55e',
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
+    const topCtx = document.getElementById('topVisitorsChart')?.getContext('2d');
+    
     // Weekly Activity Chart
-    const weeklyCtx = document.getElementById('weeklyActivityChart');
-    if (weeklyCtx) {
-        new Chart(weeklyCtx.getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [
-                    {
-                        label: 'Visitors',
-                        data: [12, 19, 9, 14, 8, 11, 15],
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59,130,246,0.1)',
-                        tension: 0.4,
-                        fill: true,
-                    },
-                    {
-                        label: 'Checkouts',
-                        data: [8, 14, 5, 10, 6, 9, 11],
-                        borderColor: '#f97316',
-                        backgroundColor: 'rgba(249,115,22,0.1)',
-                        tension: 0.4,
-                        fill: false,
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        align: 'end',
-                        labels: {
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            boxWidth: 8,
-                            boxHeight: 8,
-                            padding: 16,
-                            font: {
-                                size: 12,
-                                weight: '500',
-                            },
+    const weeklyCtx = document.getElementById('weeklyActivityChart')?.getContext('2d');
+
+    // Fetch consolidated data
+    try {
+        const res = await fetch(`${BASE_URL}/api/superadmin/dashboard/getData`);
+        const result = await res.json();
+
+        if (!result.success) {
+            console.error("Failed to load chart data:", result.message);
+            // Optionally display an error on the chart canvases
+            return;
+        }
+
+        // === Top Visitors Chart ===
+        if (topCtx && result.topVisitors) {
+            const topLabels = result.topVisitors.map(v => v.user_name || "Unknown");
+            const topData = result.topVisitors.map(v => v.visits);
+
+            new Chart(topCtx, {
+                type: "bar",
+                data: {
+                    labels: topLabels,
+                    datasets: [{
+                        label: "Visits",
+                        data: topData,
+                        backgroundColor: "#22c55e",
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        // === Weekly Activity Chart ===
+        if (weeklyCtx && result.weeklyActivity) {
+            const weeklyLabels = result.weeklyActivity.map(w => w.day);
+            const visitorsData = result.weeklyActivity.map(w => w.visitors);
+            const borrowsData = result.weeklyActivity.map(w => w.borrows);
+
+            new Chart(weeklyCtx, {
+                type: "line",
+                data: {
+                    labels: weeklyLabels,
+                    datasets: [
+                        {
+                            label: "Visitors",
+                            data: visitorsData,
+                            borderColor: "#3b82f6",
+                            backgroundColor: "rgba(59,130,246,0.1)",
+                            tension: 0.4,
+                            fill: true
                         },
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                    },
+                        {
+                            label: "Borrows",
+                            data: borrowsData,
+                            borderColor: "#f59e0b",
+                            backgroundColor: "rgba(245,158,11,0.1)",
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: '#f3f4f6' },
-                        ticks: { color: '#4b5563' },
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#4b5563' },
-                    },
-                },
-            },
-        });
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+    } catch (err) {
+        console.error("Error loading chart data:", err);
     }
 }

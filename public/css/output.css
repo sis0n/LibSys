@@ -2225,9 +2225,6 @@
     -webkit-user-select: none;
     user-select: none;
   }
-  .\[scrollbar-width\:none\] {
-    scrollbar-width: none;
-  }
   .group-hover\:scale-105 {
     &:is(:where(.group):hover *) {
       @media (hover: hover) {
@@ -2587,20 +2584,6 @@
       }
     }
   }
-  .hover\:\[scrollbar-color\:\#d4d4d4_transparent\] {
-    &:hover {
-      @media (hover: hover) {
-        scrollbar-color: #d4d4d4 transparent;
-      }
-    }
-  }
-  .hover\:\[scrollbar-width\:thin\] {
-    &:hover {
-      @media (hover: hover) {
-        scrollbar-width: thin;
-      }
-    }
-  }
   .focus\:border-orange-400 {
     &:focus {
       border-color: var(--color-orange-400);
@@ -2939,29 +2922,6 @@
   .lg\:grid-cols-6 {
     @media (width >= 64rem) {
       grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-  }
-  .\[\&\:\:-webkit-scrollbar\]\:w-0 {
-    &::-webkit-scrollbar {
-      width: calc(var(--spacing) * 0);
-    }
-  }
-  .hover\:\[\&\:\:-webkit-scrollbar-thumb\]\:rounded {
-    &:hover {
-      @media (hover: hover) {
-        &::-webkit-scrollbar-thumb {
-          border-radius: 0.25rem;
-        }
-      }
-    }
-  }
-  .hover\:\[\&\:\:-webkit-scrollbar-thumb\]\:bg-gray-300 {
-    &:hover {
-      @media (hover: hover) {
-        &::-webkit-scrollbar-thumb {
-          background-color: var(--color-gray-300);
-        }
-      }
     }
   }
 }

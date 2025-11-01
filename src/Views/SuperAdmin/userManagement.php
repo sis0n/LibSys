@@ -132,77 +132,87 @@
 <div id="addUserModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
     <div
         class="rounded-xl overflow-hidden shadow-lg border border-[var(--color-border)] bg-[var(--color-card)] w-full max-w-lg animate-fadeIn">
-        <div class="p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex flex-col min-h-[60vh] max-h-[80vh]">
 
-            <div class="flex justify-between items-start mb-4">
-                <h2 class="text-lg font-semibold flex items-center gap-2">
-                    <i class="ph ph-user-plus text-[var(--color-ring)] text-xl"></i>
-                    Add New User
-                </h2>
-                <button id="closeAddUserModal" class="text-gray-500 hover:text-red-700 transition">
-                    <i class="ph ph-x text-2xl"></i>
-                </button>
-            </div>
-
-            <p class="text-sm text-gray-600 mb-4">
-                Create a new user account with specific permissions.
-            </p>
-
-            <div class="space-y-4 mb-6">
-                <h3 class="font-medium text-[var(--color-ring)]">Basic Information</h3>
-
-                <div class="grid grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span
-                                class="text-red-500">*</span></label>
-                        <input type="text" id="addFirstName" placeholder="Juan"
-                            class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
-                        <input type="text" id="addMiddleName" placeholder="Ponce"
-                            class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span
-                                class="text-red-500">*</span></label>
-                        <input type="text" id="addLastName" placeholder="Dela Cruz"
-                            class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
-                    </div>
+            <!-- Scrollable content -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-lg font-semibold flex items-center gap-2">
+                        <i class="ph ph-user-plus text-[var(--color-ring)] text-xl"></i>
+                        Add New User
+                    </h2>
+                    <button id="closeAddUserModal" class="text-gray-500 hover:text-red-700 transition">
+                        <i class="ph ph-x text-2xl"></i>
+                    </button>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Username <span
-                                class="text-red-500">*</span></label>
-                        <input type="text" id="addUsername" placeholder="username"
-                            class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
-                    </div>
-                    <div class="relative w-full">
-                        <label class="block text-sm text-gray-700 mb-1">Role</label>
-                        <button id="userRoleDropdownBtn"
-                            class="w-full border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between hover:bg-orange-50 transition">
-                            <span id="userRoleDropdownValue">Select Role</span>
-                            <i class="ph ph-caret-down text-xs"></i>
-                        </button>
-                        <div id="userRoleDropdownMenu"
-                            class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
-                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                                onclick="selectUserRole(this, 'Student')">Student</div>
-                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                                onclick="selectUserRole(this, 'Librarian')">Librarian</div>
-                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                                onclick="selectUserRole(this, 'Admin')">Admin</div>
-                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                                onclick="selectUserRole(this, 'Faculty')">Faculty</div>
-                            <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                                onclick="selectUserRole(this, 'Staff')">Staff</div>
+                <p class="text-sm text-gray-600 mb-4">
+                    Create a new user account with specific permissions.
+                </p>
+
+                <div class="space-y-4 mb-6">
+                    <h3 class="font-medium text-[var(--color-ring)]">Basic Information</h3>
+
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" id="addFirstName" placeholder="Juan"
+                                class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
+                            <input type="text" id="addMiddleName" placeholder="Ponce"
+                                class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" id="addLastName" placeholder="Dela Cruz"
+                                class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Username <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" id="addUsername" placeholder="username"
+                                class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
+                        </div>
+                        <div class="relative w-full">
+                            <label class="block text-sm text-gray-700 mb-1">Role</label>
+                            <button id="userRoleDropdownBtn"
+                                class="w-full border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between hover:bg-orange-50 transition">
+                                <span id="userRoleDropdownValue">Select Role</span>
+                                <i class="ph ph-caret-down text-xs"></i>
+                            </button>
+                            <div id="userRoleDropdownMenu"
+                                class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
+                                <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectUserRole(this, 'Student')">Student</div>
+                                <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectUserRole(this, 'Librarian')">Librarian</div>
+                                <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectUserRole(this, 'Admin')">Admin</div>
+                                <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectUserRole(this, 'Faculty')">Faculty</div>
+                                <div class="user-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
+                                    onclick="selectUserRole(this, 'Staff')">Staff</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="addUserProgramDepartmentWrapper" class="hidden">
+                        <label id="addUserProgramDepartmentLabel"
+                            class="block text-sm font-medium text-gray-700 mb-1">Program/Department <span
+                                class="text-red-500">*</span></label>
+                        <select id="addUserProgramDepartment" required
+                            class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
+                        </select>
+                    </div>
+                </div>
+
                 <div id="modulesSection" class="hidden">
                     <h3 class="font-medium text-[var(--color-ring)] mb-2 flex items-center gap-2">
                         <i class="ph ph-shield-check text-[var(--color-ring)]"></i> Permissions
@@ -225,31 +235,34 @@
                             'restore books',
                         ];
 
-                        foreach ($modules as $module):
-                        ?>
-                            <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                                <label class="inline-flex items-center text-sm text-gray-700">
-                                    <input type="checkbox" class="mr-2 accent-orange-500" name="modules[]" value="<?= $module ?>">
-                                    <?= ucwords($module) ?>
-                                </label>
-                            </div>
+                foreach ($modules as $module):
+                ?>
+                        <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                            <label class="inline-flex items-center text-sm text-gray-700">
+                                <input type="checkbox" class="mr-2 accent-orange-500" name="modules[]"
+                                    value="<?= $module ?>">
+                                <?= ucwords($module) ?>
+                            </label>
+                        </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
-
-                <div class="flex justify-end gap-2 mt-6">
-                    <button id="confirmAddUser"
-                        class="flex-1 bg-orange-600 text-white font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-700 transition">
-                        Add User
-                    </button>
-                    <button id="cancelAddUser"
-                        class="border border-orange-200 text-gray-800 font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-50 transition">
-                        Cancel
-                    </button>
-                </div>
-
             </div>
+
+            <!-- Fixed footer buttons -->
+            <div class="flex justify-end gap-2 p-4 bg-white sticky bottom-0">
+                <button id="confirmAddUser"
+                    class="flex-1 bg-orange-600 text-white font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-700 transition">
+                    Add User
+                </button>
+                <button id="cancelAddUser"
+                    class="border border-orange-200 text-gray-800 font-medium px-4 py-2.5 text-sm rounded-md hover:bg-orange-50 transition">
+                    Cancel
+                </button>
+            </div>
+
         </div>
+
     </div>
 </div>
 
@@ -323,13 +336,13 @@
                             <button id="editRoleDropdownBtn"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-500 flex items-center justify-between bg-gray-50 cursor-not-allowed"
                                 disabled>
-                                <span id="editRoleDropdownValue">Select Role</span>
+                                <span id="editRoleDropdownValue"></span>
                                 <i class="ph ph-caret-down text-xs"></i>
                             </button>
                             <div id="editRoleDropdownMenu"
                                 class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
-                                    onclick="selectEditRole(this, 'Student')">Student</div>
+                                    onclick="selectEditRole(this, 'Student',selected)">Student</div>
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
                                     onclick="selectEditRole(this, 'Faculty')">Faculty</div>
                                 <div class="edit-role-item px-3 py-2 hover:bg-orange-100 cursor-pointer text-sm"
@@ -435,12 +448,13 @@
 
                     foreach ($modules as $module):
                     ?>
-                        <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                            <label class="inline-flex items-center text-sm text-gray-700">
-                                <input type="checkbox" class="mr-2 accent-orange-500" name="editModules[]" value="<?= $module ?>">
-                                <?= ucwords($module) ?>
-                            </label>
-                        </div>
+                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                        <label class="inline-flex items-center text-sm text-gray-700">
+                            <input type="checkbox" class="mr-2 accent-orange-500" name="editModules[]"
+                                value="<?= $module ?>">
+                            <?= ucwords($module) ?>
+                        </label>
+                    </div>
                     <?php endforeach; ?>
                 </div>
             </div>

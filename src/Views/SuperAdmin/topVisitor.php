@@ -178,4 +178,7 @@
     </div>
 
 </main>
+<script>
+    const BASE_URL = "<?= BASE_URL ?>";
+</script>
 <script src="<?= BASE_URL ?>/js/superadmin/reports.js"></script>

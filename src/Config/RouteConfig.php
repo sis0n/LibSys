@@ -112,7 +112,7 @@ class RouteConfig
         $router->get('superadmin/qrScanner', 'SidebarController@qrScanner', ['superadmin']);
         $router->get('superadmin/attendanceLogs', 'SidebarController@attendanceLogs', ['superadmin']);
         $router->get('superadmin/topVisitor', 'SidebarController@topVisitor', ['superadmin']);
-        $router->get('report/circulated-books-report', 'ReportController@getCirculatedBooksReport', ['superadmin']);
+                $router->get('superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);
         $router->get('superadmin/transactionHistory', 'SidebarController@borrowingHistory', ['superadmin']);
         $router->get('superadmin/returning', 'SidebarController@returning', ['superadmin']);
         $router->get('superadmin/borrowingForm', 'SidebarController@borrowingForm', ['superadmin']);

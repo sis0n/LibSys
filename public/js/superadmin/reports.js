@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Loading...</td></tr>';
 
         try {
-            const response = await fetch('/LibSys/public/report/circulated-books-report');
+                                                const response = await fetch(`${BASE_URL}/superadmin/reports/circulated-books`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

@@ -131,14 +131,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const endpoint = '/attendance/logs/ajax';
 
-    const url_fetch = new URL(`${BASE_URL_JS}/attendance/logs/ajax`);
-    url_fetch.searchParams.append('period', periodToSend);
-    url_fetch.searchParams.append('search', currentSearch);
+    let url = `${BASE_URL_JS}/api/attendance/logs/ajax?`;
+    url += `period=${periodToSend}&search=${currentSearch}`;
+
     if (currentCourse !== "All Courses") {
-      url_fetch.searchParams.append('course', currentCourse);
+        url += `&course=${currentCourse}`;
     }
 
-    fetch(url_fetch)
+    fetch(url)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
         return res.json();

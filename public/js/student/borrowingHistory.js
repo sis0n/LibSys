@@ -6,8 +6,6 @@ const statCurrent = document.getElementById('statCurrent');
 const statOverdue = document.getElementById('statOverdue');
 const statReturned = document.getElementById('statReturned');
 
-const BASE_AJAX_PATH = `${BASE_URL}/api/student/borrowingHistory/fetch`;
-
 function renderRecords(records) {
   if (records.length === 0) {
     recordsContainer.innerHTML = `<div class="text-center py-10 text-gray-500">No borrowing records found.</div>`;
@@ -59,14 +57,14 @@ function renderRecords(records) {
 
 function fetchBorrowingHistory() {
 
-  if (typeof BASE_URL === 'undefined' || typeof CURRENT_STUDENT_ID === 'undefined' || CURRENT_STUDENT_ID === 0) {
+  if (typeof BASE_URL_JS === 'undefined' || typeof CURRENT_STUDENT_ID === 'undefined' || CURRENT_STUDENT_ID === 0) {
     recordsContainer.innerHTML = `<div class="text-center py-10 text-red-500">Error: Student user session not found. Please log in again.</div>`;
     return;
   }
 
   recordsContainer.innerHTML = `<div class="text-center py-10 text-gray-500" id="loadingIndicator">Loading history...</div>`;
 
-  const url = `${BASE_URL}/api/student/borrowingHistory/fetch?student_id=${CURRENT_STUDENT_ID}`;
+  const url = `${BASE_URL_JS}/api/student/borrowingHistory/fetch?student_id=${CURRENT_STUDENT_ID}`;
 
   fetch(url)
     .then(res => res.json())

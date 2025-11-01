@@ -1,41 +1,49 @@
 <?php
-// session_start();
-// require __DIR__ . '/../vendor/autoload.php';
-// use App\Config\RouteConfig;
-// $router = RouteConfig::register();
-// $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-// $basePath = '/libsys/public/';
-// $uri = substr($uri, strlen($basePath));
-// $uri = $uri === '' ? 'landingPage' : $uri;
-// $method = $_SERVER['REQUEST_METHOD'];
-// $router->resolve($uri, $method);
+// Ilagay ang session_start sa pinaka-unahan
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-session_start();
+// [1] I-define ang ROOT_PATH
+define('ROOT_PATH', dirname(__DIR__)); 
 
-require __DIR__ . '/../vendor/autoload.php';
+// [2] I-load ang Autoloader
+require ROOT_PATH . '/vendor/autoload.php';
 
 use Dotenv\Dotenv;
 use App\Config\RouteConfig;
 
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+// [3] I-load ang .env
+$dotenv = Dotenv::createImmutable(ROOT_PATH);
 $dotenv->load();
 
+// [4] I-define ang BASE_URL
 if (!defined('BASE_URL')) {
-    define('BASE_URL', rtrim($_ENV['APP_URL'], '/')); 
+    $appUrl = $_ENV['APP_URL'] ?? 'http://localhost';
+    define('BASE_URL', rtrim($appUrl, '/')); 
 }
 
-$router = RouteConfig::register();
+// ---------------------------------------------------------------------
+// --- FRONT CONTROLLER LOGIC: Mas Matibay na URI Calculation ---
+// ---------------------------------------------------------------------
 
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// 5. I-parse ang Full URI na galing sa server
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // Hal: /libsys/public/api/attendance/logs/ajax
 
-$basePath = parse_url($_ENV['APP_URL'], PHP_URL_PATH) . '/';
-$uri = substr($uri, strlen($basePath));
+// 6. I-calculate ang BASE PATH na kailangan nating tanggalin
+$baseUrlPath = parse_url(BASE_URL, PHP_URL_PATH); // Hal: /libsys/public
+// Idagdag ang trailing slash para maging: /libsys/public/
+$basePathToRemove = rtrim($baseUrlPath, '/') . '/'; 
 
-// default route
-$uri = $uri === '' ? 'landingPage' : $uri;
+// 7. [ANG AYOS AY DITO] Tanggalin ang BASE PATH mula sa URI
+// Hal: /libsys/public/api/attendance/logs/ajax -> api/attendance/logs/ajax
+$route = str_replace($basePathToRemove, '', $uri); 
 
-// http method
+// 8. Final Route Normalization
+$route = trim($route, '/');
+$route = $route === '' ? 'dashboard' : $route; 
+
+// 9. I-resolve ang Router
 $method = $_SERVER['REQUEST_METHOD'];
-
-// resolve
-$router->resolve($uri, $method);
+$router = RouteConfig::register();
+$router->resolve($route, $method);

@@ -1,55 +1,7 @@
 window.addEventListener("DOMContentLoaded", () => {
-  const programs = {
-    "BSA": "Bachelor of Science in Accountancy",
-    "BSAIS": "Bachelor of Science in Accounting Information Systems",
-    "BSBA FMGT": "BSBA Major in Financial Management",
-    "BSBA HRM": "BSBA Major in Human Resource Management",
-    "BSBA MKTG": "BSBA Major in Marketing Management",
-    "BS ENTREP": "Bachelor of Science in Entrepreneurship",
-    "BS CRIM": "Bachelor of Science in Criminology",
-    "BSISM": "Bachelor of Science in Industrial Security Management",
-    "BECED": "Bachelor of Early Childhood Education",
-    "BSE ENG": "Bachelor of Secondary Education Major in English",
-    "BSE ENG-CHI": "Bachelor of Secondary Education Major in English with Additional Chinese Language and Pedagogy Courses",
-    "BSE SCI": "Bachelor of Secondary Education Major in Science",
-    "BTLED HE": "Bachelor of Technology and Livelihood Education Major in Home Economics",
-    "CPE": "Certificate in Professional Education",
-    "BS CPE": "Bachelor of Science in Computer Engineering",
-    "BS ECE": "Bachelor of Science in Electronics Engineering",
-    "BS EE": "Bachelor of Science in Electrical Engineering",
-    "BS IE": "Bachelor of Science in Industrial Engineering",
-    "ABBS": "Bachelor of Arts in Behavioral Sciences",
-    "BA COMM": "Bachelor of Arts in Communication",
-    "BA POS": "Bachelor of Arts in Political Science",
-    "BS MATH": "Bachelor of Science in Mathematics",
-    "BS PSY": "Bachelor of Science in Psychology",
-    "BSIS": "Bachelor of Science in Information Systems",
-    "BSIT": "Bachelor of Science in Information Technology",
-    "BSCS": "Bachelor of Science in Computer Science",
-    "BSEMC": "Bachelor of Science in Entertainment and Multimedia Computing",
-    "BSOAD": "Bachelor of Science in Office Administration",
-    "BSSW": "Bachelor of Science in Social Work",
-    "BSTM": "Bachelor of Science in Tourism Management",
-    "BSHM": "Bachelor of Science in Hospitality Management",
-    "DPA": "Doctor in Public Administration",
-    "BPA": "Bachelor of Public Administration",
-    "BPA ECGE": "Bachelor of Public Administration – Evening Class for Govt. Employees",
-    "MAED": "Master of Arts in Education Major in Educational Management",
-    "MAT-EG": "Master of Arts in Teaching in the Early Grades",
-    "MATS": "Master of Arts in Teaching Science",
-    "MBA": "Master in Business Administration",
-    "LAW": "Bachelor of Laws / Juris Doctor"
-  };
+  const programs = {};
 
-  const departments = [
-    "College of Business and Accountancy",
-    "College of Criminal Justice Education",
-    "College of Education",
-    "College of Engineering",
-    "College of Law",
-    "College of Liberal Arts and Sciences",
-    "Graduate School"
-  ];
+  const departments = [];
 
   // --- DOM Elements (may optional chaining kung wala) ---
   const modal = document.getElementById("importModal");
@@ -78,49 +30,31 @@ window.addEventListener("DOMContentLoaded", () => {
   let selectedStatus = "All Status";
   let currentEditingUserId = null;
 
-  // --- Helper functions ---
-  function updateProgramDepartmentDropdown(role, wrapperId, labelId, selectId, selectedValue = null) {
-    const wrapper = document.getElementById(wrapperId);
-    const label = document.getElementById(labelId);
-    const select = document.getElementById(selectId);
+  function updateProgramDepartmentDropdown(role, selectedValue = null) {
+    const wrapper = document.getElementById('addUserSingleSelectWrapper');
+    const label = document.getElementById('addUserSelectLabel');
 
-    if (!wrapper || !label || !select) return;
+    if (!wrapper || !label) return;
 
     const normalizedRole = (role || "").trim().toLowerCase();
 
-    if (normalizedRole === 'student' || normalizedRole === 'faculty') {
-      wrapper.classList.remove('hidden');
-      select.innerHTML = ''; // Clear previous options
+    // Reset/Hide wrapper first
+    wrapper.classList.add('hidden');
 
-      let options;
-      if (normalizedRole === 'student') {
-        label.innerHTML = 'Program <span class="text-red-500">*</span>';
-        options = programs;
-        const defaultOption = new Option("Select a Program", "");
-        select.add(defaultOption);
-        for (const [abbr, name] of Object.entries(options)) {
-            const option = new Option(`${abbr} - ${name}`, abbr);
-            select.add(option);
-        }
-      } else { // faculty
-        label.innerHTML = 'Department <span class="text-red-500">*</span>';
-        options = departments;
-        const defaultOption = new Option("Select a Department", "");
-        select.add(defaultOption);
-        options.forEach(dept => {
-            const option = new Option(dept, dept);
-            select.add(option);
-        });
-      }
-      
-      if (selectedValue) {
-        select.value = selectedValue;
-      }
+    if (normalizedRole === 'student') {
+      label.innerHTML = 'Course/Program <span class="text-red-500">*</span>';
+      wrapper.classList.remove('hidden');
+      loadCoursesForStudent(selectedValue); // Load courses from API
+
+    } else if (normalizedRole === 'faculty' || normalizedRole === 'staff') {
+      label.innerHTML = 'Department <span class="text-red-500">*</span>';
+      wrapper.classList.remove('hidden');
+      loadDepartments(selectedValue);
 
     } else {
       wrapper.classList.add('hidden');
-      select.innerHTML = '';
-      select.value = '';
+      const select = document.getElementById('addUserSelectField');
+      if (select) select.innerHTML = '';
     }
   }
 
@@ -151,13 +85,106 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  async function loadCoursesForStudent(selectedValue = null) {
+    const select = document.getElementById('addUserSelectField');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Loading Courses...</option>';
+
+    try {
+      const res = await fetch('api/superadmin/userManagement/getAllCourses');
+      const data = await res.json();
+
+      select.innerHTML = '<option value="">Select Course/Program</option>';
+
+      if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+        data.courses.forEach(course => {
+          const option = new Option(`${course.course_code} - ${course.course_title}`, course.course_id);
+          select.add(option);
+        });
+
+        if (selectedValue) {
+          select.value = selectedValue;
+        }
+      } else {
+        select.innerHTML = '<option value="">No Courses Found</option>';
+      }
+
+    } catch (err) {
+      console.error("Error loading courses:", err);
+      select.innerHTML = '<option value="">Error loading courses</option>';
+    }
+  }
+
+  async function loadDepartments(selectedValue = null) {
+    const select = document.getElementById('addUserSelectField');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Loading Colleges...</option>';
+
+    try {
+      const res = await fetch('api/superadmin/userManagement/getColleges');
+      const data = await res.json();
+
+      select.innerHTML = '<option value="">Select College/Department</option>';
+
+      if (data.success && Array.isArray(data.colleges) && data.colleges.length > 0) {
+        data.colleges.forEach(college => {
+          const option = new Option(`${college.college_code} - ${college.college_name}`, college.college_id);
+          select.add(option);
+        });
+
+        if (selectedValue) {
+          select.value = selectedValue;
+        }
+      } else {
+        select.innerHTML = '<option value="">No Colleges Found</option>';
+      }
+
+    } catch (err) {
+      console.error("Error loading colleges for faculty:", err);
+      select.innerHTML = '<option value="">Error loading colleges</option>';
+    }
+  }
+
+  // async function loadDepartments(selectedValue = null) {
+  //   const select = document.getElementById('addUserSelectField');
+  //   if (!select) return;
+
+  //   select.innerHTML = '<option value="">Loading Departments...</option>';
+
+  //   try {
+  //     const res = await fetch('api/superadmin/userManagement/getColleges');
+  //     const data = await res.json();
+
+  //     select.innerHTML = '<option value="">Select Department</option>';
+
+  //     if (data.success && Array.isArray(data.colleges) && data.colleges.length > 0) {
+  //       data.colleges.forEach(college => {
+  //         const option = new Option(`${college.college_code} - ${college.college_name}`, `${college.college_code} - ${college.college_name}`);
+  //         select.add(option);
+  //       });
+
+  //       if (selectedValue) {
+  //         select.value = selectedValue;
+  //       }
+  //     } else {
+  //       select.innerHTML = '<option value="">No Departments Found</option>';
+  //     }
+
+  //   } catch (err) {
+  //     console.error("Error loading departments (colleges):", err);
+  //     select.innerHTML = '<option value="">Error loading departments</option>';
+  //   }
+  // }
+
   toggleModules(modulesSection, userRoleValueEl.textContent || "");
 
   window.selectUserRole = (el, val) => {
     if (userRoleValueEl) userRoleValueEl.textContent = val;
     setActiveOption("userRoleDropdownMenu", el);
     toggleModules(modulesSection, val.trim());
-    updateProgramDepartmentDropdown(val, 'addUserProgramDepartmentWrapper', 'addUserProgramDepartmentLabel', 'addUserProgramDepartment');
+    updateProgramDepartmentDropdown(val);
   };
 
   window.selectEditRole = (el, val) => {
@@ -168,7 +195,6 @@ window.addEventListener("DOMContentLoaded", () => {
     toggleModules(editModulesContainer, user.role, user?.modules || []);
   };
 
-  // --- Bulk import modal open/close (safe checks) ---
   if (openBtn) openBtn.addEventListener("click", () => {
     modal?.classList.remove("hidden");
     document.body.classList.add("overflow-hidden");
@@ -177,7 +203,6 @@ window.addEventListener("DOMContentLoaded", () => {
   if (cancelBtn) cancelBtn.addEventListener("click", () => closeModal(modal));
   modal?.addEventListener("click", e => { if (e.target === modal) closeModal(modal); });
 
-  // --- Bulk import submit ---
   fileInput?.addEventListener("change", () => {
     if (fileInput.files.length) {
       bulkImportForm?.requestSubmit();
@@ -305,7 +330,6 @@ window.addEventListener("DOMContentLoaded", () => {
   [closeEditUserBtn, cancelEditUserBtn].forEach(btn => btn?.addEventListener("click", closeEditUserModal));
   editUserModal?.addEventListener("click", e => { if (e.target === editUserModal) closeEditUserModal(); });
 
-  // --- Dropdown setup (preserves original) ---
   function setupDropdownToggle(buttonId, menuId) {
     const btn = document.getElementById(buttonId);
     const menu = document.getElementById(menuId);
@@ -336,7 +360,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Exposed global select handlers (preserve original API) ---
   window.selectRole = (el, val) => {
     const valueEl = document.getElementById("roleDropdownValue");
     if (valueEl) valueEl.textContent = val;
@@ -359,7 +382,6 @@ window.addEventListener("DOMContentLoaded", () => {
     setActiveOption("editStatusDropdownMenu", el);
   };
 
-  // Initialize first dropdown selections if present
   const allRolesFirst = document.querySelector("#roleDropdownMenu .dropdown-item");
   if (allRolesFirst) {
     setActiveOption("roleDropdownMenu", allRolesFirst);
@@ -381,7 +403,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Load users from API ---
   async function loadUsers() {
     if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading users...</td></tr>`;
     try {
@@ -412,7 +433,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Render table ---
   function renderTable(usersToRender) {
     if (!userTableBody) return;
     userTableBody.innerHTML = "";
@@ -426,7 +446,6 @@ window.addEventListener("DOMContentLoaded", () => {
       const row = document.createElement("tr");
       row.className = user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white";
 
-      // Keep actions consistent with your original UI
       let actions = `
         <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
           <i class="ph ph-note-pencil text-base"></i><span>Edit</span>
@@ -456,7 +475,6 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Add user (preserve original) ---
   const confirmAddUserBtn = document.getElementById("confirmAddUser");
   if (confirmAddUserBtn) {
     confirmAddUserBtn.addEventListener("click", async () => {
@@ -465,19 +483,28 @@ window.addEventListener("DOMContentLoaded", () => {
       const last_name = document.getElementById("addLastName").value.trim();
       const username = document.getElementById("addUsername").value.trim();
       const role = document.getElementById("userRoleDropdownValue").textContent.trim();
-      const programDepartmentWrapper = document.getElementById('addUserProgramDepartmentWrapper');
-      const programDepartmentSelect = document.getElementById('addUserProgramDepartment');
-      let program_department = null;
+
+      const selectWrapper = document.getElementById('addUserSingleSelectWrapper');
+      const selectField = document.getElementById('addUserSelectField');
+
+      let payloadData = {};
 
       if (!first_name || !last_name || !username || role === "Select Role") {
         return alert("Please fill in all required fields (First Name, Last Name, Username, Role).");
       }
 
-      if (!programDepartmentWrapper.classList.contains('hidden')) {
-        program_department = programDepartmentSelect.value;
-        if (!program_department) {
-            const fieldName = role.toLowerCase() === 'student' ? 'Program' : 'Department';
-            return alert(`Please select a ${fieldName}.`);
+      if (selectWrapper && !selectWrapper.classList.contains('hidden')) {
+        const selectedValue = selectField.value;
+
+        if (!selectedValue) {
+          const fieldName = role.toLowerCase() === 'student' ? 'Course/Program' : 'College/Department';
+          return alert(`Please select a ${fieldName}.`);
+        }
+
+        if (role.toLowerCase() === 'student') {
+          payloadData.course_id = selectedValue;
+        } else if (role.toLowerCase() === 'faculty' || role.toLowerCase() === 'staff') {
+          payloadData.college_id = selectedValue;
         }
       }
 
@@ -494,7 +521,8 @@ window.addEventListener("DOMContentLoaded", () => {
             last_name: last_name,
             username: username,
             role: role,
-            program_department: program_department,
+            ...(payloadData.course_id && { course_id: payloadData.course_id }),
+            ...(payloadData.college_id && { college_id: payloadData.college_id }),
             modules: checkedModules
           })
         });
@@ -513,13 +541,11 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Table click handler (edit, delete, toggle, allow edit) ---
   if (userTableBody) {
     userTableBody.addEventListener("click", async (e) => {
       const row = e.target.closest("tr");
       if (!row || row.dataset.placeholder) return;
 
-      // get index among visible rows (works because we render only rows we want)
       const validRows = Array.from(userTableBody.querySelectorAll("tr:not([data-placeholder='true'])"));
       const index = validRows.indexOf(row);
       if (index < 0) return;
@@ -527,7 +553,6 @@ window.addEventListener("DOMContentLoaded", () => {
       const user = users[index];
       if (!user) return;
 
-      // EDIT
       if (e.target.closest(".editUserBtn")) {
         currentEditingUserId = user.user_id;
 
@@ -540,7 +565,6 @@ window.addEventListener("DOMContentLoaded", () => {
         document.getElementById("editStatusDropdownValue").textContent = user.status;
         document.querySelector("#editUserTitle span").textContent = user.name;
 
-        // --- Modules checkboxes ---
         const editModulesContainer = document.getElementById("editPermissionsContainer");
         if (editModulesContainer) {
           if (user.role.toLowerCase() === 'admin' || user.role.toLowerCase() === 'librarian') {
@@ -561,9 +585,6 @@ window.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add("overflow-hidden");
       }
 
-
-
-      // DELETE
       if (e.target.closest(".deleteUserBtn")) {
         if (!confirm(`Delete user "${user.name}" (${user.role})?`)) return;
         try {
@@ -605,7 +626,6 @@ window.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // ALLOW EDIT
       if (e.target.closest(".allow-edit-btn")) {
         const userId = user.user_id;
         if (!confirm(`Allow "${user.name}" to edit their profile?`)) return;
@@ -618,7 +638,7 @@ window.addEventListener("DOMContentLoaded", () => {
           const data = await res.json();
           if (data.success) {
             alert(data.message || "User can now edit their profile.");
-            await loadUsers(); // refresh table
+            await loadUsers();
           } else {
             alert("Error: " + (data.message || "Failed to allow edit."));
           }
@@ -630,12 +650,11 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Save edited user ---
   const saveEditBtn = document.getElementById("saveEditUser");
   if (saveEditBtn) {
     saveEditBtn.addEventListener("click", async () => {
       if (!currentEditingUserId) return;
-      
+
       const role = document.getElementById("editRoleDropdownValue").textContent.trim();
 
       const payload = {
@@ -661,7 +680,6 @@ window.addEventListener("DOMContentLoaded", () => {
         payload.password = newPassword;
       }
 
-      // Collect permissions if editPermissionsContainer visible
       const permContainer = document.getElementById("editPermissionsContainer");
       if (permContainer && !permContainer.classList.contains("hidden")) {
         payload.modules = Array.from(document.querySelectorAll('input[name="editModules[]"]:checked')).map(cb => cb.value);
@@ -690,7 +708,6 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Password toggles ---
   const togglePasswordCheckbox = document.getElementById('togglePassword');
   if (togglePasswordCheckbox) {
     togglePasswordCheckbox.addEventListener('change', () => {
@@ -725,7 +742,7 @@ window.addEventListener("DOMContentLoaded", () => {
       case "student": return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
       case "librarian": return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
       case "admin": return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
-      case "faculty" : return `<span class="bg-emerald-600 text-white ${base}">${role}</span>`;
+      case "faculty": return `<span class="bg-emerald-600 text-white ${base}">${role}</span>`;
       case "staff": return `<span class="bg-teal-600 text-white ${base}">${role}</span>`;
       case "superadmin": return `<span class="bg-purple-600 text-white ${base}">${role}</span>`;
       default: return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
@@ -736,6 +753,5 @@ window.addEventListener("DOMContentLoaded", () => {
     return status.toLowerCase() === "active" ? `<span class="bg-green-500 text-white ${base}">Active</span>` : `<span class="bg-gray-300 text-gray-700 ${base}">Inactive</span>`;
   }
 
-  // --- Initial load ---
   loadUsers();
 });

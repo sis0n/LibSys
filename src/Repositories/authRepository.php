@@ -16,6 +16,7 @@ class AuthRepository
   {
     $this->userRepo = new UserRepository();
     $this->userModuleRepo = new UserPermissionModuleRepository();
+    $this->collegeCourseRepo = new CollegeCourseRepository();
   }
 
   public function attemptLogin(string $username, string $password): ?array
@@ -38,7 +39,6 @@ class AuthRepository
       $modules = [];
       $role = strtolower(trim($user['role'] ?? 'guest'));
 
-      // DITO ANG FIX: Initialize $departmentOrCourse with null
       $departmentOrCourse = null;
 
       if ($role === 'student' && isset($user['course_id'])) {
@@ -59,7 +59,6 @@ class AuthRepository
         'faculty_id' => $user['faculty_id'] ?? null,
         'staff_id' => $user['staff_id'] ?? null,
 
-        // Gumagamit na ng initialized variable.
         'program_department' => $departmentOrCourse,
 
         'username' => $user['username'] ?? $user['student_number'] ?? $username,

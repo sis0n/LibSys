@@ -1,6 +1,4 @@
 <?php
-// File: App/Repositories/CollegeCourseRepository.php
-
 namespace App\Repositories;
 
 use App\Core\Database; // Assuming this is your database connection class

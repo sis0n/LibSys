@@ -44,14 +44,13 @@ class StudentProfileController extends Controller
 
     if (move_uploaded_file($file['tmp_name'], $targetFile)) {
       return BASE_URL . $targetFile;
-      
     }
     return null;
   }
 
   private function validateImageUpload($file)
   {
-    $maxSize = 1 * 1024 * 1024; 
+    $maxSize = 1 * 1024 * 1024;
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
 
     if ($file['error'] !== UPLOAD_ERR_OK) return "Upload error.";
@@ -113,10 +112,10 @@ class StudentProfileController extends Controller
       $data = $_POST;
       $profile = $this->studentRepo->getProfileByUserId($currentUserId);
 
-      $requiredFields = ['first_name', 'last_name', 'course', 'year_level', 'section', 'email', 'contact'];
+      $requiredFields = ['first_name', 'last_name', 'course_id', 'year_level', 'section', 'email', 'contact'];
       $missingFields = [];
       foreach ($requiredFields as $field) {
-        if (!isset($data[$field]) || trim($data[$field]) === '') {
+        if (!isset($data[$field]) || trim($data[$field]) === '' || (is_numeric($data[$field]) && (int)$data[$field] === 0)) {
           $missingFields[] = $field;
         }
       }
@@ -125,6 +124,11 @@ class StudentProfileController extends Controller
           'success' => false,
           'message' => 'Please fill in all required fields. (Missing: ' . implode(', ', $missingFields) . ')'
         ], 400);
+      }
+
+      $courseId = filter_var($data['course_id'], FILTER_VALIDATE_INT);
+      if (!$courseId) {
+        return $this->json(['success' => false, 'message' => 'Invalid course selection.'], 400);
       }
 
       if (!preg_match('/^\d{11}$/', $data['contact'])) {
@@ -176,9 +180,8 @@ class StudentProfileController extends Controller
 
       $this->userRepo->updateUser($currentUserId, $userData);
 
-      // --- STUDENT DATA UPDATE ---
       $studentData = [
-        'course' => $data['course'],
+        'course_id' => $courseId, 
         'year_level' => $data['year_level'],
         'section' => $data['section'],
         'contact' => $data['contact'],

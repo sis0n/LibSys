@@ -151,6 +151,7 @@ class RouteConfig
         $router->get('api/student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
         $router->get('api/student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
         $router->post('api/student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
+        $router->get('api/data/getAllCourses', 'DataController@getAllCourses', ['student']);
 
         // General AJAX routes
         $router->get('api/attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['attendance logs', 'superadmin']);

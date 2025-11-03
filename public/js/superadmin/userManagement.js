@@ -50,12 +50,12 @@ window.addEventListener("DOMContentLoaded", () => {
     if (normalizedRole === 'student') {
       label.innerHTML = 'Course/Program <span class="text-red-500">*</span>';
       wrapper.classList.remove('hidden');
-      loadCoursesForStudent(selectedValue);
+      loadCoursesForStudent(selectedValue); 
     } else if (normalizedRole === 'faculty' || normalizedRole === 'staff') {
       label.innerHTML = 'Department <span class="text-red-500">*</span>';
       wrapper.classList.remove('hidden');
-      loadDepartments(selectedValue);
-    } else {
+      loadDepartments(selectedValue); 
+    } else { 
       wrapper.classList.add('hidden');
       const select = document.getElementById('addUserSelectField');
       if (select) select.innerHTML = '';

@@ -1,7 +1,7 @@
 <?php if (!empty($csrf_token)) : ?>
-    <input type="hidden" id="csrf_token" value="<?= $csrf_token ?>">
+<input type="hidden" id="csrf_token" value="<?= $csrf_token ?>">
 <?php endif; ?>
-<main class="min-h-screen">
+<main class="min-h-screen w-full">
     <!-- Header -->
     <div class="flex items-center gap-3 mb-6">
         <i class="ph-fill ph-book-open-text text-3xl text-gray-700"></i>
@@ -65,39 +65,38 @@
         <p class="text-gray-600 mb-6">Books that have been soft-deleted can be restored or permanently archived.</p>
 
         <div class="overflow-x-auto rounded-lg border border-orange-200">
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200 text-sm table-fixed"> <!-- Added table-fixed -->
-                    <thead class="bg-orange-100">
-                        <tr>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[28%]">
-                                Book Title
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
-                                Author
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
-                                Accession Number
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
-                                Deleted Date
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
-                                Deleted By
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="deletedBooksTableBody" class="bg-white divide-y divide-gray-200"></tbody>
-                </table>
-            </div>
+            <table class="min-w-full divide-y divide-gray-200 text-sm table-fixed">
+                <!-- Added table-fixed -->
+                <thead class="bg-orange-100">
+                    <tr>
+                        <th scope="col"
+                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[28%]">
+                            Book Title
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+                            Author
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
+                            Accession Number
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
+                            Deleted Date
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
+                            Deleted By
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="deletedBooksTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+            </table>
             <p id="noDeletedBooksFound" class="text-gray-500 text-center w-full py-10 hidden">
                 <i class="ph ph-book-open-text text-4xl block mb-2 text-gray-400"></i>
                 No deleted books found.
@@ -106,12 +105,12 @@
 
         <!-- Pagination Controls -->
         <div id="pagination-container" class="flex justify-center items-center mt-6 hidden">
-            <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
+            <nav class="bg-white text-sm font-medium px-8 py-3 rounded-full shadow-md border border-gray-200">
                 <ul class="flex items-center gap-4 text-sm">
                     <!-- Previous -->
                     <li>
                         <a href="#" id="prev-page"
-                            class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                            class="flex items-center gap-1 text-gray-600 hover:text-gray-700 transition">
                             <i class="ph ph-caret-left"></i>
                             <span>Previous</span>
                         </a>
@@ -125,7 +124,7 @@
                     <!-- Next -->
                     <li>
                         <a href="#" id="next-page"
-                            class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                            class="flex items-center gap-1 text-gray-600 hover:text-gray-700 transition">
                             <span>Next</span>
                             <i class="ph ph-caret-right"></i>
                         </a>
@@ -134,115 +133,119 @@
             </nav>
         </div>
     </div>
-</main>
 
-<template id="deleted-book-row-template">
-    <tr class="hover:bg-orange-50 cursor-pointer deleted-book-row">
-        <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900 book-title"></div>
-            <div class="text-xs text-gray-500 book-isbn"></div>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 book-author"></td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 book-accession-number"></td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 book-deleted-date"></td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 book-deleted-by"></td>
-        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <button
-                class="restore-btn inline-flex items-center px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-2">
-                <i class="ph ph-arrow-counter-clockwise text-lg mr-1"></i> Restore
-            </button>
-            <button
-                class="archive-btn inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
-                <i class="ph ph-archive text-lg mr-1"></i> Archive
-            </button>
-        </td>
-    </tr>
-</template>
 
-<script src="<?= BASE_URL ?>/js/superadmin/restoreBooks.js"></script>
+    <template id="deleted-book-row-template">
+        <tr class="hover:bg-orange-50 cursor-pointer deleted-book-row">
+            <td class="px-6 py-4">
+                <div class="text-sm font-medium text-gray-900 book-title truncate" title=""></div>
+                <div class="text-xs text-gray-500 book-isbn"></div>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500 book-author truncate" title=""></td>
+            <td class="px-6 py-4 text-sm text-gray-500 book-accession-number"></td>
+            <td class="px-6 py-4 text-sm text-gray-500 book-deleted-date"></td>
+            <td class="px-6 py-4 text-sm text-gray-500 book-deleted-by truncate" title=""></td>
+            <td class="px-6 py-4 text-right text-sm font-medium">
+                <div class="flex items-center justify-end gap-2">
+                    <button
+                        class="restore-btn inline-flex items-center px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" title="Restore Book">
+                        <i class="ph ph-arrow-counter-clockwise text-lg"></i>
+                        Restore
+                    </button>
+                    <button
+                        class="archive-btn inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700" title="Archive Book">
+                        <i class="ph ph-archive text-lg"></i>
+                        Archive
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </template>
 
-<!-- Book Details Modal -->
-<div id="bookDetailsModal"
-    class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg flex flex-col">
-        <!-- Header -->
-        <div class="px-5 py-3 border-b border-gray-200 flex justify-between items-center">
-            <div>
-                <h3 class="text-xl font-semibold text-orange-600">Deleted Book Details</h3>
-                <p class="text-sm text-gray-500">Information about this deleted book</p>
+    <script src="<?= BASE_URL ?>/js/superadmin/restoreBooks.js"></script>
+
+    <!-- Book Details Modal -->
+    <div id="bookDetailsModal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg flex flex-col">
+            <!-- Header -->
+            <div class="px-5 py-3 border-b border-gray-200 flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-semibold text-orange-600">Deleted Book Details</h3>
+                    <p class="text-sm text-gray-500">Information about this deleted book</p>
+                </div>
+                <button id="closeBookDetailsModalBtn" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
             </div>
-            <button id="closeBookDetailsModalBtn" class="text-gray-400 hover:text-gray-600 transition">
-                <i class="ph ph-x text-xl"></i>
-            </button>
-        </div>
 
-        <!-- Content -->
-        <div class="p-5 space-y-4 overflow-y-auto max-h-[80vh]">
-            <!-- Book Info -->
-            <div class="border border-gray-200 rounded-lg p-3 shadow-sm">
-                <h4 class="text-xs font-semibold text-orange-500 mb-2 uppercase tracking-wider">Book Information</h4>
-                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                    <div>
-                        <p class="text-gray-500">Accession No.</p>
-                        <p id="modalBookAccessionNumber" class="font-medium text-gray-800"></p>
-                    </div>
-                    <div>
-                        <p class="text-gray-500">Call No.</p>
-                        <p id="modalBookCallNumber" class="font-medium text-gray-800"></p>
-                    </div>
-                    <div>
-                        <p class="text-gray-500">ISBN</p>
-                        <p id="modalBookIsbn" class="font-medium text-gray-800"></p>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-gray-500">Title</p>
-                        <p id="modalBookTitle" class="font-medium text-gray-800"></p>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-gray-500">Author(s)</p>
-                        <p id="modalBookAuthor" class="font-medium text-gray-800"></p>
-                    </div>
-                    <div>
-                        <p class="text-gray-500">Publisher</p>
-                        <p id="modalBookPublisher" class="font-medium text-gray-800"></p>
-                    </div>
-                    <div>
-                        <p class="text-gray-500">Year</p>
-                        <p id="modalBookYear" class="font-medium text-gray-800"></p>
-                    </div>
+            <!-- Content -->
+            <div class="p-5 space-y-4 overflow-y-auto max-h-[80vh]">
+                <!-- Book Info -->
+                <div class="border border-gray-200 rounded-lg p-3 shadow-sm">
+                    <h4 class="text-xs font-semibold text-orange-500 mb-2 uppercase tracking-wider">Book Information
+                    </h4>
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                        <div>
+                            <p class="text-gray-500">Accession No.</p>
+                            <p id="modalBookAccessionNumber" class="font-medium text-gray-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Call No.</p>
+                            <p id="modalBookCallNumber" class="font-medium text-gray-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">ISBN</p>
+                            <p id="modalBookIsbn" class="font-medium text-gray-800"></p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-gray-500">Title</p>
+                            <p id="modalBookTitle" class="font-medium text-gray-800"></p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-gray-500">Author(s)</p>
+                            <p id="modalBookAuthor" class="font-medium text-gray-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Publisher</p>
+                            <p id="modalBookPublisher" class="font-medium text-gray-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Year</p>
+                            <p id="modalBookYear" class="font-medium text-gray-800"></p>
+                        </div>
 
-                    <div class="col-span-2">
-                        <p class="text-gray-500">Subject</p>
-                        <p id="modalBookSubject" class="font-medium text-gray-800"></p>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-gray-500">Place of Publication</p>
-                        <p id="modalBookPlace" class="font-medium text-gray-800"></p>
+                        <div class="col-span-2">
+                            <p class="text-gray-500">Subject</p>
+                            <p id="modalBookSubject" class="font-medium text-gray-800"></p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-gray-500">Place of Publication</p>
+                            <p id="modalBookPlace" class="font-medium text-gray-800"></p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Deletion Info -->
-            <div class="border border-gray-200 rounded-lg p-3 shadow-sm">
-                <h4 class="text-xs font-semibold text-orange-500 mb-2 uppercase tracking-wider">Deletion Details</h4>
-                <div class="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                        <p class="text-gray-500">Created Date</p>
-                        <p id="modalBookCreatedDate" class="font-medium text-gray-800"></p>
-                    </div>
-                    <div>
-                        <p class="text-gray-500">Deleted Date</p>
-                        <p id="modalBookDeletedDate" class="font-medium text-gray-800"></p>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-gray-500">Deleted By</p>
-                        <p id="modalBookDeletedBy" class="font-medium text-gray-800"></p>
+                <!-- Deletion Info -->
+                <div class="border border-gray-200 rounded-lg p-3 shadow-sm">
+                    <h4 class="text-xs font-semibold text-orange-500 mb-2 uppercase tracking-wider">Deletion Details
+                    </h4>
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <p class="text-gray-500">Created Date</p>
+                            <p id="modalBookCreatedDate" class="font-medium text-gray-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Deleted Date</p>
+                            <p id="modalBookDeletedDate" class="font-medium text-gray-800"></p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-gray-500">Deleted By</p>
+                            <p id="modalBookDeletedBy" class="font-medium text-gray-800"></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<!-- Idinagdag ang hidden input field para sa CSRF Token -->
-<input type="hidden" id="csrf_token" value="<?= $csrf_token ?? '' ?>">
+</main>

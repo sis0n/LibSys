@@ -94,14 +94,14 @@
 
         <!-- Pagination Controls -->
         <div id="pagination-container" class="flex justify-center items-center mt-6 hidden">
-            <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
+            <nav class="bg-white px-8 py-3 text-sm font-medium rounded-full shadow-md border border-gray-200">
                 <ul class="flex items-center gap-4 text-sm">
                     <li><a href="#" id="prev-page"
-                            class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition"><i
+                            class="flex items-center gap-1 text-gray-600 hover:text-gray-700 transition"><i
                                 class="ph ph-caret-left"></i><span>Previous</span></a></li>
                     <div id="pagination-numbers" class="flex items-center gap-3"></div>
                     <li><a href="#" id="next-page"
-                            class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition"><span>Next</span><i
+                            class="flex items-center gap-1 text-gray-600 hover:text-gray-700 transition"><span>Next</span><i
                                 class="ph ph-caret-right"></i></a></li>
                 </ul>
             </nav>

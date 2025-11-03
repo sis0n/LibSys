@@ -224,13 +224,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const tr = newRow.querySelector('tr');
             tr.dataset.bookId = book.id;
 
-            newRow.querySelector('.book-title').textContent = book.title || 'N/A';
+            const bookTitleEl = newRow.querySelector('.book-title');
+            bookTitleEl.textContent = book.title || 'N/A';
+            bookTitleEl.title = book.title || 'N/A';
+
             newRow.querySelector('.book-isbn').textContent = `ISBN: ${book.book_isbn || 'N/A'}`;
-            newRow.querySelector('.book-author').textContent = book.author || 'N/A';
+
+            const bookAuthorEl = newRow.querySelector('.book-author');
+            bookAuthorEl.textContent = book.author || 'N/A';
+            bookAuthorEl.title = book.author || 'N/A';
+
             newRow.querySelector('.book-accession-number').textContent = book.accession_number || 'N/A';
 
             newRow.querySelector('.book-deleted-date').textContent = formatDate(book.deleted_at);
-            newRow.querySelector('.book-deleted-by').textContent = book.deleted_by_name || 'N/A';
+
+            const deletedByEl = newRow.querySelector('.book-deleted-by');
+            deletedByEl.textContent = book.deleted_by_name || 'N/A';
+            deletedByEl.title = book.deleted_by_name || 'N/A';
 
             const restoreBtn = newRow.querySelector('.restore-btn');
             restoreBtn.addEventListener('click', (e) => {

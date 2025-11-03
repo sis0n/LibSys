@@ -9,9 +9,12 @@ class Attendance
     private string $first_name;
     private ?string $middle_name;
     private string $last_name;
-    private string $year_level;
-    private string $course;
-    private string $source;      
+
+    private int $year_level;
+    private string $section;
+    private int $course_id;
+
+    private string $source;
     private string $timestamp;
 
     public function __construct(
@@ -20,8 +23,11 @@ class Attendance
         string $first_name,
         ?string $middle_name,
         string $last_name,
-        string $year_level,
-        string $course,
+
+        int $year_level,
+        string $section,
+        int $course_id,
+
         string $source,
         string $timestamp
     ) {
@@ -30,8 +36,11 @@ class Attendance
         $this->first_name = $first_name;
         $this->middle_name = $middle_name;
         $this->last_name = $last_name;
+
         $this->year_level = $year_level;
-        $this->course = $course;
+        $this->section = $section;
+        $this->course_id = $course_id;
+
         $this->source = $source;
         $this->timestamp = $timestamp;
     }
@@ -61,14 +70,19 @@ class Attendance
         return $this->last_name;
     }
 
-    public function getYearLevel(): string
+    public function getYearLevel(): int
     {
         return $this->year_level;
     }
 
-    public function getCourse(): string
+    public function getSection(): string
     {
-        return $this->course;
+        return $this->section;
+    }
+
+    public function getCourseId(): int
+    {
+        return $this->course_id;
     }
 
     public function getSource(): string
@@ -79,6 +93,11 @@ class Attendance
     public function getTimestamp(): string
     {
         return $this->timestamp;
+    }
+
+    public function getCourse(): string
+    {
+        return (string)$this->course_id;
     }
 
     public function getCreatedAt(): string

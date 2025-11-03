@@ -19,6 +19,7 @@
         "symfony/polyfill-ctype": "*",
         "endroid/qr-code": "^6.0@dev",
         "khanamiryan/qrcode-detector-decoder": "dev-master",
-        "dompdf/dompdf": "3.0"
+        "dompdf/dompdf": "3.0",
+        "phpmailer/phpmailer": "dev-master"
     }
 }

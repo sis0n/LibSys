@@ -59,6 +59,7 @@ class AttendanceController extends Controller
     {
         $period = $_GET['period'] ?? 'Today';
         $search = $_GET['search'] ?? '';
+        $courseName = isset($_GET['course']) && $_GET['course'] !== 'All Courses' ? $_GET['course'] : null;
         date_default_timezone_set('Asia/Manila');
 
         switch ($period) {
@@ -77,7 +78,7 @@ class AttendanceController extends Controller
                 break;
         }
 
-        $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search);
+        $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search, $courseName);
 
         $formattedLogs = [];
         foreach ($logs as $log) {

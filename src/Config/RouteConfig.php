@@ -3,7 +3,8 @@
 namespace App\Config;
 
 use App\Core\Router;
-use App\Controllers\ViewController; // Siguraduhin na na-import
+use App\Controllers\ViewController;
+use App\Controllers\DomPdfTemplateController; // Added for PDF report generation
 
 class RouteConfig
 {
@@ -142,6 +143,13 @@ class RouteConfig
         $router->get('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
         $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
         $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
+        $router->get('api/superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);    
+        $router->get('api/superadmin/reports/top-visitors', 'ReportController@getTopVisitors', ['superadmin']);
+        $router->get('api/superadmin/reports/deleted-books', 'ReportController@getDeletedBooks', ['superadmin']);
+        $router->get('api/superadmin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment', ['superadmin']);
+
+        // PDF Report Generation Route
+        $router->post('generate-report', 'DomPdfTemplateController@generateLibraryReport', ['superadmin']);
 
         // --- STUDENT (AJAX/Data Routes) ---
         $router->get('api/student/attendance/get', 'AttendanceController@getMyAttendance', ['student']);

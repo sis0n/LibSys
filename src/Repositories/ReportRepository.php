@@ -1,0 +1,287 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Core\Database;
+use PDO;
+use Exception;
+
+class ReportRepository
+{
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Database::getInstance()->getConnection();
+    }
+
+    public function getCirculatedBooksSummary()
+    {
+        try {
+            $sql = "
+                SELECT
+                    'Student' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = CURDATE() THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(CURDATE(), 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) AND MONTH(bt.borrowed_at) = MONTH(CURDATE()) THEN bti.item_id END) AS month,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) THEN bti.item_id END) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.student_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.book_id IS NOT NULL
+                UNION ALL
+                SELECT
+                    'Faculty' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = CURDATE() THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(CURDATE(), 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) AND MONTH(bt.borrowed_at) = MONTH(CURDATE()) THEN bti.item_id END) AS month,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) THEN bti.item_id END) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.faculty_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.book_id IS NOT NULL
+                UNION ALL
+                SELECT
+                    'Staff' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = CURDATE() THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(CURDATE(), 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) AND MONTH(bt.borrowed_at) = MONTH(CURDATE()) THEN bti.item_id END) AS month,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) THEN bti.item_id END) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.staff_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.book_id IS NOT NULL
+                UNION ALL
+                SELECT
+                    'TOTAL' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = CURDATE() THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(CURDATE(), 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) AND MONTH(bt.borrowed_at) = MONTH(CURDATE()) THEN bti.item_id END) AS month,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) THEN bti.item_id END) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bti.status IN ('borrowed', 'returned', 'overdue') AND bti.book_id IS NOT NULL;
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getCirculatedBooksSummary: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getTopVisitorsByYear()
+    {
+        try {
+            $sql = "
+                SELECT
+                    CONCAT(u.first_name, ' ', u.last_name) AS full_name,
+                    s.student_number AS student_number,
+                    COALESCE(c.course_code, 'N/A') AS course,
+                    COUNT(a.user_id) AS visits
+                FROM attendance a
+                JOIN students s ON a.user_id = s.user_id
+                JOIN users u ON s.user_id = u.user_id
+                LEFT JOIN courses c ON s.course_id = c.course_id
+                WHERE YEAR(a.date) = YEAR(CURDATE())
+                GROUP BY a.user_id, u.first_name, u.last_name, s.student_id, c.course_code
+                ORDER BY visits DESC
+                LIMIT 10;
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getTopVisitorsByYear: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getLibraryVisitsByDepartment()
+    {
+        try {
+            $sql = "
+                WITH DepartmentVisits AS (
+                    SELECT
+                        cl.college_name AS department,
+                        COUNT(CASE WHEN DATE(a.date) = CURDATE() THEN a.id END) AS today,
+                        COUNT(CASE WHEN a.date >= CURDATE() - INTERVAL 6 DAY THEN a.id END) AS week,
+                        COUNT(CASE WHEN MONTH(a.date) = MONTH(CURDATE()) AND YEAR(a.date) = YEAR(CURDATE()) THEN a.id END) AS month,
+                        COUNT(CASE WHEN YEAR(a.date) = YEAR(CURDATE()) THEN a.id END) AS year
+                    FROM colleges cl
+                    LEFT JOIN courses c ON cl.college_id = c.college_id
+                    LEFT JOIN students s ON c.course_id = s.course_id
+                    LEFT JOIN attendance a ON s.user_id = a.user_id
+                    GROUP BY cl.college_name
+                )
+                SELECT * FROM DepartmentVisits
+                UNION ALL
+                SELECT
+                    'TOTAL' AS department,
+                    SUM(today) AS today,
+                    SUM(week) AS week,
+                    SUM(month) AS month,
+                    SUM(year) AS year
+                FROM DepartmentVisits;
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getLibraryVisitsByDepartment: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getDeletedBooksReport()
+    {
+        try {
+            $sql = "
+                SELECT
+                    YEAR(deleted_at) as year,
+                    SUM(CASE WHEN MONTH(deleted_at) = MONTH(CURDATE()) AND YEAR(deleted_at) = YEAR(CURDATE()) THEN 1 ELSE 0 END) as month,
+                    SUM(CASE WHEN DATE(deleted_at) = CURDATE() THEN 1 ELSE 0 END) as today,
+                    COUNT(*) as count
+                FROM books
+                WHERE deleted_at IS NOT NULL
+                GROUP BY YEAR(deleted_at)
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getDeletedBooksReport: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // --- New Methods for PDF Generation with Date Range --- 
+
+    public function getLibraryResourcesData($startDate, $endDate)
+    {
+        // Placeholder data as logic is not specified
+        return [
+            [ 'year' => 2025, 'title' => '-', 'volume' => '-', 'processed' => '-' ],
+            [ 'year' => 2026, 'title' => '-', 'volume' => '-', 'processed' => '-' ],
+            [ 'year' => 2027, 'title' => '-', 'volume' => '-', 'processed' => '-' ],
+        ];
+    }
+
+    public function getDeletedBooksData($startDate, $endDate)
+    {
+        try {
+            $sql = "
+                SELECT
+                    SUM(CASE WHEN DATE(deleted_at) = :endDate THEN 1 ELSE 0 END) as today,
+                    SUM(CASE WHEN YEARWEEK(deleted_at, 1) = YEARWEEK(:endDate, 1) THEN 1 ELSE 0 END) as week,
+                    SUM(CASE WHEN MONTH(deleted_at) = MONTH(:endDate) AND YEAR(deleted_at) = YEAR(:endDate) THEN 1 ELSE 0 END) as month,
+                    COUNT(*) as year
+                FROM books
+                WHERE deleted_at BETWEEN :startDate AND :endDate;
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getDeletedBooksData: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getCirculatedBooksData($startDate, $endDate)
+    {
+        try {
+            $sql = "
+                SELECT
+                    'Student' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = :endDate THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(:endDate, 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
+                    COUNT(bti.item_id) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.student_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bt.borrowed_at BETWEEN :startDate AND :endDate
+                UNION ALL
+                SELECT
+                    'Faculty' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = :endDate THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(:endDate, 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
+                    COUNT(bti.item_id) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.faculty_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bt.borrowed_at BETWEEN :startDate AND :endDate
+                UNION ALL
+                SELECT
+                    'Staff' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = :endDate THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(:endDate, 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
+                    COUNT(bti.item_id) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.staff_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bt.borrowed_at BETWEEN :startDate AND :endDate;
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getCirculatedBooksData: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getTopVisitorsData($startDate, $endDate)
+    {
+        try {
+            $sql = "
+                SELECT
+                    CONCAT(u.first_name, ' ', u.last_name) AS full_name,
+                    s.student_number AS student_number,
+                    COALESCE(c.course_code, 'N/A') AS course,
+                    COUNT(a.user_id) AS visits
+                FROM attendance a
+                JOIN students s ON a.user_id = s.user_id
+                JOIN users u ON s.user_id = u.user_id
+                LEFT JOIN courses c ON s.course_id = c.course_id
+                WHERE a.date BETWEEN :startDate AND :endDate
+                GROUP BY a.user_id, u.first_name, u.last_name, s.student_id, c.course_code
+                ORDER BY visits DESC
+                LIMIT 10;
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getTopVisitorsData: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getLibraryVisitsData($startDate, $endDate)
+    {
+        try {
+            $sql = "
+                WITH DepartmentVisits AS (
+                    SELECT
+                        cl.college_name AS department,
+                        COUNT(CASE WHEN DATE(a.date) = :endDate THEN a.id END) AS today,
+                        COUNT(CASE WHEN a.date BETWEEN DATE_SUB(:endDate, INTERVAL 6 DAY) AND :endDate THEN a.id END) AS week,
+                        COUNT(CASE WHEN MONTH(a.date) = MONTH(:endDate) AND YEAR(a.date) = YEAR(:endDate) THEN a.id END) AS month,
+                        COUNT(a.id) AS year
+                    FROM colleges cl
+                    LEFT JOIN courses c ON cl.college_id = c.college_id
+                    LEFT JOIN students s ON c.course_id = s.course_id
+                    LEFT JOIN attendance a ON s.user_id = a.user_id AND a.date BETWEEN :startDate AND :endDate
+                    GROUP BY cl.college_name
+                )
+                SELECT * FROM DepartmentVisits
+                UNION ALL
+                SELECT
+                    'TOTAL' AS department,
+                    SUM(today) AS today,
+                    SUM(week) AS week,
+                    SUM(month) AS month,
+                    SUM(year) AS year
+                FROM DepartmentVisits;
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getLibraryVisitsData: " . $e->getMessage());
+            return [];
+        }
+    }
+}

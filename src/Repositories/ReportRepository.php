@@ -91,21 +91,33 @@ class ReportRepository
     public function getTopVisitorsByYear()
     {
         $sql = "
-            SELECT 
-                MAX(full_name) as full_name, 
-                MAX(student_number) as student_number, 
-                MAX(course) as course, 
-                COUNT(user_id) AS visits
-            FROM 
-                attendance_logs
-            WHERE 
-                YEAR(timestamp) = YEAR(CURDATE())
-                AND user_id IS NOT NULL
-            GROUP BY 
-                user_id
-            ORDER BY 
-                visits DESC
-            LIMIT 10;
+            SELECT
+                CONCAT(u.first_name, ' ', u.last_name) AS full_name,
+                s.student_number,
+                COALESCE(c.course_code, 'N/A') AS course,
+                top_visitors.visits
+            FROM (
+                SELECT
+                    student_number,
+                    COUNT(*) AS visits
+                FROM
+                    attendance_logs
+                WHERE
+                    YEAR(timestamp) = YEAR(CURDATE()) AND student_number IS NOT NULL AND student_number != ''
+                GROUP BY
+                    student_number
+                ORDER BY
+                    visits DESC
+                LIMIT 10
+            ) AS top_visitors
+            JOIN
+                students s ON top_visitors.student_number = s.student_number
+            JOIN
+                users u ON s.user_id = u.user_id
+            LEFT JOIN
+                courses c ON s.course_id = c.course_id
+            ORDER BY
+                top_visitors.visits DESC;
         ";
 
         $stmt = $this->db->prepare($sql);
@@ -117,43 +129,35 @@ class ReportRepository
     {
         $sql = "
             (SELECT
-                c.college_name AS department,
-                SUM(CASE WHEN DATE(al.timestamp) = CURDATE() THEN 1 ELSE 0 END) AS today,
-                SUM(CASE WHEN YEARWEEK(al.timestamp, 1) = YEARWEEK(CURDATE(), 1) THEN 1 ELSE 0 END) AS week,
-                SUM(CASE WHEN MONTH(al.timestamp) = MONTH(CURDATE()) AND YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month,
-                SUM(CASE WHEN YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS year
+                cl.college_name AS department,
+                SUM(CASE WHEN al.id IS NOT NULL AND DATE(al.timestamp) = CURDATE() THEN 1 ELSE 0 END) AS today,
+                SUM(CASE WHEN al.id IS NOT NULL AND YEARWEEK(al.timestamp) = YEARWEEK(CURDATE()) THEN 1 ELSE 0 END) AS week,
+                SUM(CASE WHEN al.id IS NOT NULL AND MONTH(al.timestamp) = MONTH(CURDATE()) AND YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month,
+                SUM(CASE WHEN al.id IS NOT NULL AND YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS year
             FROM
-                colleges c
+                colleges cl
             LEFT JOIN
-                courses crs ON c.college_id = crs.college_id
+                courses c ON cl.college_id = c.college_id
             LEFT JOIN
-                students s ON crs.course_id = s.course_id
-            LEFT JOIN
-                attendance_logs al ON s.student_id = al.student_id
+                attendance_logs al ON c.course_id = al.course_id
             GROUP BY
-                c.college_name)
+                cl.college_name)
             UNION ALL
             (SELECT
                 'Uncategorized' AS department,
                 SUM(CASE WHEN DATE(al.timestamp) = CURDATE() THEN 1 ELSE 0 END) AS today,
-                SUM(CASE WHEN YEARWEEK(al.timestamp, 1) = YEARWEEK(CURDATE(), 1) THEN 1 ELSE 0 END) AS week,
+                SUM(CASE WHEN YEARWEEK(al.timestamp) = YEARWEEK(CURDATE()) THEN 1 ELSE 0 END) AS week,
                 SUM(CASE WHEN MONTH(al.timestamp) = MONTH(CURDATE()) AND YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month,
                 SUM(CASE WHEN YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS year
             FROM
                 attendance_logs al
-            LEFT JOIN
-                students s ON al.student_id = s.student_id
-            LEFT JOIN
-                courses crs ON s.course_id = crs.course_id
-            LEFT JOIN
-                colleges c ON crs.college_id = c.college_id
             WHERE
-                c.college_id IS NULL AND al.student_id IS NOT NULL)
+                al.course_id IS NULL AND al.student_id IS NOT NULL)
             UNION ALL
             (SELECT
                 'TOTAL' AS department,
                 SUM(CASE WHEN DATE(al.timestamp) = CURDATE() THEN 1 ELSE 0 END) AS today,
-                SUM(CASE WHEN YEARWEEK(al.timestamp, 1) = YEARWEEK(CURDATE(), 1) THEN 1 ELSE 0 END) AS week,
+                SUM(CASE WHEN YEARWEEK(al.timestamp) = YEARWEEK(CURDATE()) THEN 1 ELSE 0 END) AS week,
                 SUM(CASE WHEN MONTH(al.timestamp) = MONTH(CURDATE()) AND YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month,
                 SUM(CASE WHEN YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS year
             FROM

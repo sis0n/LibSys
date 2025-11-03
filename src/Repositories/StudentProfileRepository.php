@@ -17,62 +17,70 @@ class StudentProfileRepository
   public function getProfileByUserId(int $userId): ?array
   {
     $stmt = $this->db->prepare("
-            SELECT 
-                u.user_id,
-                u.username,
-                u.first_name,
-                u.middle_name,
-                u.last_name,
-                u.suffix,
-                u.email,
-                u.profile_picture,
-                u.role,
-                u.is_active,
-                s.student_id,
-                s.student_number,
-                s.course,
-                s.year_level,
-                s.section,
-                s.contact,
-                s.registration_form,
-                s.profile_updated,
-                s.can_edit_profile
-            FROM users u
-            LEFT JOIN students s ON u.user_id = s.user_id
-            WHERE u.user_id = :userId AND u.deleted_at IS NULL
-        ");
+        SELECT 
+            u.user_id,
+            u.username,
+            u.first_name,
+            u.middle_name,
+            u.last_name,
+            u.suffix,
+            u.email,
+            u.profile_picture,
+            u.role,
+            u.is_active,
+            s.student_id,
+            s.student_number,
+            s.course_id, 
+            s.year_level,
+            s.section,
+            s.contact,
+            s.registration_form,
+            s.profile_updated,
+            s.can_edit_profile,
+            c.course_code,
+            c.course_title
+        FROM users u
+        LEFT JOIN students s ON u.user_id = s.user_id
+        LEFT JOIN courses c ON s.course_id = c.course_id /* <<< NEW JOIN: Para makuha ang pangalan ng kurso */
+        WHERE u.user_id = :userId AND u.deleted_at IS NULL
+    ");
     $stmt->execute([':userId' => $userId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result && $result['course_code'] && $result['course_title']) {
+      $result['course_full_name'] = $result['course_code'] . ' - ' . $result['course_title'];
+    }
+
     return $result ?: null;
   }
 
   public function updateStudentProfile(int $userId, array $data): bool
   {
+    $fields = [];
+    $params = [':userId' => $userId];
+
     $allowedFields = [
-      'course',
+      'course_id', 
       'year_level',
       'section',
       'contact',
-      'registration_form',
       'profile_updated',
       'can_edit_profile'
     ];
 
-    $sqlParts = [];
-    $params = [':user_id' => $userId];
-
-    foreach ($allowedFields as $field) {
-      if (isset($data[$field])) {
-        $sqlParts[] = "$field = :$field";
-        $params[":$field"] = $data[$field];
+    foreach ($data as $key => $value) {
+      if (in_array($key, $allowedFields)) {
+        $fields[] = "{$key} = :{$key}";
+        $params[":{$key}"] = $value;
       }
     }
 
-    if (empty($sqlParts)) {
-      return true;
+    if (empty($fields)) {
+      return false;
     }
 
-    $sql = "UPDATE students SET " . implode(", ", $sqlParts) . " WHERE user_id = :user_id";
+    $sql = "UPDATE students SET " . implode(', ', $fields) . " WHERE user_id = :userId";
+
     $stmt = $this->db->prepare($sql);
     return $stmt->execute($params);
   }

@@ -46,6 +46,7 @@ class RouteConfig
         $router->get('api/faculty/myprofile/get', 'FacultyProfileController@getProfile', ['faculty']);
         $router->post('api/faculty/myprofile/update', 'FacultyProfileController@updateProfile', ['faculty']);
         $router->get('api/faculty/borrowingHistory/fetch', 'FacultyBorrowingHistoryController@fetchHistory', ['faculty']);
+        $router->get('api/data/getColleges', 'DataController@getColleges', ['faculty']);
 
         // --- STAFF (AJAX/Data Routes) ---
         $router->get('api/staff/attendance/get', 'AttendanceController@getMyAttendance', ['staff']);
@@ -103,7 +104,8 @@ class RouteConfig
         $router->post('api/superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
         $router->post('api/superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
         $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
-        $router->get('api/superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
+        $router->get('api/superadmin/userManagement/getAllCourses', 'DataController@getAllCourses', ['superadmin']);
+        $router->get('api/superadmin/userManagement/getColleges', 'DataController@getColleges', ['superadmin']);
         $router->get('api/superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
@@ -153,6 +155,7 @@ class RouteConfig
         $router->get('api/student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
         $router->get('api/student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
         $router->post('api/student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
+        $router->get('api/data/getAllCourses', 'DataController@getAllCourses', ['student']);
 
         // General AJAX routes
         $router->get('api/attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['attendance logs', 'superadmin']);

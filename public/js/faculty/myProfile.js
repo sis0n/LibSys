@@ -1,13 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const departments = [
-        "College of Business and Accountancy",
-        "College of Criminal Justice Education",
-        "College of Education",
-        "College of Engineering",
-        "College of Law",
-        "College of Liberal Arts and Sciences",
-        "Graduate School"
-    ];
 
     const uploadInput = document.getElementById('uploadProfile');
     const profilePreview = document.getElementById('profilePreview');
@@ -30,28 +21,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileFacultyId = document.getElementById('profileFacultyId');
     const uploadLabel = document.getElementById('uploadLabel');
 
+    const departmentSelect = document.getElementById('department'); // Target SELECT ID
     const allInputs = profileForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select');
     const editableInputs = Array.from(allInputs).filter(input => input.id !== 'facultyId');
 
     const MAX_FILE_SIZE = 1 * 1024 * 1024;
     let originalProfileData = {};
+    let isEditing = false; // State tracker added
 
-    function populateDepartments() {
-        const select = document.getElementById('department');
-        if (!select) return;
-        const currentValue = select.value;
-        select.innerHTML = '';
-        const defaultOption = new Option('Select a Department', '');
-        select.add(defaultOption);
+    async function loadCollegeOptions(currentCollegeId = null) {
+        if (!departmentSelect) return;
 
-        departments.forEach(dept => {
-            const option = new Option(dept, dept);
-            select.add(option);
-        });
-        select.value = currentValue;
+        departmentSelect.innerHTML = '<option value="">Loading Departments...</option>';
+        departmentSelect.disabled = true;
+
+        try {
+            const res = await fetch('api/data/getColleges'); 
+            const data = await res.json();
+
+            departmentSelect.innerHTML = '';
+            const defaultOption = new Option('Select a Department', '');
+            departmentSelect.add(defaultOption);
+
+            if (data.success && Array.isArray(data.colleges)) {
+                data.colleges.forEach(college => {
+                    // VALUE is the college_id (INT)
+                    const option = new Option(`${college.college_code} - ${college.college_name}`, String(college.college_id));
+                    departmentSelect.add(option);
+                });
+            }
+
+            if (currentCollegeId) {
+                departmentSelect.value = String(currentCollegeId);  
+            }
+            if (isEditing) departmentSelect.disabled = false;
+
+        } catch (err) {
+            console.error("Error fetching college options:", err);
+            departmentSelect.innerHTML = `<option value="">Error loading departments</option>`;
+            departmentSelect.disabled = true;
+        }
     }
 
-    // --- Load Faculty Profile ---
+
     async function loadProfile() {
         try {
             const res = await fetch('api/faculty/myprofile/get');
@@ -62,10 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const profile = data.profile;
                 originalProfileData = profile;
 
-                const fullName = profile.full_name ||
-                    [profile.first_name, profile.middle_name, profile.last_name, profile.suffix]
-                        .filter(Boolean).join(' ') || 'Faculty Name';
-
+                const fullName = profile.full_name || [profile.first_name, profile.middle_name, profile.last_name, profile.suffix].filter(Boolean).join(' ') || 'Faculty Name';
                 profileName.textContent = fullName;
                 profileFacultyId.textContent = profile.unique_faculty_id || 'Faculty ID';
 
@@ -73,10 +82,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('middleName').value = profile.middle_name || '';
                 document.getElementById('lastName').value = profile.last_name || '';
                 document.getElementById('suffix').value = profile.suffix || '';
-                document.getElementById('department').value = profile.department || '';
                 document.getElementById('email').value = profile.email || '';
                 document.getElementById('contact').value = profile.contact || '';
                 document.getElementById('facultyId').value = profile.unique_faculty_id || '';
+
+                const currentCollegeId = String(profile.college_id || '');
+                const collegeDisplayName = profile.college_code ? `${profile.college_code} - ${profile.college_name}` : 'Select a Department';
+
+                if (!isEditing && departmentSelect) {
+                    departmentSelect.innerHTML = `<option value="${currentCollegeId}">${collegeDisplayName}</option>`;
+                    departmentSelect.value = currentCollegeId;
+                    departmentSelect.disabled = true;
+                } else if (isEditing) {
+                    loadCollegeOptions(currentCollegeId);
+                }
+
 
                 if (profile.profile_picture) {
                     profilePreview.src = profile.profile_picture;
@@ -89,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 editProfileBtn.classList.remove('hidden');
                 uploadLabel.classList.add('hidden');
-                // uploadLabel.classList.remove('hidden');
             } else {
                 throw new Error(data.message || 'Could not parse profile data.');
             }
@@ -99,36 +118,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Toggle Edit Mode ---
-    function toggleEdit(isEditing) {
-        editableInputs.forEach(input => {
-            input.disabled = !isEditing;
-            input.classList.toggle('bg-white', isEditing);
-            input.classList.toggle('border-gray-300', isEditing);
-            input.classList.toggle('focus:border-orange-500', isEditing);
-            input.classList.toggle('focus:ring-orange-500', isEditing);
-            input.classList.toggle('bg-gray-50', !isEditing);
-            input.classList.toggle('border-gray-200', !isEditing);
-        });
+    function toggleEdit(shouldEdit) {
+        isEditing = shouldEdit;
 
-        formActions.classList.toggle('hidden', !isEditing);
-        editProfileBtn.classList.toggle('hidden', isEditing);
-        uploadLabel.classList.toggle('hidden', !isEditing);
+        if (shouldEdit) {
+            loadCollegeOptions(originalProfileData.college_id); 
 
-        if (!isEditing) loadProfile(); // Revert changes on cancel
+            editableInputs.forEach(input => {
+                input.disabled = false;
+                input.classList.remove('bg-gray-50', 'border-gray-200');
+                input.classList.add('bg-white', 'border-gray-300', 'focus:border-orange-500', 'focus:ring-orange-500');
+            });
+            formActions.classList.remove('hidden');
+            editProfileBtn.classList.add('hidden');
+            uploadLabel.classList.remove('hidden');
+        } else {
+            editableInputs.forEach(input => {
+                input.disabled = true;
+                input.classList.add('bg-gray-50', 'border-gray-200');
+                input.classList.remove('bg-white', 'border-gray-300', 'focus:border-orange-500', 'focus:ring-orange-500');
+            });
+            formActions.classList.add('hidden');
+            editProfileBtn.classList.remove('hidden');
+            uploadLabel.classList.add('hidden');
+            loadProfile(); 
+        }
     }
+
 
     editProfileBtn?.addEventListener('click', () => toggleEdit(true));
     cancelProfileBtn?.addEventListener('click', () => toggleEdit(false));
 
-    // --- Submit Profile Form ---
     profileForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(profileForm);
 
-        // Validate required fields
-        const requiredFields = ['first_name', 'last_name', 'department', 'email', 'contact'];
-        const missingFields = requiredFields.filter(f => !formData.get(f) || formData.get(f).trim() === '');
+        const selectedCollegeId = formData.get('department');
+        formData.delete('department');
+        formData.append('college_id', selectedCollegeId); 
+
+        const requiredFields = ['first_name', 'last_name', 'college_id', 'email', 'contact'];
+        const missingFields = requiredFields.filter(f => !formData.get(f) || formData.get(f).trim() === '' || (f === 'college_id' && (formData.get(f) === '0' || formData.get(f) === '')));
+
         if (missingFields.length) {
             alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
             return;
@@ -156,6 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Profile updated successfully!');
                 croppedBlob = null;
                 uploadInput.value = "";
+
+                const newFullName = [formData.get('first_name'), formData.get('middle_name'), formData.get('last_name'), formData.get('suffix')].filter(Boolean).join(' ');
+                document.getElementById('headerFullname').textContent = newFullName;
+
                 loadProfile();
                 toggleEdit(false);
             } else {
@@ -167,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Profile Picture Upload & Crop ---
     uploadInput?.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -214,6 +248,5 @@ document.addEventListener('DOMContentLoaded', () => {
         cropper.destroy();
     });
 
-    populateDepartments();
     loadProfile();
 });

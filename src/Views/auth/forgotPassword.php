@@ -36,7 +36,7 @@
         type="submit"
         id="sendBtn"
         class="w-full bg-orange-600 text-white py-2.5 rounded-lg font-medium hover:bg-orange-700 disabled:bg-orange-300 disabled:text-orange-800 active:scale-[.98] transition-transform">
-        Send Password
+        Continue
       </button>
     </form>
 
@@ -47,7 +47,7 @@
     </div>
 
     <div class="mt-7 text-center">
-      <a href="login.html" class="text-sm text-orange-700 hover:underline font-medium">Back to Login</a>
+      <a href="login" class="text-sm text-orange-700 hover:underline font-medium">Back to Login</a>
     </div>
   </div>
 
@@ -56,32 +56,29 @@
   const alertBox = document.getElementById("alertBox");
   const message = document.getElementById("message");
   const sendBtn = document.getElementById("sendBtn");
-  let countdownInterval;
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
     sendBtn.disabled = true;
-    startTimer(60);
+    sendBtn.textContent = "Processing...";
 
-    alertBox.classList.remove("hidden");
-    message.textContent = "Checked. If registered, the instruction has been sent.";
+    // dito normally tatawag ka ng AJAX to backend para send otp to email
+    // after success
+    setTimeout(() => {
+      // pwede mo ilagay kung ano gusto mo message
+      alertBox.classList.remove("hidden");
+      message.textContent = "Verification code has been sent to your email.";
+
+      // redirect OTP page after 1s delay for UX smooth
+      setTimeout(() => {
+        window.location.href = "verifyOTP";
+      }, 1000);
+
+    }, 800);
   });
-
-  function startTimer(sec) {
-    sendBtn.textContent = `Resend in ${sec}s`;
-
-    countdownInterval = setInterval(() => {
-      sec--;
-      sendBtn.textContent = `Resend in ${sec}s`;
-      if (sec <= 0) {
-        clearInterval(countdownInterval);
-        sendBtn.disabled = false;
-        sendBtn.textContent = "Send Password Reset";
-      }
-    }, 1000);
-  }
 </script>
+
 
 </body>
 </html>

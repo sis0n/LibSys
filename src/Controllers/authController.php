@@ -213,4 +213,29 @@ class AuthController extends Controller
             ]);
         }
     }
+
+    public function resetPassword()
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        $this->view("auth/resetPassword", [
+            "title" => "Reset Password",
+            "csrf_token" => $_SESSION['csrf_token']
+        ], false);
+    }
+
+    public function verifyOTP()
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        $this->view("auth/verifyOTP", [
+            "title" => "Verify OTP",
+            "csrf_token" => $_SESSION['csrf_token']
+        ], false);
+        
+    }
+
+    
 }

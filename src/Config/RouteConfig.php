@@ -15,6 +15,8 @@ class RouteConfig
         $router->get('landingPage', 'GuestController@guestDisplay');
         $router->get('login', 'AuthController@showLogin');
         $router->get('forgotPassword', 'AuthController@forgotPassword');
+        $router->get('verifyOTP', 'AuthController@verifyOTP');
+        $router->get('resetPassword', 'AuthController@resetPassword');
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
 
         // --- API / DATA ROUTES (Lahat ay may 'api/' prefix) ---

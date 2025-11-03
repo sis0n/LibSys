@@ -6,8 +6,7 @@
   <title>Verify OTP</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/phosphor-icons@1.4.1/src/css/phosphor.css">
-
-  </head>
+</head>
 <body class="bg-gradient-to-br from-orange-50 to-green-50 font-sans flex items-center justify-center min-h-screen p-4">
   <div class="bg-white/95 backdrop-blur-sm border border-orange-200/60 shadow-xl shadow-orange-200/40 rounded-2xl p-8 w-full max-w-md">
 
@@ -200,7 +199,9 @@
     verifyBtn.textContent = 'Verifying...';
 
     setTimeout(() => {
-      const success = false; // simulate fail (change to true if success)
+      // === DUMMY OTP CHECK ===
+      // Accept only 123456 while testing
+      const success = (code === "123456");
 
       if(success){
         verifyBtn.textContent = 'Verified';

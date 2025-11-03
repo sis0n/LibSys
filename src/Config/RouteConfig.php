@@ -96,6 +96,7 @@ class RouteConfig
 
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
+        $router->get('api/superadmin/userManagement/fetch', 'UserManagementController@fetchPaginated', ['superadmin']);
         $router->get('api/superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
         $router->get('api/superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
         $router->post('api/superadmin/userManagement/add', 'UserManagementController@addUser', ['superadmin']);

@@ -476,4 +476,82 @@ class UserRepository
 
     return $userId;
   }
+
+  public function getPaginatedUsers(int $limit, int $offset, string $search, string $role, string $status): array
+  {
+    $query = "
+        SELECT 
+            u.user_id, u.username, u.first_name, u.middle_name, u.last_name, u.suffix,
+            u.email, u.role, u.is_active, u.created_at,
+            GROUP_CONCAT(um.module_name) AS modules
+        FROM users u
+        LEFT JOIN user_module_permissions um ON um.user_id = u.user_id
+        WHERE u.deleted_at IS NULL
+        AND u.role != 'Superadmin' AND u.role != 'Scanner'
+    ";
+    $params = [];
+
+    if ($search !== '') {
+      $query .= " AND (CONCAT(u.first_name, ' ', u.last_name) LIKE ? OR u.username LIKE ? OR u.email LIKE ?)";
+      $searchTerm = "%$search%";
+      $params[] = $searchTerm;
+      $params[] = $searchTerm;
+      $params[] = $searchTerm;
+    }
+
+    if ($role !== '' && strtolower($role) !== 'all roles') {
+      $query .= " AND u.role = ?";
+      $params[] = $role;
+    }
+
+    if ($status !== '' && strtolower($status) !== 'all status') {
+      $query .= " AND u.is_active = ?";
+      $params[] = (strtolower($status) === 'active') ? 1 : 0;
+    }
+
+    $query .= " GROUP BY u.user_id ORDER BY u.user_id DESC LIMIT " . (int) $limit . " OFFSET " . (int) $offset;
+
+    $stmt = $this->db->prepare($query);
+    $stmt->execute($params);
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($users as &$user) {
+      $user['modules'] = $user['modules'] ? explode(',', $user['modules']) : [];
+    }
+
+    return $users;
+  }
+
+  public function countPaginatedUsers(string $search, string $role, string $status): int
+  {
+    $query = "
+        SELECT COUNT(*) 
+        FROM users u
+        WHERE u.deleted_at IS NULL
+        AND u.role != 'Superadmin' AND u.role != 'Scanner'
+    ";
+    $params = [];
+
+    if ($search !== '') {
+      $query .= " AND (CONCAT(u.first_name, ' ', u.last_name) LIKE ? OR u.username LIKE ? OR u.email LIKE ?)";
+      $searchTerm = "%$search%";
+      $params[] = $searchTerm;
+      $params[] = $searchTerm;
+      $params[] = $searchTerm;
+    }
+
+    if ($role !== '' && strtolower($role) !== 'all roles') {
+      $query .= " AND u.role = ?";
+      $params[] = $role;
+    }
+
+    if ($status !== '' && strtolower($status) !== 'all status') {
+      $query .= " AND u.is_active = ?";
+      $params[] = (strtolower($status) === 'active') ? 1 : 0;
+    }
+
+    $stmt = $this->db->prepare($query);
+    $stmt->execute($params);
+    return (int) $stmt->fetchColumn();
+  }
 }

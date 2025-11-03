@@ -73,6 +73,10 @@
         </div>
     </div>
 
+    <h4 id="resultsIndicator" class="text-sm text-gray-600 mb-3">
+        Loading...
+    </h4>
+
     <div class="overflow-x-auto rounded-lg border border-orange-200">
         <table class="w-full text-sm border-collapse">
             <thead class="bg-orange-50 text-gray-700 border border-orange-100">
@@ -95,6 +99,12 @@
 
         </table>
     </div>
+
+    <nav id="paginationControls" aria-label="Page navigation"
+        class="flex items-center justify-center bg-white border border-gray-200 rounded-full shadow-md px-4 py-2 mt-6 w-fit mx-auto gap-3 hidden">
+        <ul id="paginationList" class="flex items-center h-9 text-sm gap-3">
+        </ul>
+    </nav>
 </div>
 
 <div id="importModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">

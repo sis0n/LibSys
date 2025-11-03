@@ -19,6 +19,8 @@ class RouteConfig
         $router->get('verifyOTP', 'AuthController@verifyOTP');
         $router->get('resetPassword', 'AuthController@resetPassword');
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
+        $router->get('forgot-password', 'ForgotPasswordController@index');
+        $router->post('forgot-password/send-otp', 'ForgotPasswordController@sendOTP');
 
         // --- API / DATA ROUTES (Lahat ay may 'api/' prefix) ---
 

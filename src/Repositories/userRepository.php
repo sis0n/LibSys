@@ -509,6 +509,51 @@ class UserRepository
     }
   }
 
+  /**
+   * Finds a user by their email address.
+   * Returns user data (joined with student/faculty if possible) if found, otherwise null.
+   */
+  public function findByEmail(string $email)
+  {
+    try {
+      $stmt = $this->db->prepare("
+                SELECT 
+                    u.user_id, 
+                    u.username, 
+                    u.password, 
+                    u.first_name, 
+                    u.middle_name, 
+                    u.last_name, 
+                    u.suffix, 
+                    u.profile_picture, 
+                    u.is_active, 
+                    u.role,
+                    u.email,
+                    s.student_id, 
+                    s.student_number, 
+                    s.year_level, 
+                    s.course_id,
+                    s.section,
+                    f.faculty_id,
+                    f.college_id
+                FROM users u
+                LEFT JOIN students s ON u.user_id = s.user_id AND s.deleted_at IS NULL
+                LEFT JOIN faculty f ON u.user_id = f.user_id
+                WHERE LOWER(u.email) = LOWER(:email)
+                AND u.deleted_at IS NULL
+                LIMIT 1
+            ");
+
+      $stmt->execute(['email' => strtolower($email)]);
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      return $user ?: null;
+    } catch (\PDOException $e) {
+      error_log("[UserRepository::findByEmail] " . $e->getMessage());
+      return null;
+    }
+  }
+  
   // Restored Pagination Logic
   public function getPaginatedUsers(int $limit, int $offset, string $search, string $role, string $status): array
   {

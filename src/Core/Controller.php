@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Core;
 
 class Controller
@@ -10,6 +11,8 @@ class Controller
      * @param array  $data  Data to extract into the view
      * @param void   $withLayout Include header/footer (default: true)
      */
+    // File: App/Core/Controller.php (Updated view method)
+
     public function view(string $view, array $data = [], bool $withLayout = true): void
     {
         extract($data, EXTR_SKIP);
@@ -23,13 +26,17 @@ class Controller
         $viewPath = $basePath . $view . ".php";
 
 
-        if ($withLayout && file_exists($head)) {
-            include $head;
-        }
-        if ($withLayout) {
-            echo '<body class="bg-gray-50 font-sans min-h-screen flex">'; // full screen height
+        // Check if the current view is the scanner view
+        $isScannerView = (strpos($view, 'scanner/attendance') !== false);
+
+        if ($withLayout && !$isScannerView) {
+            // --- STANDARD LAYOUT (With Sidebar) ---
+            if (file_exists($head)) {
+                include $head;
+            }
+            echo '<body class="bg-gray-50 font-sans min-h-screen flex">';
             echo '<div class="flex min-h-screen w-full">';
-            
+
             // Sidebar
             if (file_exists($sidebar)) {
                 include $sidebar;
@@ -65,7 +72,7 @@ class Controller
             echo '</body>';
         }
 
-         else {
+        else {
             if (file_exists($viewPath)) {
                 include $viewPath;
             } else {

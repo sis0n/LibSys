@@ -15,7 +15,7 @@ class RouteConfig
         $router->get('landingPage', 'GuestController@guestDisplay');
         $router->get('login', 'AuthController@showLogin');
         $router->get('forgotPassword', 'AuthController@forgotPassword');
-        $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
+        $router->get('scanner/attendance', 'ScannerController@scannerDisplay');
 
         // --- API / DATA ROUTES (Lahat ay may 'api/' prefix) ---
 
@@ -108,6 +108,7 @@ class RouteConfig
         $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
         $router->get('api/superadmin/userManagement/getAllCourses', 'DataController@getAllCourses', ['superadmin']);
         $router->get('api/superadmin/userManagement/getColleges', 'DataController@getColleges', ['superadmin']);
+        $router->get('api/superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
         $router->get('api/superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);

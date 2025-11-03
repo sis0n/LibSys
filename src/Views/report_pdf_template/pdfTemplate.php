@@ -1,6 +1,5 @@
 <?php
 // Ensure variables are defined to avoid errors if they are empty
-$libraryResources = $libraryResources ?? [];
 $deletedBooks = !empty($deletedBooks) ? $deletedBooks[0] : ['today' => '-', 'week' => '-', 'month' => '-', 'year' => '-'];
 $circulatedBooks = $circulatedBooks ?? [];
 $topVisitors = $topVisitors ?? [];
@@ -30,16 +29,6 @@ $dateRange = $dateRange ?? [null, null];
             Report for the period: <?= htmlspecialchars(date('F j, Y', strtotime($dateRange[0]))) ?> to <?= htmlspecialchars(date('F j, Y', strtotime($dateRange[1]))) ?>
         <?php endif; ?>
     </div>
-
-    <h2>Library Resources</h2>
-    <table>
-        <thead><tr><th>YEAR</th><th>TITLE</th><th>VOLUME</th><th>PROCESSED</th></tr></thead>
-        <tbody>
-            <?php foreach ($libraryResources as $row): ?>
-            <tr><td><?= htmlspecialchars($row['year']) ?></td><td><?= htmlspecialchars($row['title']) ?></td><td><?= htmlspecialchars($row['volume']) ?></td><td><?= htmlspecialchars($row['processed']) ?></td></tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
 
     <h2>Deleted Books</h2>
     <table>

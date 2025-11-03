@@ -30,7 +30,6 @@ class DomPdfTemplateController extends Controller
         $reportRepo = new ReportRepository();
 
         $data = [
-            'libraryResources' => $reportRepo->getLibraryResourcesData($startDate, $endDate),
             'deletedBooks'     => $reportRepo->getDeletedBooksData($startDate, $endDate),
             'circulatedBooks'  => $reportRepo->getCirculatedBooksData($startDate, $endDate),
             'topVisitors'      => $reportRepo->getTopVisitorsData($startDate, $endDate),

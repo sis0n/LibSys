@@ -7,29 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const endDateInput = document.getElementById('endDate');
     const downloadReportBtn = document.getElementById('download-report-btn');
 
-    // --- Library Resources ---
-    const libraryResourcesData = [
-        { year: 2025, title: '-', volume: '-', processed: '-' },
-        { year: 2026, title: '-', volume: '-', processed: '-' },
-        { year: 2027, title: '-', volume: '-', processed: '-' },
-    ];
-
-    const libraryResourcesTbody = document.getElementById('library-resources-tbody');
-    if (libraryResourcesTbody) {
-        libraryResourcesData.forEach(data => {
-            const row = document.createElement('tr');
-            row.classList.add('border-b', 'border-orange-100');
-            row.innerHTML = `
-                <td class="px-6 py-4 text-center font-medium">${data.year}</td>
-                <td class="px-6 py-4 text-center font-medium">${data.title}</td>
-                <td class="px-6 py-4 text-center font-medium">${data.volume}</td>
-                <td class="px-6 py-4 text-center font-medium">${data.processed}</td>
-            `;
-            libraryResourcesTbody.appendChild(row);
-        });
-    }
-
-        // --- Circulated Books ---
+    // --- Circulated Books ---
         async function populateCirculatedBooks() {
             const tbody = document.getElementById('circulated-books-tbody');
             if (!tbody) return;

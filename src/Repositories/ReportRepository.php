@@ -137,7 +137,7 @@ class ReportRepository
                     SUM(CASE WHEN DATE(deleted_at) = CURDATE() THEN 1 ELSE 0 END) as today,
                     COUNT(*) as count
                 FROM books
-                WHERE deleted_by IS NOT NULL
+                WHERE deleted_at IS NOT NULL
                 GROUP BY YEAR(deleted_at)
             ";
             $stmt = $this->db->prepare($sql);

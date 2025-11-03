@@ -38,7 +38,9 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 const response = await fetch(`${BASE_URL}/api/superadmin/reports/circulated-books`);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    alert(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                 }
                 const result = await response.json();
                 tbody.innerHTML = ''; // Clear loading message
@@ -82,7 +84,9 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 const response = await fetch(`${BASE_URL}/api/superadmin/reports/deleted-books`);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    alert(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                 }
                 const result = await response.json();
                 tbody.innerHTML = ''; // Clear loading message
@@ -124,7 +128,9 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 const response = await fetch(`${BASE_URL}/api/superadmin/reports/library-visits-department`);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    alert(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                 }
                 const result = await response.json();
                 tbody.innerHTML = ''; // Clear loading message
@@ -167,7 +173,9 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 const response = await fetch(`${BASE_URL}/api/superadmin/reports/top-visitors`);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    alert(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                 }
                 const result = await response.json();
                 tbody.innerHTML = ''; // Clear loading message

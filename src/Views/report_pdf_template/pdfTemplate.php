@@ -1,7 +1,7 @@
 <?php
 // Ensure variables are defined to avoid errors if they are empty
 $libraryResources = $libraryResources ?? [];
-$deletedBooks = $deletedBooks[0] ?? ['today' => 0, 'week' => 0, 'month' => 0, 'year' => 0];
+$deletedBooks = !empty($deletedBooks) ? $deletedBooks[0] : ['today' => '-', 'week' => '-', 'month' => '-', 'year' => '-'];
 $circulatedBooks = $circulatedBooks ?? [];
 $topVisitors = $topVisitors ?? [];
 $libraryVisits = $libraryVisits ?? [];
@@ -67,6 +67,34 @@ $dateRange = $dateRange ?? [null, null];
                 <td class="text-center"><?= htmlspecialchars($row['year']) ?></td>
             </tr>
             <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <h2>Top 10 Visitors</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Student ID</th>
+                <th>Course</th>
+                <th class="text-center">Visits</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($topVisitors)): ?>
+                <?php foreach ($topVisitors as $index => $visitor): ?>
+                <tr>
+                    <td><?= $index + 1 ?></td>
+                    <td><?= htmlspecialchars($visitor['full_name']) ?></td>
+                    <td><?= htmlspecialchars($visitor['student_number']) ?></td>
+                    <td><?= htmlspecialchars($visitor['course']) ?></td>
+                    <td class="text-center"><?= htmlspecialchars($visitor['visits']) ?></td>
+                </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="5" class="text-center">-</td></tr>
+            <?php endif; ?>
         </tbody>
     </table>
 

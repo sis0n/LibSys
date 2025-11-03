@@ -59,16 +59,17 @@ class AttendanceController extends Controller
     {
         $period = $_GET['period'] ?? 'Today';
         $search = $_GET['search'] ?? '';
+        $courseName = isset($_GET['course']) && $_GET['course'] !== 'All Courses' ? $_GET['course'] : null;
         date_default_timezone_set('Asia/Manila');
 
         switch ($period) {
             case 'Today':
-                $start = (new \DateTime('today'))->format('Y-m-d 00:00:00');
-                $end   = (new \DateTime('today'))->format('Y-m-d 23:59:59');
+                $start = (new DateTime('today'))->format('Y-m-d 00:00:00');
+                $end   = (new DateTime('today'))->format('Y-m-d 23:59:59');
                 break;
             case 'Yesterday':
-                $start = (new \DateTime('yesterday'))->format('Y-m-d 00:00:00');
-                $end   = (new \DateTime('yesterday'))->format('Y-m-d 23:59:59');
+                $start = (new DateTime('yesterday'))->format('Y-m-d 00:00:00');
+                $end   = (new DateTime('yesterday'))->format('Y-m-d 23:59:59');
                 break;
             case 'All dates':
             default:
@@ -77,28 +78,25 @@ class AttendanceController extends Controller
                 break;
         }
 
-        $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search);
-    //     header('Content-Type: text/plain'); // Palitan ang JSON ng Plain Text
-    // echo "DEBUG INFO:\n";
-    // echo "search Term: {$search}\n";
-    // echo "start Date: {$start}\n";
-    // echo "end Date: {$end}\n";
-    // echo "total Logs Found (db): " . count($logs) . "\n\n";
-    // print_r($logs);
-    // exit;
-        // var_dump($logs);
-        // exit;
+        $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search, $courseName);
 
         $formattedLogs = [];
         foreach ($logs as $log) {
-            $logTime = new \DateTime($log['timestamp'], new \DateTimeZone('Asia/Manila'));
+            $logTime = new DateTime($log['timestamp'], new DateTimeZone('Asia/Manila'));
+
+            $courseDisplay = $log['course'] ?? 'N/A';
+
+            $yearLevelSectionDisplay = $log['year_level_section'] ?? 'N/A';
+
             $formattedLogs[] = [
                 'date' => $logTime->format("Y-m-d"),
                 'day' => $logTime->format("l"),
                 'studentName' => $log['full_name'],
                 'studentNumber' => $log['student_number'],
                 'time' => $logTime->format("H:i:s"),
-                'status' => "Present"
+                'status' => "Present",
+                'course' => $courseDisplay,
+                'year_level_section' => $yearLevelSectionDisplay
             ];
         }
 

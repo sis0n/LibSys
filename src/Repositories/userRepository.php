@@ -112,14 +112,23 @@ class UserRepository
         return $faculty;
       }
 
-      return null;
+      $stmt = $this->db->prepare("
+            SELECT 
+                user_id, username, password, first_name, middle_name, last_name, suffix, profile_picture, is_active, role, email
+            FROM users
+            WHERE LOWER(username) = LOWER(:identifier)
+            AND deleted_at IS NULL
+            LIMIT 1
+        ");
+      $stmt->execute(['identifier' => $identifier]);
+      $genericUser = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+      return $genericUser ?: null;
     } catch (\PDOException $e) {
       error_log("[UserRepository::findByIdentifier] " . $e->getMessage());
       return null;
     }
   }
-
-
 
   public function insertUser(array $data): int
   {
@@ -475,6 +484,29 @@ class UserRepository
     ]);
 
     return $userId;
+  }
+
+  public function findByStudentNumberWithDetails(string $studentNumber): ?array
+  {
+    try {
+      $stmt = $this->db->prepare("
+            SELECT 
+                u.user_id, u.username, u.password, u.first_name, u.middle_name, u.last_name, u.suffix, 
+                s.student_number, s.course_id, s.year_level, s.section
+            FROM students s
+            JOIN users u ON s.user_id = u.user_id
+            WHERE UPPER(s.student_number) = UPPER(:studentNumber)
+            AND u.deleted_at IS NULL
+            LIMIT 1
+        ");
+      $stmt->execute(['studentNumber' => $studentNumber]);
+      $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+      return $result ?: null;
+    } catch (\PDOException $e) {
+      error_log("[UserRepository::findByStudentNumberWithDetails] " . $e->getMessage());
+      return null;
+    }
   }
 
   public function getPaginatedUsers(int $limit, int $offset, string $search, string $role, string $status): array

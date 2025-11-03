@@ -425,3 +425,13 @@ is_archived TINYINT(1) DEFAULT 0
 
 ALTER TABLE faculty
 CHANGE COLUMN department college_id INT(11) NULL;
+
+--11/03/25
+--pang palit ng course_id sa course ni attendance log
+ALTER TABLE attendance_log
+CHANGE COLUMN course course_id INT(11) NULL DEFAULT NULL;
+
+-- pang align sa students table into attendanceLogs dahil nag reset ito ng NULL VALUE
+UPDATE attendance_logs a
+JOIN students s ON a.student_number = s.student_number
+SET a.course_id = s.course_id;

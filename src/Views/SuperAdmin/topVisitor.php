@@ -42,62 +42,45 @@
     </div>
 
    <!-- First Row of Tables -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-    <!-- Library Resources Table -->
-    <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-2 flex flex-col scale-[1.02]">
-        <h3 class="text-lg font-medium mb-4 text-center mt-2">Library Resources</h3>
-        <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
-            <table class="w-full text-sm border-collapse">
-                <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
-                    <tr>
-                        <th scope="col" class="px-4 py-3 text-center">YEAR</th>
-                        <th scope="col" class="px-4 py-3 text-center">TITLE</th>
-                        <th scope="col" class="px-4 py-3 text-center">VOLUME</th>
-                        <th scope="col" class="px-4 py-3 text-center">PROCESSED</th>
-                    </tr>
-                </thead>
-                <tbody id="library-resources-tbody"></tbody>
-            </table>
-        </div>
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
 
-    <!-- Circulated Books Table -->
-    <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-2 flex flex-col scale-[1.02]">
-        <h3 class="text-lg font-medium mb-4 text-center mt-2">Circulated Books</h3>
-        <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
-            <table class="w-full text-sm border-collapse">
-                <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
-                    <tr>
-                        <th scope="col" class="px-4 py-3 text-center">Category</th>
-                        <th scope="col" class="px-4 py-3 text-center">Today</th>
-                        <th scope="col" class="px-4 py-3 text-center">Week</th>
-                        <th scope="col" class="px-4 py-3 text-center">Month</th>
-                        <th scope="col" class="px-4 py-3 text-center">Year</th>
-                    </tr>
-                </thead>
-                <tbody id="circulated-books-tbody"></tbody>
-            </table>
+        <!-- Circulated Books Table -->
+        <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-4">
+            <h3 class="text-lg font-medium mb-4 text-center mt-2">Circulated Books</h3>
+            <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
+                <table class="w-full text-sm border-collapse">
+                    <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left">Category</th>
+                            <th scope="col" class="px-4 py-3 text-center">Today</th>
+                            <th scope="col" class="px-4 py-3 text-center">Week</th>
+                            <th scope="col" class="px-4 py-3 text-center">Month</th>
+                            <th scope="col" class="px-4 py-3 text-center">Year</th>
+                        </tr>
+                    </thead>
+                    <tbody id="circulated-books-tbody"></tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <!-- Deleted Books Table -->
-    <div class="bg-white border-orange-200 rounded-lg shadow-sm p-2 flex flex-col scale-[1.02]">
-        <h3 class="text-lg font-medium mb-4 text-center mt-2">Deleted Books</h3>
-        <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
-            <table class="w-full text-sm border-collapse">
-                <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
-                    <tr>
-                        <th scope="col" class="px-4 py-3 text-center">Count</th>
-                        <th scope="col" class="px-4 py-3 text-center">Today</th>
-                        <th scope="col" class="px-4 py-3 text-center">Month</th>
-                        <th scope="col" class="px-4 py-3 text-center">Year</th>
-                    </tr>
-                </thead>
-                <tbody id="deleted-books-tbody"></tbody>
-            </table>
+        <!-- Deleted Books Table -->
+        <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-4">
+            <h3 class="text-lg font-medium mb-4 text-center mt-2">Deleted Books</h3>
+            <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
+                <table class="w-full text-sm border-collapse">
+                    <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left">Year</th>
+                            <th scope="col" class="px-4 py-3 text-center">Month</th>
+                            <th scope="col" class="px-4 py-3 text-center">Today</th>
+                            <th scope="col" class="px-4 py-3 text-center">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deleted-books-tbody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Second Row of Tables -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -144,38 +127,41 @@
 
     <!-- Custom Date Modal -->
     <div id="customDateModal"
-        class="fixed inset-0 bg-black-500/20 backdrop-blur-md flex items-center justify-center h-full w-full hidden z-50">
-        <div class="relative bg-white rounded-2xl shadow-xl w-[420px] p-6 border border-gray-200">
-            <h3 class="text-base font-semibold text-gray-800 text-center">
-                Pick a date range for the data you want to download.
-            </h3>
+    class="fixed inset-0 bg-black-500/20 backdrop-blur-md flex items-center justify-center h-full w-full hidden z-50">
+    <div class="relative bg-white rounded-2xl shadow-xl w-[420px] p-6 border border-gray-200">
+        <h3 class="text-base font-semibold text-gray-800 text-center">
+            Pick a date range for the data you want to download.
+        </h3>
 
-            <div class="mt-5 space-y-4">
-                <div>
-                    <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                    <input type="date" id="startDate" name="startDate"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all">
-                </div>
-
-                <div>
-                    <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                    <input type="date" id="endDate" name="endDate"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all">
-                </div>
+        <div class="mt-5 space-y-4">
+            <div>
+                <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <input type="date" id="startDate" name="startDate"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all">
             </div>
 
-            <div class="flex items-center justify-end gap-3 mt-6">
-                <button id="confirmDateRange"
-                    class="px-6 py-2 bg-orange-500 text-white rounded-lg font-medium text-sm shadow-sm hover:bg-orange-600 focus:ring-2 focus:ring-orange-300 transition-all">
-                    Confirm
-                </button>
-                <button id="cancelDateRange"
-                    class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg font-medium text-sm hover:bg-gray-200 focus:ring-2 focus:ring-gray-300 transition-all">
-                    Cancel
-                </button>
+            <div>
+                <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <input type="date" id="endDate" name="endDate"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all">
             </div>
         </div>
+
+        <div class="flex items-center justify-end gap-3 mt-6">
+            <button id="confirmDateRange"
+                class="px-6 py-2 bg-orange-500 text-white rounded-lg font-medium text-sm shadow-sm hover:bg-orange-600 focus:ring-2 focus:ring-orange-300 transition-all">
+                Confirm
+            </button>
+            <button id="cancelDateRange"
+                class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg font-medium text-sm hover:bg-gray-200 focus:ring-2 focus:ring-gray-300 transition-all">
+                Cancel
+            </button>
+        </div>
     </div>
+</div>
 
 </main>
+<script>
+    const BASE_URL = "<?= BASE_URL ?>";
+</script>
 <script src="<?= BASE_URL ?>/js/superadmin/reports.js"></script>

@@ -3,7 +3,8 @@
 namespace App\Config;
 
 use App\Core\Router;
-use App\Controllers\ViewController; // Siguraduhin na na-import
+use App\Controllers\ViewController;
+use App\Controllers\DomPdfTemplateController; // Added for PDF report generation
 
 class RouteConfig
 {
@@ -15,6 +16,8 @@ class RouteConfig
         $router->get('landingPage', 'GuestController@guestDisplay');
         $router->get('login', 'AuthController@showLogin');
         $router->get('forgotPassword', 'AuthController@forgotPassword');
+        $router->get('verifyOTP', 'AuthController@verifyOTP');
+        $router->get('resetPassword', 'AuthController@resetPassword');
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
 
         // --- API / DATA ROUTES (Lahat ay may 'api/' prefix) ---
@@ -76,6 +79,8 @@ class RouteConfig
         $router->post('api/librarian/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/librarian/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/librarian/returning/extend', 'ReturningController@extendDueDate', ['returning']);
+        $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
+
 
         // --- ADMIN (AJAX/Data Routes) ---
         $router->get('api/admin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['restore books']);
@@ -107,6 +112,7 @@ class RouteConfig
         $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
         $router->get('api/superadmin/userManagement/getAllCourses', 'DataController@getAllCourses', ['superadmin']);
         $router->get('api/superadmin/userManagement/getColleges', 'DataController@getColleges', ['superadmin']);
+        $router->get('api/superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
         $router->get('api/superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
@@ -138,6 +144,13 @@ class RouteConfig
         $router->get('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
         $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
         $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
+        $router->get('api/superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);    
+        $router->get('api/superadmin/reports/top-visitors', 'ReportController@getTopVisitors', ['superadmin']);
+        $router->get('api/superadmin/reports/deleted-books', 'ReportController@getDeletedBooks', ['superadmin']);
+        $router->get('api/superadmin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment', ['superadmin']);
+
+        // PDF Report Generation Route
+        $router->post('generate-report', 'DomPdfTemplateController@generateLibraryReport', ['superadmin']);
 
         // --- STUDENT (AJAX/Data Routes) ---
         $router->get('api/student/attendance/get', 'AttendanceController@getMyAttendance', ['student']);

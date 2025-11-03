@@ -15,14 +15,19 @@ class RouteConfig
         // --- VIEW ROUTES (Walang API prefix) ---
         $router->get('landingPage', 'GuestController@guestDisplay');
         $router->get('login', 'AuthController@showLogin');
-        $router->get('forgotPassword', 'AuthController@forgotPassword');
-        $router->get('verifyOTP', 'AuthController@verifyOTP');
-        $router->get('resetPassword', 'AuthController@resetPassword');
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
-        $router->get('forgot-password', 'ForgotPasswordController@index');
+
+
+        // $router->get('forgotPassword', 'AuthController@forgotPassword');
+        $router->get('forgotPassword', 'ForgotPasswordController@index');
         $router->post('forgot-password/send-otp', 'ForgotPasswordController@sendOTP');
 
-        // --- API / DATA ROUTES (Lahat ay may 'api/' prefix) ---
+        $router->get('verifyOTP', 'ForgotPasswordController@verifyOTPPage');
+        $router->post('verify-otp/check', 'ForgotPasswordController@checkOTP');
+        $router->post('verify-otp/resend', 'ForgotPasswordController@resendOTP');
+
+        $router->get('resetPassword', 'ForgotPasswordController@resetPasswordPage');
+        $router->post('reset-password/submit', 'ForgotPasswordController@updatePassword');
 
         // Auth API
         $router->post('login', 'AuthController@login');
@@ -146,7 +151,7 @@ class RouteConfig
         $router->get('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
         $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
         $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
-        $router->get('api/superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);    
+        $router->get('api/superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);
         $router->get('api/superadmin/reports/top-visitors', 'ReportController@getTopVisitors', ['superadmin']);
         $router->get('api/superadmin/reports/deleted-books', 'ReportController@getDeletedBooks', ['superadmin']);
         $router->get('api/superadmin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment', ['superadmin']);

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -7,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/phosphor-icons@1.4.1/src/css/phosphor.css">
 </head>
+
 <body class="bg-gradient-to-br from-orange-50 to-green-50 font-sans flex items-center justify-center min-h-screen p-4">
   <div class="bg-white/95 backdrop-blur-sm border border-orange-200/60 shadow-xl shadow-orange-200/40 rounded-2xl p-8 w-full max-w-md">
 
@@ -26,19 +28,21 @@
     </div>
 
     <form id="otpForm" action="#" method="POST" class="mt-6">
+      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token ?? '', ENT_QUOTES, 'UTF-8') ?>">
+
       <div id="otpRow" class="flex justify-center gap-3">
         <input inputmode="numeric" pattern="\d*" maxlength="1" autocomplete="one-time-code" autofocus
-              id="d1" name="d1" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
+          id="d1" name="d1" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
         <input inputmode="numeric" pattern="\d*" maxlength="1" autocomplete="one-time-code"
-              id="d2" name="d2" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
+          id="d2" name="d2" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
         <input inputmode="numeric" pattern="\d*" maxlength="1" autocomplete="one-time-code"
-              id="d3" name="d3" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
+          id="d3" name="d3" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
         <input inputmode="numeric" pattern="\d*" maxlength="1" autocomplete="one-time-code"
-              id="d4" name="d4" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
+          id="d4" name="d4" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
         <input inputmode="numeric" pattern="\d*" maxlength="1" autocomplete="one-time-code"
-              id="d5" name="d5" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
+          id="d5" name="d5" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
         <input inputmode="numeric" pattern="\d*" maxlength="1" autocomplete="one-time-code"
-              id="d6" name="d6" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
+          id="d6" name="d6" class="otp-input w-14 h-14 rounded-md border border-orange-300 bg-orange-50 px-2 py-1 text-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 transition" />
       </div>
 
       <p id="otpError" class="text-red-600 text-sm mt-3 text-center hidden">Invalid code. Please check and try again.</p>
@@ -61,10 +65,10 @@
     </div>
   </div>
 
-<script>
-  // Inject necessary CSS not available in pure Tailwind
-  const style = document.createElement('style');
-  style.innerHTML = `
+  <script>
+    // Inject necessary CSS not available in pure Tailwind
+    const style = document.createElement('style');
+    style.innerHTML = `
     /* OTP input tweaks: -moz-appearance, caret-color and text-align/font-weight not available in TW */
     .otp-input {
       -moz-appearance: textfield;
@@ -86,145 +90,182 @@
     }
     .shake { animation: shake .35s ease; }
   `;
-  document.head.appendChild(style);
+    document.head.appendChild(style);
 
 
-  // Elements
-  const inputs = Array.from(document.querySelectorAll('#d1,#d2,#d3,#d4,#d5,#d6'));
-  const otpForm = document.getElementById('otpForm');
-  const resendLink = document.getElementById('resendLink');
-  const resendText = document.getElementById('resendText');
-  const infoBox = document.getElementById('infoBox');
-  const infoText = document.getElementById('infoText');
-  const otpError = document.getElementById('otpError');
-  const verifyBtn = document.getElementById('verifyBtn');
-  const otpRow = document.getElementById('otpRow');
+    // Elements
+    const inputs = Array.from(document.querySelectorAll('#d1,#d2,#d3,#d4,#d5,#d6'));
+    const otpForm = document.getElementById('otpForm');
+    const resendLink = document.getElementById('resendLink');
+    const resendText = document.getElementById('resendText');
+    const otpError = document.getElementById('otpError');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const otpRow = document.getElementById('otpRow');
 
-  let resendTimer = null;
-  const RESEND_DURATION = 60; // seconds
-  let resendSeconds = RESEND_DURATION;
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
 
-  // Show info helper (with opacity transition)
-  function showInfo(msg){
-    infoText.textContent = msg;
-    infoBox.classList.remove('hidden');
-    // Use timeout for opacity transition
-    setTimeout(()=> { infoBox.classList.add('opacity-100'); }, 20);
-  }
+    const BASE_URL = "<?= BASE_URL ?>"
 
-  // Focus management & auto move to next input
-  inputs.forEach((input, idx) => {
-    input.addEventListener('input', (e) => {
-      const val = e.target.value.replace(/\D/g,'');
-      e.target.value = val; // only allow digits
-      if(val.length === 1){
-        if(idx < inputs.length - 1) inputs[idx + 1].focus();
-      }
-    });
+    let resendTimer = null;
+    const RESEND_DURATION = 60; // seconds
+    let resendSeconds = RESEND_DURATION;
 
-    input.addEventListener('keydown', (e) => {
-      if(e.key === 'Backspace' && !input.value && idx > 0){
-        inputs[idx - 1].focus();
-      } else if(e.key === 'ArrowLeft' && idx > 0){
-        inputs[idx - 1].focus();
-      } else if(e.key === 'ArrowRight' && idx < inputs.length - 1){
-        inputs[idx + 1].focus();
-      }
-    });
-
-    // Paste support (paste full code in any box)
-    input.addEventListener('paste', (e) => {
-      e.preventDefault();
-      const paste = (e.clipboardData || window.clipboardData).getData('text').trim().replace(/\D/g,'');
-      if(!paste) return;
-      const chars = paste.split('').slice(0, inputs.length);
-      inputs.forEach((el, i) => { el.value = chars[i] || ''; });
-      // focus next empty or last
-      const firstEmpty = inputs.find(i => !i.value);
-      (firstEmpty || inputs[inputs.length - 1]).focus();
-    });
-  });
-
-  // Resend logic (with countdown)
-  function startResendCountdown(sec = RESEND_DURATION){
-    clearInterval(resendTimer);
-    resendSeconds = sec;
-    resendLink.disabled = true;
-    resendLink.setAttribute('aria-disabled','true');
-    updateResendText();
-    resendTimer = setInterval(() => {
-      resendSeconds--;
-      updateResendText();
-      if(resendSeconds <= 0){
-        clearInterval(resendTimer);
-        resendLink.disabled = false;
-        resendLink.setAttribute('aria-disabled','false');
-        resendText.textContent = 'Resend';
-      }
-    }, 1000);
-  }
-
-  function updateResendText(){
-    resendText.textContent = `Resend in ${resendSeconds}s`;
-  }
-
-  resendLink.addEventListener('click', () => {
-    if(resendLink.disabled) return;
-    // simulate resend action (backend will actually handle sending)
-    showInfo('OTP resent to your email.');
-    startResendCountdown(RESEND_DURATION);
-  });
-
-  // Initial load: show info + start countdown
-  showInfo('OTP sent to your email.');
-  startResendCountdown(RESEND_DURATION);
-
-  // Form submit
-  otpForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    otpError.classList.add('hidden');
-    otpRow.classList.remove('shake');
-
-    const code = inputs.map(i => i.value || '').join('');
-    if(code.length !== inputs.length){
-      otpError.textContent = 'Please enter the full 6-digit code.';
-      otpError.classList.remove('hidden');
-      otpRow.classList.add('shake');
-      setTimeout(()=> otpRow.classList.remove('shake'), 350);
-      return;
+    function showInfo(msg) {
+      infoText.textContent = msg;
+      infoBox.classList.remove('hidden');
+      setTimeout(() => {
+        infoBox.classList.add('opacity-100');
+      }, 20);
     }
 
-    // Front-end only simulation (backend must validate the real OTP)
-    verifyBtn.disabled = true;
-    verifyBtn.textContent = 'Verifying...';
+    // Focus management & auto move to next input
+    inputs.forEach((input, idx) => {
+      input.addEventListener('input', (e) => {
+        const val = e.target.value.replace(/\D/g, '');
+        e.target.value = val;
+        if (val.length === 1) {
+          if (idx < inputs.length - 1) inputs[idx + 1].focus();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && idx > 0) {
+          inputs[idx - 1].focus();
+        } else if (e.key === 'ArrowLeft' && idx > 0) {
+          inputs[idx - 1].focus();
+        } else if (e.key === 'ArrowRight' && idx < inputs.length - 1) {
+          inputs[idx + 1].focus();
+        }
+      });
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text').trim().replace(/\D/g, '');
+        if (!paste) return;
+        const chars = paste.split('').slice(0, inputs.length);
+        inputs.forEach((el, i) => {
+          el.value = chars[i] || '';
+        });
+        const firstEmpty = inputs.find(i => !i.value);
+        (firstEmpty || inputs[inputs.length - 1]).focus();
+      });
+    });
 
-    setTimeout(() => {
-      // === DUMMY OTP CHECK ===
-      // Accept only 123456 while testing
-      const success = (code === "123456");
+    // Resend logic (with countdown)
+    function startResendCountdown(sec = RESEND_DURATION) {
+      clearInterval(resendTimer);
+      resendSeconds = sec;
+      resendLink.disabled = true;
+      resendLink.setAttribute('aria-disabled', 'true');
+      updateResendText();
+      resendTimer = setInterval(() => {
+        resendSeconds--;
+        updateResendText();
+        if (resendSeconds <= 0) {
+          clearInterval(resendTimer);
+          resendLink.disabled = false;
+          resendLink.setAttribute('aria-disabled', 'false');
+          resendText.textContent = 'Resend';
+        }
+      }, 1000);
+    }
 
-      if(success){
-        verifyBtn.textContent = 'Verified';
-        verifyBtn.classList.remove('bg-orange-600', 'hover:bg-orange-700');
-        verifyBtn.classList.add('bg-green-500', 'hover:bg-green-600');
-        setTimeout(() => {
-          window.location.href = 'resetPassword';
-        }, 1200);
-      } else {
-        otpError.textContent = 'Invalid code. Please try again.';
+    function updateResendText() {
+      resendText.textContent = `Resend in ${resendSeconds}s`;
+    }
+
+    resendLink.addEventListener('click', () => {
+      if (resendLink.disabled) return;
+
+      fetch(`${BASE_URL}/verify-otp/resend`, {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            // Mags-start na lang 'yung countdown
+            showInfo(data.message);
+            startResendCountdown(RESEND_DURATION);
+          } else {
+            otpError.textContent = data.message;
+            otpError.classList.remove('hidden');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          otpError.textContent = 'Failed to resend. Check connection.';
+          otpError.classList.remove('hidden');
+        });
+    });
+
+    showInfo('OTP sent to your email.');
+    startResendCountdown(RESEND_DURATION);
+
+    otpForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      otpError.classList.add('hidden');
+      otpRow.classList.remove('shake');
+
+      const code = inputs.map(i => i.value || '').join('');
+      if (code.length !== inputs.length) {
+        otpError.textContent = 'Please enter the full 6-digit code.';
         otpError.classList.remove('hidden');
-        verifyBtn.disabled = false;
-        verifyBtn.textContent = 'Verify Code';
         otpRow.classList.add('shake');
-        setTimeout(()=> otpRow.classList.remove('shake'), 350);
+        setTimeout(() => otpRow.classList.remove('shake'), 350);
+        return;
       }
-    }, 900);
-  });
 
-  // auto-focus first input on load
-  window.addEventListener('load', () => {
-    inputs[0].focus();
-  });
-</script>
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = 'Verifying...';
+
+      const formData = new FormData();
+      formData.append('otp', code);
+
+      fetch(`${BASE_URL}/verify-otp/check`, {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+          },
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            verifyBtn.textContent = 'Verified';
+            verifyBtn.classList.remove('bg-orange-600', 'hover:bg-orange-700');
+            verifyBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+
+            setTimeout(() => {
+              window.location.href = `${BASE_URL}/resetPassword`;
+            }, 1000);
+
+          } else {
+            // Failed
+            otpError.textContent = data.message;
+            otpError.classList.remove('hidden');
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = 'Verify Code';
+            otpRow.classList.add('shake');
+            setTimeout(() => otpRow.classList.remove('shake'), 350);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          otpError.textContent = 'An error occurred. Please check connection.';
+          otpError.classList.remove('hidden');
+          verifyBtn.disabled = false;
+          verifyBtn.textContent = 'Verify Code';
+          S
+        });
+    });
+
+    window.addEventListener('load', () => {
+      inputs[0].focus();
+    });
+  </script>
 </body>
+
 </html>

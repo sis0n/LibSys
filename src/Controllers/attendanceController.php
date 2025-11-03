@@ -59,6 +59,7 @@ class AttendanceController extends Controller
     {
         $period = $_GET['period'] ?? 'Today';
         $search = $_GET['search'] ?? '';
+        $courseName = isset($_GET['course']) && $_GET['course'] !== 'All Courses' ? $_GET['course'] : null;
         date_default_timezone_set('Asia/Manila');
 
         switch ($period) {
@@ -77,17 +78,7 @@ class AttendanceController extends Controller
                 break;
         }
 
-        $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search);
-    //     header('Content-Type: text/plain'); // Palitan ang JSON ng Plain Text
-    // echo "DEBUG INFO:\n";
-    // echo "search Term: {$search}\n";
-    // echo "start Date: {$start}\n";
-    // echo "end Date: {$end}\n";
-    // echo "total Logs Found (db): " . count($logs) . "\n\n";
-    // print_r($logs);
-    // exit;
-        // var_dump($logs);
-        // exit;
+        $logs = $this->attendanceRepo->getLogsByPeriod($start, $end, $search, $courseName);
 
         $formattedLogs = [];
         foreach ($logs as $log) {

@@ -60,12 +60,13 @@ class StudentProfileRepository
     $params = [':userId' => $userId];
 
     $allowedFields = [
-      'course_id', 
+      'course_id',
       'year_level',
       'section',
       'contact',
       'profile_updated',
-      'can_edit_profile'
+      'can_edit_profile',
+      'registration_form' 
     ];
 
     foreach ($data as $key => $value) {
@@ -76,12 +77,13 @@ class StudentProfileRepository
     }
 
     if (empty($fields)) {
-      return false;
+      return true; 
     }
 
     $sql = "UPDATE students SET " . implode(', ', $fields) . " WHERE user_id = :userId";
 
     $stmt = $this->db->prepare($sql);
+
     return $stmt->execute($params);
   }
 

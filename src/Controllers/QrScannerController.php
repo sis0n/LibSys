@@ -82,10 +82,7 @@ class QRScannerController extends Controller
         $profilePicUrl = $baseUrlCleaned . '/' . $finalRelativePath;
       }
     }
-    // --- End Profile Picture URL Construction ---
 
-    // --- User Info Initialization ---
-    // Inalis ang unang redundant na $userInfo assignment
     $userInfo = [
       'type' => $userType,
       'name' => $fullName,

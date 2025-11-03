@@ -27,7 +27,7 @@ class QRScannerRepository
             f.unique_faculty_id, /* <<< FIXED: Walang alias, direkta sa field name */
             f.college_id,
             
-            st.staff_id AS st_id, st.position, st.contact,
+            st.staff_id, st.employee_id, st.position, st.contact,
             u.profile_picture, u.first_name, u.last_name, u.middle_name, u.suffix,
             
             s.course_id,

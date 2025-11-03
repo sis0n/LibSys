@@ -27,7 +27,16 @@ class AttendanceRepository
                 ORDER BY al.timestamp DESC
             ");
             $stmt->execute(['user_id' => $userId]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return array_map(function ($row) {
+                $row['year_level_section'] = trim(($row['year_level'] ?? '') . ' ' . ($row['section'] ?? ''));
+                $row['course'] = ($row['course_code'] && $row['course_title'])
+                    ? $row['course_code'] . ' - ' . $row['course_title']
+                    : 'N/A';
+                return $row;
+            }, $results);
         } catch (PDOException $e) {
             error_log("Fetch attendance failed: " . $e->getMessage());
             return [];
@@ -85,7 +94,7 @@ class AttendanceRepository
             $stmtLogs = $this->db->prepare($sqlLogs);
 
             $ok1 = $stmtLogs->execute([
-                ':user_id'        => $attendance->getUserId(),
+                ':user_id' => $attendance->getUserId(),
                 ':student_number' => $attendance->getStudentNumber(),
                 ':full_name'      => $fullName,
                 ':year_level'     => $attendance->getYearLevel(),
@@ -97,7 +106,7 @@ class AttendanceRepository
             if (!$ok1) {
                 $errorInfo = $stmtLogs->errorInfo();
                 $this->db->rollBack();
-                error_log("STOP at logs insert: " . implode(" - ", $errorInfo));
+                error_log("SQL Error (Logs): " . implode(" - ", $errorInfo));
                 throw new \Exception("SQL Error (Logs): " . $errorInfo[2]);
             }
 
@@ -116,18 +125,18 @@ class AttendanceRepository
             $stmtSummary = $this->db->prepare($sqlSummary);
 
             $ok2 = $stmtSummary->execute([
-                ':user_id'             => $attendance->getUserId(),
-                ':date'                => $date,
-                ':first_scan_at'       => $ts,
-                ':last_scan_at'        => $ts,
-                ':created_at'          => $ts,
+                ':user_id' => $attendance->getUserId(),
+                ':date' => $date,
+                ':first_scan_at' => $ts,
+                ':last_scan_at' => $ts,
+                ':created_at' => $ts,
                 ':last_scan_at_update' => $ts
             ]);
 
             if (!$ok2) {
                 $errorInfo = $stmtSummary->errorInfo();
                 $this->db->rollBack();
-                error_log("STOP at attendance insert: " . implode(" - ", $errorInfo));
+                error_log("SQL Error (Summary): " . implode(" - ", $errorInfo));
                 throw new \Exception("SQL Error (Summary): " . $errorInfo[2]);
             }
 

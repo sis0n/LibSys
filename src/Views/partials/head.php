@@ -19,7 +19,6 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-    // TINANGGAL ang trailing slash sa BASE_URL_JS para hindi mag-fail ang new URL()
     const BASE_URL_JS = '<?= rtrim(BASE_URL, '/') ?>'; 
 </script>
 

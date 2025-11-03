@@ -64,12 +64,12 @@ class AttendanceController extends Controller
 
         switch ($period) {
             case 'Today':
-                $start = (new \DateTime('today'))->format('Y-m-d 00:00:00');
-                $end   = (new \DateTime('today'))->format('Y-m-d 23:59:59');
+                $start = (new DateTime('today'))->format('Y-m-d 00:00:00');
+                $end   = (new DateTime('today'))->format('Y-m-d 23:59:59');
                 break;
             case 'Yesterday':
-                $start = (new \DateTime('yesterday'))->format('Y-m-d 00:00:00');
-                $end   = (new \DateTime('yesterday'))->format('Y-m-d 23:59:59');
+                $start = (new DateTime('yesterday'))->format('Y-m-d 00:00:00');
+                $end   = (new DateTime('yesterday'))->format('Y-m-d 23:59:59');
                 break;
             case 'All dates':
             default:
@@ -82,14 +82,21 @@ class AttendanceController extends Controller
 
         $formattedLogs = [];
         foreach ($logs as $log) {
-            $logTime = new \DateTime($log['timestamp'], new \DateTimeZone('Asia/Manila'));
+            $logTime = new DateTime($log['timestamp'], new DateTimeZone('Asia/Manila'));
+
+            $courseDisplay = $log['course'] ?? 'N/A';
+
+            $yearLevelSectionDisplay = $log['year_level_section'] ?? 'N/A';
+
             $formattedLogs[] = [
                 'date' => $logTime->format("Y-m-d"),
                 'day' => $logTime->format("l"),
                 'studentName' => $log['full_name'],
                 'studentNumber' => $log['student_number'],
                 'time' => $logTime->format("H:i:s"),
-                'status' => "Present"
+                'status' => "Present",
+                'course' => $courseDisplay,
+                'year_level_section' => $yearLevelSectionDisplay
             ];
         }
 

@@ -16,23 +16,32 @@ class TransactionHistoryController extends Controller
 
   public function getTransactionsJson()
   {
-
     header('Content-Type: application/json');
 
+    // Parameters from the frontend, with defaults
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
     $status = strtolower($_GET['status'] ?? 'all');
-    $date   = $_GET['date'] ?? null;
+    $date = $_GET['date'] ?? null;
+    $search = $_GET['search'] ?? null;
+    $offset = ($page - 1) * $limit;
 
-    if ($status === 'pending') {
-      echo json_encode([]);
-      return;
-    }
+    // Fetch total records based on filters
+    $totalRecords = $this->repo->countTransactions($status, $date, $search);
 
-    if ($status === 'all') {
-      $transactions = $this->repo->getAllTransactions($date);
-    } else {
-      $transactions = $this->repo->getTransactionsByStatus($status, $date);
-    }
+    // Fetch paginated data
+    $transactions = $this->repo->getPaginatedTransactions($status, $date, $search, $limit, $offset);
 
-    echo json_encode($transactions);
+    // Calculate total pages
+    $totalPages = ceil($totalRecords / $limit);
+
+    // This structure matches the User Management pagination response
+    echo json_encode([
+        'success' => true,
+        'data' => $transactions,
+        'totalRecords' => $totalRecords,
+        'totalPages' => $totalPages,
+        'currentPage' => $page
+    ]);
   }
 }

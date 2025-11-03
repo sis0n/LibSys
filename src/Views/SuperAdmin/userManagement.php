@@ -227,14 +227,17 @@
                     <h3 class="font-medium text-[var(--color-ring)]">Student Information</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label id="addCollegeLabel" class="block text-sm font-medium text-gray-700 mb-1">College <span class="text-red-500">*</span></label>
+                            <label id="addCollegeLabel" class="block text-sm font-medium text-gray-700 mb-1">College
+                                <span class="text-red-500">*</span></label>
                             <select id="addCollegeDropdown" required
                                 class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
                                 <option value="">Select College</option>
                             </select>
                         </div>
                         <div>
-                            <label id="addCourseLabel" class="block text-sm font-medium text-gray-700 mb-1">Course/Program <span class="text-red-500">*</span></label>
+                            <label id="addCourseLabel"
+                                class="block text-sm font-medium text-gray-700 mb-1">Course/Program <span
+                                    class="text-red-500">*</span></label>
                             <select id="addCourseDropdown" name="course_id" required disabled
                                 class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm bg-gray-100 focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
                                 <option value="">Select College First</option>
@@ -244,7 +247,8 @@
                 </div>
 
                 <div id="addUserDepartmentWrapper" class="hidden">
-                    <label id="addUserDepartmentLabel" class="block text-sm font-medium text-gray-700 mb-1">Department <span class="text-red-500">*</span></label>
+                    <label id="addUserDepartmentLabel" class="block text-sm font-medium text-gray-700 mb-1">Department
+                        <span class="text-red-500">*</span></label>
                     <select id="addUserDepartment" required
                         class="w-full border border-[var(--color-border)] rounded-md px-3 py-2 text-sm focus-visible:ring-[var(--color-ring)] focus-visible:border-[var(--color-ring)] outline-none">
                         <option value="">Select Department</option>
@@ -275,13 +279,13 @@
 
                         foreach ($modules as $module):
                         ?>
-                            <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                                <label class="inline-flex items-center text-sm text-gray-700">
-                                    <input type="checkbox" class="mr-2 accent-orange-500" name="modules[]"
-                                        value="<?= $module ?>">
-                                    <?= ucwords($module) ?>
-                                </label>
-                            </div>
+                        <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                            <label class="inline-flex items-center text-sm text-gray-700">
+                                <input type="checkbox" class="mr-2 accent-orange-500" name="modules[]"
+                                    value="<?= $module ?>">
+                                <?= ucwords($module) ?>
+                            </label>
+                        </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -486,13 +490,13 @@
 
                     foreach ($modules as $module):
                     ?>
-                        <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
-                            <label class="inline-flex items-center text-sm text-gray-700">
-                                <input type="checkbox" class="mr-2 accent-orange-500" name="editModules[]"
-                                    value="<?= $module ?>">
-                                <?= ucwords($module) ?>
-                            </label>
-                        </div>
+                    <div class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                        <label class="inline-flex items-center text-sm text-gray-700">
+                            <input type="checkbox" class="mr-2 accent-orange-500" name="editModules[]"
+                                value="<?= $module ?>">
+                            <?= ucwords($module) ?>
+                        </label>
+                    </div>
                     <?php endforeach; ?>
                 </div>
             </div>

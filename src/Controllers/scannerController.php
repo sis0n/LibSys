@@ -6,6 +6,7 @@ use App\Core\Controller;
 use App\Repositories\UserRepository;
 use App\Repositories\AttendanceRepository;
 use App\Models\Attendance;
+use DateTimeZone;
 
 class ScannerController extends Controller
 {
@@ -20,16 +21,14 @@ class ScannerController extends Controller
 
     public function scannerDisplay()
     {
-        $this->view("scanner/attendance", [
-            "title" => "Scanner"
-        ], false);
+        $this->view("scanner/attendance", ["title" => "Scanner"], false);
     }
 
     public function attendance()
     {
         header('Content-Type: application/json');
         try {
-            $qrValue  = $_POST['qrCodeValue'] ?? null;
+            $qrValue = $_POST['qrCodeValue'] ?? null;
             if ($qrValue) {
                 $qrValue = strtoupper(trim($qrValue));
             }
@@ -38,12 +37,21 @@ class ScannerController extends Controller
                 throw new \Exception("No student number provided.");
             }
 
-            $user = $this->userRepo->findByStudentNumber($qrValue);
+            $user = $this->userRepo->findByStudentNumberWithDetails($qrValue);
             if (!$user) {
                 throw new \Exception("Student not found in records.");
             }
 
-            $manila = new \DateTimeZone('Asia/Manila');
+            // Tiyakin na ang required fields ay nandiyan
+            $courseId = (int)($user['course_id'] ?? 0);
+            $yearLevel = (int)($user['year_level'] ?? 0);
+            $section = $user['section'] ?? '';
+
+            if (!$courseId || !$yearLevel) {
+                throw new \Exception("Student profile incomplete (Course/Year not set).");
+            }
+
+            $manila = new DateTimeZone('Asia/Manila');
             $now = new \DateTime('now', $manila);
             $timestamp = $now->format('Y-m-d H:i:s');
 
@@ -53,8 +61,9 @@ class ScannerController extends Controller
                 $user['first_name'],
                 $user['middle_name'],
                 $user['last_name'],
-                $user['year_level'],
-                $user['course'],
+                $yearLevel, // FIXED: Year Level (INT)
+                $section,   // FIXED: Section (STRING)
+                $courseId,  // FIXED: Course ID (INT)
                 'qr',
                 $timestamp
             );
@@ -93,12 +102,23 @@ class ScannerController extends Controller
                 throw new \Exception("No student number provided.");
             }
 
-            $user = $this->userRepo->findByStudentNumber($studentNumber);
+            // NOTE: Assuming UserRepository has findByStudentNumberWithDetails method
+            $user = $this->userRepo->findByStudentNumberWithDetails($studentNumber);
             if (!$user) {
                 throw new \Exception("Student not found in records.");
             }
 
-            $now = new \DateTime('now', new \DateTimeZone('Asia/Manila'));
+            // Tiyakin na ang required fields ay nandiyan
+            $courseId = (int)($user['course_id'] ?? 0);
+            $yearLevel = (int)($user['year_level'] ?? 0);
+            $section = $user['section'] ?? '';
+
+            if (!$courseId || !$yearLevel) {
+                throw new \Exception("Student profile incomplete (Course/Year not set).");
+            }
+
+
+            $now = new \DateTime('now', new DateTimeZone('Asia/Manila'));
             $timestamp = $now->format('Y-m-d H:i:s');
 
             $attendance = new \App\Models\Attendance(
@@ -107,8 +127,9 @@ class ScannerController extends Controller
                 $user['first_name'],
                 $user['middle_name'],
                 $user['last_name'],
-                $user['year_level'],
-                $user['course'],
+                $yearLevel, // FIXED: Year Level (INT)
+                $section,   // FIXED: Section (STRING)
+                $courseId,  // FIXED: Course ID (INT)
                 'manual',
                 $timestamp
             );

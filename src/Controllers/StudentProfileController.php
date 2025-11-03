@@ -34,16 +34,20 @@ class StudentProfileController extends Controller
       return null;
     }
 
-    if (!file_exists($uploadDir)) {
-      mkdir($uploadDir, 0777, true);
+    $uploadDir = ltrim(rtrim($uploadDir, '/'), '/') . '/';
+
+    $localSavePath = ROOT_PATH . '/public/' . $uploadDir;
+
+    if (!file_exists($localSavePath)) {
+      mkdir($localSavePath, 0777, true);
     }
 
     $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     $fileName = uniqid('file_', true) . '.' . $extension;
-    $targetFile = $uploadDir . $fileName;
+    $targetLocalFile = $localSavePath . $fileName;
 
-    if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-      return BASE_URL . $targetFile;
+    if (move_uploaded_file($file['tmp_name'], $targetLocalFile)) {
+      return $uploadDir . $fileName;
     }
     return null;
   }
@@ -115,7 +119,7 @@ class StudentProfileController extends Controller
       $requiredFields = ['first_name', 'last_name', 'course_id', 'year_level', 'section', 'email', 'contact'];
       $missingFields = [];
       foreach ($requiredFields as $field) {
-        if (!isset($data[$field]) || trim($data[$field]) === '' || (is_numeric($data[$field]) && (int)$data[$field] === 0)) {
+        if (!isset($data[$field]) || trim($data[$field]) === '' || ($field === 'course_id' && (!is_numeric($data[$field]) || (int)$data[$field] === 0))) {
           $missingFields[] = $field;
         }
       }
@@ -146,14 +150,22 @@ class StudentProfileController extends Controller
         ], 403);
       }
 
-      if (empty($profile['profile_picture']) && (!isset($_FILES['profile_image']) || $_FILES['profile_image']['error'] !== 0)) {
+      // --- FILE UPLOAD CHECKS ---
+      $hasExistingProfilePic = !empty($profile['profile_picture']);
+      $isNewProfilePicUploaded = (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0);
+
+      if (!$hasExistingProfilePic && !$isNewProfilePicUploaded) {
         return $this->json(['success' => false, 'message' => 'Profile picture is required.'], 400);
       }
 
-      if (empty($profile['registration_form']) && (!isset($_FILES['reg_form']) || $_FILES['reg_form']['error'] !== 0)) {
+      $hasExistingRegForm = !empty($profile['registration_form']);
+      $isNewRegFormUploaded = (isset($_FILES['reg_form']) && $_FILES['reg_form']['error'] === 0);
+
+      if (!$hasExistingRegForm && !$isNewRegFormUploaded) {
         return $this->json(['success' => false, 'message' => 'Registration form is required.'], 400);
       }
 
+      // --- Data Construction ---
       $fullName = trim(implode(' ', array_filter([
         $data['first_name'],
         $data['middle_name'] ?? null,
@@ -170,18 +182,19 @@ class StudentProfileController extends Controller
         'email' => $data['email']
       ];
 
+      // --- PROFILE IMAGE UPLOAD ---
       $imagePath = null;
-      if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
+      if ($isNewProfilePicUploaded) {
         $validation = $this->validateImageUpload($_FILES['profile_image']);
         if ($validation !== true) return $this->json(['success' => false, 'message' => $validation], 400);
-        $imagePath = $this->handleFileUpload($_FILES['profile_image'], "uploads/profile_images/");
+        $imagePath = $this->handleFileUpload($_FILES['profile_image'], "uploads/profile_images"); // Fixed path
         $userData['profile_picture'] = $imagePath;
       }
 
       $this->userRepo->updateUser($currentUserId, $userData);
 
       $studentData = [
-        'course_id' => $courseId, 
+        'course_id' => $courseId,
         'year_level' => $data['year_level'],
         'section' => $data['section'],
         'contact' => $data['contact'],
@@ -192,10 +205,12 @@ class StudentProfileController extends Controller
         $studentData['can_edit_profile'] = 0;
       }
 
-      if (isset($_FILES['reg_form']) && $_FILES['reg_form']['error'] === 0) {
+      // --- REG FORM UPLOAD (FIXED: Mag-u-upload lang kapag may bagong file) ---
+      $pdfPath = null;
+      if ($isNewRegFormUploaded) {
         $validation = $this->validatePDFUpload($_FILES['reg_form']);
         if ($validation !== true) return $this->json(['success' => false, 'message' => $validation], 400);
-        $pdfPath = $this->handleFileUpload($_FILES['reg_form'], "uploads/reg_forms/");
+        $pdfPath = $this->handleFileUpload($_FILES['reg_form'], "uploads/reg_forms"); // Fixed path
         $studentData['registration_form'] = $pdfPath;
       }
 

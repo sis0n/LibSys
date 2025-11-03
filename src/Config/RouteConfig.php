@@ -170,6 +170,7 @@ class RouteConfig
 
         // General AJAX routes
         $router->get('api/attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['attendance logs', 'superadmin']);
+        $router->get('api/attendance/logs/pagination', 'AttendanceController@fetchPaginatedAttendance', ['attendance logs', 'superadmin']);
 
 
         // ----------------------------------------------------------------------

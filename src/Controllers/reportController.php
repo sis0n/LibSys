@@ -53,8 +53,8 @@ class ReportController extends Controller
             $statsByYear[$row['year']] = [
                 'month' => (int)$row['month'],
                 'today' => (int)$row['today'],
-                'count' => (int)$row['count'
-            ]];
+                'count' => (int)$row['count']
+            ];
         }
 
         $years = [2025, 2026, 2027];

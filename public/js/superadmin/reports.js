@@ -227,9 +227,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (startDate && endDate) {
                 customDateModal.classList.add('hidden');
-                
-                const reportUrl = `/LibSys/src/Views/report_pdf_template/pdfTemplate.php?start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}`;
-                window.open(reportUrl, '_blank');
+
+                // Create a form to submit the data via POST to trigger the PDF download
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `${BASE_URL}/generate-report`;
+                form.target = '_blank'; // Open in a new tab to not interrupt the user's view
+
+                const startInput = document.createElement('input');
+                startInput.type = 'hidden';
+                startInput.name = 'start_date';
+                startInput.value = startDate;
+                form.appendChild(startInput);
+
+                const endInput = document.createElement('input');
+                endInput.type = 'hidden';
+                endInput.name = 'end_date';
+                endInput.value = endDate;
+                form.appendChild(endInput);
+
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
             } else {
                 alert('Please select both start and end dates.');
             }

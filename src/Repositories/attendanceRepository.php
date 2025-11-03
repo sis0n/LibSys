@@ -16,9 +16,6 @@ class AttendanceRepository
         $this->db = Database::getInstance()->getConnection();
     }
 
-    /**
-     * Retrieves attendance logs for a specific user (used by My Profile).
-     */
     public function getByUserId(int $userId): array
     {
         try {
@@ -39,7 +36,6 @@ class AttendanceRepository
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             return array_map(function ($row) {
-                // Pinagsama ang year_level at section (hal: 3 A)
                 $row['year_level_section'] = trim(($row['year_level'] ?? '') . ' ' . ($row['section'] ?? ''));
                 $row['course'] = ($row['course_code'] && $row['course_title'])
                     ? $row['course_code'] . ' - ' . $row['course_title']
@@ -61,13 +57,9 @@ class AttendanceRepository
 
     public function getAllLogs(): array
     {
-        // Pinalitan ng tawag sa getLogsByPeriod na walang parameters
         return $this->getLogsByPeriod(null, null, '');
     }
 
-    /**
-     * Retrieves all logs for the Admin/Superadmin viewing (Ajax Table).
-     */
     public function getLogsByPeriod(?string $start = null, ?string $end = null, string $search = ''): array
     {
         $query = "
@@ -114,10 +106,6 @@ class AttendanceRepository
         return $stmt->execute([$time, $attendanceId]);
     }
 
-    /**
-     * Saves attendance to logs and updates summary table.
-     * Assumes Attendance model has getYearLevel(), getSection(), and getCourseId().
-     */
     public function logBoth(\App\Models\Attendance $attendance): bool
     {
         try {
@@ -130,7 +118,6 @@ class AttendanceRepository
             ];
             $fullName = implode(' ', array_filter($parts));
 
-            // FIXED SQL: Uses year_level, section, and course_id
             $sqlLogs = "
             INSERT INTO attendance_logs 
                 (user_id, student_number, full_name, year_level, section, course_id, method, timestamp) 

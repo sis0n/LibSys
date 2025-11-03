@@ -30,9 +30,9 @@ window.addEventListener("DOMContentLoaded", () => {
   let currentSearch = '';
   let searchTimeout;
 
-  // --- Pagination State ---
+  // --- Pagination State (Restored) ---
   let totalUsers = 0;
-  const limit = 10;
+  const limit = 10; // Records per page
   let currentPage = 1;
   let totalPages = 1;
   let isLoading = false;
@@ -40,22 +40,18 @@ window.addEventListener("DOMContentLoaded", () => {
   function updateProgramDepartmentDropdown(role, selectedValue = null) {
     const wrapper = document.getElementById('addUserSingleSelectWrapper');
     const label = document.getElementById('addUserSelectLabel');
-
     if (!wrapper || !label) return;
-
     const normalizedRole = (role || "").trim().toLowerCase();
-
     wrapper.classList.add('hidden');
-
     if (normalizedRole === 'student') {
       label.innerHTML = 'Course/Program <span class="text-red-500">*</span>';
       wrapper.classList.remove('hidden');
-      loadCoursesForStudent(selectedValue); 
+      loadCoursesForStudent(selectedValue);
     } else if (normalizedRole === 'faculty' || normalizedRole === 'staff') {
       label.innerHTML = 'Department <span class="text-red-500">*</span>';
       wrapper.classList.remove('hidden');
-      loadDepartments(selectedValue); 
-    } else { 
+      loadDepartments(selectedValue);
+    } else {
       wrapper.classList.add('hidden');
       const select = document.getElementById('addUserSelectField');
       if (select) select.innerHTML = '';
@@ -75,7 +71,6 @@ window.addEventListener("DOMContentLoaded", () => {
   function toggleModules(container, role, userModules = []) {
     if (!container) return;
     const normalizedRole = (role || "").trim().toLowerCase();
-
     if (normalizedRole === "admin" || normalizedRole === "librarian") {
       container.classList.remove("hidden");
       container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
@@ -214,7 +209,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Search & Filters ---
+  // --- Search & Filters (Connected to Pagination) ---
   searchInput?.addEventListener("input", e => {
     currentSearch = e.target.value.trim();
     clearTimeout(searchTimeout);
@@ -260,7 +255,7 @@ window.addEventListener("DOMContentLoaded", () => {
     setActiveOption("editStatusDropdownMenu", el);
   };
 
-  // --- Data Loading ---
+  // --- Data Loading (Restored Pagination Logic) ---
   async function loadUsers(page = 1) {
     if (isLoading) return;
     isLoading = true;
@@ -361,8 +356,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Pagination Rendering ---
+  // --- Pagination Rendering (Restored) ---
   function renderPagination(totalPages, page) {
+    if (!paginationControls || !paginationList) return;
     if (totalPages <= 1) {
       paginationControls.classList.add("hidden");
       return;

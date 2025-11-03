@@ -20,7 +20,15 @@ class AttendanceRepository
     {
         try {
             $stmt = $this->db->prepare("
-                SELECT al.student_number, al.full_name, c.course_title AS course, al.year_level, al.method, al.timestamp
+                SELECT 
+                    al.student_number, 
+                    al.full_name, 
+                    c.course_code, 
+                    c.course_title, 
+                    al.year_level, 
+                    al.section, 
+                    al.method, 
+                    al.timestamp
                 FROM attendance_logs al
                 LEFT JOIN courses c ON al.course_id = c.course_id
                 WHERE al.user_id = :user_id
@@ -32,9 +40,14 @@ class AttendanceRepository
 
             return array_map(function ($row) {
                 $row['year_level_section'] = trim(($row['year_level'] ?? '') . ' ' . ($row['section'] ?? ''));
-                $row['course'] = ($row['course_code'] && $row['course_title'])
-                    ? $row['course_code'] . ' - ' . $row['course_title']
+
+                $course_code = $row['course_code'] ?? null;
+                $course_title = $row['course_title'] ?? null;
+
+                $row['course'] = ($course_code && $course_title)
+                    ? $course_code . ' - ' . $course_title
                     : 'N/A';
+
                 return $row;
             }, $results);
         } catch (PDOException $e) {
@@ -172,7 +185,7 @@ class AttendanceRepository
         }
 
         if ($courseName) {
-            $query .= " AND c.course_title = :courseName"; 
+            $query .= " AND c.course_title = :courseName";
             $params[':courseName'] = $courseName;
         }
 

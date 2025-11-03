@@ -113,6 +113,62 @@ class ReportRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getLibraryVisitsByDepartment()
+    {
+        $sql = "
+            (SELECT
+                c.college_name AS department,
+                SUM(CASE WHEN DATE(al.timestamp) = CURDATE() THEN 1 ELSE 0 END) AS today,
+                SUM(CASE WHEN YEARWEEK(al.timestamp, 1) = YEARWEEK(CURDATE(), 1) THEN 1 ELSE 0 END) AS week,
+                SUM(CASE WHEN MONTH(al.timestamp) = MONTH(CURDATE()) AND YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month,
+                SUM(CASE WHEN YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS year
+            FROM
+                colleges c
+            LEFT JOIN
+                courses crs ON c.college_id = crs.college_id
+            LEFT JOIN
+                students s ON crs.course_id = s.course_id
+            LEFT JOIN
+                attendance_logs al ON s.student_id = al.student_id
+            GROUP BY
+                c.college_name)
+            UNION ALL
+            (SELECT
+                'Uncategorized' AS department,
+                SUM(CASE WHEN DATE(al.timestamp) = CURDATE() THEN 1 ELSE 0 END) AS today,
+                SUM(CASE WHEN YEARWEEK(al.timestamp, 1) = YEARWEEK(CURDATE(), 1) THEN 1 ELSE 0 END) AS week,
+                SUM(CASE WHEN MONTH(al.timestamp) = MONTH(CURDATE()) AND YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month,
+                SUM(CASE WHEN YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS year
+            FROM
+                attendance_logs al
+            LEFT JOIN
+                students s ON al.student_id = s.student_id
+            LEFT JOIN
+                courses crs ON s.course_id = crs.course_id
+            LEFT JOIN
+                colleges c ON crs.college_id = c.college_id
+            WHERE
+                c.college_id IS NULL AND al.student_id IS NOT NULL)
+            UNION ALL
+            (SELECT
+                'TOTAL' AS department,
+                SUM(CASE WHEN DATE(al.timestamp) = CURDATE() THEN 1 ELSE 0 END) AS today,
+                SUM(CASE WHEN YEARWEEK(al.timestamp, 1) = YEARWEEK(CURDATE(), 1) THEN 1 ELSE 0 END) AS week,
+                SUM(CASE WHEN MONTH(al.timestamp) = MONTH(CURDATE()) AND YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month,
+                SUM(CASE WHEN YEAR(al.timestamp) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS year
+            FROM
+                attendance_logs al
+            WHERE
+                al.student_id IS NOT NULL)
+            ORDER BY
+                CASE WHEN department = 'TOTAL' THEN 2 WHEN department = 'Uncategorized' THEN 1 ELSE 0 END, department ASC
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getDeletedBooksReport()
     {
         $sql = "

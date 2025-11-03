@@ -9,6 +9,9 @@ class ReportController extends Controller
 {
     public function getCirculatedBooksReport()
     {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
         $repository = new ReportRepository();
         $data = $repository->getCirculatedBooksSummary();
         header('Content-Type: application/json');
@@ -17,14 +20,31 @@ class ReportController extends Controller
 
     public function getTopVisitors()
     {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
         $repository = new ReportRepository();
         $data = $repository->getTopVisitorsByYear();
         header('Content-Type: application/json');
         echo json_encode(['success' => true, 'data' => $data]);
     }
 
+    public function getLibraryVisitsByDepartment()
+    {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        $repository = new ReportRepository();
+        $data = $repository->getLibraryVisitsByDepartment();
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'data' => $data]);
+    }
+
     public function getDeletedBooks()
     {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
         $repository = new ReportRepository();
         $dbData = $repository->getDeletedBooksReport();
 

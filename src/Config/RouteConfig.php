@@ -76,6 +76,8 @@ class RouteConfig
         $router->post('api/librarian/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/librarian/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/librarian/returning/extend', 'ReturningController@extendDueDate', ['returning']);
+        $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
+
 
         // --- ADMIN (AJAX/Data Routes) ---
         $router->get('api/admin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['restore books']);

@@ -38,20 +38,19 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const normalizedRole = (role || "").trim().toLowerCase();
 
-    // Reset/Hide wrapper first
     wrapper.classList.add('hidden');
 
     if (normalizedRole === 'student') {
       label.innerHTML = 'Course/Program <span class="text-red-500">*</span>';
       wrapper.classList.remove('hidden');
-      loadCoursesForStudent(selectedValue); // Load courses from API
+      loadCoursesForStudent(selectedValue); 
 
-    } else if (normalizedRole === 'faculty' || normalizedRole === 'staff') {
-      label.innerHTML = 'Department <span class="text-red-500">*</span>';
+    } else if (normalizedRole === 'faculty') { 
+      label.innerHTML = 'College/Department <span class="text-red-500">*</span>';
       wrapper.classList.remove('hidden');
-      loadDepartments(selectedValue);
+      loadDepartments(selectedValue); 
 
-    } else {
+    } else { 
       wrapper.classList.add('hidden');
       const select = document.getElementById('addUserSelectField');
       if (select) select.innerHTML = '';

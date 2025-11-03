@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('accession_number', accessionNumber);
 
-            const response = await fetch('api/superadmin/returning/checkBook', {
+            const response = await fetch('api/librarian/returning/checkBook', {
                 method: 'POST',
                 body: formData
             });
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const formData = new FormData();
                 formData.append('borrowing_id', borrowingId);
 
-                const response = await fetch('api/superadmin/returning/markReturned', {
+                const response = await fetch('api/librarian/returning/markReturned', {
                     method: 'POST',
                     body: formData
                 });

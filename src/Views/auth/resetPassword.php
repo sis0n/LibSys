@@ -127,7 +127,7 @@
                 if(s <= 0){
                     clearInterval(timer);
                     // Baguhin ang "login.html" sa tamang login page URL mo
-                    window.location.href="login.html"; 
+                    window.location.href="login"; 
                 }
             },1000);
         },1000);

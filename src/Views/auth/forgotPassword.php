@@ -65,7 +65,7 @@
     startTimer(60);
 
     alertBox.classList.remove("hidden");
-    message.textContent = "If your email is registered, reset instructions have been sent.";
+    message.textContent = "Checked. If registered, the instruction has been sent.";
   });
 
   function startTimer(sec) {

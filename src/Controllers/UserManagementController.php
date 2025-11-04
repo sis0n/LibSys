@@ -298,19 +298,51 @@ class UserManagementController extends Controller
     }
 
     try {
-      if (isset($data['password']) && !empty($data['password'])) {
-        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-      }
+      // Itabi ang module data
+      $modulesPayload = $data['modules'] ?? null;
+      $modulesKeyWasPresent = array_key_exists('modules', $data);
+      unset($data['modules']); // Alisin sa $data para 'di ma-save sa 'users' table
 
+      // Kunin ang role ng user mula sa database (dahil hindi ito nagbabago)
+      $currentUser = $this->userRepo->getUserById((int)$id);
+      $currentRole = strtolower($currentUser['role'] ?? '');
+
+      // Siguraduhin na hindi aksidenteng mapapalitan ang role
+      unset($data['role']);
       unset($data['user_id']);
 
-      $updated = $this->userRepo->updateUser((int)$id, $data);
-
-      if (in_array(strtolower($data['role'] ?? ''), ['admin', 'librarian']) && isset($data['modules'])) {
-        $this->userPermissionRepo->assignModules((int)$id, $data['modules']);
+      // Handle password update kung meron
+      if (isset($data['password']) && !empty($data['password'])) {
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+      } else {
+        unset($data['password']); // 'Wag i-update kung empty
       }
 
-      if ($updated) {
+      // I-update ang user details (name, email, password, etc.)
+      $userUpdated = $this->userRepo->updateUser((int)$id, $data);
+
+      // --- LOGIC PARA LANG SA MODULES ---
+      $modulesUpdated = false;
+
+      // Titingnan lang natin kung ang role NIYA TALAGA ay admin o librarian
+      if ($currentRole === 'admin' || $currentRole === 'librarian') {
+
+        // At titingnan kung sinadya bang ipadala ang 'modules' key
+        if ($modulesKeyWasPresent) {
+
+          // Kung 'null' (uncheck all) or 'di array, gawing '[]'
+          $modulesToAssign = is_array($modulesPayload) ? $modulesPayload : [];
+
+          // I-sync ang modules (I-assume na ang assignModules ay nagde-DELETE muna bago mag-INSERT)
+          $this->userPermissionRepo->assignModules((int)$id, $modulesToAssign);
+          $modulesUpdated = true;
+        }
+      }
+
+      // --- END NG LOGIC ---
+
+      if ($userUpdated || $modulesUpdated) {
+        // Mag-success kung may nagbago sa details O sa modules
         echo json_encode([
           'success' => true,
           'message' => 'User updated successfully.'

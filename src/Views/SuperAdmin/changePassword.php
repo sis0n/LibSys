@@ -18,7 +18,7 @@
         Update your account password to keep your account secure.
       </p>
 
-      <form id="passwordForm" action="<?= BASE_URL ?>/change-password" method="POST" class="space-y-4">
+      <form id="passwordForm" action="<?= BASE_URL ?>/api/change-password" method="POST" class="space-y-4">
 
         <div>
           <label class="block text-gray-700 text-sm font-medium mb-1">

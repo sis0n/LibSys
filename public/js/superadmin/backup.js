@@ -79,16 +79,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalPages = Math.ceil(totalItems / itemsPerPage);
 
         if (totalPages <= 1) {
-            paginationContainer.classList.add('hidden');
+            // paginationContainer.classList.add('hidden');
             return;
         }
-        paginationContainer.classList.remove('hidden');
+        // paginationContainer.classList.remove('hidden');
 
         const makeLink = (page, isActive) => {
             const link = document.createElement('a');
             link.href = '#';
             link.textContent = page;
-            link.className = `flex items-center justify-center w-8 h-8 rounded-full text-gray-700 transition ${isActive ? 'bg-orange-500 text-white font-semibold' : 'hover:bg-orange-50 hover:text-orange-600'}`;
+            link.className = `flex items-center justify-center text-sm font-medium w-8 h-8 rounded-full text-gray-700 transition ${isActive ? 'bg-orange-500 text-white font-semibold' : 'hover:bg-orange-50 hover:text-orange-600'}`;
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 goToPage(page);

@@ -1,5 +1,5 @@
 <?php if (!empty($csrf_token)) : ?>
-    <input type="hidden" id="csrf_token" value="<?= $csrf_token ?>">
+<input type="hidden" id="csrf_token" value="<?= $csrf_token ?>">
 <?php endif; ?>
 <main class="min-h-screen">
     <!-- Header -->
@@ -50,7 +50,8 @@
                     class="backup-btn group flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg shadow-sm 
                             hover:bg-amber-500 hover:border-orange-500 hover:shadow-md transition-all duration-200 cursor-pointer">
                     <i class="ph ph-desktop-tower text-3xl text-red-500 group-hover:text-white transition-colors"></i>
-                    <span class="text-base font-semibold text-gray-700 group-hover:text-white mt-2">Equipment Only</span>
+                    <span class="text-base font-semibold text-gray-700 group-hover:text-white mt-2">Equipment
+                        Only</span>
                     <span class="text-sm text-gray-700 group-hover:text-white">Equipment data</span>
                 </button>
             </div>
@@ -102,36 +103,35 @@
                 <i class="ph ph-folder-simple-x text-4xl block mb-2 text-gray-400"></i>
                 No backup files found.
             </p>
-        </div>
+            <!-- Pagination -->
+            <div id="pagination-container" class="flex justify-center items-center mt-6">
+                <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
+                    <ul class="flex items-center gap-4 text-sm">
+                        <!-- Previous -->
+                        <li>
+                            <a href="#" id="prev-page"
+                                class="flex items-center gap-1 text-gray-400 hover:text-orange-600 transition">
+                                <i class="ph ph-caret-left"></i>
+                                <span>Previous</span>
+                            </a>
+                        </li>
 
-        <!-- Pagination -->
-        <div id="pagination-container" class="flex justify-center items-center mt-6">
-            <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
-                <ul class="flex items-center gap-4 text-sm">
-                    <!-- Previous -->
-                    <li>
-                        <a href="#" id="prev-page"
-                            class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
-                            <i class="ph ph-caret-left"></i>
-                            <span>Previous</span>
-                        </a>
-                    </li>
+                        <!-- Page Numbers -->
+                        <div id="pagination-numbers" class="flex items-center gap-3">
+                            <!-- JS will insert page numbers here -->
+                        </div>
 
-                    <!-- Page Numbers -->
-                    <div id="pagination-numbers" class="flex items-center gap-3">
-                        <!-- JS will insert page numbers here -->
-                    </div>
-
-                    <!-- Next -->
-                    <li>
-                        <a href="#" id="next-page"
-                            class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
-                            <span>Next</span>
-                            <i class="ph ph-caret-right"></i>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+                        <!-- Next -->
+                        <li>
+                            <a href="#" id="next-page"
+                                class="flex items-center gap-1 text-gray-400 hover:text-orange-600 transition">
+                                <span>Next</span>
+                                <i class="ph ph-caret-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </main>

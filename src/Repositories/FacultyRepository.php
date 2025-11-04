@@ -14,18 +14,18 @@ class FacultyRepository
     $this->db = Database::getInstance()->getConnection();
   }
 
-  public function insertFaculty(int $userId, string $department, string $contact, string $status = 'active'): int
+  public function insertFaculty(int $userId, int $collegeId, string $contact, string $status = 'active'): int
   {
     $uniqueId = $this->generateUniqueFacultyId();
 
     $stmt = $this->db->prepare("
-        INSERT INTO faculty (user_id, faculty_id, department, contact, status, created_at)
-        VALUES (:user_id, :unique_id, :department, :contact, :status, NOW())
+        INSERT INTO faculty (user_id, unique_faculty_id, college_id, contact, status, created_at)
+        VALUES (:user_id, :unique_id, :college_id, :contact, :status, NOW())
     ");
     $stmt->execute([
       ':user_id' => $userId,
       ':unique_id' => $uniqueId,
-      ':department' => $department,
+      ':college_id' => $collegeId,
       ':contact' => $contact,
       ':status' => $status
     ]);

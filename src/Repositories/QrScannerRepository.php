@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Core\Database;
+use Exception;
+use PDO;
 
 class QRScannerRepository
 {
@@ -16,25 +18,35 @@ class QRScannerRepository
   public function getTransactionDetailsByCode(string $code)
   {
     $stmt = $this->db->prepare("
-            SELECT 
-                bt.transaction_id, bt.transaction_code, bt.borrowed_at, bt.due_date, bt.status,
-                bt.student_id, bt.faculty_id, bt.staff_id,
+        SELECT 
+            bt.transaction_id, bt.transaction_code, bt.borrowed_at, bt.due_date, bt.status,
+            bt.student_id, bt.faculty_id, bt.staff_id,
 
-                s.student_number, s.course, s.year_level, s.section, 
-                f.faculty_id AS f_id, f.department,
-                st.staff_id AS st_id, st.position, st.contact,
-                u.profile_picture, u.first_name, u.last_name, u.middle_name, u.suffix
+            s.student_number, s.year_level, s.section, 
+            
+            f.unique_faculty_id, /* <<< FIXED: Walang alias, direkta sa field name */
+            f.college_id,
+            
+            st.staff_id, st.employee_id, st.position, st.contact,
+            u.profile_picture, u.first_name, u.last_name, u.middle_name, u.suffix,
+            
+            s.course_id,
+            c.course_code, c.course_title,
+            cl.college_code, cl.college_name
 
-            FROM borrow_transactions bt
-            LEFT JOIN students s ON bt.student_id = s.student_id
-            LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
-            LEFT JOIN staff st ON bt.staff_id = st.staff_id
-            LEFT JOIN users u ON u.user_id = COALESCE(s.user_id, f.user_id, st.user_id)
-            WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code)
-            LIMIT 1
-        ");
+        FROM borrow_transactions bt
+        LEFT JOIN students s ON bt.student_id = s.student_id
+        LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
+        LEFT JOIN staff st ON bt.staff_id = st.staff_id
+        LEFT JOIN users u ON u.user_id = COALESCE(s.user_id, f.user_id, st.user_id)
+        LEFT JOIN courses c ON s.course_id = c.course_id
+        LEFT JOIN colleges cl ON f.college_id = cl.college_id
+        
+        WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code)
+        LIMIT 1
+    ");
     $stmt->execute(['code' => trim($code)]);
-    return $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
   public function getTransactionItems(string $code)
@@ -47,7 +59,7 @@ class QRScannerRepository
             WHERE LOWER(TRIM(bt.transaction_code)) = LOWER(:code)
         ");
     $stmt->execute(['code' => trim($code)]);
-    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
   public function getBorrowedCount(string $idColumn, int $idValue, string $currentTransactionCode): int
@@ -103,7 +115,7 @@ class QRScannerRepository
 
       $this->db->commit();
       return $transactionId;
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       error_log("Save Borrowing Error: " . $e->getMessage());
       $this->db->rollBack();
       return 0;
@@ -150,7 +162,7 @@ class QRScannerRepository
 
       $this->db->commit();
       return true;
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       error_log("Process Borrowing Error: " . $e->getMessage());
       $this->db->rollBack();
       return false;
@@ -162,8 +174,7 @@ class QRScannerRepository
   {
     $query = "
             SELECT 
-                -- Identify the user type and ID
-                COALESCE(s.student_number, f.faculty_id) AS user_identifier,
+                COALESCE(s.student_number, f.unique_faculty_id) AS user_identifier,
                 s.student_id, 
                 f.faculty_id,
                 
@@ -174,12 +185,15 @@ class QRScannerRepository
                 COUNT(bti.book_id) AS items_borrowed,
                 u.first_name, u.last_name, u.middle_name, u.suffix,
                 
-                -- Additional context fields
-                s.course, f.department
+                c.course_code, cl.college_code 
+                
             FROM borrow_transactions bt
             LEFT JOIN students s ON bt.student_id = s.student_id
             LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
             LEFT JOIN users u ON u.user_id = COALESCE(s.user_id, f.user_id)
+            LEFT JOIN courses c ON s.course_id = c.course_id
+            LEFT JOIN colleges cl ON f.college_id = cl.college_id
+            
             JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
             WHERE 1=1
             AND bt.status IN ('borrowed', 'returned', 'pending')
@@ -188,7 +202,7 @@ class QRScannerRepository
     $params = [];
 
     if ($search) {
-      $query .= " AND (s.student_number LIKE :search OR f.faculty_id LIKE :search OR bt.transaction_code LIKE :search)";
+      $query .= " AND (s.student_number LIKE :search OR f.unique_faculty_id LIKE :search OR bt.transaction_code LIKE :search OR u.first_name LIKE :search OR u.last_name LIKE :search)";
       $params['search'] = "%$search%";
     }
 
@@ -198,26 +212,26 @@ class QRScannerRepository
     }
 
     if ($date) {
-      $query .= " AND (DATE(bt.borrowed_at) = :date OR DATE(MAX(bti.returned_at)) = :date)";
+      $query .= " AND DATE(bt.borrowed_at) = :date";
       $params['date'] = $date;
     }
 
     $query .= " GROUP BY 
             bt.transaction_id, bt.transaction_code, bt.borrowed_at, bt.status, 
-            s.student_number, s.student_id, s.course, 
-            f.faculty_id, f.department,
+            s.student_number, s.student_id, c.course_code, 
+            f.faculty_id, f.unique_faculty_id, cl.college_code,
             u.first_name, u.last_name, u.middle_name, u.suffix
             ORDER BY bt.borrowed_at DESC";
 
     $stmt = $this->db->prepare($query);
     $stmt->execute($params);
-    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
   public function getAllTransactions()
   {
     $stmt = $this->db->query("SELECT transaction_code, status FROM borrow_transactions");
-    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
   public function expireOldPendingTransactions(): void
@@ -226,10 +240,10 @@ class QRScannerRepository
             SELECT transaction_id 
             FROM borrow_transactions
             WHERE status = 'pending'
-              AND expires_at <= NOW()
+            AND expires_at <= NOW()
         ");
     $stmt->execute();
-    $expiredTransactions = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+    $expiredTransactions = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     if (!empty($expiredTransactions)) {
       $idsPlaceholders = implode(',', array_fill(0, count($expiredTransactions), '?'));

@@ -1,45 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const courses = {
-        "BSA": "Bachelor of Science in Accountancy",
-        "BSAIS": "Bachelor of Science in Accounting Information Systems",
-        "BSBA FMGT": "BSBA Major in Financial Management",
-        "BSBA HRM": "BSBA Major in Human Resource Management",
-        "BSBA MKTG": "BSBA Major in Marketing Management",
-        "BS ENTREP": "Bachelor of Science in Entrepreneurship",
-        "BS CRIM": "Bachelor of Science in Criminology",
-        "BSISM": "Bachelor of Science in Industrial Security Management",
-        "BECED": "Bachelor of Early Childhood Education",
-        "BSE ENG": "Bachelor of Secondary Education Major in English",
-        "BSE ENG-CHI": "Bachelor of Secondary Education Major in English with Additional Chinese Language and Pedagogy Courses",
-        "BSE SCI": "Bachelor of Secondary Education Major in Science",
-        "BTLED HE": "Bachelor of Technology and Livelihood Education Major in Home Economics",
-        "CPE": "Certificate in Professional Education",
-        "BS CPE": "Bachelor of Science in Computer Engineering",
-        "BS ECE": "Bachelor of Science in Electronics Engineering",
-        "BS EE": "Bachelor of Science in Electrical Engineering",
-        "BS IE": "Bachelor of Science in Industrial Engineering",
-        "ABBS": "Bachelor of Arts in Behavioral Sciences",
-        "BA COMM": "Bachelor of Arts in Communication",
-        "BA POS": "Bachelor of Arts in Political Science",
-        "BS MATH": "Bachelor of Science in Mathematics",
-        "BS PSY": "Bachelor of Science in Psychology",
-        "BSIS": "Bachelor of Science in Information Systems",
-        "BSIT": "Bachelor of Science in Information Technology",
-        "BSCS": "Bachelor of Science in Computer Science",
-        "BSEMC": "Bachelor of Science in Entertainment and Multimedia Computing",
-        "BSOAD": "Bachelor of Science in Office Administration",
-        "BSSW": "Bachelor of Science in Social Work",
-        "BSTM": "Bachelor of Science in Tourism Management",
-        "BSHM": "Bachelor of Science in Hospitality Management",
-        "DPA": "Doctor in Public Administration",
-        "BPA": "Bachelor of Public Administration",
-        "BPA ECGE": "Bachelor of Public Administration – Evening Class for Govt. Employees",
-        "MAED": "Master of Arts in Education Major in Educational Management",
-        "MAT-EG": "Master of Arts in Teaching in the Early Grades",
-        "MATS": "Master of Arts in Teaching Science",
-        "MBA": "Master in Business Administration",
-        "LAW": "Bachelor of Laws / Juris Doctor"
-    };
 
     const uploadInput = document.getElementById('uploadProfile');
     const profilePreview = document.getElementById('profilePreview');
@@ -67,25 +26,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadLabel = document.getElementById('uploadLabel');
     const profileLockedInfo = document.getElementById('profileLockedInfo');
 
+    const courseSelect = document.getElementById('course');
     const allInputs = profileForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select');
     const editableInputs = Array.from(allInputs).filter(input => input.id !== 'studentNumber');
 
     const MAX_FILE_SIZE = 1 * 1024 * 1024;
     let originalProfileData = {};
+    let isEditing = false;
 
-    function populateCourses() {
-        const select = document.getElementById('course');
-        if (!select) return;
-        const currentValue = select.value;
-        select.innerHTML = '';
-        const defaultOption = new Option('Select a Course', '');
-        select.add(defaultOption);
+    async function loadCourseOptions(currentCourseId = null) {
+        if (!courseSelect) return;
 
-        for (const [abbr, name] of Object.entries(courses)) {
-            const option = new Option(`${abbr} - ${name}`, abbr);
-            select.add(option);
+        courseSelect.innerHTML = '<option value="">Loading Courses...</option>';
+        courseSelect.disabled = true;
+
+        try {
+            const res = await fetch('api/data/getAllCourses');
+            const data = await res.json();
+
+            courseSelect.innerHTML = '';
+            const defaultOption = new Option('Select a Course', '');
+            courseSelect.add(defaultOption);
+
+            if (data.success && Array.isArray(data.courses)) {
+                data.courses.forEach(course => {
+                    const option = new Option(`${course.course_code} - ${course.course_title}`, String(course.course_id));
+                    courseSelect.add(option);
+                });
+            }
+
+            if (currentCourseId) {
+                courseSelect.value = String(currentCourseId);
+            }
+            if (!isEditing) courseSelect.disabled = true;
+
+        } catch (err) {
+            console.error("Error fetching course options:", err);
+            courseSelect.innerHTML = `<option value="${currentCourseId || ''}">Error loading courses</option>`;
+            courseSelect.disabled = true;
         }
-        select.value = currentValue;
     }
 
     async function loadProfile() {
@@ -101,9 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const profile = data.profile;
                 originalProfileData = profile;
 
-                const fullName = profile.full_name ||
-                    [profile.first_name, profile.middle_name, profile.last_name, profile.suffix]
-                        .filter(Boolean).join(' ') || 'Student Name';
+                const fullName = profile.full_name || [profile.first_name, profile.middle_name, profile.last_name, profile.suffix].filter(Boolean).join(' ') || 'Student Name';
                 profileName.textContent = fullName;
                 profileStudentId.textContent = profile.student_number || 'Student ID';
 
@@ -112,11 +89,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('lastName').value = profile.last_name || '';
                 document.getElementById('suffix').value = profile.suffix || '';
                 document.getElementById('studentNumber').value = profile.student_number || '';
-                document.getElementById('course').value = profile.course || '';
                 document.getElementById('yearLevel').value = profile.year_level || '';
                 document.getElementById('section').value = profile.section || '';
                 document.getElementById('email').value = profile.email || '';
                 document.getElementById('contact').value = profile.contact || '';
+
+                const currentCourseId = String(profile.course_id) || '';
+                const courseDisplayName = profile.course_code ? `${profile.course_code} - ${profile.course_title}` : 'Select a Course';
+
+                if (!isEditing && courseSelect) {
+                    courseSelect.innerHTML = `<option value="${currentCourseId}">${courseDisplayName}</option>`;
+                    courseSelect.value = currentCourseId;
+                    courseSelect.disabled = true;
+                } else if (isEditing) {
+                    loadCourseOptions(currentCourseId);
+                }
 
                 if (profile.profile_picture) {
                     profilePreview.src = profile.profile_picture;
@@ -156,8 +143,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleEdit(isEditing) {
-        if (isEditing) {
+    function toggleEdit(shouldEdit) {
+        isEditing = shouldEdit;
+
+        if (shouldEdit) {
+            loadCourseOptions(originalProfileData.course_id);
+
             editableInputs.forEach(input => {
                 input.disabled = false;
                 input.classList.remove('bg-gray-50', 'border-gray-200');
@@ -194,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewRegForm.classList.remove('hidden');
             }
 
-            loadProfile();
+            // loadProfile();
         }
     }
 
@@ -209,7 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let missingFields = [];
 
         for (const field of requiredFields) {
-            if (!formData.get(field) || formData.get(field).trim() === '') {
+            const value = formData.get(field);
+            if (!value || value.trim() === '' || (field === 'course' && (value === '0' || value === ''))) {
                 missingFields.push(field);
             }
         }
@@ -230,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const email = formData.get('email');
-        if (!/^[^ -- -퟿豈-﷏ﷰ-￯]+@[^ -- -퟿豈-﷏ﷰ-￯]+\.[^ -- -퟿豈-﷏ﷰ-￯]+$/.test(email)) {
+        if (!/^[^--Ÿ -퟿豈-﷏ﷰ-￯]+@[^--Ÿ -퟿豈-﷏ﷰ-￯]+\.[^--Ÿ -퟿豈-﷏ﷰ-￯]+$/.test(email)) {
             Swal.fire('Invalid Email', 'Please enter a valid email address.', 'warning');
             return;
         }
@@ -282,6 +274,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (croppedBlob) {
             formData.append('profile_image', croppedBlob, 'profile.png');
         }
+
+        const selectedCourseValue = formData.get('course');
+        formData.delete('course');
+        formData.append('course_id', selectedCourseValue);
 
         try {
             const res = await fetch('api/student/myprofile/update', {
@@ -427,6 +423,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(modal) { if (modal) { modal.classList.remove("hidden"); document.body.classList.add("overflow-hidden"); } }
     function closeModal(modal) { if (modal) { modal.classList.add("hidden"); document.body.classList.remove("overflow-hidden"); } }
 
-    populateCourses();
+    isEditing = false;
     loadProfile();
+
+    // loadCourseOptions(null);
+
 });

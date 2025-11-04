@@ -18,205 +18,58 @@ class ReturningRepository
   public function getDueSoonAndOverdue(): ?array
   {
     try {
-      // --- Near Due ---
-      $stmtNearDue = $this->db->prepare("
-            SELECT * FROM (
-                -- Students
+      // --- NEAR DUE & OVERDUE BASE QUERY ---
+      $baseSelect = "
                 SELECT 
-                    'student' AS borrower_type,
-                    u.first_name,
-                    u.last_name,
-                    s.student_number AS id_number,
-                    s.course,
-                    s.year_level,
-                    s.section,
-                    s.contact AS contact_number,
-                    b.title AS item_borrowed,
+                    bti.status,
+                    bt.due_date,
                     bt.borrowed_at,
-                    bt.due_date
+                    b.title AS item_borrowed,
+                    u.first_name, u.last_name,
+                    s.student_number AS id_number, s.year_level, s.section, s.contact AS contact_number,
+                    f.faculty_id AS id_number_f, f.contact AS contact_number_f,
+                    st.staff_id AS id_number_st, st.position AS department_st, st.contact AS contact_number_st,
+                    g.guest_id AS id_number_g, g.contact AS contact_number_g, g.first_name AS g_first_name, g.last_name AS g_last_name,
+
+                    -- NEW ID FIELDS
+                    s.course_id, 
+                    f.college_id, 
+                    
+                    -- NEW DISPLAY FIELDS (COALESCE for Union compatibility)
+                    COALESCE(c.course_code, cl.college_code, st.position) AS department_course_code,
+                    COALESCE(c.course_title, cl.college_name, st.position) AS department_course_name
+            ";
+
+      $baseFrom = "
                 FROM borrow_transaction_items bti
                 JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
+                JOIN books b ON bti.book_id = b.book_id
                 LEFT JOIN students s ON bt.student_id = s.student_id
-                LEFT JOIN users u ON s.user_id = u.user_id
-                JOIN books b ON bti.book_id = b.book_id
-                WHERE bti.status = 'borrowed' 
-                  AND DATE(bt.due_date) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
-
-                UNION ALL
-
-                -- Faculty
-                SELECT 
-                    'faculty' AS borrower_type,
-                    u.first_name,
-                    u.last_name,
-                    f.faculty_id AS id_number,
-                    f.department,
-                    NULL AS year_level,
-                    NULL AS section,
-                    f.contact AS contact_number,
-                    b.title AS item_borrowed,
-                    bt.borrowed_at,
-                    bt.due_date
-                FROM borrow_transaction_items bti
-                JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
                 LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
-                LEFT JOIN users u ON f.user_id = u.user_id
-                JOIN books b ON bti.book_id = b.book_id
-                WHERE bti.status = 'borrowed' 
-                  AND bt.faculty_id IS NOT NULL
-                  AND DATE(bt.due_date) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
-
-                UNION ALL
-
-                -- Staff
-                SELECT 
-                    'staff' AS borrower_type,
-                    u.first_name,
-                    u.last_name,
-                    st.staff_id AS id_number,
-                    st.position AS department,
-                    NULL AS year_level,
-                    NULL AS section,
-                    st.contact AS contact_number,
-                    b.title AS item_borrowed,
-                    bt.borrowed_at,
-                    bt.due_date
-                FROM borrow_transaction_items bti
-                JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
                 LEFT JOIN staff st ON bt.staff_id = st.staff_id
-                LEFT JOIN users u ON st.user_id = u.user_id
-                JOIN books b ON bti.book_id = b.book_id
-                WHERE bti.status = 'borrowed' 
-                  AND bt.staff_id IS NOT NULL
-                  AND DATE(bt.due_date) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
-
-                UNION ALL
-
-                -- Guests
-                SELECT
-                    'guests' AS borrower_type,
-                    g.first_name,
-                    g.last_name,
-                    g.guest_id AS id_number,
-                    NULL AS department,
-                    NULL AS year_level,
-                    NULL AS section,
-                    g.contact AS contact_number,
-                    b.title AS item_borrowed,
-                    bt.borrowed_at,
-                    bt.due_date
-                FROM borrow_transaction_items bti
-                JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
                 LEFT JOIN guests g ON bt.guest_id = g.guest_id
-                JOIN books b ON bti.book_id = b.book_id
-                WHERE bti.status = 'borrowed'
-                  AND bt.guest_id IS NOT NULL
-                  AND DATE(bt.due_date) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+                LEFT JOIN users u ON u.user_id = COALESCE(s.user_id, f.user_id, st.user_id)
+                -- NEW JOINS
+                LEFT JOIN courses c ON s.course_id = c.course_id
+                LEFT JOIN colleges cl ON f.college_id = cl.college_id
+            ";
 
-            ) AS combined
-            ORDER BY due_date ASC
-        ");
+
+      // --- NEAR DUE QUERY ---
+      $queryNearDue = $baseSelect . $baseFrom . "
+                WHERE bti.status = 'borrowed' 
+                AND DATE(bt.due_date) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+            ";
+      $stmtNearDue = $this->db->prepare($queryNearDue . " ORDER BY bt.due_date ASC");
       $stmtNearDue->execute();
       $nearDue = $stmtNearDue->fetchAll(PDO::FETCH_ASSOC);
 
-      // --- Overdue ---
-      $stmtOverdue = $this->db->prepare("
-            SELECT * FROM (
-                -- Students
-                SELECT 
-                    'student' AS borrower_type,
-                    u.first_name,
-                    u.last_name,
-                    s.student_number AS id_number,
-                    s.course,
-                    s.year_level,
-                    s.section,
-                    s.contact AS contact_number,
-                    b.title AS item_borrowed,
-                    bt.borrowed_at,
-                    bt.due_date
-                FROM borrow_transaction_items bti
-                JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
-                JOIN students s ON bt.student_id = s.student_id
-                JOIN users u ON s.user_id = u.user_id
-                JOIN books b ON bti.book_id = b.book_id
+      // --- OVERDUE QUERY ---
+      $queryOverdue = $baseSelect . $baseFrom . "
                 WHERE bti.status = 'borrowed' 
-                  AND DATE(bt.due_date) < CURDATE()
-
-                UNION ALL
-
-                -- Faculty
-                SELECT 
-                    'faculty' AS borrower_type,
-                    u.first_name,
-                    u.last_name,
-                    f.faculty_id AS id_number,
-                    f.department,
-                    NULL AS year_level,
-                    NULL AS section,
-                    f.contact AS contact_number,
-                    b.title AS item_borrowed,
-                    bt.borrowed_at,
-                    bt.due_date
-                FROM borrow_transaction_items bti
-                JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
-                LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
-                LEFT JOIN users u ON f.user_id = u.user_id
-                JOIN books b ON bti.book_id = b.book_id
-                WHERE bti.status = 'borrowed' 
-                  AND bt.faculty_id IS NOT NULL
-                  AND DATE(bt.due_date) < CURDATE()
-
-                UNION ALL
-
-                -- Staff
-                SELECT 
-                    'staff' AS borrower_type,
-                    u.first_name,
-                    u.last_name,
-                    st.staff_id AS id_number,
-                    st.position AS department,
-                    NULL AS year_level,
-                    NULL AS section,
-                    st.contact AS contact_number,
-                    b.title AS item_borrowed,
-                    bt.borrowed_at,
-                    bt.due_date
-                FROM borrow_transaction_items bti
-                JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
-                LEFT JOIN staff st ON bt.staff_id = st.staff_id
-                LEFT JOIN users u ON st.user_id = u.user_id
-                JOIN books b ON bti.book_id = b.book_id
-                WHERE bti.status = 'borrowed' 
-                  AND bt.staff_id IS NOT NULL
-                  AND DATE(bt.due_date) < CURDATE()
-
-                UNION ALL
-
-                -- Guests
-                SELECT
-                    'guest' AS borrower_type,
-                    g.first_name,
-                    g.last_name,
-                    g.guest_id AS id_number,
-                    NULL AS department,
-                    NULL AS year_level,
-                    NULL AS section,
-                    g.contact AS contact_number,
-                    b.title AS item_borrowed,
-                    bt.borrowed_at,
-                    bt.due_date
-                FROM borrow_transaction_items bti
-                JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
-                LEFT JOIN guests g ON bt.guest_id = g.guest_id
-                JOIN books b ON bti.book_id = b.book_id
-                WHERE bti.status = 'borrowed'
-                  AND bt.guest_id IS NOT NULL
-                  AND DATE(bt.due_date) < CURDATE()
-
-            ) AS combined
-            ORDER BY due_date ASC
-        ");
+                AND DATE(bt.due_date) < CURDATE()
+            ";
+      $stmtOverdue = $this->db->prepare($queryOverdue . " ORDER BY bt.due_date ASC");
       $stmtOverdue->execute();
       $overdue = $stmtOverdue->fetchAll(PDO::FETCH_ASSOC);
 
@@ -232,14 +85,9 @@ class ReturningRepository
     }
   }
 
-
-
-
-
   public function findBookByAccession($accessionNumber): ?array
   {
     try {
-      // Step 1: Hanapin ang libro
       $stmt = $this->db->prepare("SELECT * FROM books WHERE accession_number = ?");
       $stmt->execute([$accessionNumber]);
       $book = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -248,36 +96,44 @@ class ReturningRepository
         return ['status' => 'not_found'];
       }
 
-      // Step 2: Check availability
       $availability = strtolower(trim($book['availability'] ?? ''));
 
-      // Step 3: Kung borrowed, kunin borrower details
       if ($availability === 'borrowed') {
         $stmt = $this->db->prepare("
                 SELECT 
-                    bti.item_id,
-                    bti.transaction_id,
-                    bti.book_id,
-                    bt.borrowed_at AS date_borrowed,
-                    bt.due_date,
-                    s.student_id, s.student_number, s.course, s.year_level, s.section, s.contact AS student_contact,
-                    f.faculty_id, f.department AS faculty_dept, f.contact AS faculty_contact,
-                    st.staff_id, st.position AS staff_position, st.contact AS staff_contact,
-                    g.guest_id, g.first_name AS guest_first_name, g.last_name AS guest_last_name, g.contact AS guest_contact,
-                    u_student.first_name AS student_first_name, u_student.last_name AS student_last_name,
-                    u_faculty.first_name AS faculty_first_name, u_faculty.last_name AS faculty_last_name,
-                    u_staff.first_name AS staff_first_name, u_staff.last_name AS staff_last_name,
-                    bti.status,
-                    bti.item_id AS borrowing_id,
-                    b.title AS book_title
+                    bti.item_id, bti.transaction_id, bti.book_id,
+                    bt.borrowed_at AS date_borrowed, bt.due_date,
+                    
+                    bt.student_id, bt.faculty_id, bt.staff_id, bt.guest_id,
+
+                    s.student_number, s.year_level, s.section, s.contact AS student_contact,
+                    u_student.first_name AS student_first_name, u_student.last_name AS student_last_name, u_student.email AS student_email, 
+                    c.course_code, c.course_title, 
+
+                    f.unique_faculty_id, f.college_id, f.contact AS faculty_contact, 
+                    u_faculty.first_name AS faculty_first_name, u_faculty.last_name AS faculty_last_name, u_faculty.email AS faculty_email, 
+                    cl.college_code, cl.college_name, 
+
+                    st.staff_id AS staff_id_num, st.employee_id, st.position AS staff_position, st.contact AS staff_contact,
+                    u_staff.first_name AS staff_first_name, u_staff.last_name AS staff_last_name, u_staff.email AS staff_email,
+
+                    g.guest_id AS guest_id_num, g.first_name AS guest_first_name, g.last_name AS guest_last_name, g.contact AS guest_contact,
+                    
+                    bti.status, bti.item_id AS borrowing_id, b.title AS book_title
                 FROM borrow_transaction_items bti
                 JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
+                
                 LEFT JOIN students s ON bt.student_id = s.student_id
                 LEFT JOIN users u_student ON s.user_id = u_student.user_id
+                LEFT JOIN courses c ON s.course_id = c.course_id 
+
                 LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
                 LEFT JOIN users u_faculty ON f.user_id = u_faculty.user_id
+                LEFT JOIN colleges cl ON f.college_id = cl.college_id 
+
                 LEFT JOIN staff st ON bt.staff_id = st.staff_id
                 LEFT JOIN users u_staff ON st.user_id = u_staff.user_id
+                
                 LEFT JOIN guests g ON bt.guest_id = g.guest_id
                 JOIN books b ON bti.book_id = b.book_id
                 WHERE bti.book_id = ? AND bti.status = 'borrowed'
@@ -287,37 +143,42 @@ class ReturningRepository
         $borrowInfo = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($borrowInfo) {
-          // Determine borrower type and details
+
+          $borrowerName = $borrowerType = $contact = $email = $idNumber = $courseOrDept = $yearSectionDisplay = 'N/A';
+
           if (!empty($borrowInfo['student_id'])) {
             $borrowerName = trim(($borrowInfo['student_first_name'] ?? '') . ' ' . ($borrowInfo['student_last_name'] ?? ''));
             $borrowerType = 'student';
             $contact = $borrowInfo['student_contact'] ?? 'N/A';
+            $email = $borrowInfo['student_email'] ?? 'N/A';
             $idNumber = $borrowInfo['student_number'] ?? 'N/A';
-            $courseOrDept = trim(($borrowInfo['course'] ?? 'N/A') . ' - ' . ($borrowInfo['year_level'] ?? 'N/A') . ' ' . ($borrowInfo['section'] ?? ''));
+
+            $courseOrDept = trim(($borrowInfo['course_code'] ?? 'N/A') . ' - ' . ($borrowInfo['course_title'] ?? 'N/A'));
+            $yearSectionDisplay = trim(($borrowInfo['year_level'] ?? 'N/A') . ' ' . ($borrowInfo['section'] ?? 'N/A'));
           } elseif (!empty($borrowInfo['faculty_id'])) {
             $borrowerName = trim(($borrowInfo['faculty_first_name'] ?? '') . ' ' . ($borrowInfo['faculty_last_name'] ?? ''));
             $borrowerType = 'faculty';
             $contact = $borrowInfo['faculty_contact'] ?? 'N/A';
-            $idNumber = $borrowInfo['faculty_id'] ?? 'N/A';
-            $courseOrDept = $borrowInfo['faculty_dept'] ?? 'N/A';
+            $email = $borrowInfo['faculty_email'] ?? 'N/A';
+            $idNumber = $borrowInfo['unique_faculty_id'] ?? $borrowInfo['faculty_id'] ?? 'N/A';
+            $courseOrDept = trim(($borrowInfo['college_code'] ?? 'N/A') . ' - ' . ($borrowInfo['college_name'] ?? 'N/A'));
+            $yearSectionDisplay = $borrowInfo['college_name'] ?? 'N/A';
           } elseif (!empty($borrowInfo['staff_id'])) {
             $borrowerName = trim(($borrowInfo['staff_first_name'] ?? '') . ' ' . ($borrowInfo['staff_last_name'] ?? ''));
             $borrowerType = 'staff';
             $contact = $borrowInfo['staff_contact'] ?? 'N/A';
-            $idNumber = $borrowInfo['staff_id'] ?? 'N/A';
+            $email = $borrowInfo['staff_email'] ?? 'N/A';
+            $idNumber = $borrowInfo['employee_id'] ?? $borrowInfo['staff_id_num'] ?? 'N/A';
             $courseOrDept = $borrowInfo['staff_position'] ?? 'N/A';
+            $yearSectionDisplay = $borrowerType;
           } elseif (!empty($borrowInfo['guest_id'])) {
             $borrowerName = trim(($borrowInfo['guest_first_name'] ?? '') . ' ' . ($borrowInfo['guest_last_name'] ?? ''));
             $borrowerType = 'guest';
             $contact = $borrowInfo['guest_contact'] ?? 'N/A';
-            $idNumber = $borrowInfo['guest_id'] ?? 'N/A';
+            $email = 'N/A';
+            $idNumber = $borrowInfo['guest_id_num'] ?? 'N/A';
             $courseOrDept = 'N/A';
-          } else {
-            $borrowerName = 'Unknown';
-            $borrowerType = 'unknown';
-            $contact = 'N/A';
-            $idNumber = 'N/A';
-            $courseOrDept = 'N/A';
+            $yearSectionDisplay = $borrowerType;
           }
 
           return [
@@ -327,7 +188,9 @@ class ReturningRepository
               'borrower_name' => $borrowerName,
               'id_number' => $idNumber,
               'course_or_department' => $courseOrDept,
+              'student_year_section' => $yearSectionDisplay,
               'contact' => $contact,
+              'email' => $email,
               'date_borrowed' => $borrowInfo['date_borrowed'],
               'due_date' => $borrowInfo['due_date'],
               'borrowing_id' => $borrowInfo['borrowing_id']
@@ -341,37 +204,27 @@ class ReturningRepository
         ];
       }
 
-      // Default available
       return [
         'status' => 'available',
         'details' => $book
       ];
     } catch (PDOException $e) {
       error_log('[ReturningRepository::findBookByAccession] ' . $e->getMessage());
-      echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-      return null;
+      return ['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()];
     }
   }
 
-
-
-
-
-  /**
-   * I-update ang borrowing record at ibalik ang status ng libro sa 'available'.
-   */
   public function markAsReturned($itemId): ?array
   {
     try {
       $this->db->beginTransaction();
 
-      // Kunin ang item at transaction info kasama borrower types
       $stmtGetItem = $this->db->prepare("
-            SELECT bti.book_id, bti.transaction_id, bt.student_id, bt.faculty_id, bt.staff_id, bt.guest_id
-            FROM borrow_transaction_items bti
-            JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
-            WHERE bti.item_id = ? AND bti.status = 'borrowed'
-        ");
+                SELECT bti.book_id, bti.transaction_id, bt.student_id, bt.faculty_id, bt.staff_id, bt.guest_id
+                FROM borrow_transaction_items bti
+                JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
+                WHERE bti.item_id = ? AND bti.status = 'borrowed'
+            ");
       $stmtGetItem->execute([$itemId]);
       $itemInfo = $stmtGetItem->fetch(PDO::FETCH_ASSOC);
 
@@ -383,24 +236,21 @@ class ReturningRepository
       $bookId = $itemInfo['book_id'];
       $transactionId = $itemInfo['transaction_id'];
 
-      // Update borrow_transaction_items
       $stmtUpdateItem = $this->db->prepare("
-            UPDATE borrow_transaction_items
-            SET status = 'returned', returned_at = NOW()
-            WHERE item_id = ? AND status = 'borrowed'
-        ");
+                UPDATE borrow_transaction_items
+                SET status = 'returned', returned_at = NOW()
+                WHERE item_id = ? AND status = 'borrowed'
+            ");
       $stmtUpdateItem->execute([$itemId]);
 
-      // Update book availability
       $stmtUpdateBook = $this->db->prepare("UPDATE books SET availability = 'available' WHERE book_id = ?");
       $stmtUpdateBook->execute([$bookId]);
 
-      // Check if may natitirang borrowed items sa transaction
       $stmtCheckAll = $this->db->prepare("
-            SELECT COUNT(*) as remaining
-            FROM borrow_transaction_items
-            WHERE transaction_id = ? AND status = 'borrowed'
-        ");
+                SELECT COUNT(*) as remaining
+                FROM borrow_transaction_items
+                WHERE transaction_id = ? AND status = 'borrowed'
+            ");
       $stmtCheckAll->execute([$transactionId]);
       $remaining = $stmtCheckAll->fetch(PDO::FETCH_ASSOC)['remaining'];
 
@@ -413,29 +263,28 @@ class ReturningRepository
 
       // Kunin ang updated book info kasama borrower info
       $stmtBook = $this->db->prepare("
-            SELECT b.*,
-                   bt.student_id, bt.faculty_id, bt.staff_id, bt.guest_id,
-                   u_student.first_name AS student_first_name, u_student.last_name AS student_last_name,
-                   u_faculty.first_name AS faculty_first_name, u_faculty.last_name AS faculty_last_name,
-                   u_staff.first_name AS staff_first_name, u_staff.last_name AS staff_last_name,
-                   g.first_name AS guest_first_name, g.last_name AS guest_last_name, g.contact AS guest_contact
-            FROM books b
-            LEFT JOIN borrow_transaction_items bti ON b.book_id = bti.book_id
-            LEFT JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
-            LEFT JOIN students s ON bt.student_id = s.student_id
-            LEFT JOIN users u_student ON s.user_id = u_student.user_id
-            LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
-            LEFT JOIN users u_faculty ON f.user_id = u_faculty.user_id
-            LEFT JOIN staff st ON bt.staff_id = st.staff_id
-            LEFT JOIN users u_staff ON st.user_id = u_staff.user_id
-            LEFT JOIN guests g ON bt.guest_id = g.guest_id
-            WHERE b.book_id = ?
-            LIMIT 1
-        ");
+                SELECT b.*,
+                    bt.student_id, bt.faculty_id, bt.staff_id, bt.guest_id,
+                    u_student.first_name AS student_first_name, u_student.last_name AS student_last_name,
+                    u_faculty.first_name AS faculty_first_name, u_faculty.last_name AS faculty_last_name,
+                    u_staff.first_name AS staff_first_name, u_staff.last_name AS staff_last_name,
+                    g.first_name AS guest_first_name, g.last_name AS guest_last_name, g.contact AS guest_contact
+                FROM books b
+                LEFT JOIN borrow_transaction_items bti ON b.book_id = bti.book_id
+                LEFT JOIN borrow_transactions bt ON bti.transaction_id = bt.transaction_id
+                LEFT JOIN students s ON bt.student_id = s.student_id
+                LEFT JOIN users u_student ON s.user_id = u_student.user_id
+                LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
+                LEFT JOIN users u_faculty ON f.user_id = u_faculty.user_id
+                LEFT JOIN staff st ON bt.staff_id = st.staff_id
+                LEFT JOIN users u_staff ON st.user_id = u_staff.user_id
+                LEFT JOIN guests g ON bt.guest_id = g.guest_id
+                WHERE b.book_id = ?
+                LIMIT 1
+            ");
       $stmtBook->execute([$bookId]);
       $updatedBook = $stmtBook->fetch(PDO::FETCH_ASSOC);
 
-      // Format borrower name dynamically
       if (!empty($updatedBook['student_id'])) {
         $updatedBook['borrower_name'] = trim(($updatedBook['student_first_name'] ?? '') . ' ' . ($updatedBook['student_last_name'] ?? ''));
       } elseif (!empty($updatedBook['faculty_id'])) {
@@ -457,11 +306,6 @@ class ReturningRepository
     }
   }
 
-
-  /**
-   * I-e-extend ang due date ng isang transaction.
-   * @return string|null Ang bagong due date, or null kung failed.
-   */
   public function extendDueDate($itemId, $days): ?string
   {
     try {
@@ -506,9 +350,9 @@ class ReturningRepository
     $borrowerType = $row['borrower_type'] ?? 'student';
 
     $courseOrDept = match ($borrowerType) {
-      'student' => ($row['course'] ?? 'N/A') . ' - ' . ($row['year_level'] ?? 'N/A') . ' ' . ($row['section'] ?? ''),
-      'faculty' => $row['department'] ?? 'N/A',
-      'staff' => $row['department'] ?? 'N/A',
+      'student' => ($row['department_course_code'] ?? 'N/A') . ' - ' . ($row['department_course_name'] ?? 'N/A') . ' ' . ($row['year_level'] ?? 'N/A') . ' ' . ($row['section'] ?? ''),
+      'faculty' => $row['department_course_name'] ?? 'N/A', // Gagamitin ang College Name
+      'staff' => $row['department_st'] ?? 'N/A', // Position/Department ng Staff
       'guest' => 'N/A',
       default => 'N/A'
     };
@@ -529,10 +373,11 @@ class ReturningRepository
   private function formatModalData($row)
   {
     $borrowerType = $row['student_id'] ? 'student' : ($row['faculty_id'] ? 'faculty' : 'staff');
+
     $courseOrDept = match ($borrowerType) {
-      'student' => ($row['course'] ?? 'N/A') . ' - ' . ($row['year_level'] ?? 'N/A') . ' ' . ($row['section'] ?? ''),
-      'faculty' => $row['faculty_dept'] ?? 'N/A',
-      'staff' => $row['staff_dept'] ?? 'N/A',
+      'student' => ($row['course_code'] ?? 'N/A') . ' - ' . ($row['course_title'] ?? 'N/A') . ' ' . ($row['year_level'] ?? 'N/A') . ' ' . ($row['section'] ?? ''),
+      'faculty' => ($row['faculty_dept_code'] ?? 'N/A') . ' - ' . ($row['faculty_dept_name'] ?? 'N/A'),
+      'staff' => $row['staff_position'] ?? 'N/A',
       default => 'N/A'
     };
 
@@ -550,7 +395,7 @@ class ReturningRepository
       'course_or_department' => $courseOrDept,
       'email' => $row['email'] ?? 'N/A',
       'contact' => $row['contact_number'] ?? 'N/A',
-      'date_borrowed' => (new \DateTime($row['borrowed_at']))->format('Y-m-d H:i'),
+      'date_borrowed' => (new \DateTime($row['date_borrowed']))->format('Y-m-d H:i'),
       'due_date' => (new \DateTime($row['due_date']))->format('Y-m-d H:i')
     ];
   }

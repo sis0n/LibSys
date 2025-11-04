@@ -27,15 +27,10 @@ class AuthController extends Controller
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
 
-        // === [BINAGO DITO] ===
-        // Imbes na mag-check ng roles, i-redirect na lang lahat sa generic dashboard.
-        // Ang ViewController@handleDashboard na ang bahala mag-sort kung saan sila dapat mapunta.
         if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
-            header("Location: " . BASE_URL . "/dashboard"); // Palaging generic dashboard
+            header("Location: " . BASE_URL . "/dashboard");
             exit;
         }
-        // === [WAKAS NG PAGBABAGO] ===
-
 
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -92,23 +87,31 @@ class AuthController extends Controller
         if ($user) {
             $redirect = '';
             $userRole = strtolower($user['role'] ?? '');
-            $redirect = BASE_URL . '/dashboard';
 
+            $finalPath = '';
+
+            // 1. Admin/Librarian (based on permissions)
             if (User::isAdmin($user) || User::isLibrarian($user)) {
                 $permissions = $_SESSION['user_permissions'] ?? [];
-                $redirect = User::getFirstAccessibleModuleUrl($userRole, $permissions);
-            } elseif (User::isSuperadmin($user) || User::isStudent($user) || User::isFaculty($user) || User::isStaff($user) || User::isScanner($user)) {
-                $redirect = BASE_URL . '/dashboard';
+                $finalPath = User::getFirstAccessibleModuleUrl($userRole, $permissions);
+
+                // 2. Scanner Isolation (Priority)
+            } elseif (User::isScanner($user)) {
+                $finalPath = BASE_URL . '/attendance'; // <<< DITO ANG TAMA
+
+                // 3. Superadmin, Student, Faculty, Staff (Default to Dashboard)
+            } elseif (User::isSuperadmin($user) || User::isStudent($user) || User::isFaculty($user) || User::isStaff($user)) {
+                $finalPath = BASE_URL . '/dashboard';
             }
 
-            if (empty($redirect)) {
+            if (empty($finalPath)) {
                 echo json_encode(['status' => 'error', 'message' => 'Role not recognized or no accessible module.']);
                 return;
             }
 
             echo json_encode([
                 'status' => 'success',
-                'redirect' => $redirect
+                'redirect' => $finalPath
             ]);
             return;
         } else {
@@ -132,7 +135,6 @@ class AuthController extends Controller
 
     public function forgotPassword()
     {
-        session_start();
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }

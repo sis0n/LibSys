@@ -46,8 +46,14 @@ switch ($role) {
         <div class="flex items-center gap-3">
 
             <div id="headerAvatarContainer" class="w-9 h-9 rounded-full bg-orange-100 border border-orange-300 flex items-center justify-center text-orange-600 text-lg font-semibold overflow-hidden">
-                <?php if ($profilePic): ?>
-                    <img id="headerProfilePic" src="<?= htmlspecialchars($profilePic) ?>" alt="Profile" class="w-full h-full object-cover">
+                <?php if ($profilePic):
+                    // Tiyakin na walang leading slash ang path bago i-append sa BASE_URL
+                    $cleanProfilePic = ltrim($profilePic, '/');
+                ?>
+                    <img id="headerProfilePic"
+                        src="<?= BASE_URL ?>/<?= htmlspecialchars($cleanProfilePic) ?>"
+                        alt="Profile"
+                        class="w-full h-full object-cover">
                 <?php else: ?>
                     <i id="headerProfileIcon" class="ph ph-user"></i>
                 <?php endif; ?>
@@ -67,7 +73,6 @@ switch ($role) {
     </div>
 </header>
 
-
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const sidebar = document.getElementById("sidebar");
@@ -80,7 +85,7 @@ switch ($role) {
                 try {
                     sessionStorage.removeItem('bookCatalogPage');
                     sessionStorage.removeItem('bookManagementPage');
-                    sessionStorage.removeItem('bookManagementPage'); 
+                    sessionStorage.removeItem('bookManagementPage');
                 } catch (e) {
                     console.error("Could not remove item from sessionStorage during logout:", e);
                 }
@@ -90,7 +95,7 @@ switch ($role) {
             console.warn("Logout form with id='logoutForm' not found.");
         }
 
-        if (btn && sidebar) { 
+        if (btn && sidebar) {
             function toggleSidebar(forceClose = false) {
                 const isHidden = sidebar.classList.contains("-translate-x-full");
                 const body = document.body;

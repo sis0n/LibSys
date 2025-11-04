@@ -9,8 +9,8 @@ const statusMenu = document.getElementById("statusFilterMenu");
 const statusValue = document.getElementById("statusFilterValue");
 
 function renderScanResult(data) {
-    if (!data || !data.isValid) {
-        scanResultCard.innerHTML = `
+  if (!data || !data.isValid) {
+    scanResultCard.innerHTML = `
             <div>
                 <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
                 <p class="text-gray-500 mb-6">Review ticket details and process transaction</p>
@@ -25,25 +25,21 @@ function renderScanResult(data) {
                 </div>
             </div>
         `;
-        return;
-    }
+    return;
+  }
 
-    const user = data.user;
-    const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
+  const user = data.user;
+  const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
+  const profilePicPath = user.profilePicture || defaultAvatar;
 
-    let profilePicPath = defaultAvatar;
-    if (user.profilePicture) {
-        profilePicPath = user.profilePicture.startsWith('/') ? user.profilePicture : `/${user.profilePicture}`;
-    }
-
-    const actionButton = isBorrowed ?
-        `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>` :
-        `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
+  const actionButton = isBorrowed ?
+    `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>` :
+    `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
             class="w-full bg-orange-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-orange-600 transition">
             Confirm Borrow (${data.items.length} Items)
-        </button>`;
+          </button>`;
 
-    const itemsHtml = data.items.map((item, index) => `
+  const itemsHtml = data.items.map((item, index) => `
         <li class="mb-3 flex items-start gap-3">
             <span class="text-sm font-semibold text-gray-700 w-6 text-right">${index + 1}.</span>
             <div class="flex-1">
@@ -58,22 +54,22 @@ function renderScanResult(data) {
         </li>
     `).join('');
 
-    let extraInfoHtml = '';
-    if (user.type === 'student') {
-        extraInfoHtml = `
+  let extraInfoHtml = '';
+  if (user.type === 'student') {
+    extraInfoHtml = `
             <div class="flex justify-between"><span>Course:</span><span class="font-medium text-right">${user.course}</span></div>
             <div class="flex justify-between"><span>Year & Section:</span><span class="font-medium text-right">${user.yearsection}</span></div>
         `;
-    } else if (user.type === 'faculty') {
-        extraInfoHtml = `<div class="flex justify-between"><span>Department:</span><span class="font-medium text-right">${user.department}</span></div>`;
-    } else if (user.type === 'staff') {
-        extraInfoHtml = `
+  } else if (user.type === 'faculty') {
+    extraInfoHtml = `<div class="flex justify-between"><span>College/Dept:</span><span class="font-medium text-right">${user.department}</span></div>`;
+  } else if (user.type === 'staff') {
+    extraInfoHtml = `
             <div class="flex justify-between"><span>Position:</span><span class="font-medium text-right">${user.position}</span></div>
             <div class="flex justify-between"><span>Contact:</span><span class="font-medium text-right">${user.contact}</span></div>
         `;
-    }
+  }
 
-    scanResultCard.innerHTML = `
+  scanResultCard.innerHTML = `
         <div class="flex flex-col flex-grow">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold">Scan Result</h2>
@@ -89,7 +85,7 @@ function renderScanResult(data) {
                 <div class="flex items-center gap-3 mb-2">
                     <div class="w-16 h-16 flex-shrink-0">
                         <img src="${profilePicPath}" alt="User Avatar" 
-                             class="w-full h-full object-cover rounded-full border border-orange-300">
+                              class="w-full h-full object-cover rounded-full border border-orange-300">
                     </div>
                     <div class="self-center">
                         <p class="font-bold text-lg text-gray-800">${user.name}</p> 

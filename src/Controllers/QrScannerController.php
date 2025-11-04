@@ -35,7 +35,6 @@ class QRScannerController extends Controller
       return ['success' => false, 'message' => 'This ticket is already processed or expired.'];
     }
 
-    // Determine user type
     if (!empty($transaction['faculty_id'])) {
       $userType = 'faculty';
       $idColumn = 'faculty_id';
@@ -66,28 +65,42 @@ class QRScannerController extends Controller
 
     $items = $this->qrScannerRepository->getTransactionItems($transactionCode);
 
-    // Build unified user info
     $middleInitial = !empty($transaction['middle_name']) ? strtoupper(substr($transaction['middle_name'], 0, 1)) . '. ' : '';
     $suffix = !empty($transaction['suffix']) ? ' ' . $transaction['suffix'] : '';
     $fullName = trim("{$transaction['first_name']} {$middleInitial}{$transaction['last_name']}{$suffix}");
 
+    // --- Profile Picture URL Construction ---
+    $profilePicPath = $transaction['profile_picture'];
+    $profilePicUrl = null;
+
+    if ($profilePicPath) {
+      $baseUrlCleaned = rtrim(BASE_URL, '/');
+      $uploadsPosition = strpos($profilePicPath, 'uploads/');
+
+      if ($uploadsPosition !== false) {
+        $finalRelativePath = substr($profilePicPath, $uploadsPosition);
+        $profilePicUrl = $baseUrlCleaned . '/' . $finalRelativePath;
+      }
+    }
+
     $userInfo = [
       'type' => $userType,
       'name' => $fullName,
-      'profilePicture' => $transaction['profile_picture'] ?? null
+      'profilePicture' => $profilePicUrl
     ];
 
     if ($userType === 'student') {
-      $userInfo['id'] = $transaction['student_number'];
-      $userInfo['course'] = $transaction['course'];
-      $userInfo['yearsection'] = $transaction['year_level'] . '-' . $transaction['section'];
+      $userInfo['id'] = $transaction['student_number'] ?? 'N/A';
+      $userInfo['course'] = $transaction['course_code'] ?? 'N/A';
+      $userInfo['yearsection'] = ($transaction['year_level'] ?? '') . '-' . ($transaction['section'] ?? '');
     } elseif ($userType === 'faculty') {
-      $userInfo['id'] = $transaction['f_id'];
-      $userInfo['department'] = $transaction['department'];
-    } else {
-      $userInfo['id'] = $transaction['st_id'];
-      $userInfo['position'] = $transaction['position'];
-      $userInfo['contact'] = $transaction['contact'];
+      // FIXED: Gamitin ang unique_faculty_id
+      $userInfo['id'] = $transaction['unique_faculty_id'] ?? 'N/A';
+      $userInfo['department'] = $transaction['college_code'] ?? 'N/A';
+    } else { // Staff
+      $userInfo['id'] = $transaction['employee_id'] ?? 'N/A';
+      $userInfo['position'] = $transaction['position'] ?? 'N/A';
+      $userInfo['contact'] = $transaction['contact'] ?? 'N/A';
     }
 
     $responseData = [
@@ -206,9 +219,12 @@ class QRScannerController extends Controller
     $formattedHistory = array_map(function ($h) {
 
       $isFaculty = !empty($h['faculty_id']);
+      $isStudent = !empty($h['student_id']);
 
       $middleInitial = !empty($h['middle_name']) ? strtoupper(substr($h['middle_name'], 0, 1)) . '. ' : '';
       $suffix = !empty($h['suffix']) ? ' ' . $h['suffix'] : '';
+
+      // Final Name Construction
       $fullName = trim("{$h['first_name']} {$middleInitial}{$h['last_name']}{$suffix}");
 
       $borrowedDateTime = $h['borrowed_at']
@@ -219,10 +235,20 @@ class QRScannerController extends Controller
         ? date('M d, Y h:i A', strtotime($h['returned_at']))
         : 'Not yet returned';
 
+      // Set user ID based on role
+      $userIdValue = '';
+      if ($isStudent) {
+        $userIdValue = $h['student_number'] ?? $h['user_identifier'];
+      } elseif ($isFaculty) {
+        $userIdValue = $h['unique_faculty_id'] ?? $h['user_identifier'];
+      } else {
+        $userIdValue = $h['user_identifier'];
+      }
+
       return [
-        'userName' => $fullName,
-        'userId' => $isFaculty ? $h['faculty_id'] : $h['user_identifier'], // user_identifier holds student_number or faculty_id
-        'userType' => $isFaculty ? 'Faculty' : 'Student',
+        'userName' => $fullName, // Ibinigay na ang tamang full name
+        'userId' => $userIdValue,
+        'userType' => $isFaculty ? 'Faculty' : ($isStudent ? 'Student' : 'Staff/Guest'),
         'itemsBorrowed' => (int) $h['items_borrowed'],
         'status' => ucfirst($h['status']),
         'borrowedDateTime' => $borrowedDateTime,

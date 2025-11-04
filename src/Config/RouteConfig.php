@@ -74,7 +74,8 @@ class RouteConfig
         $router->get('api/staff/qrBorrowingTicket', 'StaffTicketController@show', ['staff']);
         $router->get('api/staff/myprofile/get', 'StaffProfileController@getProfile', ['staff']);
         $router->post('api/staff/myprofile/update', 'StaffProfileController@updateProfile', ['staff']);
-        $router->get('api/staff/borrowingHistory/fetch', 'StaffBorrowingHistoryController@fetchHistory', ['staff']);
+        $router->get('api/staff/borrowing-history/pagination', 'StaffBorrowingHistoryController@fetchPaginatedBorrowingHistory', ['staff']);
+        $router->get('api/staff/borrowing-history/stats', 'StaffBorrowingHistoryController@fetchStats', ['staff']);
 
         // --- LIBRARIAN (AJAX/Data Routes) ---
         $router->get('api/librarian/booksmanagement/fetch', 'BookManagementController@fetch', ['book management']);

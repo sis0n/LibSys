@@ -70,4 +70,50 @@ class StaffBorrowingHistoryRepository
     $stmt->execute(['uid' => $userId]);
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
+
+  // --- Pagination Start ---
+  public function getPaginatedBorrowingHistory(int $userId, int $limit, int $offset): array
+  {
+    $stmt = $this->db->prepare("
+        SELECT 
+            bt.transaction_id, 
+            bti.item_id, 
+            b.title, 
+            b.author, 
+            bt.borrowed_at, 
+            bt.due_date, 
+            bti.returned_at, 
+            bti.status,
+            COALESCE(CONCAT(librarian.first_name, ' ', librarian.last_name), 'N/A') AS librarian_name
+        FROM borrow_transactions bt
+        JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+        JOIN books b ON bti.book_id = b.book_id
+        JOIN staff s ON bt.staff_id = s.staff_id
+        LEFT JOIN users librarian ON bt.librarian_id = librarian.user_id
+        WHERE s.user_id = :user_id
+        AND bt.status != 'pending'
+        ORDER BY bt.borrowed_at DESC
+        LIMIT :limit OFFSET :offset
+    ");
+
+    $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+    $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  public function countBorrowingHistory(int $userId): int
+  {
+    $stmt = $this->db->prepare("
+        SELECT COUNT(bti.item_id)
+        FROM borrow_transactions bt
+        JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+        JOIN staff s ON bt.staff_id = s.staff_id
+        WHERE s.user_id = :user_id AND bt.status != 'pending'
+    ");
+    $stmt->execute(['user_id' => $userId]);
+    return (int)$stmt->fetchColumn();
+  }
+  // --- Pagination End ---
 }

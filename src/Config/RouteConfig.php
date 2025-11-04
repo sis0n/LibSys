@@ -124,7 +124,6 @@ class RouteConfig
         $router->get('api/admin/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
         // PDF Report Generation Route
         $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
-        $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
 
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);

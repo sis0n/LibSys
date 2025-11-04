@@ -92,7 +92,7 @@ class RouteConfig
         $router->get('api/librarian/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/librarian/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
         // PDF Report Generation Route
-        $router->post('generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
+        $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
 
 
         // --- ADMIN (AJAX/Data Routes) ---
@@ -116,7 +116,7 @@ class RouteConfig
         $router->get('api/admin/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
         // PDF Report Generation Route
-        $router->post('generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
+        $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
 
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);

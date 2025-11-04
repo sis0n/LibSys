@@ -47,14 +47,10 @@
             </button>
             <div id="statusFilterMenu"
                 class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20 text-sm">
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All
-                    Status</div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">Borrowed
-                </div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Returned">Returned
-                </div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Expired">Expired
-                </div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All Status</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">Borrowed</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Returned">Returned</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Expired">Expired</div>
             </div>
         </div>
 
@@ -63,26 +59,24 @@
 
 <!-- Transaction History Table -->
 <section class="bg-white shadow-md rounded-lg border border-gray-200 p-6 mb-6 mt-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div>
             <h4 class="text-base font-semibold text-gray-800">Transaction History</h4>
             <p class="text-sm text-gray-600">View recent borrowing and return transactions</p>
         </div>
-    </div>
 
-    <!-- Results Indicator (like in User Management) -->
-    <h4 id="resultsIndicator" class="text-sm text-gray-600 mb-4">Loading...</h4>
+
+    </div>
 
     <div class="overflow-x-auto rounded-lg border border-orange-200">
         <table class="min-w-full divide-y divide-gray-300">
             <thead class="bg-orange-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User Name
-                    </th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User ID
-                        Number</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Accession
-                        Number</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User
+                        Name</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User
+                        ID Number</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Accession Number</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Borrowed
                         Date/Time</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Returned
@@ -121,13 +115,35 @@
         </template>
     </div>
 
-    <!-- New Pagination Container (Matches User Management) -->
-    <nav id="paginationControls" aria-label="Page navigation"
-        class="flex items-center justify-center bg-white border border-gray-200 rounded-full shadow-md px-4 py-2 mt-6 w-fit mx-auto gap-3 hidden">
-        <ul id="paginationList" class="flex items-center h-9 text-sm gap-3">
-            <!-- JS will insert pagination controls here -->
-        </ul>
-    </nav>
+    <!-- Pagination -->
+    <div id="pagination-container" class="flex justify-center items-center mt-6">
+        <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
+            <ul class="flex items-center gap-4 text-sm">
+                <!-- Previous -->
+                <li>
+                    <a href="#" id="prev-page"
+                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                        <i class="ph ph-caret-left"></i>
+                        <span>Previous</span>
+                    </a>
+                </li>
+
+                <!-- Page Numbers -->
+                <div id="pagination-numbers" class="flex items-center gap-3">
+                    <!-- JS will insert page numbers here -->
+                </div>
+
+                <!-- Next -->
+                <li>
+                    <a href="#" id="next-page"
+                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                        <span>Next</span>
+                        <i class="ph ph-caret-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </section>
 
 <!-- Transaction Details Modal -->

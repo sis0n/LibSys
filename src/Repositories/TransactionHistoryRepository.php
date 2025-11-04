@@ -4,118 +4,101 @@ namespace App\Repositories;
 
 use App\Core\Database;
 use PDO;
+use PDOException;
 
 class TransactionHistoryRepository
 {
-    protected PDO $db;
+  protected PDO $db;
 
-    public function __construct()
-    {
-        $this->db = Database::getInstance()->getConnection();
-    }
+  public function __construct()
+  {
+    $this->db = Database::getInstance()->getConnection();
+  }
 
-    // Combines fetching for all and by status, with pagination and search.
-    public function getPaginatedTransactions(string $status, ?string $date, ?string $search, int $limit, int $offset): array
-    {
-        // FIX: The FROM and JOIN clauses were missing. Added getBaseFromJoinQuery().
-        $sql = $this->getBaseQuery() . $this->getBaseFromJoinQuery();
-        $params = [];
-
-        $this->applyFilters($sql, $params, $status, $date, $search);
-
-        $sql .= " ORDER BY bt.borrowed_at DESC LIMIT :limit OFFSET :offset";
-
-        $stmt = $this->db->prepare($sql);
-
-        foreach ($params as $key => &$value) {
-            $stmt->bindParam($key, $value);
-        }
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Combines counting for all and by status, with search.
-    public function countTransactions(string $status, ?string $date, ?string $search): int
-    {
-        // The COUNT query must join the same tables to get an accurate count of items.
-        $sql = "SELECT COUNT(bti.item_id) " . $this->getBaseFromJoinQuery();
-        $params = [];
-
-        $this->applyFilters($sql, $params, $status, $date, $search);
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-
-        return (int) $stmt->fetchColumn();
-    }
-
-    // Returns the base SELECT statement.
-    private function getBaseQuery(): string
-    {
-        return "
+  private function getBaseSelectQuery(): string
+  {
+    return "
             SELECT 
-                bt.transaction_id, bt.borrowed_at, bti.returned_at, bt.status AS transaction_status,
-                COALESCE(CONCAT(su.first_name, ' ', su.last_name), CONCAT(fu.first_name, ' ', fu.last_name), CONCAT(stu.first_name, ' ', stu.last_name), CONCAT(g.first_name, ' ', g.last_name)) AS user_name,
-                COALESCE(s.student_number, f.unique_faculty_id, st.employee_id, g.guest_id) AS user_id_number,
-                b.accession_number, b.title AS book_title, b.author AS book_author, b.call_number, b.book_isbn,
-                s.student_id, f.faculty_id, st.staff_id, g.guest_id, 
-                c.course_code, c.course_title, cl.college_code, cl.college_name, s.year_level, s.section, st.position,
-                CONCAT(librarian.first_name, ' ', librarian.last_name) AS librarian_name
-        ";
-    }
+                bt.transaction_id, bt.transaction_code, bt.borrowed_at, bt.due_date, bt.expires_at,
+                bti.returned_at,
+                bt.status AS transaction_status,
 
-    // Returns the base FROM and JOIN clauses.
-    private function getBaseFromJoinQuery(): string
-    {
-        return "
+                librarian.user_id AS librarian_id,
+                CONCAT(librarian.first_name, ' ', COALESCE(librarian.middle_name,''), ' ', librarian.last_name) AS librarian_name,
+
+                s.student_id, s.student_number, s.course_id, s.year_level, s.section,
+                f.faculty_id, f.unique_faculty_id, f.college_id,
+                st.staff_id, st.employee_id, st.position,
+                g.guest_id, g.first_name AS guest_first_name, g.last_name AS guest_last_name,
+
+                COALESCE(su.first_name, fu.first_name, stu.first_name, g.first_name) AS first_name,
+                COALESCE(su.middle_name, fu.middle_name, stu.middle_name) AS middle_name,
+                COALESCE(su.last_name, fu.last_name, stu.last_name, g.last_name) AS last_name,
+
+                b.book_id, b.title AS book_title, b.author AS book_author, b.accession_number, b.call_number, b.book_isbn, b.cover,
+                
+                c.course_code, c.course_title,
+                cl.college_code, cl.college_name
+        ";
+  }
+
+  private function getBaseFromJoinQuery(): string
+  {
+    return "
             FROM borrow_transactions bt
             JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
             JOIN books b ON bti.book_id = b.book_id
+            
             LEFT JOIN students s ON bt.student_id = s.student_id
             LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
             LEFT JOIN staff st ON bt.staff_id = st.staff_id
             LEFT JOIN guests g ON bt.guest_id = g.guest_id
+            
+            -- User Details for Borrowers
             LEFT JOIN users su ON s.user_id = su.user_id
             LEFT JOIN users fu ON f.user_id = fu.user_id
             LEFT JOIN users stu ON st.user_id = stu.user_id
+
+            -- Course/College Details
             LEFT JOIN courses c ON s.course_id = c.course_id
             LEFT JOIN colleges cl ON f.college_id = cl.college_id
+
             LEFT JOIN users librarian ON bt.librarian_id = librarian.user_id
         ";
+  }
+
+  public function getAllTransactions(?string $date = null): array
+  {
+    $sql = $this->getBaseSelectQuery() . $this->getBaseFromJoinQuery() . "
+            WHERE bt.status != 'Pending'
+            " . ($date ? " AND DATE(bt.borrowed_at) = :date" : "") . "
+            ORDER BY bt.borrowed_at DESC
+        ";
+
+    $stmt = $this->db->prepare($sql);
+    if ($date) $stmt->bindParam(':date', $date);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  public function getTransactionsByStatus(string $status, ?string $date = null): array
+  {
+    if (strtolower($status) === 'pending') {
+      return [];
     }
 
-    // Applies WHERE clauses for all filters.
-    private function applyFilters(string &$sql, array &$params, string $status, ?string $date, ?string $search)
-    {
-        $sql .= " WHERE 1=1 "; // Start with a true condition
+    $sql = $this->getBaseSelectQuery() . $this->getBaseFromJoinQuery() . "
+            WHERE bt.status = :status
+            " . ($date ? " AND DATE(bt.borrowed_at) = :date" : "") . "
+            ORDER BY bt.borrowed_at DESC
+        ";
 
-        if ($status !== 'all' && $status !== 'pending') {
-            $sql .= " AND bt.status = :status";
-            $params[':status'] = $status;
-        } else {
-            $sql .= " AND bt.status != 'Pending'";
-        }
+    $stmt = $this->db->prepare($sql);
+    $stmt->bindParam(':status', $status);
+    if ($date) $stmt->bindParam(':date', $date);
+    $stmt->execute();
 
-        if ($date) {
-            $sql .= " AND DATE(bt.borrowed_at) = :date";
-            $params[':date'] = $date;
-        }
-
-        if ($search) {
-            $sql .= " AND (
-                CONCAT_WS(' ', su.first_name, su.last_name) LIKE :search OR
-                CONCAT_WS(' ', fu.first_name, fu.last_name) LIKE :search OR
-                CONCAT_WS(' ', stu.first_name, stu.last_name) LIKE :search OR
-                s.student_number LIKE :search OR
-                f.unique_faculty_id LIKE :search OR
-                st.employee_id LIKE :search OR
-                b.title LIKE :search OR
-                b.accession_number LIKE :search
-            )";
-            $params[':search'] = "%{$search}%";
-        }
-    }
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 }

@@ -3,12 +3,17 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Repositories\UserPermissionModuleRepository;
 
 class ViewController extends Controller
 {
-  /**
-   * Hahawakan ang generic /dashboard request.
-   */
+  private $userPermissionsRepo;
+
+  public function __construct()
+  {
+    $this->userPermissionsRepo = new UserPermissionModuleRepository();
+  }
+
   public function handleDashboard()
   {
     if (!isset($_SESSION['user_id'])) {
@@ -44,7 +49,6 @@ class ViewController extends Controller
           'reports',
           'transaction history',
           'restore books',
-          // 'change password', 
         ];
 
         foreach ($priority_privileges as $privilege) {
@@ -60,41 +64,76 @@ class ViewController extends Controller
     }
 
     if ($view_path) {
-      // [TAMA NA ITO]
       $this->view($view_path, [
         "title" => $title,
         "currentPage" => $current_page
       ]);
     } else {
-      // [TAMA NA ITO]
       $this->view("errors/403", ["title" => "Forbidden"], false);
     }
   }
 
-  /**
-   * Hahawakan ang LAHAT ng ibang generic pages (e.g., /myProfile, /bookManagement).
-   */
   public function handleGenericPage($action, $id = null)
   {
-    // 1. Kunin ang role mula sa Session
     if (!isset($_SESSION['user_id'])) {
       header('Location: ' . BASE_URL . '/login');
       exit;
     }
 
+    $userId = (int)$_SESSION['user_id'];
     $role = strtolower($_SESSION['role'] ?? '');
 
-    // 2. I-construct ang View Path gamit ang role mula sa session
-    $viewPath = $role . '/' . $action;
-
-    // 3. I-construct ang Data
-    $data = [
-      "title" => ucfirst($action),
-      "currentPage" => $action // Para sa sidebar highlighting
+    $protectedModules = [
+      'bookManagement' => 'book management',
+      'qrScanner' => 'qr scanner',
+      'returning' => 'returning',
+      'borrowingForm' => 'borrowing form',
+      'attendanceLogs' => 'attendance logs',
+      'reports' => 'reports',
+      'topVisitor' => 'reports',
+      'transactionHistory' => 'transaction history',
+      'restoreBooks' => 'restore books',
+      'userManagement' => 'user management' 
     ];
 
-    // 4. Gamitin ang "view" method
-    // [INAYOS DITO - Ito ang line 96]
+    $universalPages = [
+      'changePassword',
+      'myProfile',
+      'bookCatalog',
+      'myCart',
+      'qrBorrowingTicket',
+      'borrowingHistory',
+      'myAttendance',
+      'dashboard',
+    ];
+
+    if (array_key_exists($action, $protectedModules)) {
+
+      if ($role === 'superadmin') {
+      } else if ($role === 'admin' || $role === 'librarian') {
+        $permissionName = $protectedModules[$action];
+
+        if (!$this->userPermissionsRepo->hasAccess($userId, $permissionName)) {
+          $this->view("errors/403", ["title" => "Forbidden"], false);
+          exit;
+        }
+      } else {
+        $this->view("errors/403", ["title" => "Forbidden"], false);
+        exit;
+      }
+    } else if (in_array($action, $universalPages)) {
+    }
+    else {
+      $this->view("errors/404", ["title" => "Not Found"], false);
+      exit;
+    }
+
+    $viewPath = $role . '/' . $action;
+    $data = [
+      "title" => ucfirst($action),
+      "currentPage" => $action
+    ];
+
     $this->view($viewPath, $data);
   }
 }

@@ -56,7 +56,8 @@ class RouteConfig
         $router->get('api/faculty/qrBorrowingTicket', 'FacultyTicketController@show', ['faculty']);
         $router->get('api/faculty/myprofile/get', 'FacultyProfileController@getProfile', ['faculty']);
         $router->post('api/faculty/myprofile/update', 'FacultyProfileController@updateProfile', ['faculty']);
-        $router->get('api/faculty/borrowingHistory/fetch', 'FacultyBorrowingHistoryController@fetchHistory', ['faculty']);
+        $router->get('api/faculty/borrowing-history/pagination', 'FacultyBorrowingHistoryController@fetchPaginatedBorrowingHistory', ['faculty']);
+        $router->get('api/faculty/borrowing-history/stats', 'FacultyBorrowingHistoryController@fetchStats', ['faculty']);
         $router->get('api/data/getColleges', 'DataController@getColleges', ['faculty']);
 
         // --- STAFF (AJAX/Data Routes) ---

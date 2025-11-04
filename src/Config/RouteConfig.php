@@ -32,7 +32,8 @@ class RouteConfig
         // Auth API
         $router->post('login', 'AuthController@login');
         $router->post('logout', 'AuthController@logout');
-        $router->post('api/change-password', 'AuthController@changePassword', ['change password', 'student', 'faculty', 'staff', 'superadmin']);
+        // $router->post('api/change-password', 'AuthController@changePassword', ['admin', 'librarian', 'student', 'faculty', 'staff', 'superadmin']);
+        $router->post('api/change-password', 'AuthController@changePassword');
 
         // Scanner API
         $router->post('api/scanner/scan', 'ScannerController@attendance', ['scanner']);

@@ -32,7 +32,8 @@ class RouteConfig
         // Auth API
         $router->post('login', 'AuthController@login');
         $router->post('logout', 'AuthController@logout');
-        $router->post('api/change-password', 'AuthController@changePassword', ['change password']);
+        // $router->post('api/change-password', 'AuthController@changePassword', ['admin', 'librarian', 'student', 'faculty', 'staff', 'superadmin']);
+        $router->post('api/change-password', 'AuthController@changePassword');
 
         // Scanner API
         $router->post('api/scanner/scan', 'ScannerController@attendance', ['scanner']);
@@ -108,6 +109,10 @@ class RouteConfig
         $router->post('api/admin/bookManagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
         $router->post('api/admin/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
+        $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
+        $router->get('api/admin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
+        $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
+        $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
         $router->get('api/admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
@@ -159,8 +164,8 @@ class RouteConfig
         $router->get('api/superadmin/dashboard/top-visitors', 'App\Controllers\DashboardController@getTopVisitors', ['superadmin']);
         $router->get('api/superadmin/dashboard/weekly-activity', 'App\Controllers\DashboardController@getWeeklyActivity', ['superadmin']);
         $router->get('api/superadmin/dashboard/getData', 'DashboardController@getData', ['superadmin']);
-        $router->post('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['superadmin']);
         $router->get('api/superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
+        $router->post('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['superadmin']);
         $router->get('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
         $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
         $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');

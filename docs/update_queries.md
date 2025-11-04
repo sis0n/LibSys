@@ -435,8 +435,9 @@ CHANGE COLUMN course course_id INT(11) NULL DEFAULT NULL;
 UPDATE attendance_logs a
 JOIN students s ON a.student_number = s.student_number
 SET a.course_id = s.course_id;
-composer require phpmailer/phpmailer
 
+
+composer require phpmailer/phpmailer
 
 CREATE TABLE `password_reset_tokens` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

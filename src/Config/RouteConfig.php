@@ -105,6 +105,7 @@ class RouteConfig
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
+        $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
 
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);

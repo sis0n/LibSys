@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadTransactions() {
         try {
+            // NOTE: Kung ang API ay nagre-return ng unique row per BOOK/ITEM, ito ay OK.
             const response = await fetch('api/librarian/transactionHistory/json');
             allTransactions = await response.json();
             currentFilteredTransactions = allTransactions;
@@ -54,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPagination(currentFilteredTransactions);
     }
 
+    // Status dropdown toggle
     statusBtn.addEventListener('click', e => {
         e.stopPropagation();
         statusMenu.classList.toggle('hidden');
@@ -89,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newRow = rowTemplate.cloneNode(true);
             const tr = newRow.querySelector('tr');
             tr.dataset.transactionId = transaction.transaction_id;
-            tr.classList.add('transaction-row');
+            tr.classList.add('transaction-row'); // Add this class for modal event listener
 
             const cells = newRow.querySelectorAll('td');
 
@@ -99,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cells[0].textContent = borrowerName;
             cells[1].textContent = borrowerId;
 
+            // FIXED: Gamitin ang accession_number ng item imbes na itemsBorrowed
             cells[2].textContent = transaction.accession_number || 'N/A';
 
             cells[3].textContent = transaction.borrowed_at || '';
@@ -129,9 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const pageCount = Math.ceil(data.length / rowsPerPage);
 
         prevPageBtn.classList.toggle('text-gray-400', currentPage === 1);
-        prevPageBtn.classList.toggle('hover:text-orange-600', currentPage !== 1);
+        prevPageBtn.classList.toggle('hover:text-orange-700', currentPage !== 1);
         nextPageBtn.classList.toggle('text-gray-400', currentPage === pageCount);
-        nextPageBtn.classList.toggle('hover:text-orange-600', currentPage !== pageCount);
+        nextPageBtn.classList.toggle('hover:text-orange-700', currentPage !== pageCount);
 
         for (let i = 1; i <= pageCount; i++) {
             const pageNumber = document.createElement('a');
@@ -235,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('hidden');
     }
 
+    // Default date
     const today = new Date();
     dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 

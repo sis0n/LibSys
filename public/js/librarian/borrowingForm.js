@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'Domino',
     'Connect 4',
     ];
-    
+
     let highlightedIndex = -1;
     let wasPointerDownOnInput = false;
 

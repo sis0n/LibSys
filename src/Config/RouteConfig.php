@@ -87,8 +87,12 @@ class RouteConfig
         $router->post('api/librarian/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/librarian/returning/extend', 'ReturningController@extendDueDate', ['returning']);
         $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
-        $router->post('api/librarian/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
-        $router->post('api/librarian/borrowingForm/create', 'ManualBorrowingController@create');
+        $router->post('api/librarian/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['borrowing form']);
+        $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['borrowing form']);
+        $router->get('api/librarian/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
+        $router->post('api/librarian/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
+        $router->post('api/librarian/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
+
 
 
         // --- ADMIN (AJAX/Data Routes) ---
@@ -107,8 +111,11 @@ class RouteConfig
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
-        $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
-        $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create');
+        $router->post('api/admin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['borrowing form']);
+        $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['borrowing form']);
+        $router->get('api/admin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
+        $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
+        $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
 
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);

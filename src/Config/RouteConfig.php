@@ -87,6 +87,8 @@ class RouteConfig
         $router->post('api/librarian/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/librarian/returning/extend', 'ReturningController@extendDueDate', ['returning']);
         $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
+        $router->post('api/librarian/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
+        $router->post('api/librarian/borrowingForm/create', 'ManualBorrowingController@create');
 
 
         // --- ADMIN (AJAX/Data Routes) ---
@@ -105,6 +107,8 @@ class RouteConfig
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
+        $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
+        $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create');
 
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);

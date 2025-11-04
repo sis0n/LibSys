@@ -146,11 +146,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemNameDropdownArrow = document.getElementById('item_name_dropdown_arrow');
 
     const suggestions = [
-    'Laptop',
-    'Projector',
-    'HDMI Cable',
+    'Computer',
+    'Table',
     'Extension Cord',
-    'Microphone'
+    'Whiteboard',
+    'HDMI Cable',
+    'Chess',
+    'Scabble',
+    'Domino',
+    'Connect 4',
     ];
 
     let highlightedIndex = -1;

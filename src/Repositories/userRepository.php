@@ -571,7 +571,7 @@ class UserRepository
 
     if ($search !== '') {
       $query .= " AND (CONCAT(u.first_name, ' ', u.last_name) LIKE ? OR u.username LIKE ? OR u.email LIKE ?)";
-      $searchTerm = "%{$search}%";
+      $searchTerm = "%$search%";
       $params[] = $searchTerm;
       $params[] = $searchTerm;
       $params[] = $searchTerm;
@@ -600,7 +600,6 @@ class UserRepository
     return $users;
   }
 
-  // Restored Pagination Logic
   public function countPaginatedUsers(string $search, string $role, string $status): int
   {
     $query = "
@@ -613,7 +612,7 @@ class UserRepository
 
     if ($search !== '') {
       $query .= " AND (CONCAT(u.first_name, ' ', u.last_name) LIKE ? OR u.username LIKE ? OR u.email LIKE ?)";
-      $searchTerm = "%{$search}%";
+      $searchTerm = "%$search%";
       $params[] = $searchTerm;
       $params[] = $searchTerm;
       $params[] = $searchTerm;

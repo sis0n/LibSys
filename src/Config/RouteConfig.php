@@ -88,16 +88,13 @@ class RouteConfig
         $router->post('api/librarian/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/librarian/returning/extend', 'ReturningController@extendDueDate', ['returning']);
         $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
-        $router->get('api/librarian/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
-        $router->post('api/librarian/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
-        $router->post('api/librarian/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
-        $router->get('api/librarian/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['reports']);
-        $router->get('api/librarian/reports/top-visitors', 'ReportController@getTopVisitors', ['reports']);
-        $router->get('api/librarian/reports/deleted-books', 'ReportController@getDeletedBooks', ['reports']);
-        $router->get('api/librarian/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment', ['reports']);
-
+        $router->get('api/librarian/reports/circulated-books', 'ReportController@getCirculatedBooksReport',['reports']);
+        $router->get('api/librarian/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
+        $router->get('api/librarian/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
+        $router->get('api/librarian/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
+        $router->get('api/librarian/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
         // PDF Report Generation Route
-        $router->post('generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
+        $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
 
 
         // --- ADMIN (AJAX/Data Routes) ---
@@ -120,13 +117,13 @@ class RouteConfig
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
-        $router->get('api/admin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['reports']);
-        $router->get('api/admin/reports/top-visitors', 'ReportController@getTopVisitors', ['reports']);
-        $router->get('api/admin/reports/deleted-books', 'ReportController@getDeletedBooks', ['reports']);
-        $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment', ['reports']);
-
+        $router->get('api/admin/reports/circulated-books', 'ReportController@getCirculatedBooksReport',['reports']);
+        $router->get('api/admin/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
+        $router->get('api/admin/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
+        $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
+        $router->get('api/admin/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
         // PDF Report Generation Route
-        $router->post('generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
+        $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
 
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);

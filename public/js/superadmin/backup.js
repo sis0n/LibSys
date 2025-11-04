@@ -171,8 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('opacity-70');
 
             const exportUrl = type === 'full_sql'
-                ? 'backup/database/full'
-                : `backup/export/zip/${type}`;
+                ? `${BASE_URL_JS}/api/superadmin/backup/database/full`
+                : `${BASE_URL_JS}/api/superadmin/backup/export/zip/${type}`;
 
             try {
                 const exportRes = await fetch(exportUrl);
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exportData = await exportRes.json();
                 if (!exportData.success || !exportData.filename) throw new Error(exportData.message || 'Failed to create backup.');
 
-                const downloadUrl = `backup/secure_download/${encodeURIComponent(exportData.filename)}`;
+                const downloadUrl = `${BASE_URL_JS}/api/superadmin/backup/secure_download/${encodeURIComponent(exportData.filename)}`;
                 await secureDownload(downloadUrl, exportData.filename);
 
 

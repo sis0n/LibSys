@@ -149,7 +149,7 @@ class RouteConfig
         $router->post('api/superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
         $router->post('api/superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']);
         $router->get('api/superadmin/qrScanner/transactionHistory', 'QRScannerController@history', ['superadmin']);
-        $router->get('api/superadmin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['superadmin']);
+        $router->get('api/superadmin/returning/getTableData', 'ReturningController@getOverdue', ['superadmin']);
         $router->post('api/superadmin/returning/checkBook', 'ReturningController@checkBookStatus', ['superadmin']);
         $router->post('api/superadmin/returning/markReturned', 'ReturningController@returnBook', ['superadmin']);
         $router->post('api/superadmin/returning/extend', 'ReturningController@extendDueDate', ['superadmin']);

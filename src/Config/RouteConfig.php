@@ -190,6 +190,8 @@ class RouteConfig
         $router->get('api/student/bookCatalog/availableCount', 'BookCatalogController@getAvailableCount', ['student']);
         $router->get('api/student/bookCatalog/fetch', 'BookCatalogController@fetch', ['student']);
         $router->get('api/student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
+        $router->get('api/student/borrowing-history/stats', 'StudentBorrowingHistoryController@fetchStats', ['student']); // Stats Route
+        $router->get('api/student/borrowing-history/pagination', 'StudentBorrowingHistoryController@fetchPaginatedBorrowingHistory', ['student']); // Pagination Route
         $router->get('api/student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
         $router->post('api/student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
         $router->get('api/data/getAllCourses', 'DataController@getAllCourses', ['student']);

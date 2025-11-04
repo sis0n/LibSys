@@ -105,6 +105,10 @@ class RouteConfig
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
+        $router->get('api/admin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['report']);
+        $router->get('api/admin/reports/top-visitors', 'ReportController@getTopVisitors', ['report']);
+        $router->get('api/admin/reports/deleted-books', 'ReportController@getDeletedBooks', ['report']);
+        $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment', ['report']);
 
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);

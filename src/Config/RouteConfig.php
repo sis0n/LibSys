@@ -85,7 +85,7 @@ class RouteConfig
         $router->post('api/librarian/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
         $router->post('api/librarian/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/librarian/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
-        $router->get('api/librarian/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);
+        $router->get('api/librarian/returning/getTableData', 'ReturningController@getOverdue', ['returning']);
         $router->post('api/librarian/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/librarian/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/librarian/returning/extend', 'ReturningController@extendDueDate', ['returning']);

@@ -91,6 +91,7 @@ class RouteConfig
         $router->get('api/librarian/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
         $router->get('api/librarian/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/librarian/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
+        $router->get('api/librarian/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
         // PDF Report Generation Route
         $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
 
@@ -115,6 +116,7 @@ class RouteConfig
         $router->get('api/admin/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
         $router->get('api/admin/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
+        $router->get('api/admin/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
         // PDF Report Generation Route
         $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
 

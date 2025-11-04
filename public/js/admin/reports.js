@@ -247,7 +247,7 @@ async function initializeCharts() {
 
     // Fetch consolidated data
     try {
-        const res = await fetch(`${BASE_URL}/api/admin/dashboard/getData`);
+        const res = await fetch(`${BASE_URL}/api/admin/reports/getGraphData`);
         const result = await res.json();
 
         if (!result.success) {

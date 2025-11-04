@@ -44,7 +44,7 @@ class ViewController extends Controller
           'reports',
           'transaction history',
           'restore books',
-          'change password', // Fallback
+          'change password', 
         ];
 
         foreach ($priority_privileges as $privilege) {

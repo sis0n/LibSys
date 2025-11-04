@@ -22,8 +22,7 @@ if (isset($_SESSION['user_id'])) {
     <!-- Tailwind CSS -->
     <link href="<?= BASE_URL ?>/css/output.css" rel="stylesheet">
     <!-- PHOSPHOR ICONS -->
-    <link rel="stylesheet" type="text/css"
-        href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- SWEETALERT2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -33,21 +32,21 @@ if (isset($_SESSION['user_id'])) {
 
 <body class="bg-orange-50/50 text-gray-700 text-md">
     <!-- HERO -->
-    <section class="max-w-6xl mx-auto mt-10">
+    <section class="max-w-6xl mx-auto mt-4 sm:mt-10 px-4">
         <div
-            class="bg-gradient-to-r from-orange-700 to-amber-500 rounded-2xl px-8 py-6 flex justify-between items-center text-white shadow-lg">
+            class="bg-gradient-to-r from-orange-700 to-amber-500 rounded-2xl px-6 sm:px-8 py-8 flex flex-col lg:flex-row justify-between items-center text-white shadow-lg gap-6 text-center lg:text-left">
 
             <!-- Left Section -->
-            <div>
-                <div class="flex items-center gap-3">
+            <div class="w-full">
+                <div class="flex items-center justify-center lg:justify-start gap-3">
                     <div class="bg-white/20 p-3 rounded-lg flex items-center justify-center">
                         <i class="ph ph-books text-xl"></i>
                     </div>
-                    <h1 class="text-4xl text-white font-bold">Book Collections</h1>
+                    <h1 class="text-3xl sm:text-4xl text-white font-bold">Book Collections</h1>
                 </div>
 
                 <p class="text-base mt-2 opacity-90"><i class="ph ph-sparkle"></i> Discover your next great read</p>
-                <p class="text-sm mt-3 text-orange-50 max-w-lg leading-relaxed">
+                <p class="text-sm mt-3 text-orange-50 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                     Browse our comprehensive collection of academic resources. Find books, check availability,
                     and seamlessly add them to your borrowing cart.
                 </p>
@@ -55,7 +54,7 @@ if (isset($_SESSION['user_id'])) {
 
             <!-- Sign In Button -->
             <button onclick="window.location.href='<?= BASE_URL ?>/login'"
-                class="self-center bg-white text-orange-700 flex items-center gap-2 px-6 py-4 rounded-md text-base text-sm font-medium hover:bg-orange-50 hover:shadow-md transition">
+                class="self-center bg-white text-orange-700 flex items-center gap-2 px-6 py-3 rounded-md text-base text-sm font-medium hover:bg-orange-50 hover:shadow-md transition w-full sm:w-auto flex-shrink-0">
                 <i class="ph ph-sign-in text-lg"></i>
                 Sign In to Borrow
             </button>
@@ -63,7 +62,7 @@ if (isset($_SESSION['user_id'])) {
     </section>
 
     <!-- SEARCH SECTION -->
-    <section class="max-w-6xl mx-auto mt-8">
+    <section class="max-w-6xl mx-auto mt-8 px-4">
         <div class="bg-white border border-orange-100 rounded-2xl p-6 shadow-sm">
             <div class="flex items-center gap-2 mb-4">
                 <div
@@ -75,19 +74,19 @@ if (isset($_SESSION['user_id'])) {
             <p class="text-md text-gray-500 mb-6">
                 Find exactly what you're looking for with our advanced search tools.
             </p>
-            <div class="flex flex-wrap gap-3 items-center">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-3 items-center">
                 <!-- SEARCH INPUT -->
-                <div class="flex-1 min-w-[300px] relative">
+                <div class="flex-1 w-full sm:min-w-[300px] relative">
                     <i
                         class="ph ph-magnifying-glass text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-base"></i>
-                    <input type="text" placeholder="Search by title, author, ISBN, Book ID..."
+                    <input type="text" id="searchInput" placeholder="Search by title, author, ISBN..."
                         class="w-full border border-orange-200 rounded-lg pl-9 pr-3 py-3 text-sm outline-none transition focus:border-orange-400">
                 </div>
 
                 <!-- STATUS DROPDOWN -->
-                <div class="relative">
+                <div class="relative w-full sm:w-auto">
                     <button id="statusDropdownBtn"
-                        class="w-40 flex items-center justify-between px-4 py-3 rounded-lg border border-orange-200 bg-white hover:bg-orange-50 transition text-sm focus:outline-none align-middle">
+                        class="w-full sm:w-40 flex items-center justify-between px-4 py-3 rounded-lg border border-orange-200 bg-white hover:bg-orange-50 transition text-sm focus:outline-none align-middle">
                         <span class="flex items-center gap-2 text-gray-700">
                             <i class="ph ph-check-circle text-gray-500"></i>
                             <span id="statusDropdownValue">All Status</span>
@@ -97,7 +96,7 @@ if (isset($_SESSION['user_id'])) {
 
                     <!-- MENU -->
                     <div id="statusDropdownMenu"
-                        class="absolute mt-2 w-40 bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
+                        class="absolute mt-2 w-full sm:w-40 bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
                         <ul class="py-1 text-sm text-gray-700">
                             <li>
                                 <button
@@ -120,150 +119,87 @@ if (isset($_SESSION['user_id'])) {
     </section>
 
     <!-- DISPLAY BOOKS -->
-    <section class="max-w-6xl mx-auto mt-10 mb-20">
-        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Book Collections</h2>
-
-        <!-- BOOK STATS HEADER -->
-        <?php
-        $totalBooks = count($books);
-        $availableBooks = count(array_filter($books, fn($b) => strtolower($b['availability']) === 'available'));
-        $totalCopies = array_sum(array_map(fn($b) => $b['copies'] ?? 1, $books));
-        ?>
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-3">
-                <div
-                    class="text-white px-2 py-2 bg-gradient-to-br from-green-500 to-teal-500 rounded-md flex items-center justify-center">
-                    <i class="ph ph-book text-xl"></i>
-                </div>
-                <div>
-                    <p class="text-lg font-semibold text-gray-700"><?= $totalBooks ?> Books Found</p>
-                    <p class="text-sm text-gray-500">Total collection: <?= $totalBooks ?> books</p>
-                </div>
-            </div>
-
-            <div class="flex gap-4 flex-wrap">
-                <span class="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm font-medium">
-                    Available: <?= $availableBooks ?>
-                </span>
-                <span class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-lg text-sm font-medium">
-                    Total Copies: <?= $totalCopies ?>
-                </span>
-            </div>
+    <section class="max-w-6xl mx-auto mt-10 mb-20 px-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-700 flex-shrink-0">Book Collections</h2>
+            <p id="resultsIndicator" class="text-sm text-gray-600 w-full sm:w-auto sm:text-right">Loading...</p>
         </div>
 
         <!-- BOOK CARD DISPLAY -->
         <div id="bookGrid"
-            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 place-items-center">
-            <?php if (!empty($books)): ?>
-                <?php $initialBooks = array_slice($books, 0, 30); ?>
-                <?php foreach ($initialBooks as $index => $book): ?>
-                    <div class="book-card relative bg-white border border-orange-100 rounded-2xl overflow-hidden shadow-sm group transform transition duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer max-w-[230px] w-full flex flex-col"
-                        data-book='<?= htmlspecialchars(json_encode($book), ENT_QUOTES, 'UTF-8') ?>'>
-
-                        <div
-                            class="w-full aspect-[2/3] bg-white flex items-center justify-center overflow-hidden flex-shrink-0">
-                            <?php if (!empty($book['image'])): ?>
-                                <img src="<?= htmlspecialchars($book['image']) ?>" alt="<?= htmlspecialchars($book['title']) ?>"
-                                    class="h-full w-auto object-contain group-hover:scale-105 transition duration-300">
-                            <?php else: ?>
-                                <i class="ph ph-book-open text-gray-400 text-5xl"></i>
-                            <?php endif; ?>
-                        </div>
-
-                        <span class="absolute top-2 left-2 px-3 py-1 text-xs font-medium rounded-full text-white shadow-sm
-                    <?= strtolower($book['availability']) === 'available' ? 'bg-orange-500' : 'bg-red-500' ?>">
-                            <?= htmlspecialchars(ucfirst($book['availability'])) ?>
-                        </span>
-
-                        <div
-                            class="p-3 bg-white group-hover:bg-gray-100 transition-colors duration-300 flex flex-col flex-grow">
-
-                            <h4
-                                class="text-sm font-semibold text-gray-700 group-hover:text-orange-600 line-clamp-2 min-h-[2.5rem]">
-                                <?= htmlspecialchars($book['title']) ?>
-                            </h4>
-
-                            <p class="text-xs text-gray-500 truncate mt-0.5">
-                                by <?= htmlspecialchars($book['author'] ?: 'Unknown Author') ?>
-                            </p>
-
-                            <p class="text-[11px] font-medium text-orange-600 mt-1 truncate flex-grow">
-                                <?= htmlspecialchars($book['subject'] ?? '') ?>
-                            </p>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-center text-gray-500 py-10 col-span-full">No books available right now.</p>
-            <?php endif; ?>
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6 place-items-stretch">
+            <!-- Book cards will be injected here by JavaScript -->
         </div>
 
-        <div id="loadingIndicator" class="text-center text-gray-500 py-6 hidden">
-            <i class="ph ph-spinner animate-spin text-xl"></i> Loading more books...
-        </div>
-
+        <!-- PAGINATION CONTROLS -->
+        <nav id="paginationControls" aria-label="Page navigation"
+            class="flex items-center justify-center bg-white border border-gray-200 rounded-full shadow-md px-4 py-2 mt-8 w-fit mx-auto gap-3 hidden">
+            <ul id="paginationList" class="flex items-center h-9 text-sm gap-3">
+                <!-- Pagination links will be injected here -->
+            </ul>
+        </nav>
     </section>
+
     <!-- MODAL -->
     <div id="bookModal"
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300 ease-out">
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300 ease-out p-4">
         <div id="bookModalContent"
-            class="bg-[var(--color-card)] w-full max-w-lg rounded-2xl shadow-lg overflow-hidden transform scale-95 transition-transform duration-300 ease-out">
+            class="bg-white w-full max-w-lg rounded-2xl shadow-lg overflow-hidden transform scale-95 transition-transform duration-300 ease-out max-h-[90vh] flex flex-col">
             <div
                 class="bg-gradient-to-r from-orange-500 to-amber-500 p-4 text-white flex-shrink-0 flex justify-between items-center">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 overflow-hidden">
                     <div id="modalCoverContainer"
-                        class="w-12 h-16 rounded-md flex items-center justify-center bg-white/20">
+                        class="w-12 h-16 rounded-md flex items-center justify-center bg-white/20 flex-shrink-0">
                         <i id="modalIcon" class="ph ph-book-open text-3xl text-white"></i>
                         <img id="modalImg" src="" alt="Book Cover"
                             class="w-full h-full object-cover rounded-md bg-white hidden" />
                     </div>
-                    <div>
-                        <h2 id="modalTitle" class="text-lg font-bold text-white">Book Title</h2>
-                        <p id="modalAuthor" class="text-sm">by Author</p>
+                    <div class="overflow-hidden">
+                        <h2 id="modalTitle" class="text-lg font-bold text-white truncate">Book Title</h2>
+                        <p id="modalAuthor" class="text-sm truncate">by Author</p>
                     </div>
                 </div>
                 <button id="closeModal"
-                    class="text-white text-3xl hover:text-red-500 transition-colors duration-200">
+                    class="text-white text-3xl hover:text-red-500 transition-colors duration-200 flex-shrink-0 ml-2">
                     <i class="ph ph-x-circle"></i>
                 </button>
             </div>
 
-            <div class="p-4 space-y-4">
+            <div class="p-4 space-y-4 overflow-y-auto">
                 <div class="grid grid-cols-2 gap-4">
                     <div
-                        class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded flex flex-col items-start">
-                        <p class="text-sm text-orange-500 font-semibold">STATUS</p>
-                        <p id="modalStatus" class="font-semibold text-xs text-green-600">AVAILABLE</p>
+                        class="p-3 shadow-sm border border-orange-100 bg-orange-50/50 rounded flex flex-col items-start">
+                        <p class="text-xs text-orange-500 font-semibold mb-1">STATUS</p>
+                        <p id="modalStatus" class="font-semibold text-sm">AVAILABLE</p>
                     </div>
 
                     <div
-                        class="p-3 shadow-md border border-orange-200 bg-orange-50 rounded flex flex-col items-start">
-                        <p class="text-sm text-orange-500 font-semibold">CALL NUMBER</p>
-                        <p id="modalCallNumber" class="text-xs font-semibold">N/A</p>
+                        class="p-3 shadow-sm border border-orange-100 bg-orange-50/50 rounded flex flex-col items-start">
+                        <p class="text-xs text-orange-500 font-semibold mb-1">CALL NUMBER</p>
+                        <p id="modalCallNumber" class="text-sm font-semibold">N/A</p>
                     </div>
                 </div>
 
-                <div class="text-sm bg-white rounded-lg border border-gray-200 p-3 space-y-1">
-                    <p class="font-semibold text-foreground text-sm">Book Information</p>
-                    <p><span class="text-amber-700">Accession Number:</span> <span id="modalAccessionNumber"
-                            class="font-mono text-sm font-semibold text-orange-600"></span></p>
-                    <p><span class="text-amber-700">ISBN:</span> <span id="modalIsbn"></span></p>
-                    <p><span class="text-amber-700">Subject:</span> <span id="modalSubject"></span></p>
-                    <p><span class="text-amber-700">Book Place:</span> <span id="modalPlace"></span></p>
-                    <p><span class="text-amber-700">Book Publisher:</span> <span id="modalPublisher"></span></p>
-                    <p><span class="text-amber-700">Year:</span> <span id="modalYear"></span></p>
-                    <p><span class="text-amber-700">Book Edition:</span> <span id="modalEdition"></span></p>
-                    <p><span class="text-amber-700">Book Supplementary:</span> <span id="modalSupplementary"></span>
-                    </p>
+                <div class="text-sm bg-white rounded-lg border border-gray-200 p-3 space-y-1.5">
+                    <p class="font-semibold text-gray-700 text-sm mb-1">Book Information</p>
+                    <p><span class="text-gray-500 w-28 inline-block flex-shrink-0">Accession #:</span> <span id="modalAccessionNumber"
+                            class="font-mono text-sm font-semibold text-orange-600 break-words"></span></p>
+                    <p><span class="text-gray-500 w-28 inline-block flex-shrink-0">ISBN:</span> <span id="modalIsbn" class="break-words"></span></p>
+                    <p><span class="text-gray-500 w-28 inline-block flex-shrink-0">Subject:</span> <span id="modalSubject" class="break-words"></span></p>
+                    <p><span class="text-gray-500 w-28 inline-block flex-shrink-0">Place:</span> <span id="modalPlace" class="break-words"></span></p>
+                    <p><span class="text-gray-500 w-28 inline-block flex-shrink-0">Publisher:</span> <span id="modalPublisher" class="break-words"></span></p>
+                    <p><span class="text-gray-500 w-28 inline-block flex-shrink-0">Year:</span> <span id="modalYear" class="break-words"></span></p>
+                    <p><span class="text-gray-500 w-28 inline-block flex-shrink-0">Edition:</span> <span id="modalEdition" class="break-words"></span></p>
+                    <p><span class="text-gray-500 w-28 inline-block flex-shrink-0">Supplementary:</span> <span id="modalSupplementary" class="break-words"></span></p>
                 </div>
 
-                <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-3 border border-orange-200">
-                    <p class="font-semibold text-orange-900 mb-2 text-sm">Description</p>
-                    <p class="text-amber-700 text-sm" id="modalDescription"></p>
+                <div class="bg-orange-50/30 rounded-lg p-3 border border-orange-100">
+                    <p class="font-semibold text-orange-800 mb-1 text-sm">Description</p>
+                    <p class="text-gray-700 text-sm" id="modalDescription"></p>
                 </div>
             </div>
 
-            <div class="px-3 py-4 bg-gray-50">
+            <div class="px-3 py-4 bg-gray-50 border-t border-gray-200 mt-auto flex-shrink-0">
                 <button id="signInToBorrowBtn"
                     class="inline-flex items-center justify-center whitespace-nowrap text-sm w-full gap-3 h-11 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl font-semibold"
                     onclick="window.location.href='<?= BASE_URL ?>/login'">
@@ -274,240 +210,288 @@ if (isset($_SESSION['user_id'])) {
     </div>
 
     <script>
-        // --- Data and Pagination Setup ---
-        // Ensure $books array is available from PHP
-        const allBooks = <?php echo json_encode($books); ?>;
-        const booksPerPage = 30;
+    document.addEventListener("DOMContentLoaded", () => {
+        // --- DOM Elements ---
         const bookGrid = document.getElementById('bookGrid');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        let currentPage = 1; // 1st batch already loaded by PHP
-        let displayedBooks = allBooks;
+        const searchInput = document.getElementById('searchInput');
+        const resultsIndicator = document.getElementById('resultsIndicator');
+        const paginationControls = document.getElementById("paginationControls");
+        const paginationList = document.getElementById("paginationList");
 
-        // --- Modal Elements ---
+        // --- State ---
+        let currentPage = 1;
+        const limit = 30;
+        let totalBooks = 0;
+        let totalPages = 1;
+        let currentSearch = '';
+        let currentStatus = 'All Status';
+        let isLoading = false;
+        let searchDebounce;
+
+        // --- Data Fetching ---
+        async function loadBooks(page = 1) {
+            if (isLoading) return;
+            isLoading = true;
+            currentPage = page;
+
+            // Show loading state
+            bookGrid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-3xl"></i><p class="mt-2">Loading Books...</p></div>`;
+            paginationControls.classList.add('hidden');
+            resultsIndicator.textContent = 'Loading...';
+
+            const offset = (page - 1) * limit;
+            const params = new URLSearchParams({
+                search: currentSearch,
+                status: currentStatus === 'All Status' ? '' : currentStatus,
+                limit: limit,
+                offset: offset,
+                sort: 'default'
+            });
+
+            try {
+                const res = await fetch(`${BASE_URL_JS}/api/guest/fetchBooks?${params.toString()}`);
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                const data = await res.json();
+
+                if (data.books) {
+                    totalBooks = data.totalCount;
+                    totalPages = Math.ceil(totalBooks / limit) || 1;
+                    
+                    if (page > totalPages && totalPages > 0) {
+                        loadBooks(totalPages); // a little recursion if page is out of bounds
+                        return;
+                    }
+
+                    renderBooks(data.books);
+                    renderPagination(totalPages, currentPage);
+                    updateResultsIndicator(data.books.length, totalBooks, page, limit);
+                } else {
+                    throw new Error(data.message || "Invalid data format from server.");
+                }
+            } catch (err) {
+                console.error("Fetch books error:", err);
+                bookGrid.innerHTML = `<div class="col-span-full text-center text-red-500 py-10"><i class="ph ph-warning-circle text-3xl"></i><p class="mt-2">Error loading books.</p></div>`;
+                updateResultsIndicator(0, 0, 1, limit);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // --- Rendering ---
+        function renderBooks(books) {
+            bookGrid.innerHTML = ""; // Clear loading/previous state
+            if (!books || books.length === 0) {
+                bookGrid.innerHTML = `
+                    <div class="col-span-full text-center text-gray-500 py-10">
+                        <i class="ph ph-books text-5xl mb-3"></i>
+                        <p class="font-medium text-gray-700">No books found</p>
+                        <p class="text-sm text-gray-500">No books match your current filters.</p>
+                    </div>`;
+                return;
+            }
+            books.forEach(book => {
+                bookGrid.appendChild(createBookCard(book));
+            });
+        }
+
+        function createBookCard(book) {
+            const div = document.createElement('div');
+            div.className = "book-card relative bg-white border border-orange-100 rounded-2xl overflow-hidden shadow-sm group transform transition duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer w-full flex flex-col";
+            div.setAttribute('data-book', JSON.stringify(book));
+
+            const availabilityClass = (book.availability || '').toLowerCase() === 'available' ? 'bg-orange-500' : 'bg-red-500';
+            const availabilityText = book.availability ? book.availability.charAt(0).toUpperCase() + book.availability.slice(1) : 'Unknown';
+
+            div.innerHTML = `
+                <div class="w-full aspect-[2/3] bg-gray-50 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    ${book.cover 
+                        ? `<img src="${book.cover}" alt="${book.title}" class="h-full w-full object-cover group-hover:scale-105 transition duration-300">` 
+                        : `<i class="ph ph-book-open text-gray-400 text-5xl"></i>`}
+                </div>
+                <span class="absolute top-2 left-2 px-3 py-1 text-xs font-medium rounded-full text-white shadow-sm ${availabilityClass}">
+                    ${availabilityText}
+                </span>
+                <div class="p-3 bg-white group-hover:bg-gray-50 transition-colors duration-300 flex flex-col flex-grow">
+                    <h4 class="text-sm font-semibold text-gray-700 group-hover:text-orange-600 line-clamp-2 min-h-[2.5rem]">
+                        ${book.title || 'No Title'}
+                    </h4>
+                    <p class="text-xs text-gray-500 truncate mt-0.5">
+                        by ${book.author || 'Unknown Author'}
+                    </p>
+                    <p class="text-[11px] font-medium text-orange-600 mt-1 truncate flex-grow">
+                        ${book.subject || ''}
+                    </p>
+                </div>
+            `;
+            return div;
+        }
+
+        function renderPagination(totalPages, page) {
+            if (totalPages <= 1) {
+                paginationControls.classList.add("hidden");
+                return;
+            }
+            paginationControls.classList.remove("hidden");
+            paginationList.innerHTML = '';
+
+            const createPageLink = (type, text, pageNum, isDisabled = false, isActive = false) => {
+                const li = document.createElement("li");
+                const a = document.createElement("a");
+                a.href = "#";
+                a.setAttribute("data-page", String(pageNum));
+                let baseClasses = `flex items-center justify-center min-w-[32px] h-9 text-sm font-medium transition-all duration-200`;
+                if (type === "prev" || type === "next") {
+                    a.innerHTML = text;
+                    baseClasses += ` text-gray-700 hover:text-orange-600 px-3`;
+                    if (isDisabled) baseClasses += ` opacity-50 cursor-not-allowed pointer-events-none`;
+                } else if (type === "ellipsis") {
+                    a.textContent = text;
+                    baseClasses += ` text-gray-400 cursor-default px-2`;
+                } else {
+                    a.textContent = text;
+                    if (isActive) {
+                        baseClasses += ` text-white bg-orange-600 rounded-full shadow-sm px-3`;
+                    } else {
+                        baseClasses += ` text-gray-700 hover:text-orange-600 hover:bg-orange-100 rounded-full px-3`;
+                    }
+                }
+                a.className = baseClasses;
+                li.appendChild(a);
+                paginationList.appendChild(li);
+            };
+
+            createPageLink("prev", `<i class="flex ph ph-caret-left text-lg"></i>`, page - 1, page === 1);
+            const windowSize = 1;
+            let pagesToShow = new Set([1, totalPages, page]);
+            for (let i = 1; i <= windowSize; i++) {
+                if (page - i > 1) pagesToShow.add(page - i);
+                if (page + i < totalPages) pagesToShow.add(page + i);
+            }
+            const sortedPages = [...pagesToShow].sort((a, b) => a - b);
+            let lastPage = 0;
+            for (const p of sortedPages) {
+                if (p > lastPage + 1) createPageLink("ellipsis", "…", "...", true);
+                createPageLink("number", p, p, false, p === page);
+                lastPage = p;
+            }
+            createPageLink("next", `<i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
+        }
+
+        function updateResultsIndicator(booksLength, totalCount, page, perPage) {
+            if (totalCount === 0) {
+                resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">0</span> of <span class="font-medium text-gray-800">0</span> books`;
+            } else {
+                const startItem = (page - 1) * perPage + 1;
+                const endItem = (page - 1) * perPage + booksLength;
+                resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">${startItem}-${endItem}</span> of <span class="font-medium text-gray-800">${totalCount.toLocaleString()}</span> books`;
+            }
+        }
+
+        // --- Event Listeners ---
+        searchInput.addEventListener("input", e => {
+            currentSearch = e.target.value.trim();
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                loadBooks(1);
+            }, 500);
+        });
+
+        paginationList.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isLoading) return;
+            const target = e.target.closest('a[data-page]');
+            if (!target) return;
+            const pageStr = target.dataset.page;
+            if (pageStr === '...') return;
+            const pageNum = parseInt(pageStr, 10);
+            if (!isNaN(pageNum) && pageNum !== currentPage) {
+                loadBooks(pageNum);
+                window.scrollTo({ top: bookGrid.offsetTop - 80, behavior: 'smooth' });
+            }
+        });
+
+        // --- Modal Logic ---
         const modal = document.getElementById("bookModal");
         const modalContent = document.getElementById("bookModalContent");
         const closeModalBtn = document.getElementById("closeModal");
-        const modalImg = document.getElementById("modalImg");
-        const modalIcon = document.getElementById("modalIcon");
-        const modalTitle = document.getElementById("modalTitle");
-        const modalAuthor = document.getElementById("modalAuthor");
-        const modalCallNumber = document.getElementById("modalCallNumber");
-        const modalAccessionNumber = document.getElementById("modalAccessionNumber");
-        const modalIsbn = document.getElementById("modalIsbn");
-        const modalSubject = document.getElementById("modalSubject");
-        const modalDescription = document.getElementById("modalDescription");
-        const modalPlace = document.getElementById("modalPlace");
-        const modalPublisher = document.getElementById("modalPublisher");
-        const modalYear = document.getElementById("modalYear");
-        const modalEdition = document.getElementById("modalEdition");
-        const modalSupplementary = document.getElementById("modalSupplementary");
-        const modalStatus = document.getElementById("modalStatus");
-
-        // --- Utility Functions ---
 
         function openModal(book) {
-            // Set book data (assuming the book object passed has keys matching the modal IDs/needs)
-            // Set cover image or icon
-            if (book.image) { // Changed from book.cover to book.image to match PHP code
-                modalImg.src = book.image;
+            const modalImg = document.getElementById("modalImg");
+            const modalIcon = document.getElementById("modalIcon");
+            
+            if (book.cover) {
+                modalImg.src = book.cover;
                 modalImg.classList.remove("hidden");
                 modalIcon.classList.add("hidden");
-                document.getElementById("modalCoverContainer").classList.remove("bg-white/20");
             } else {
                 modalImg.classList.add("hidden");
                 modalIcon.classList.remove("hidden");
-                document.getElementById("modalCoverContainer").classList.add("bg-white/20");
             }
 
-            modalTitle.textContent = book.title;
-            modalAuthor.textContent = "by " + (book.author || "Unknown");
-            modalCallNumber.textContent = book.call_number || "N/A";
-            modalAccessionNumber.textContent = book.accession_number || "";
-            modalIsbn.textContent = book.book_isbn || "";
-            modalSubject.textContent = book.subject || "";
-            modalPlace.textContent = book.book_place || "";
-            modalPublisher.textContent = book.book_publisher || "";
-            modalYear.textContent = book.year || "";
-            modalEdition.textContent = book.book_edition || "";
-            modalSupplementary.textContent = book.book_supplementary || "";
-            modalDescription.textContent = book.description || "No description available.";
+            document.getElementById("modalTitle").textContent = book.title || 'No Title';
+            document.getElementById("modalAuthor").textContent = "by " + (book.author || "Unknown");
+            document.getElementById("modalCallNumber").textContent = book.call_number || "N/A";
+            document.getElementById("modalAccessionNumber").textContent = book.accession_number || "N/A";
+            document.getElementById("modalIsbn").textContent = book.book_isbn || "N/A";
+            document.getElementById("modalSubject").textContent = book.subject || "N/A";
+            document.getElementById("modalPlace").textContent = book.book_place || "N/A";
+            document.getElementById("modalPublisher").textContent = book.book_publisher || "N/A";
+            document.getElementById("modalYear").textContent = book.year || "N/A";
+            document.getElementById("modalEdition").textContent = book.book_edition || "N/A";
+            document.getElementById("modalSupplementary").textContent = book.book_supplementary || "N/A";
+            document.getElementById("modalDescription").textContent = book.description || "No description available.";
+            
+            const statusEl = document.getElementById("modalStatus");
+            statusEl.textContent = (book.availability || "").toUpperCase();
+            statusEl.className = `font-semibold text-sm ${(book.availability || '').toLowerCase() === "available" ? "text-green-600" : "text-orange-600"}`;
 
-            // Status styling
-            modalStatus.textContent = (book.availability || "").toUpperCase();
-            if ((book.availability || "").toUpperCase() === "AVAILABLE") {
-                modalStatus.classList.add("text-green-600");
-                modalStatus.classList.remove("text-orange-600");
-            } else {
-                modalStatus.classList.add("text-orange-600");
-                modalStatus.classList.remove("text-green-600");
-            }
-
-            // Show Modal
-            modal.classList.remove("hidden", "opacity-100");
-            modal.classList.add("opacity-0");
-            modalContent.classList.remove("scale-100");
-            modalContent.classList.add("scale-95");
+            modal.classList.remove("hidden");
             requestAnimationFrame(() => {
                 modal.classList.remove("opacity-0");
-                modal.classList.add("opacity-100");
                 modalContent.classList.remove("scale-95");
-                modalContent.classList.add("scale-100");
             });
         }
 
         function closeModal() {
-            modal.classList.remove("opacity-100");
             modal.classList.add("opacity-0");
-            modalContent.classList.remove("scale-100");
             modalContent.classList.add("scale-95");
             setTimeout(() => modal.classList.add("hidden"), 300);
         }
 
-        // Function to create a book card for the infinite scroll
-        function createBookCard(book) {
-            const div = document.createElement('div');
-            // IMPORTANT: Add 'book-card' class and data-book attribute for the click listener
-            div.className =
-                "book-card relative bg-white border border-orange-100 rounded-2xl overflow-hidden shadow-sm group transform transition duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer max-w-[230px] w-full";
-
-            div.setAttribute('data-book', JSON.stringify(book));
-
-            div.innerHTML = `
-            <div class="w-full aspect-[2/3] bg-gray-50 flex items-center justify-center overflow-hidden">
-                ${book.image 
-                    ? `<img src="${book.image}" alt="${book.title}" class="h-full w-auto object-contain group-hover:scale-105 transition duration-300">` 
-                    : `<i class="ph ph-book-open text-gray-400 text-5xl"></i>`}
-            </div>
-            <span class="absolute top-2 left-2 px-3 py-1 text-xs font-medium rounded-full text-white shadow-sm ${book.availability.toLowerCase() === 'available' ? 'bg-orange-500' : 'bg-red-500'}">
-                ${book.availability.charAt(0).toUpperCase() + book.availability.slice(1)}
-            </span>
-            <div class="p-3 bg-white group-hover:bg-orange-50 transition-colors duration-300">
-                <h4 class="text-sm font-semibold text-gray-700 truncate group-hover:text-orange-600">${book.title}</h4>
-                <p class="text-xs text-gray-500 truncate">by ${book.author || 'Unknown Author'}</p>
-                <p class="text-[11px] font-medium text-orange-600 mt-1 truncate">${book.subject || ''}</p>
-            </div>
-        `;
-            return div;
-        }
-
-        function loadNextPage() {
-            const start = currentPage * booksPerPage;
-            const end = start + booksPerPage;
-            const nextBooks = displayedBooks.slice(start, end);
-            if (nextBooks.length === 0) return;
-            loadingIndicator.classList.remove('hidden');
-
-            setTimeout(() => {
-                nextBooks.forEach(book => bookGrid.appendChild(createBookCard(book)));
-                currentPage++;
-                loadingIndicator.classList.add('hidden');
-            }, 500);
-        }
-
-        // --- Event Listeners ---
-
-        // 1. Modal Open Listener (Delegated to the grid)
         bookGrid.addEventListener("click", e => {
             const card = e.target.closest(".book-card");
-            if (!card) return;
-
-            // This line attempts to parse data-book from the clicked card
-            try {
-                const book = JSON.parse(card.dataset.book);
-                openModal(book);
-            } catch (error) {
-                console.error("Error parsing book data from card:", error);
+            if (card && card.dataset.book) {
+                try {
+                    openModal(JSON.parse(card.dataset.book));
+                } catch (err) { console.error("Failed to parse book data:", err); }
             }
         });
 
-        // 2. Modal Close Listeners
         closeModalBtn.addEventListener("click", closeModal);
-        modal.addEventListener("click", e => {
-            if (e.target === modal) closeModal();
-        });
-        document.addEventListener("keydown", e => {
-            if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
-        });
+        modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+        document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
-        window.addEventListener('scroll', () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
-                loadNextPage();
-            }
-        });
-
-        // Dropdown functions (kept as is)
-        function setupDropdownToggle(buttonId, menuId) {
-            const btn = document.getElementById(buttonId);
-            const menu = document.getElementById(menuId);
-            const caret = btn.querySelector(".ph-caret-down");
-
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                document.querySelectorAll(".absolute.mt-2").forEach((m) => {
-                    if (m !== menu) m.classList.add("hidden");
-                });
-                const isHidden = menu.classList.toggle("hidden");
-                caret.style.transform = isHidden ? "rotate(0deg)" : "rotate(180deg)";
-            });
-        }
-
-        setupDropdownToggle("statusDropdownBtn", "statusDropdownMenu");
-
-        // Close dropdown when clicking outside
-        document.addEventListener("click", () => {
-            document.querySelectorAll(".absolute.mt-2").forEach(menu => menu.classList.add("hidden"));
-            document.querySelectorAll(".ph-caret-down").forEach(icon => icon.style.transform = "rotate(0deg)");
-        });
-
-        // Highlight and select logic
-        function selectStatus(el, val) {
+        // --- Dropdown Logic ---
+        window.selectStatus = (el, val) => {
             document.getElementById("statusDropdownValue").textContent = val;
             document.getElementById("statusDropdownMenu").classList.add("hidden");
-            document.querySelector("#statusDropdownBtn .ph-caret-down").style.transform = "rotate(0deg)";
-
-            // Remove highlight from all options
-            document.querySelectorAll(".status-item").forEach(btn => {
-                btn.classList.remove("bg-orange-100", "text-orange-700", "font-medium");
-            });
-
-            // Highlight selected
+            document.querySelectorAll(".status-item").forEach(btn => btn.classList.remove("bg-orange-100", "text-orange-700", "font-medium"));
             el.classList.add("bg-orange-100", "text-orange-700", "font-medium");
-            filterBooksByStatus(val);
-        }
+            currentStatus = val;
+            loadBooks(1);
+        };
 
-        function filterBooksByStatus(status) {
-            // Get the book grid container
-            const bookGrid = document.getElementById("bookGrid");
-            bookGrid.innerHTML = ""; // Clear all current cards
+        const statusBtn = document.getElementById("statusDropdownBtn");
+        const statusMenu = document.getElementById("statusDropdownMenu");
+        statusBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            statusMenu.classList.toggle("hidden");
+        });
+        document.addEventListener("click", () => statusMenu.classList.add("hidden"));
 
-            // Filter logic
-            let filteredBooks = [];
-            if (status === "All Status") {
-                filteredBooks = allBooks;
-            } else {
-                filteredBooks = allBooks.filter(b =>
-                    b.availability.toLowerCase() === status.toLowerCase()
-                );
-            }
-
-            displayedBooks = filteredBooks;
-
-            // Display filtered books
-            if (filteredBooks.length > 0) {
-                filteredBooks.slice(0, 30).forEach(book => {
-                    bookGrid.appendChild(createBookCard(book));
-                });
-            } else {
-                bookGrid.innerHTML = `<p class="text-center text-gray-500 py-10 col-span-full">No books found with status "${status}".</p>`;
-            }
-
-            // Reset pagination to handle filtered results
-            currentPage = 1;
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-        }
+        // --- Initial Load ---
+        loadBooks(1);
+    });
     </script>
 
 </body>

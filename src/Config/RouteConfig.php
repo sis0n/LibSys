@@ -115,7 +115,7 @@ class RouteConfig
         $router->get('api/admin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
         $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
         $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
-        $router->get('api/admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);
+        $router->get('api/admin/returning/getTableData', 'ReturningController@getOverdue', ['returning']);
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);

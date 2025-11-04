@@ -52,32 +52,7 @@
             Use a barcode scanner or manually enter the Barcode or Accession Number
         </p>
     </div>
-
-    <!-- Books Near Due Date Section -->
-    <div class="mt-8 bg-amber-50/60 border border-amber-200/80 rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
-        <div class="flex items-center gap-3 mb-4">
-            <i class="ph ph-warning text-2xl text-amber-500"></i>
-            <h3 class="text-xl font-semibold text-gray-800">Books Near Due Date</h3>
-        </div>
-        <p class="text-gray-600 -mt-2 ml-9">Books that will be due soon (within 7 days)</p>
-        <div class="mt-4 bg-white border border-gray-200/80 rounded-lg overflow-hidden">
-            <table class="w-full books-near-due-table">
-                <thead class="bg-stone-50">
-                    <tr class="border-b border-gray-200/80">
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Student Info</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Item Borrowed</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Date Borrowed</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Due Date</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Contact</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200/80">
-                </tbody>
-            </table>
-        </div>
-    </div>
-
+    
     <!-- Overdue Books Section -->
     <div class="mt-8 bg-red-50/60 border border-red-200/80 rounded-lg p-6 shadow-sm max-w-7xl mx-auto">
         <div class="flex items-center gap-3 mb-4">

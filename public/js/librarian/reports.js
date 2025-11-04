@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Loading...</td></tr>';
     
             try {
-                const response = await fetch(`${BASE_URL}/api/superadmin/reports/circulated-books`);
+                const response = await fetch(`${BASE_URL}/api/librarian/reports/circulated-books`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">Loading...</td></tr>';
     
             try {
-                const response = await fetch(`${BASE_URL}/api/superadmin/reports/deleted-books`);
+                const response = await fetch(`${BASE_URL}/api/librarian/reports/deleted-books`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Loading...</td></tr>';
 
             try {
-                const response = await fetch(`${BASE_URL}/api/superadmin/reports/library-visits-department`);
+                const response = await fetch(`${BASE_URL}/api/librarian/reports/library-visits-department`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Loading...</td></tr>';
     
             try {
-                const response = await fetch(`${BASE_URL}/api/superadmin/reports/top-visitors`);
+                const response = await fetch(`${BASE_URL}/api/librarian/reports/top-visitors`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -247,7 +247,7 @@ async function initializeCharts() {
 
     // Fetch consolidated data
     try {
-        const res = await fetch(`${BASE_URL}/api/superadmin/dashboard/getData`);
+        const res = await fetch(`${BASE_URL}/api/librarian/dashboard/getData`);
         const result = await res.json();
 
         if (!result.success) {

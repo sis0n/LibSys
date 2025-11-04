@@ -33,7 +33,7 @@ foreach ($allLogs as $log) {
     </div>
 
     <!-- Top Stats -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- Books Borrowed -->
         <div
             class="relative bg-[var(--color-card)] shadow-md rounded-lg border border-[var(--color-border)] p-4 overflow-hidden">
@@ -42,17 +42,6 @@ foreach ($allLogs as $log) {
             <h3 class="text-sm text-gray-600">Books Borrowed</h3>
             <p class="text-3xl font-bold mt-2">0</p>
             <span class="text-sm text-gray-500">Currently borrowed</span>
-        </div>
-
-        <!-- Days Visited -->
-        <div
-            class="relative bg-[var(--color-card)] shadow-md rounded-lg border border-[var(--color-border)] p-4 overflow-hidden">
-            <div class="absolute top-0 left-0 h-full w-1 bg-[var(--color-green-500)]"></div>
-            <div class="absolute top-3 right-3 text-xl text-[var(--color-green-500)]"><i
-                    class="ph ph-calendar-check"></i></div>
-            <h3 class="text-sm text-gray-600">Days Visited</h3>
-            <p class="text-3xl font-bold mt-2"><?php echo $daysVisitedThisMonth?></p>
-            <span class="text-sm text-gray-500">This month</span>
         </div>
 
         <!-- Overdue Books -->
@@ -114,7 +103,7 @@ foreach ($allLogs as $log) {
             <p class="text-sm text-gray-600 mb-4">Common tasks</p>
 
             <div class="space-y-3">
-                <a href="/libsys/public/faculty/bookCatalog"
+                <a href="<?= BASE_URL ?>/faculty/bookCatalog"
                     class="flex items-start gap-3 bg-[var(--color-orange-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-orange-100)] transition">
                     <i class="ph ph-magnifying-glass text-lg mt-0.5"></i>
                     <span>
@@ -123,7 +112,7 @@ foreach ($allLogs as $log) {
                     </span>
                 </a>
 
-                <a href="/libsys/public/faculty/qrBorrowingTicket"
+                <a href="<?= BASE_URL ?>/faculty/qrBorrowingTicket"
                     class="flex items-start gap-3 bg-[var(--color-green-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-green-100)] transition">
                     <i class="ph ph-qr-code text-lg mt-0.5"></i>
                     <span>
@@ -132,7 +121,7 @@ foreach ($allLogs as $log) {
                     </span>
                 </a>
 
-                <a href="/libsys/public/faculty/borrowingHistory"
+                <a href="<?= BASE_URL ?>/faculty/borrowingHistory"
                     class="flex items-start gap-3 bg-[var(--color-amber-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-amber-100)] transition">
                     <i class="ph ph-clock-counter-clockwise text-lg mt-0.5"></i>
                     <span>
@@ -141,7 +130,7 @@ foreach ($allLogs as $log) {
                     </span>
                 </a>
 
-                <a href="/libsys/public/faculty/myAttendance"
+                <a href="<?= BASE_URL ?>/faculty/myAttendance"
                     class="flex items-start gap-3 bg-[var(--color-green-100)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-green-200)] transition">
                     <i class="ph ph-user-check text-lg mt-0.5"></i>
                     <span>

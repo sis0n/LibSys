@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadTransactions() {
         try {
-            const response = await fetch('transactionHistory/json');
+            const response = await fetch('api/admin/transactionHistory/json');
             allTransactions = await response.json();
             currentFilteredTransactions = allTransactions;
             applyAndRenderFilters();
@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPagination(currentFilteredTransactions);
     }
 
-    // Status dropdown toggle
     statusBtn.addEventListener('click', e => {
         e.stopPropagation();
         statusMenu.classList.toggle('hidden');
@@ -90,11 +89,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const newRow = rowTemplate.cloneNode(true);
             const tr = newRow.querySelector('tr');
             tr.dataset.transactionId = transaction.transaction_id;
+            tr.classList.add('transaction-row');
 
             const cells = newRow.querySelectorAll('td');
-            cells[0].textContent = transaction.studentName || transaction.student_number;
-            cells[1].textContent = transaction.studentNumber || transaction.student_number;
-            cells[2].textContent = transaction.itemsBorrowed || 1;
+
+            const borrowerName = transaction.studentName || `${transaction.first_name || ''} ${transaction.last_name || ''}`;
+            const borrowerId = transaction.student_number || transaction.unique_faculty_id || transaction.employee_id || transaction.guest_id || 'N/A';
+
+            cells[0].textContent = borrowerName;
+            cells[1].textContent = borrowerId;
+
+            cells[2].textContent = transaction.accession_number || 'N/A';
+
             cells[3].textContent = transaction.borrowed_at || '';
             cells[4].textContent = transaction.returned_at ? transaction.returned_at : 'Not yet returned';
 
@@ -103,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
             statusCell.textContent = transaction.transaction_status || 'N/A';
             statusCell.className = 'px-3 py-1 rounded-full font-medium text-xs';
 
-            // Remove Pending logic
             if (statusText === 'borrowed') {
                 statusCell.classList.add('bg-red-100', 'text-red-800');
             } else if (statusText === 'returned') {
@@ -178,11 +183,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function openModalWithTransaction(transaction) {
-        document.getElementById('modalStudentName').textContent = transaction.studentName || '';
-        document.getElementById('modalStudentId').textContent = transaction.student_number ?? '-';
-        document.getElementById('modalCourse').textContent = transaction.course || '';
-        document.getElementById('modalYear').textContent = transaction.year_level || '';
-        document.getElementById('modalSection').textContent = transaction.section || '';
+        const isStudent = !!transaction.student_id;
+        const isFaculty = !!transaction.faculty_id;
+        const isStaff = !!transaction.staff_id;
+
+        const borrowerName = transaction.studentName || `${transaction.first_name || ''} ${transaction.last_name || ''}`;
+        const borrowerId = transaction.student_number || transaction.unique_faculty_id || transaction.employee_id || transaction.guest_id || 'N/A';
+
+        let courseOrDepartment = 'N/A';
+        let yearOrPosition = 'N/A';
+
+        if (isStudent) {
+            courseOrDepartment = `${transaction.course_code || ''} - ${transaction.course_title || ''}`;
+            yearOrPosition = `${transaction.year_level || ''} ${transaction.section || ''}`;
+        } else if (isFaculty) {
+            courseOrDepartment = `${transaction.college_code || ''} - ${transaction.college_name || ''}`;
+            yearOrPosition = 'Faculty';
+        } else if (isStaff) {
+            courseOrDepartment = transaction.position || 'N/A';
+            yearOrPosition = 'Staff';
+        }
+
+        document.getElementById('modalStudentName').textContent = borrowerName;
+        document.getElementById('modalStudentId').textContent = borrowerId;
+
+        document.getElementById('modalCourse').textContent = courseOrDepartment;
+        document.getElementById('modalYear').textContent = yearOrPosition;
+        document.getElementById('modalSection').textContent = transaction.section || (isFaculty ? 'N/A' : (transaction.employee_id ? 'Staff' : 'N/A'));
+
         document.getElementById('modalItemTitle').textContent = transaction.book_title || '';
         document.getElementById('modalItemAuthor').textContent = transaction.book_author || '';
         document.getElementById('modalItemAccession').textContent = transaction.accession_number || '';
@@ -207,7 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('hidden');
     }
 
-    // Default date
     const today = new Date();
     dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 

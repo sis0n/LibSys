@@ -110,7 +110,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function loadCart() {
     try {
-      const r = await fetch("faculty/cart/json");
+      const r = await fetch("api/faculty/cart/json");
       if (!r.ok) throw Error();
       cart = await r.json();
       updateCartBadge();
@@ -133,7 +133,7 @@ window.addEventListener("DOMContentLoaded", () => {
   async function addToCart(id) {
     if (!id) return;
     try {
-      const r = await fetch(`faculty/cart/add/${id}`);
+      const r = await fetch(`api/faculty/cart/add/${id}`);
       if (!r.ok) throw Error((await r.json()).message || `Err ${r.status}`);
       const d = await r.json();
       if (d.success) {
@@ -157,7 +157,7 @@ window.addEventListener("DOMContentLoaded", () => {
   async function removeFromCart(id) {
     if (!id) return;
     try {
-      const r = await fetch(`cart/remove/${id}`, {
+      const r = await fetch(`api/faculty/cart/remove/${id}`, {
         method: "POST"
       });
       if (!r.ok) throw Error(`Err ${r.status}`);
@@ -195,7 +195,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   async function performClearCart() {
     try {
-      const r = await fetch("cart/clear", {
+      const r = await fetch("api/faculty/cart/clear", {
         method: "POST"
       });
       if (!r.ok) throw Error("Failed");
@@ -238,7 +238,7 @@ window.addEventListener("DOMContentLoaded", () => {
       });
       if (statusValueFilter !== "All Status") params.set('status', statusValueFilter.toLowerCase());
       if (sortValueFilter !== "default") params.set('sort', sortValueFilter); // Send sort
-      const res = await fetch(`bookCatalog/fetch?${params.toString()}`);
+      const res = await fetch(`api/faculty/bookCatalog/fetch?${params.toString()}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       let books;
@@ -373,7 +373,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function loadAvailableCount() {
     try {
-      const r = await fetch("bookCatalog/availableCount");
+      const r = await fetch("api/faculty/bookCatalog/availableCount");
       if (!r.ok) throw Error();
       const d = await r.json();
       const el = document.getElementById("availableCount");

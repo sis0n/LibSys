@@ -423,3 +423,27 @@ is_archived TINYINT(1) DEFAULT 0
 );
 
 
+ALTER TABLE faculty
+CHANGE COLUMN department college_id INT(11) NULL;
+
+--11/03/25
+--pang palit ng course_id sa course ni attendance log
+ALTER TABLE attendance_log
+CHANGE COLUMN course course_id INT(11) NULL DEFAULT NULL;
+
+-- pang align sa students table into attendanceLogs dahil nag reset ito ng NULL VALUE
+UPDATE attendance_logs a
+JOIN students s ON a.student_number = s.student_number
+SET a.course_id = s.course_id;
+composer require phpmailer/phpmailer
+
+
+CREATE TABLE `password_reset_tokens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `token` varchar(10) NOT NULL COMMENT 'This stores the 6-digit OTP',
+  `expires_at` datetime NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

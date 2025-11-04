@@ -39,9 +39,6 @@ class User
 
     public static function getFirstAccessibleModuleUrl(string $role, array $permissions): string
     {
-        $role = strtolower($role);
-        $baseUrl = "/libsys/public/{$role}/";
-
         $normalizedPermissions = array_map('strtolower', $permissions);
 
         $orderedModules = [
@@ -59,13 +56,12 @@ class User
 
         foreach ($orderedModules as $permission => $urlSegment) {
             if (in_array($permission, $normalizedPermissions)) {
-                return "{$baseUrl}{$urlSegment}";
+                return $urlSegment;
             }
         }
 
-        return "{$baseUrl}changePassword";
+        return "changePassword";
     }
-
     // static role checks – secure role methods
     public static function isAdmin(array $user): bool
     {

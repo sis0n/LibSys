@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchTableData() {
         try {
-            const response = await fetch('returning/getTableData');
+            const response = await fetch('api/superadmin/returning/getTableData');
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
@@ -98,10 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    // =================================================================
-    // HANDLE BOOK CHECK
-    // =================================================================
-    let scanInProgress = false; // prevent multiple requests
+    let scanInProgress = false;
+
 
     async function handleBookCheck(accessionNumber) {
         if (!accessionNumber || scanInProgress) return;
@@ -111,15 +109,21 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('accession_number', accessionNumber);
 
-            const response = await fetch('returning/checkBook', {
+            const response = await fetch('api/superadmin/returning/checkBook', {
                 method: 'POST',
                 body: formData
             });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: 'Server responded with an unexpected format.' }));
+                throw new Error(errorData.message || `Server error: ${response.status}`);
+            }
 
             const result = await response.json();
 
             if (result.success) {
                 const data = result.data;
+
                 console.log('Book Data Received:', result.data);
 
                 if (data.status === 'borrowed' && data.details) openReturnModal(data.details);
@@ -130,44 +134,91 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } catch (error) {
             console.error('Error checking book:', error);
-            Swal.fire('Error', 'Could not connect to the server.', 'error');
+            Swal.fire('Error', error.message || 'Could not connect to the server.', 'error');
         }
 
         if (accessionInput) accessionInput.value = '';
         if (qrCodeValueInput) qrCodeValueInput.value = '';
-
         if (qrCodeValueInput) qrCodeValueInput.focus();
 
         scanInProgress = false;
     }
 
-    const openReturnModal = (bookData) => {
-        const setText = (id, value) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = value || 'N/A';
-        };
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value || 'N/A';
+    };
 
-        // Book info
-        setText('modal-book-title', bookData.title);
+    const openReturnModal = (bookData) => {
+        const type = bookData.borrower_type || 'student';
+        const isStudent = type === 'student';
+        const isFaculty = type === 'faculty';
+        const isStaff = type === 'staff';
+
+        let borrowerId = 'N/A';
+        let idLabel = 'Student Number:';
+
+        if (isStudent) {
+            borrowerId = bookData.student_number || bookData.id_number || 'N/A';
+        } else if (isFaculty) {
+            borrowerId = bookData.unique_faculty_id || bookData.id_number || bookData.faculty_id || 'N/A';
+            idLabel = 'Faculty ID:';
+        } else if (isStaff) {
+            borrowerId = bookData.employee_id || bookData.id_number || 'N/A';
+            idLabel = 'Employee ID:';
+        } else {
+            borrowerId = bookData.id_number || 'N/A';
+            idLabel = 'Guest ID:';
+        }
+
+        let courseOrDepartment = bookData.course_or_department || 'N/A'; 
+        let yearSectionLabel = 'Year & Section:';
+        let yearSectionValue = 'N/A';
+
+        if (isStudent) {
+            yearSectionValue = bookData.student_year_section || 'N/A';
+            yearSectionLabel = 'Year & Section:';
+
+        } else if (isFaculty) {
+            const facultyDeptString = bookData.course_or_department || ' - ';
+            const parts = facultyDeptString.split(' - ');
+
+            courseOrDepartment = parts[0] || 'N/A';
+            yearSectionLabel = 'College Name:';
+            yearSectionValue = parts[1] || 'N/A';
+        } else if (isStaff) {
+            courseOrDepartment = bookData.course_or_department || 'N/A';
+            yearSectionLabel = 'Position:';
+            yearSectionValue = bookData.borrower_type?.toUpperCase() || 'N/A';
+        } else { 
+            yearSectionLabel = 'Borrower Type:';
+            yearSectionValue = bookData.borrower_type?.toUpperCase() || 'Guest';
+        }
+
+        setText('modal-book-title', bookData.book_title || bookData.title);
         setText('modal-book-author', bookData.author);
         setText('modal-book-status', bookData.availability);
-        setText('modal-book-isbn', bookData.isbn);
+        setText('modal-book-isbn', bookData.book_isbn);
         setText('modal-book-accessionnumber', bookData.accession_number);
         setText('modal-book-callnumber', bookData.call_number);
 
-        // Borrower info
         setText('modal-borrower-name', bookData.borrower_name);
-        setText('modal-student-id', bookData.id_number);
 
-        const courseParts = (bookData.student_course || ' - ').split(' - ');
-        setText('modal-borrower-course', courseParts[0] || 'N/A');
-        setText('modal-borrower-year-section', courseParts[1] || 'N/A');
+        const idLabelEl = document.getElementById('modal-student-id-label');
+        const yearLabelEl = document.getElementById('modal-year-section-label');
+
+        if (idLabelEl) idLabelEl.textContent = idLabel;
+        if (yearLabelEl) yearLabelEl.textContent = yearSectionLabel;
+
+        setText('modal-student-id', borrowerId);
+        setText('modal-borrower-course', courseOrDepartment);
+        setText('modal-borrower-year-section', yearSectionValue);
+
         setText('modal-borrower-email', bookData.email || 'N/A');
         setText('modal-borrower-contact', bookData.contact || 'N/A');
         setText('modal-borrow-date', bookData.date_borrowed);
         setText('modal-due-date', bookData.due_date);
 
-        // Attach borrowing ID to buttons
         if (modalReturnButton) modalReturnButton.dataset.borrowingId = bookData.borrowing_id;
         if (modalExtendButton) modalExtendButton.dataset.borrowingId = bookData.borrowing_id;
 
@@ -176,8 +227,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
 
-    // --- Update Available Modal ---
-    // --- Update Available Modal ---
     const openAvailableModal = (bookData, status) => {
         const setText = (id, value) => {
             const el = document.getElementById(id);
@@ -185,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         // Book basic info
-        setText('available-modal-title', bookData.title);
+        setText('available-modal-title', bookData.book_title || bookData.title);
         setText('available-modal-author', bookData.author);
         setText('available-modal-isbn', bookData.book_isbn);
         setText('available-modal-accession', bookData.accession_number);
@@ -201,22 +250,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 : 'bg-gray-200 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full';
         }
 
-        // Borrower info
-        setText('available-modal-borrower-name', bookData.borrower_name);
-        setText('available-modal-borrower-id', bookData.id_number);
-        setText('available-modal-borrower-course', bookData.course_or_department);
-        setText('available-modal-borrower-contact', bookData.contact);
-        setText('available-modal-date-borrowed', bookData.date_borrowed);
-        setText('available-modal-due-date', bookData.due_date);
+        // Borrower info (Ito ay malinis dahil ito ay available book)
+        setText('available-modal-borrower-name', bookData.borrower_name || 'N/A');
+        setText('available-modal-borrower-id', bookData.id_number || 'N/A');
+        setText('available-modal-borrower-course', bookData.course_or_department || 'N/A');
+        setText('available-modal-borrower-contact', bookData.contact || 'N/A');
+        setText('available-modal-date-borrowed', bookData.date_borrowed || 'N/A');
+        setText('available-modal-due-date', bookData.due_date || 'N/A');
 
         // Additional Book Details
-        setText('available-modal-subject', bookData.subject);
-        setText('available-modal-place', bookData.book_place);
-        setText('available-modal-publisher', bookData.book_publisher);
-        setText('available-modal-year', bookData.year);
-        setText('available-modal-edition', bookData.book_edition);
-        setText('available-modal-supplementary', bookData.book_supplementary);
-        setText('available-modal-description', bookData.description);
+        setText('available-modal-subject', bookData.subject || 'N/A');
+        setText('available-modal-place', bookData.book_place || 'N/A');
+        setText('available-modal-publisher', bookData.book_publisher || 'N/A');
+        setText('available-modal-year', bookData.year || 'N/A');
+        setText('available-modal-edition', bookData.book_edition || 'N/A');
+        setText('available-modal-supplementary', bookData.book_supplementary || 'N/A');
+        setText('available-modal-description', bookData.description || 'N/A');
 
         // Show modal
         if (availableBookModal) availableBookModal.classList.remove('hidden');
@@ -285,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const formData = new FormData();
                 formData.append('borrowing_id', borrowingId);
 
-                const response = await fetch('returning/markReturned', {
+                const response = await fetch('api/superadmin/returning/markReturned', {
                     method: 'POST',
                     body: formData
                 });
@@ -295,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (result.success) {
                     Swal.fire('Success', 'Book marked as returned successfully.', 'success');
                     closeReturnModal();
-                    fetchTableData(); 
+                    fetchTableData();
                 } else {
                     Swal.fire('Error', result.message || 'Could not mark as returned.', 'error');
                 }

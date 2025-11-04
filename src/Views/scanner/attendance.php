@@ -5,14 +5,14 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library | Login</title>
+    <title>Library | Scanner</title>
     <!-- Tailwind CSS -->
-    <link href="/LibSys/public/css/output.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>/css/output.css" rel="stylesheet">
     <!-- PHOSPHOR ICONS -->
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
     <!-- SWEETALERT2 -->
-     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-orange-50 font-sans flex flex-col min-h-screen">
@@ -21,7 +21,7 @@
     <header
         class="sticky top-0 z-10 bg-white border-b border-orange-200 px-4 sm:px-6 flex flex-wrap justify-between items-center">
         <div class="flex items-center gap-3 sm:gap-4">
-            <img src="/LibSys/assets/library-icons/apple-touch-icon.png" alt="Logo" class="h-12">
+            <img src="<?= BASE_URL ?>/assets/library-icons/apple-touch-icon.png" alt="Logo" class="h-12">
             <span class="font-semibold text-lg sm:text-xl text-orange-700 whitespace-nowrap">
                 Library Online Software
             </span>
@@ -29,7 +29,7 @@
 
         <div class="mt-2 sm:mt-0 flex items-center gap-4">
             <!-- Logout -->
-            <form method="POST" action="/LibSys/public/logout">
+            <form method="POST" action="<?= BASE_URL ?>/logout">
                 <button type="submit" class="p-2 rounded hover:bg-gray-100">
                     <i class="ph ph-sign-out"></i>
                 </button>
@@ -43,7 +43,7 @@
 
 
             <!-- QR Code Scanner Form -->
-            <form action="/libsys/public/scanner/scan" method="POST"
+            <form action="<?= BASE_URL ?>/scanner/scan" method="POST"
                 class="relative bg-white shadow rounded-lg border border-orange-200 p-4 sm:p-6 text-center">
                 <h2 class="text-xl sm:text-2xl font-semibold text-orange-700 mb-2">
                     Attendance Scanner
@@ -72,7 +72,7 @@
                     Manually record student attendance when you don't have ID or QR scanning
                 </p>
 
-                <form action="/libsys/public/scanner/manual" method="POST"
+                <form action="<?= BASE_URL ?>/scanner/manual" method="POST"
                     class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
                         <label for="studentNumber" class="block text-md font-medium text-gray-700 mb-1">
@@ -128,167 +128,71 @@
         </div>
     </footer>
     <script>
-        
-    // === QR SCANNER ===
-    const qrInput = document.getElementById("qrCodeValue");
-    const qrBox = document.getElementById("qrBox");
-    const qrForm = qrInput.form;
+        // === QR SCANNER ===
+        const qrInput = document.getElementById("qrCodeValue");
+        const qrBox = document.getElementById("qrBox");
+        const qrForm = qrInput.form;
+        const manualForm = document.querySelector("form[action='<?= BASE_URL ?>/scanner/manual']");
 
-    // Kapag na-click QR box, mag-focus sa QR input
-    qrBox.addEventListener("click", () => {
-        qrInput.focus();
-    });
-
-    // Auto-focus QR input kapag page load
-    window.addEventListener("load", () => {
-        qrInput.focus();
-    });
-
-    // Kapag nag-click sa manual input, i-unfocus QR input
-    const manualInputs = document.querySelectorAll("#studentNumber");
-    manualInputs.forEach(input => {
-        input.addEventListener("focus", () => qrInput.blur());
-    });
-
-    // === QR FORM SUBMIT ===
-    if (qrForm) {
-        qrForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(qrForm);
-            try {
-                const res = await fetch("/libsys/public/scanner/scan", {
-                    method: "POST",
-                    body: formData
-                });
-
-                const data = await res.json();
-                let timerInterval;
-
-                const showAlert = (isSuccess) => {
-                    Swal.fire({
-                        position: "center",
-                        showConfirmButton: false,
-                        backdrop: `
-                        rgba(0,0,0,0.3)
-                        backdrop-filter: blur(6px)
-                    `,
-                        timer: 2000,
-                        didOpen: () => {
-                            const progressBar = Swal.getHtmlContainer().querySelector(
-                                "#progress-bar");
-                            let width = 100;
-                            timerInterval = setInterval(() => {
-                                width -= 100 / 20;
-                                if (progressBar) {
-                                    progressBar.style.width = width + "%";
-                                }
-                            }, 100);
-                        },
-                        willClose: () => {
-                            clearInterval(timerInterval);
-
-                            // reset & focus ulit para ready sa next scan
-                            qrForm.reset();
-                            qrInput.value = "";
-                            qrInput.focus();
-                        },
-                        html: isSuccess ? `
-                            <div class="w-[450px] bg-orange-50 border-2 border-orange-300 rounded-2xl p-8 shadow-lg text-center">
-                                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 mx-auto mb-4">
-                                    <i class="ph ph-user-check text-orange-600 text-3xl"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold text-orange-700">Attendance Recorded</h3>
-                                <div class="text-base text-orange-700 mt-3 space-y-1">
-                                    <p><strong>Name:</strong> ${data.full_name}</p>
-                                    <p><strong>Student Number:</strong> ${data.student_number}</p>
-                                    <p><strong>Time:</strong> ${data.time}</p>
-                                </div>
-                                <div class="w-full bg-orange-100 h-2 rounded mt-4 overflow-hidden">
-                                    <div id="progress-bar" class="bg-orange-500 h-2 w-full transition-all"></div>
-                                </div>
-                            </div>
-                        ` : `
-                            <div class="w-[450px] bg-red-50 border-2 border-red-300 rounded-2xl p-8 shadow-lg text-center">
-                                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
-                                    <i class="ph ph-x-circle text-red-600 text-3xl"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold text-red-700">Attendance Failed</h3>
-                                <p class="text-base text-red-600 mt-1">Invalid QR. Please try again.</p>
-                                <div class="w-full bg-red-100 h-2 rounded mt-4 overflow-hidden">
-                                    <div id="progress-bar" class="bg-red-500 h-2 w-full transition-all"></div>
-                                </div>
-                            </div>
-                        `,
-                        customClass: {
-                            popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
-                        }
-                    });
-                };
-
-                if (data.status === "success") {
-                    showAlert(true);
-                } else {
-                    showAlert(false);
-                }
-            } catch (err) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong while scanning QR.",
-                });
-
-                qrForm.reset();
-                qrInput.value = "";
-                qrInput.focus();
-            }
+        // Kapag na-click QR box, mag-focus sa QR input
+        qrBox.addEventListener("click", () => {
+            qrInput.focus();
         });
-    }
 
+        // Auto-focus QR input kapag page load
+        window.addEventListener("load", () => {
+            qrInput.focus();
+        });
 
+        // Kapag nag-click sa manual input, i-unfocus QR input
+        const manualInputs = document.querySelectorAll("#studentNumber");
+        manualInputs.forEach(input => {
+            input.addEventListener("focus", () => qrInput.blur());
+        });
 
-    // === MANUAL FORM ===
-    const manualForm = document.querySelector("form[action='/libsys/public/scanner/manual']");
-    if (manualForm) {
-        manualForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
+        // === QR FORM SUBMIT (QR Scan) ===
+        if (qrForm) {
+            qrForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
 
-            const formData = new FormData(manualForm);
-            try {
-                const res = await fetch("/libsys/public/scanner/manual", {
-                    method: "POST",
-                    body: formData
-                });
+                const formData = new FormData(qrForm);
+                try {
+                    // FIXED: Use relative path /scanner/scan
+                    const res = await fetch("api/scanner/scan", {
+                        method: "POST",
+                        body: formData
+                    });
 
-                const data = await res.json();
-                let timerInterval;
+                    const data = await res.json();
+                    let timerInterval;
 
-                const showAlert = (isSuccess) => {
-                    Swal.fire({
-                        position: "center",
-                        showConfirmButton: false,
-                        backdrop: `
+                    const showAlert = (isSuccess) => {
+                        Swal.fire({
+                            position: "center",
+                            showConfirmButton: false,
+                            backdrop: `
                         rgba(0,0,0,0.3)
                         backdrop-filter: blur(6px)
-                    `,
-                        timer: 2000,
-                        didOpen: () => {
-                            const progressBar = Swal.getHtmlContainer().querySelector(
-                                "#progress-bar");
-                            let width = 100;
-                            timerInterval = setInterval(() => {
-                                width -= 100 / 20;
-                                if (progressBar) {
-                                    progressBar.style.width = width + "%";
-                                }
-                            }, 100);
-                        },
-                        willClose: () => {
-                            clearInterval(timerInterval);
-                            // reset ulit form para ready sa next manual input
-                            manualForm.reset();
-                        },
-                        html: isSuccess ? `
+                        `,
+                            timer: 2000,
+                            didOpen: () => {
+                                const progressBar = Swal.getHtmlContainer().querySelector(
+                                    "#progress-bar");
+                                let width = 100;
+                                timerInterval = setInterval(() => {
+                                    width -= 100 / 20;
+                                    if (progressBar) {
+                                        progressBar.style.width = width + "%";
+                                    }
+                                }, 100);
+                            },
+                            willClose: () => {
+                                clearInterval(timerInterval);
+                                qrForm.reset();
+                                qrInput.value = "";
+                                qrInput.focus();
+                            },
+                            html: isSuccess ? `
                         <div class="w-[450px] bg-orange-50 border-2 border-orange-300 rounded-2xl p-8 shadow-lg text-center">
                             <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 mx-auto mb-4">
                                 <i class="ph ph-user-check text-orange-600 text-3xl"></i>
@@ -303,7 +207,100 @@
                                 <div id="progress-bar" class="bg-orange-500 h-2 w-full transition-all"></div>
                             </div>
                         </div>
-                    ` : `
+                        ` : `
+                        <div class="w-[450px] bg-red-50 border-2 border-red-300 rounded-2xl p-8 shadow-lg text-center">
+                            <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
+                                <i class="ph ph-x-circle text-red-600 text-3xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-red-700">Attendance Failed</h3>
+                            <p class="text-base text-red-600 mt-1">Invalid QR. Please try again.</p>
+                            <div class="w-full bg-red-100 h-2 rounded mt-4 overflow-hidden">
+                                <div id="progress-bar" class="bg-red-500 h-2 w-full transition-all"></div>
+                            </div>
+                        </div>
+                        `,
+                            customClass: {
+                                popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
+                            }
+                        });
+                    };
+
+                    if (data.status === "success") {
+                        showAlert(true);
+                    } else {
+                        showAlert(false);
+                    }
+                } catch (err) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Something went wrong while scanning QR.",
+                    });
+
+                    qrForm.reset();
+                    qrInput.value = "";
+                    qrInput.focus();
+                }
+            });
+        }
+
+
+        // === MANUAL FORM ===
+        if (manualForm) {
+            manualForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(manualForm);
+                try {
+                    // FIXED: Use relative path /api/scanner/manual
+                    const res = await fetch("api/scanner/manual", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    let timerInterval;
+
+                    const showAlert = (isSuccess) => {
+                        Swal.fire({
+                            position: "center",
+                            showConfirmButton: false,
+                            backdrop: `
+                        rgba(0,0,0,0.3)
+                        backdrop-filter: blur(6px)
+                        `,
+                            timer: 2000,
+                            didOpen: () => {
+                                const progressBar = Swal.getHtmlContainer().querySelector(
+                                    "#progress-bar");
+                                let width = 100;
+                                timerInterval = setInterval(() => {
+                                    width -= 100 / 20;
+                                    if (progressBar) {
+                                        progressBar.style.width = width + "%";
+                                    }
+                                }, 100);
+                            },
+                            willClose: () => {
+                                clearInterval(timerInterval);
+                                manualForm.reset();
+                            },
+                            html: isSuccess ? `
+                        <div class="w-[450px] bg-orange-50 border-2 border-orange-300 rounded-2xl p-8 shadow-lg text-center">
+                            <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 mx-auto mb-4">
+                                <i class="ph ph-user-check text-orange-600 text-3xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-orange-700">Attendance Recorded</h3>
+                            <div class="text-base text-orange-700 mt-3 space-y-1">
+                                <p><strong>Name:</strong> ${data.full_name}</p>
+                                <p><strong>Student Number:</strong> ${data.student_number}</p>
+                                <p><strong>Time:</strong> ${data.time}</p>
+                            </div>
+                            <div class="w-full bg-orange-100 h-2 rounded mt-4 overflow-hidden">
+                                <div id="progress-bar" class="bg-orange-500 h-2 w-full transition-all"></div>
+                            </div>
+                        </div>
+                        ` : `
                         <div class="w-[450px] bg-red-50 border-2 border-red-300 rounded-2xl p-8 shadow-lg text-center">
                             <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
                                 <i class="ph ph-x-circle text-red-600 text-3xl"></i>
@@ -314,28 +311,28 @@
                                 <div id="progress-bar" class="bg-red-500 h-2 w-full transition-all"></div>
                             </div>
                         </div>
-                    `,
-                        customClass: {
-                            popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
-                        }
-                    });
-                };
+                        `,
+                            customClass: {
+                                popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
+                            }
+                        });
+                    };
 
-                if (data.status === "success") {
-                    showAlert(true);
-                } else {
-                    showAlert(false);
+                    if (data.status === "success") {
+                        showAlert(true);
+                    } else {
+                        showAlert(false);
+                    }
+                } catch (err) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Something went wrong while submitting manual attendance.",
+                    });
+                    manualForm.reset();
                 }
-            } catch (err) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong while submitting manual attendance.",
-                });
-                manualForm.reset();
-            }
-        });
-    }
+            });
+        }
     </script>
 
 

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+
     const uploadInput = document.getElementById('uploadProfile');
     const profilePreview = document.getElementById('profilePreview');
     const profileIcon = document.getElementById('profileIcon');
@@ -25,15 +26,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadLabel = document.getElementById('uploadLabel');
     const profileLockedInfo = document.getElementById('profileLockedInfo');
 
-    const allInputs = profileForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"]');
+    const courseSelect = document.getElementById('course');
+    const allInputs = profileForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select');
     const editableInputs = Array.from(allInputs).filter(input => input.id !== 'studentNumber');
 
     const MAX_FILE_SIZE = 1 * 1024 * 1024;
     let originalProfileData = {};
+    let isEditing = false;
+
+    async function loadCourseOptions(currentCourseId = null) {
+        if (!courseSelect) return;
+
+        courseSelect.innerHTML = '<option value="">Loading Courses...</option>';
+        courseSelect.disabled = true;
+
+        try {
+            const res = await fetch('api/data/getAllCourses');
+            const data = await res.json();
+
+            courseSelect.innerHTML = '';
+            const defaultOption = new Option('Select a Course', '');
+            courseSelect.add(defaultOption);
+
+            if (data.success && Array.isArray(data.courses)) {
+                data.courses.forEach(course => {
+                    const option = new Option(`${course.course_code} - ${course.course_title}`, String(course.course_id));
+                    courseSelect.add(option);
+                });
+            }
+
+            if (currentCourseId) {
+                courseSelect.value = String(currentCourseId);
+            }
+            if (!isEditing) courseSelect.disabled = true;
+
+        } catch (err) {
+            console.error("Error fetching course options:", err);
+            courseSelect.innerHTML = `<option value="${currentCourseId || ''}">Error loading courses</option>`;
+            courseSelect.disabled = true;
+        }
+    }
 
     async function loadProfile() {
         try {
-            const res = await fetch('myprofile/get');
+            const res = await fetch('api/student/myprofile/get');
             if (!res.ok) {
                 const errData = await res.json().catch(() => null);
                 throw new Error(errData?.message || `Failed to fetch profile. Status: ${res.status}`);
@@ -44,13 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const profile = data.profile;
                 originalProfileData = profile;
 
-                console.log("profile_updated:", profile.profile_updated);
-                console.log("allow_edit:", profile.allow_edit);
-                console.log("Edit button element:", editProfileBtn);
-
-                const fullName = profile.full_name ||
-                    [profile.first_name, profile.middle_name, profile.last_name, profile.suffix]
-                        .filter(Boolean).join(' ') || 'Student Name';
+                const fullName = profile.full_name || [profile.first_name, profile.middle_name, profile.last_name, profile.suffix].filter(Boolean).join(' ') || 'Student Name';
                 profileName.textContent = fullName;
                 profileStudentId.textContent = profile.student_number || 'Student ID';
 
@@ -59,11 +89,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('lastName').value = profile.last_name || '';
                 document.getElementById('suffix').value = profile.suffix || '';
                 document.getElementById('studentNumber').value = profile.student_number || '';
-                document.getElementById('course').value = profile.course || '';
                 document.getElementById('yearLevel').value = profile.year_level || '';
                 document.getElementById('section').value = profile.section || '';
                 document.getElementById('email').value = profile.email || '';
                 document.getElementById('contact').value = profile.contact || '';
+
+                const currentCourseId = String(profile.course_id) || '';
+                const courseDisplayName = profile.course_code ? `${profile.course_code} - ${profile.course_title}` : 'Select a Course';
+
+                if (!isEditing && courseSelect) {
+                    courseSelect.innerHTML = `<option value="${currentCourseId}">${courseDisplayName}</option>`;
+                    courseSelect.value = currentCourseId;
+                    courseSelect.disabled = true;
+                } else if (isEditing) {
+                    loadCourseOptions(currentCourseId);
+                }
 
                 if (profile.profile_picture) {
                     profilePreview.src = profile.profile_picture;
@@ -83,10 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (profile.profile_updated == 0 || profile.can_edit_profile == 1) {
-                    editProfileBtn.classList.remove('hidden');  
+                    editProfileBtn.classList.remove('hidden');
                     profileLockedInfo.classList.add('hidden');
                 } else {
-                    editProfileBtn.classList.add('hidden');      
+                    editProfileBtn.classList.add('hidden');
                     profileLockedInfo.classList.remove('hidden');
                 }
 
@@ -100,8 +140,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleEdit(isEditing) {
-        if (isEditing) {
+    function toggleEdit(shouldEdit) {
+        isEditing = shouldEdit;
+
+        if (shouldEdit) {
+            loadCourseOptions(originalProfileData.course_id);
+
             editableInputs.forEach(input => {
                 input.disabled = false;
                 input.classList.remove('bg-gray-50', 'border-gray-200');
@@ -138,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewRegForm.classList.remove('hidden');
             }
 
-            loadProfile();
+            // loadProfile();
         }
     }
 
@@ -153,7 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const requiredFields = ['first_name', 'last_name', 'course', 'year_level', 'section', 'email', 'contact'];
         let missingFields = [];
         for (const field of requiredFields) {
-            if (!formData.get(field) || formData.get(field).trim() === '') {
+            const value = formData.get(field);
+            if (!value || value.trim() === '' || (field === 'course' && (value === '0' || value === ''))) {
                 missingFields.push(field);
             }
         }
@@ -170,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const email = formData.get('email');
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (!/^[^--Ÿ -퟿豈-﷏ﷰ-￯]+@[^--Ÿ -퟿豈-﷏ﷰ-￯]+\.[^--Ÿ -퟿豈-﷏ﷰ-￯]+$/.test(email)) {
             Swal.fire('Invalid Email', 'Please enter a valid email address.', 'warning');
             return;
         }
@@ -205,8 +250,12 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('profile_image', croppedBlob, 'profile.png');
         }
 
+        const selectedCourseValue = formData.get('course');
+        formData.delete('course');
+        formData.append('course_id', selectedCourseValue);
+
         try {
-            const res = await fetch('myprofile/update', {
+            const res = await fetch('api/student/myprofile/update', {
                 method: 'POST',
                 body: formData
             });
@@ -315,7 +364,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(modal) { if (modal) { modal.classList.remove("hidden"); document.body.classList.add("overflow-hidden"); } }
     function closeModal(modal) { if (modal) { modal.classList.add("hidden"); document.body.classList.remove("overflow-hidden"); } }
 
+    isEditing = false;
     loadProfile();
 
-});
+    // loadCourseOptions(null);
 
+});

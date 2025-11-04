@@ -120,5 +120,5 @@
         </div>
     </div>
 
-    <script src="/libsys/public/js/student/equipmentCatalog.js" defer></script>
+    <script src="<?= BASE_URL ?>/js/student/equipmentCatalog.js" defer></script>
 </div>

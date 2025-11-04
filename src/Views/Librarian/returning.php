@@ -155,15 +155,15 @@
                     <p id="modal-borrower-name" class="font-medium text-gray-700"></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500">Student Number</p>
+                    <p id="modal-student-id-label"class="text-xs text-gray-500">Student Number</p>
                     <p id="modal-student-id" class="font-medium text-gray-700"></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500">Course</p>
+                    <p id="modal-borrower-course-label" class="text-xs text-gray-500">Course</p>
                     <p id="modal-borrower-course" class="font-medium text-gray-700"></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500">Year & Section</p>
+                    <p id="modal-year-section-label" class="text-xs text-gray-500">Year & Section</p>
                     <p id="modal-borrower-year-section" class="font-medium text-gray-700"></p>
                 </div>
                 <div>
@@ -287,4 +287,4 @@
     </div>
 </div>
 
-<script src="/libsys/public/js/librarian/returning.js" defer></script>
+<script src="<?= BASE_URL ?>/js/librarian/returning.js" defer></script>

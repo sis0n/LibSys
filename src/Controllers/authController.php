@@ -23,46 +23,13 @@ class AuthController extends Controller
 
     public function showLogin()
     {
-
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
 
-
         if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
-            $role = strtolower($_SESSION['role']);
-            $redirectUrl = '';
-
-            if ($role === 'admin' || $role === 'librarian') {
-                $permissions = $_SESSION['user_permissions'] ?? [];
-
-                $redirectUrl = \App\Models\User::getFirstAccessibleModuleUrl($role, $permissions);
-            } else {
-                switch ($role) {
-                    case 'superadmin':
-                        $redirectUrl = '/libsys/public/superadmin/dashboard';
-                        break;
-                    case 'student':
-                        $redirectUrl = '/libsys/public/student/dashboard';
-                        break;
-                    case 'faculty':
-                        $redirectUrl = '/libsys/public/faculty/dashboard';
-                        break;
-                    case 'staff':
-                        $redirectUrl = '/libsys/public/staff/dashboard';
-                        break;
-                    case 'scanner':
-                        $redirectUrl = '/libsys/public/scanner/attendance';
-                        break;
-                    default:
-                        return;
-                }
-            }
-
-            if (!empty($redirectUrl)) {
-                header("Location: {$redirectUrl}");
-                exit;
-            }
+            header("Location: " . BASE_URL . "/dashboard");
+            exit;
         }
 
         if (empty($_SESSION['csrf_token'])) {
@@ -121,41 +88,30 @@ class AuthController extends Controller
             $redirect = '';
             $userRole = strtolower($user['role'] ?? '');
 
-            if (User::isSuperadmin($user) || User::isStudent($user) || User::isFaculty($user) || User::isStaff($user) || User::isScanner($user)) {
+            $finalPath = '';
 
-                switch ($userRole) {
-                    case 'superadmin':
-                        $redirect = '/libsys/public/superadmin/dashboard';
-                        break;
-                    case 'student':
-                        $redirect = '/libsys/public/student/dashboard';
-                        break;
-                    case 'faculty':
-                        $redirect = '/libsys/public/faculty/dashboard';
-                        break;
-                    case 'staff':
-                        $redirect = '/libsys/public/staff/dashboard';
-                        break;
-                    case 'scanner':
-                        $redirect = '/libsys/public/scanner/attendance';
-                        break;
-                }
+            // 1. Admin/Librarian (based on permissions)
+            if (User::isAdmin($user) || User::isLibrarian($user)) {
+                $permissions = $_SESSION['user_permissions'] ?? [];
+                $finalPath = User::getFirstAccessibleModuleUrl($userRole, $permissions);
+
+                // 2. Scanner Isolation (Priority)
+            } elseif (User::isScanner($user)) {
+                $finalPath = BASE_URL . '/attendance'; // <<< DITO ANG TAMA
+
+                // 3. Superadmin, Student, Faculty, Staff (Default to Dashboard)
+            } elseif (User::isSuperadmin($user) || User::isStudent($user) || User::isFaculty($user) || User::isStaff($user)) {
+                $finalPath = BASE_URL . '/dashboard';
             }
 
-            elseif (User::isAdmin($user) || User::isLibrarian($user)) {
-                $permissions = $_SESSION['user_permissions'] ?? [];
-                $redirect = User::getFirstAccessibleModuleUrl($userRole, $permissions);
-            } else {
-                echo json_encode([
-                    'status' => 'error',
-                    'message' => 'Role not recognized.'
-                ]);
+            if (empty($finalPath)) {
+                echo json_encode(['status' => 'error', 'message' => 'Role not recognized or no accessible module.']);
                 return;
             }
 
             echo json_encode([
                 'status' => 'success',
-                'redirect' => $redirect
+                'redirect' => $finalPath
             ]);
             return;
         } else {
@@ -171,12 +127,14 @@ class AuthController extends Controller
     {
         session_start();
         $this->AuthRepository->logout();
-        header("Location: /libsys/public/login");
+
+        // === [BINAGO DITO] ===
+        // Gumamit ng BASE_URL para sa tamang redirect path
+        header("Location: " . BASE_URL . "/login");
     }
 
     public function forgotPassword()
     {
-        session_start();
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
@@ -262,4 +220,29 @@ class AuthController extends Controller
             ]);
         }
     }
+
+    public function resetPassword()
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        $this->view("auth/resetPassword", [
+            "title" => "Reset Password",
+            "csrf_token" => $_SESSION['csrf_token']
+        ], false);
+    }
+
+    public function verifyOTP()
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        $this->view("auth/verifyOTP", [
+            "title" => "Verify OTP",
+            "csrf_token" => $_SESSION['csrf_token']
+        ], false);
+        
+    }
+
+    
 }

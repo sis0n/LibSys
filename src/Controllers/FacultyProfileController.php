@@ -45,7 +45,7 @@ class FacultyProfileController extends Controller
 
     if (move_uploaded_file($file['tmp_name'], $targetFile)) {
       // Ito ang URL path na i-store sa DB o ibabalik
-      return '/libsys/public/uploads/profile_images/' . $fileName;
+      return  BASE_URL . '/uploads/profile_images/' . $fileName;
     }
 
     return null;
@@ -90,14 +90,13 @@ class FacultyProfileController extends Controller
     $profile = $this->facultyRepo->getProfileByUserId($currentUserId);
     if (!$profile) return $this->json(['success' => false, 'message' => 'Profile not found.'], 404);
 
-    // Faculty: unlimited edits → REMOVE profile lock
-    // if ($profile['profile_updated'] == 1) ...
-
-    // Validate required fields
-    $requiredFields = ['first_name', 'last_name', 'email', 'department', 'contact'];
+    $requiredFields = ['first_name', 'last_name', 'email', 'contact', 'college_id'];
     $missingFields = [];
+
     foreach ($requiredFields as $field) {
-      if (!isset($data[$field]) || trim($data[$field]) === '') $missingFields[] = $field;
+      if (!isset($data[$field]) || trim($data[$field]) === '' || ($field === 'college_id' && (!is_numeric($data[$field]) || (int)$data[$field] === 0))) {
+        $missingFields[] = $field;
+      }
     }
     if (!empty($missingFields)) {
       return $this->json([
@@ -106,17 +105,29 @@ class FacultyProfileController extends Controller
       ], 400);
     }
 
-    // Contact validation
+    // --- Profile Picture Requirement Check ---
+    // Kung walang profile picture (null o walang laman) at walang bagong file na in-upload
+    $hasExistingProfilePic = !empty($profile['profile_picture']);
+    $isNewFileUploaded = (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0);
+
+    if (!$hasExistingProfilePic && !$isNewFileUploaded) {
+      return $this->json(['success' => false, 'message' => 'Profile picture is required.'], 400);
+    }
+    // -----------------------------------------
+
+    $collegeId = filter_var($data['college_id'], FILTER_VALIDATE_INT);
+    if (!$collegeId) {
+      return $this->json(['success' => false, 'message' => 'Invalid college/department selection.'], 400);
+    }
+
     if (!preg_match('/^\d{11}$/', $data['contact'])) {
       return $this->json(['success' => false, 'message' => 'Contact number must be 11 digits.'], 400);
     }
 
-    // Email validation
     if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
       return $this->json(['success' => false, 'message' => 'Invalid email address.'], 400);
     }
 
-    // Update users table
     $fullName = trim(implode(' ', array_filter([$data['first_name'], $data['middle_name'] ?? null, $data['last_name'], $data['suffix'] ?? null])));
     $userData = [
       'first_name' => $data['first_name'],
@@ -127,7 +138,8 @@ class FacultyProfileController extends Controller
       'email' => $data['email']
     ];
 
-    if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
+    $imagePath = null;
+    if ($isNewFileUploaded) {
       $validation = $this->validateImageUpload($_FILES['profile_image']);
       if ($validation !== true) return $this->json(['success' => false, 'message' => $validation], 400);
       $imagePath = $this->handleFileUpload($_FILES['profile_image'], "public/uploads/profile_images/");
@@ -136,15 +148,17 @@ class FacultyProfileController extends Controller
 
     $this->userRepo->updateUser($currentUserId, $userData);
 
-    // Update faculty table
     $facultyData = [
-      'department' => $data['department'],
+      'college_id' => $collegeId,
       'contact' => $data['contact'],
-      'profile_updated' => 1 // optional, just for record
+      'profile_updated' => 1
     ];
-    $this->facultyRepo->updateFacultyProfile($currentUserId, $facultyData);
 
-    // Update session
+    $updated = $this->facultyRepo->updateFacultyProfile($currentUserId, $facultyData);
+    if (!$updated) {
+      return $this->json(['success' => false, 'message' => 'Profile update failed. No changes were made or a repository error occurred.'], 500);
+    }
+
     $_SESSION['fullname'] = $fullName;
     if (isset($imagePath)) $_SESSION['profile_picture'] = $imagePath;
 

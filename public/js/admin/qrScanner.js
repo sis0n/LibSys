@@ -9,9 +9,8 @@ const statusMenu = document.getElementById("statusFilterMenu");
 const statusValue = document.getElementById("statusFilterValue");
 
 function renderScanResult(data) {
-
-    if (!data || !data.isValid) {
-        scanResultCard.innerHTML = `
+  if (!data || !data.isValid) {
+    scanResultCard.innerHTML = `
             <div>
                 <h2 class="text-xl font-semibold mb-2">Scan Result</h2>
                 <p class="text-gray-500 mb-6">Review ticket details and process transaction</p>
@@ -26,26 +25,21 @@ function renderScanResult(data) {
                 </div>
             </div>
         `;
-        return;
-    }
+    return;
+  }
 
-    const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
+  const user = data.user;
+  const isBorrowed = data.ticket.status.toLowerCase() === 'borrowed';
+  const profilePicPath = user.profilePicture || defaultAvatar;
 
-    let profilePicPath = defaultAvatar;
-    if (data.student.profilePicture) {
-        profilePicPath = data.student.profilePicture.startsWith('/') ?
-            data.student.profilePicture :
-            `/${data.student.profilePicture}`;
-    }
+  const actionButton = isBorrowed ?
+    `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>` :
+    `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
+            class="w-full bg-orange-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-orange-600 transition">
+            Confirm Borrow (${data.items.length} Items)
+          </button>`;
 
-    const actionButton = isBorrowed ?
-        `<p class="text-sm text-green-600 font-semibold py-3">This ticket has already been processed.</p>` :
-        `<button id="processBorrowBtn" data-code="${data.ticket.id}" data-action="borrow"
-              class="w-full bg-orange-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-orange-600 transition">
-              Confirm Borrow (${data.items.length} Items)
-           </button>`;
-
-    const itemsHtml = data.items.map((item, index) => `
+  const itemsHtml = data.items.map((item, index) => `
         <li class="mb-3 flex items-start gap-3">
             <span class="text-sm font-semibold text-gray-700 w-6 text-right">${index + 1}.</span>
             <div class="flex-1">
@@ -60,7 +54,22 @@ function renderScanResult(data) {
         </li>
     `).join('');
 
-    scanResultCard.innerHTML = `
+  let extraInfoHtml = '';
+  if (user.type === 'student') {
+    extraInfoHtml = `
+            <div class="flex justify-between"><span>Course:</span><span class="font-medium text-right">${user.course}</span></div>
+            <div class="flex justify-between"><span>Year & Section:</span><span class="font-medium text-right">${user.yearsection}</span></div>
+        `;
+  } else if (user.type === 'faculty') {
+    extraInfoHtml = `<div class="flex justify-between"><span>College/Dept:</span><span class="font-medium text-right">${user.department}</span></div>`;
+  } else if (user.type === 'staff') {
+    extraInfoHtml = `
+            <div class="flex justify-between"><span>Position:</span><span class="font-medium text-right">${user.position}</span></div>
+            <div class="flex justify-between"><span>Contact:</span><span class="font-medium text-right">${user.contact}</span></div>
+        `;
+  }
+
+  scanResultCard.innerHTML = `
         <div class="flex flex-col flex-grow">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold">Scan Result</h2>
@@ -75,21 +84,20 @@ function renderScanResult(data) {
             <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
                 <div class="flex items-center gap-3 mb-2">
                     <div class="w-16 h-16 flex-shrink-0">
-                        <img src="${profilePicPath}" alt="Student Avatar" 
-                             class="w-full h-full object-cover rounded-full border border-orange-300">
+                        <img src="${profilePicPath}" alt="User Avatar" 
+                              class="w-full h-full object-cover rounded-full border border-orange-300">
                     </div>
                     <div class="self-center">
-                        <p class="font-bold text-lg text-gray-800">${data.student.name}</p> 
+                        <p class="font-bold text-lg text-gray-800">${user.name}</p> 
                         <p class="text-md text-gray-600">
-                            Student Number: <span class="font-medium text-gray-700">${data.student.id}</span> 
+                            ID: <span class="font-medium text-gray-700">${user.id}</span> 
                         </p>
                     </div>
                 </div>
 
                 <h2 class="font-semibold text-gray-700 mb-2">Details:</h2>
                 <div class="space-y-1 text-sm text-gray-700">
-                    <div class="flex justify-between"><span>Course:</span><span class="font-medium text-right">${data.student.course}</span></div>
-                    <div class="flex justify-between"><span>Year & Section:</span><span class="font-medium text-right">${data.student.yearsection}</span></div>
+                    ${extraInfoHtml}
                     <div class="flex justify-between"><span>Ticket:</span><span class="font-medium text-right">${data.ticket.id}</span></div>
                     <div class="flex justify-between"><span>Status:</span><span class="font-medium text-right uppercase">${data.ticket.status}</span></div>
                     <div class="flex justify-between"><span>Generated:</span><span class="font-medium text-right">${data.ticket.generated}</span></div>
@@ -113,7 +121,6 @@ function renderScanResult(data) {
     `;
 
   const processBorrowBtn = document.getElementById('processBorrowBtn');
-
   if (processBorrowBtn) {
     processBorrowBtn.addEventListener('click', () => processTransaction(data.ticket.id, 'borrow'));
   }
@@ -179,7 +186,7 @@ function processTransaction(transactionCode, action) {
     confirmButtonText: `Yes, Process Borrow!`,
   }).then((result) => {
     if (result.isConfirmed) {
-      const url = `${BASE_AJAX_PATH}/borrowTransaction`;
+      const url = `api/admin/qrScanner/borrowTransaction`;
       const formData = `transaction_code=${encodeURIComponent(transactionCode)}`;
 
       fetch(url, {
@@ -192,7 +199,7 @@ function processTransaction(transactionCode, action) {
           if (res.success) {
             Swal.fire('Success!', res.message, 'success');
             renderScanResult(null);
-            
+
             document.getElementById('scannerInput').focus();
           } else {
             Swal.fire({ icon: 'error', title: 'Transaction Failed', text: res.message });
@@ -208,7 +215,7 @@ function processTransaction(transactionCode, action) {
 
 
 function scanQRCode(transactionCode) {
-  fetch(`${BASE_AJAX_PATH}/scanTicket`, {
+  fetch(`api/admin/qrScanner/scanTicket`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: `transaction_code=${encodeURIComponent(transactionCode)}`
@@ -241,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
       item.addEventListener("click", () => {
         statusValue.textContent = item.dataset.value;
         statusMenu.classList.add("hidden");
-        
+
       });
     });
 

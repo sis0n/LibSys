@@ -44,12 +44,6 @@ class RestoreBookController extends Controller
       return;
     }
 
-    if (!$this->validateCsrf()) {
-      http_response_code(403);
-      echo json_encode(['success' => false, 'message' => 'CSRF Token Validation Failed.']);
-      return;
-    }
-
     $input = json_decode(file_get_contents('php://input'), true);
     $bookId = $input['book_id'] ?? null;
 

@@ -18,7 +18,7 @@
         </div>
         <p class="text-gray-600 mb-6">Choose the type and format for the data export.</p>
 
-        <form id="backupForm" method="GET" action="/libsys/public/backup/export/csv">
+        <form id="backupForm" method="GET" action="<?= BASE_URL ?>/backup/export/csv">
             <input type="hidden" name="type" id="backupType" value="">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -136,7 +136,7 @@
     </div>
 </main>
 
-<script src="/libsys/public/js/superadmin/backup.js"></script>
+<script src="<?= BASE_URL ?>/js/superadmin/backup.js"></script>
 
 <template id="backup-file-row-template">
     <tr>

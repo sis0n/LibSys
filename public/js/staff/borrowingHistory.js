@@ -54,14 +54,14 @@ function renderRecords(records) {
 
 function fetchBorrowingHistory() {
 
-  if (typeof BASE_URL === 'undefined' || typeof CURRENT_STAFF_ID === 'undefined' || CURRENT_STAFF_ID === 0) {
+  if (typeof BASE_URL_JS === 'undefined' || typeof CURRENT_STAFF_ID === 'undefined' || CURRENT_STAFF_ID === 0) {
     recordsContainer.innerHTML = `<div class="text-center py-10 text-red-500">Error: Staff user session not found. Please log in again.</div>`;
     return;
   }
 
   recordsContainer.innerHTML = `<div class="text-center py-10 text-gray-500">Loading history...</div>`;
 
-  const url = `${BASE_URL}/staff/borrowingHistory/fetch?staff_id=${CURRENT_STAFF_ID}`;
+  const url = `api/staff/borrowingHistory/fetch?staff_id=${CURRENT_STAFF_ID}`;
 
   fetch(url)
     .then(res => res.json())

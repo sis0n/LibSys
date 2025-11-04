@@ -151,5 +151,5 @@
         </div>
     </form>
 
-    <script src="/libsys/public/js/superadmin/borrowingForm.js" defer></script>
+    <script src="<?= BASE_URL ?>/js/superadmin/borrowingForm.js" defer></script>
 </main>

@@ -7,6 +7,6 @@
 <body>
     <h1>404</h1>
     <p>huli na !</p>
-    <a href="/libsys/public/login">Go back to login</a>
+    <a href="<?= BASE_URL ?>/login">Go back to login</a>
 </body>
 </html>

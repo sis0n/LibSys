@@ -130,16 +130,15 @@ document.addEventListener("DOMContentLoaded", () => {
     noRecordsRow.querySelector('td').innerHTML = `<i class="ph ph-spinner animate-spin text-2xl"></i> Loading...`;
 
     const endpoint = '/attendance/logs/ajax';
-    const absoluteUrl = BASE_URL_JS + endpoint;
 
-    const url_fetch = new URL(absoluteUrl);
-    url_fetch.searchParams.append('period', periodToSend);
-    url_fetch.searchParams.append('search', currentSearch);
+    let url = `${BASE_URL_JS}/api/attendance/logs/ajax?`;
+    url += `period=${periodToSend}&search=${currentSearch}`;
+
     if (currentCourse !== "All Courses") {
-      url_fetch.searchParams.append('course', currentCourse);
+        url += `&course=${currentCourse}`;
     }
 
-    fetch(url_fetch)
+    fetch(url)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
         return res.json();

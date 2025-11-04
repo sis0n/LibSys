@@ -475,7 +475,7 @@
             console.log("Uploading file:", fileInput.files[0].name);
 
             try {
-                const res = await fetch(`bookManagement/bulkImport`, {
+                const res = await fetch(`api/admin/bookManagement/bulkImport`, {
                     method: "POST",
                     body: formData
                 });
@@ -523,15 +523,15 @@
 
         //     const path = window.location.pathname;
 
-        //     if (path.includes('/superadmin/')) {
-        //         currentApiBaseUrl = '/libsys/public/superadmin';
-        //     } else if (path.includes('/admin/')) {
-        //         currentApiBaseUrl = '/libsys/public/admin';
+        //     if (path.includes('/super')) {
+        //         currentApiBaseUrl = '/libsys/public/super;
+        //     } else if (path.includes('/')) {
+        //         currentApiBaseUrl = '/libsys/public/;
         //     } else if (path.includes('/librarian/')) {
         //         currentApiBaseUrl = '/libsys/public/librarian';
         //     } else {
         //         console.error("CRITICAL: Cannot determine user role from URL path.");
-        //         currentApiBaseUrl = '/libsys/public/superadmin';
+        //         currentApiBaseUrl = '/libsys/public/super;
         //     }
         //     return currentApiBaseUrl;
         // }
@@ -713,7 +713,7 @@
                     offset: offset
                 });
 
-                const res = await fetch(`bookManagement/fetch?${params.toString()}`);
+                const res = await fetch(`<?= BASE_URL ?>/api/admin/bookManagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
 
@@ -905,7 +905,7 @@
                 return;
             }
             try {
-                const res = await fetch(`bookManagement/store`, {
+                const res = await fetch(`<?= BASE_URL ?>/api/admin/bookManagement/store`, {
                     method: "POST",
                     body: formData
                 });
@@ -929,7 +929,7 @@
         window.viewBook = async (bookId) => {
             if (!bookId) return;
             try {
-                const res = await fetch(`bookManagement/get/${bookId}`);
+                const res = await fetch(`/api/admin/bookManagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
 
                 const data = await res.json();
@@ -971,7 +971,7 @@
             if (!bookId) return;
             currentEditingBookId = bookId;
             try {
-                const res = await fetch(`bookManagement/get/${bookId}`);
+                const res = await fetch(`api/admin/bookManagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
                 const data = await res.json();
                 if (data.success && data.book) {
@@ -1017,7 +1017,7 @@
                 return;
             }
             try {
-                const res = await fetch(`bookManagement/update/${currentEditingBookId}`, {
+                const res = await fetch(`api/admin/bookManagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
@@ -1048,7 +1048,7 @@
             });
             if (result.isConfirmed) {
                 try {
-                    const res = await fetch(`bookManagement/delete/${bookId}`, {
+                    const res = await fetch(`api/admin/bookManagement/delete/${bookId}`, {
                         method: "POST"
                     });
                     const result = await res.json();

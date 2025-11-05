@@ -37,7 +37,7 @@ switch ($role) {
             <i class="ph ph-list text-2xl"></i>
         </button>
 
-        <h1 class="text-lg font-semibold text-gray-800 leading-none">
+        <h1 class="text-base sm:text-lg font-semibold text-gray-800 leading-none">
             <?= $roleTitle ?>
         </h1>
     </div>
@@ -60,8 +60,8 @@ switch ($role) {
             </div>
 
             <div class="leading-tight">
-                <p id="headerFullname" class="text-sm font-medium text-gray-700"><?= htmlspecialchars($fullname) ?></p>
-                <p id="headerUsername" class="text-xs text-gray-500"><?= htmlspecialchars($username) ?></p>
+                <p id="headerFullname" class="text-xs sm:text-sm font-medium text-gray-700"><?= htmlspecialchars($fullname) ?></p>
+                <p id="headerUsername" class="text-[10px] sm:text-xs text-gray-500"><?= htmlspecialchars($username) ?></p>
             </div>
         </div>
 

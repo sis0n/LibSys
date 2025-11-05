@@ -1,7 +1,10 @@
-// --- CORE CONFIRMATION FUNCTION (ORANGE BORDER, FINAL DESIGN) ---
-// Note: Gagamitin ang ORANGE BORDER sa Confirmation Modal para mag-match sa App Theme.
+// --- CORE CONFIRMATION FUNCTION (FINAL TEMPLATE - INLINE STYLE) ---
 async function showCustomConfirmationModal(title, text, confirmText = "Confirm") {
     if (typeof Swal == "undefined") return confirm(title);
+    
+    // Inline CSS Style para sa Orange Border, White BG, at Black Shadow
+    const inlineStyle = "border: 2px solid #f97316 !important; background: white !important; box-shadow: 0 0 15px #00000030 !important;";
+
     const result = await Swal.fire({
         background: "transparent",
         buttonsStyling: false, 
@@ -23,10 +26,9 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm")
         cancelButtonText: "Cancel",
         
         customClass: {
-            // FINAL RULE: Orange Border + White BG + Orange Shadow
-            popup:
-                "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
-                
+            // Tanggalin ang border/shadow/bg classes, hayaan ang rounded corners at padding
+            popup: "!rounded-xl !p-6",
+            
             // Confirm Button (Orange, Large, Bold)
             confirmButton:
                 "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
@@ -36,22 +38,29 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm")
 
             actions: "!mt-4"
         },
+        // Gamitin ang didOpen hook para i-inject ang inline style
+        didOpen: (popup) => {
+            popup.style.cssText = inlineStyle + " " + popup.style.cssText;
+        }
     });
     return result.isConfirmed;
 }
 // ----------------------------------------------------
 
-// --- SweetAlert Helper Functions for Toasts and Loaders ---
+// Inalis ang mga declarations na hindi ginagamit sa snippet na ito.
 
-const showProfileToast = (icon, title, text, theme, duration = 3000) => {
-    if (typeof Swal == "undefined") return alert(`${title}: ${text}`);
+// --- SweetAlert Helper Functions for Toasts and Loaders (Shared design) ---
 
-    const themeMap = {
-        'warning': { color: 'text-orange-600', bg: 'bg-orange-100', icon: 'ph-warning' },
-        'error': { color: 'text-red-600', bg: 'bg-red-100', icon: 'ph-x-circle' },
-        'success': { color: 'text-green-600', bg: 'bg-green-100', icon: 'ph-check-circle' },
-    };
-    const selectedTheme = themeMap[theme];
+// Utility for showing small, auto-closing toasts (RED BORDER ONLY)
+const showLibrarianToast = (title, text, duration = 3000) => {
+    
+    // HARDCODED RED BORDER THEME (FOR INVALID TICKET/ERROR)
+    const iconClass = 'ph-x-circle'; 
+    const contentColor = 'text-red-600'; 
+    const bgColor = 'bg-red-100'; 
+    
+    // INLINE CSS STYLE PARA SA RED BORDER (ito ang sa Invalid Ticket)
+    const inlineStyle = "border: 2px solid #dc2626 !important;"; // Red 600
 
     Swal.fire({
         toast: true,
@@ -59,7 +68,71 @@ const showProfileToast = (icon, title, text, theme, duration = 3000) => {
         showConfirmButton: false,
         timer: duration,
         width: "360px",
-        background: "transparent",
+        
+        background: "white", 
+        backdrop: `transparent`,
+        
+        customClass: {
+            // Tanggalin ang border classes, hayaan ang rounded corners at padding
+            popup: `!rounded-xl !p-4 backdrop-blur-sm`, 
+        },
+        
+        html: `
+            <div class="flex flex-col text-left">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full ${bgColor} ${contentColor}">
+                        <i class="ph ${iconClass} text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-[15px] font-semibold ${contentColor}">${title}</h3>
+                        <p class="text-[13px] text-gray-700 mt-0.5">${text}</p>
+                    </div>
+                </div>
+            </div>
+        `,
+        
+        // Gagamitin ang didOpen hook para i-inject ang style pagkatapos ma-render ang toast.
+        didOpen: (toast) => {
+            // I-apply ang style sa popup element
+            const popup = toast;
+            popup.style.cssText = inlineStyle + " " + popup.style.cssText;
+        },
+    });
+};
+
+const showProfileToast = (icon, title, text, theme, duration = 3000) => {
+    if (typeof Swal == "undefined") return alert(`${title}: ${text}`);
+
+    // Gagamitin ang theme colors para sa icon/text
+    const themeMap = {
+        'warning': { color: 'text-orange-600', bg: 'bg-orange-100', icon: 'ph-warning' },
+        'error': { color: 'text-red-600', bg: 'bg-red-100', icon: 'ph-x-circle' },
+        'success': { color: 'text-green-600', bg: 'bg-green-100', icon: 'ph-check-circle' },
+    };
+    const selectedTheme = themeMap[theme];
+
+    let inlineStyle;
+
+    if (theme === 'warning') {
+        // INLINE STYLE para sa ORANGE BORDER at ORANGE SHADOW (para sa Not Found)
+        inlineStyle = "border: 2px solid #f97316 !important; box-shadow: 0 0 10px #f9731670 !important;"; // Orange 500 border/shadow
+    } else if (theme === 'success') {
+        // INLINE STYLE para sa GREEN BORDER at GREEN SHADOW
+        inlineStyle = "border: 2px solid #10b981 !important; box-shadow: 0 0 10px #10b98170 !important;"; // Green 500 border/shadow
+    } else {
+        // Default style (Black/Gray border para sa Error/Other)
+        inlineStyle = "border: 2px solid #1f2937 !important; box-shadow: 0 0 10px #00000030 !important;"; // Gray-900 / Black border
+    }
+
+
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: duration,
+        width: "360px",
+        background: "white", // Explicitly set to white
+        
         html: `
             <div class="flex flex-col text-left">
                 <div class="flex items-center gap-3 mb-2">
@@ -73,15 +146,23 @@ const showProfileToast = (icon, title, text, theme, duration = 3000) => {
                 </div>
             </div>
         `,
-        // TOAST MODAL: Black Border + Transparent BG + Black Shadow
         customClass: {
-            popup: `!rounded-xl !shadow-md !border-2 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm !border-gray-900 shadow-[0_0_10px_#00000030]`,
+            // TOAST MODAL: Tanggalin ang border/shadow classes, hayaan ang rounded corners at padding
+            popup: `!rounded-xl !p-4`,
+        },
+        didOpen: (toast) => {
+            // I-apply ang inline style (Orange/Green/Black depende sa theme)
+            toast.style.cssText = inlineStyle + " " + toast.style.cssText;
         },
     });
 };
 
 const showLoadingModal = (message = "Processing request...", subMessage = "Please wait.") => {
     if (typeof Swal == "undefined") return;
+    
+    // INLINE STYLE para sa ORANGE BORDER at ORANGE SHADOW (para sa Loading)
+    const inlineStyle = "border: 2px solid #f97316 !important; background: white !important; box-shadow: 0 0 8px #f9731670 !important;"; // Orange 500 border/shadow
+
     Swal.fire({
         background: "transparent",
         html: `
@@ -93,8 +174,12 @@ const showLoadingModal = (message = "Processing request...", subMessage = "Pleas
         allowOutsideClick: false,
         showConfirmButton: false,
         customClass: {
-            // LOADING MODAL: Orange Border + Orange Spinner
-            popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-white shadow-[0_0_8px_#ffb34770]",
+            // LOADING MODAL: Tanggalin ang border/shadow classes
+            popup: "!rounded-xl !p-6",
+        },
+        didOpen: (popup) => {
+            // I-apply ang inline style (Orange)
+            popup.style.cssText = inlineStyle + " " + popup.style.cssText;
         },
     });
 };
@@ -120,6 +205,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const accessionInput = document.getElementById('accession-input');
     const scanButton = document.getElementById('scan-button');
     const qrCodeValueInput = document.getElementById('qrCodeValue');
+    
+    // --- Close Modal Functions (Needed for Auto-Close) ---
+    const closeReturnModal = () => { if (returnModal) returnModal.classList.add('hidden'); };
+    const closeAvailableModal = () => { if (availableBookModal) availableBookModal.classList.add('hidden'); };
+    // --- End Close Modal Functions ---
+
 
     async function fetchTableData() {
         try {
@@ -203,16 +294,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (data.status === 'borrowed' && data.details) openReturnModal(data.details);
                 else if (data.status === 'available' && data.details) openAvailableModal(data.details, data.status);
-                // Replaced generic Swal.fire with custom toast
+                // Gagamitin ang showProfileToast na may ORANGE border (warning)
                 else showProfileToast('ph-warning', 'Not Found', 'No book found with that Accession Number.', 'warning');
             } else {
-                 // Replaced generic Swal.fire with custom toast
+                 // Gagamitin ang showProfileToast na may BLACK/GRAY border (error)
                 showProfileToast('ph-x-circle', 'Error', result.message || 'An error occurred.', 'error');
             }
         } catch (error) {
             Swal.close();
             console.error('Error checking book:', error);
-             // Replaced generic Swal.fire with custom toast
+             // Gagamitin ang showProfileToast na may BLACK/GRAY border (error)
             showProfileToast('ph-x-circle', 'Error', error.message || 'Could not connect to the server.', 'error');
         }
 
@@ -309,6 +400,9 @@ document.addEventListener('DOMContentLoaded', function () {
         modalExtendButton.addEventListener('click', async () => {
             const borrowingId = modalExtendButton.dataset.borrowingId;
             if (!borrowingId) return;
+            
+            // NEW CODE: Isara ang Return Modal bago magpakita ng confirmation
+            closeReturnModal();
 
             const { value: days } = await Swal.fire({
                 title: 'Extend Due Date',
@@ -328,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     const formData = new FormData();
                     formData.append('borrowing_id', borrowingId);
-                    formData.append('days', days);
+                    formData.append('days', days); 
 
                     const response = await fetch('api/librarian/returning/extend', {
                         method: 'POST',
@@ -403,8 +497,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    const closeReturnModal = () => { if (returnModal) returnModal.classList.add('hidden'); };
-    const closeAvailableModal = () => { if (availableBookModal) availableBookModal.classList.add('hidden'); };
+    // const closeReturnModal = () => { if (returnModal) returnModal.classList.add('hidden'); }; // Moved above for access
+    // const closeAvailableModal = () => { if (availableBookModal) availableBookModal.classList.add('hidden'); }; // Moved above for access
 
     fetchTableData();
 
@@ -433,15 +527,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        document.addEventListener('click', (e) => {
-            if (e.target !== accessionInput) {
-                setTimeout(() => qrCodeValueInput.focus(), 10);
-            }
-        });
+        // document.addEventListener('click', (e) => {
+        //      if (e.target !== accessionInput) {
+        //          setTimeout(() => qrCodeValueInput.focus(), 10);
+        //      }
+        // });
     }
 
 
-    // --- Manual input / Enter key ---
     if (accessionInput) {
         accessionInput.removeAttribute('readonly');
         accessionInput.addEventListener('keydown', e => {
@@ -452,11 +545,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- Handle "Mark as Returned" ---
     if (modalReturnButton) {
         modalReturnButton.addEventListener('click', async () => {
             const borrowingId = modalReturnButton.dataset.borrowingId;
             if (!borrowingId) return;
+            
+            // NEW CODE: Isara ang Return Modal bago magpakita ng confirmation
+            closeReturnModal();
+            // Isara rin ang available modal kung sakaling bukas (just in case)
+            closeAvailableModal();
 
             // 1. CONFIRMATION
             const isConfirmed = await showCustomConfirmationModal(
@@ -484,7 +581,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (result.success) {
                     showProfileToast('ph-check-circle', 'Success', 'Book marked as returned successfully.', 'success');
-                    closeReturnModal();
+                    // Kung may error sa confirmation, baka kailangan i-close ulit:
+                    closeReturnModal(); 
                     fetchTableData();
                 } else {
                     showProfileToast('ph-x-circle', 'Error', result.message || 'Could not mark as returned.', 'error');

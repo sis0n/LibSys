@@ -1,8 +1,8 @@
 window.addEventListener("DOMContentLoaded", () => {
-    // --- SweetAlert Helper Functions (Galing sa Book Catalog Design) ---
+    // --- SweetAlert Helper Functions (Final Shared Design) ---
 
-    // 1. SUCCESS/ADD/UPDATE Toast (Green Theme)
-    function showSuccessToast(title, body = "") {
+    // 1. SUCCESS/ADD/UPDATE Toast (Themed Border)
+    function showSuccessToast(title, body = "Successfully processed.") {
         if (typeof Swal == "undefined") return alert(title);
         Swal.fire({
             toast: true,
@@ -54,32 +54,42 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 4. CONFIRMATION Modal (Orange Theme)
+    // 4. CONFIRMATION Modal (Orange Border Final)
     async function showConfirmationModal(title, text, confirmText = "Confirm") {
         if (typeof Swal == "undefined") return confirm(title);
         const result = await Swal.fire({
             background: "transparent",
+            buttonsStyling: false, 
+            width: '450px', 
+            
             html: `
                 <div class="flex flex-col text-center">
                     <div class="flex justify-center mb-3">
-                        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
-                            <i class="ph ph-warning-circle text-2xl"></i>
+                        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-orange-600">
+                            <i class="ph ph-warning-circle text-3xl"></i>
                         </div>
                     </div>
-                    <h3 class="text-[17px] font-semibold text-orange-700">${title}</h3>
+                    <h3 class="text-xl font-semibold text-gray-800">${title}</h3>
                     <p class="text-[14px] text-gray-700 mt-1">${text}</p>
                 </div>
             `,
             showCancelButton: true,
             confirmButtonText: confirmText,
             cancelButtonText: "Cancel",
+            
             customClass: {
+                // FINAL FIX: Orange Border + White BG + Orange Shadow (Matching the theme)
                 popup:
-                    "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+                    "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
+                    
+                // Confirm Button (Orange, Large, Bold)
                 confirmButton:
-                    "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+                    "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
+                // Cancel Button (Gray, Large, Bold)
                 cancelButton:
-                    "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+                    "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
+
+                actions: "!mt-4"
             },
         });
         return result.isConfirmed;
@@ -87,7 +97,6 @@ window.addEventListener("DOMContentLoaded", () => {
     // --- End SweetAlert Helper Functions ---
 
     const programs = {};
-
     const departments = [];
 
     // --- DOM Elements (may optional chaining kung wala) ---
@@ -110,120 +119,119 @@ window.addEventListener("DOMContentLoaded", () => {
     const modulesSection = document.getElementById("modulesSection");
     const userRoleValueEl = document.getElementById("userRoleDropdownValue");
 
-  // --- State ---
-  let allUsers = [];
-  let users = [];
-  let selectedRole = "All Roles";
-  let selectedStatus = "All Status";
-  let currentEditingUserId = null;
+    // --- State ---
+    let allUsers = [];
+    let users = [];
+    let selectedRole = "All Roles";
+    let selectedStatus = "All Status";
+    let currentEditingUserId = null;
 
-  // --- Pagination State ---
-  let currentPage = 1;
-  const limit = 10;
-  let totalUsers = 0;
-  let totalPages = 1;
-  let isLoading = false;
-  let searchDebounce;
+    // --- Pagination State ---
+    let currentPage = 1;
+    const limit = 10;
+    let totalUsers = 0;
+    let totalPages = 1;
+    let isLoading = false;
+    let searchDebounce;
 
-  // --- Page Memory ---
-  try {
-    const savedPage = sessionStorage.getItem('userManagementPage');
-    if (savedPage) {
-        const parsedPage = parseInt(savedPage, 10);
-        if (!isNaN(parsedPage) && parsedPage > 0) {
-            currentPage = parsedPage;
-        } else {
-            sessionStorage.removeItem('userManagementPage');
-        }
-    }
-  } catch (e) {
-      console.error("SessionStorage Error:", e);
-      currentPage = 1;
-  }
-
-  function updateUserCounts(usersLength, totalCountNum, page, perPage) {
-    const resultsIndicator = document.getElementById("resultsIndicator");
-    if (resultsIndicator) {
-        if (totalCountNum === 0) {
-            resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">0</span> of <span class="font-medium text-gray-800">0</span> users`;
-        } else {
-            const startItem = (page - 1) * perPage + 1;
-            const endItem = (page - 1) * perPage + usersLength;
-            resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">${startItem}-${endItem}</span> of <span class="font-medium text-gray-800">${totalCountNum.toLocaleString()}</span> users`;
-        }
-    }
-  }
-
-  function renderPagination(totalPages, page) {
-    const paginationControls = document.getElementById("paginationControls");
-    const paginationList = document.getElementById("paginationList");
-
-    if (!paginationControls || !paginationList) return;
-
-    if (totalPages <= 1) {
-        paginationControls.classList.add("hidden");
-        return;
-    }
-
-    paginationControls.classList.remove("hidden");
-    paginationList.innerHTML = '';
-
-    const createPageLink = (type, text, pageNum, isDisabled = false, isActive = false) => {
-        const li = document.createElement("li");
-        const a = document.createElement("a");
-        a.href = "#";
-        a.setAttribute("data-page", String(pageNum));
-        let baseClasses = `flex items-center justify-center min-w-[32px] h-9 text-sm font-medium transition-all duration-200`;
-        if (type === "prev" || type === "next") {
-            a.innerHTML = text;
-            baseClasses += ` text-gray-700 hover:text-orange-600 px-3`;
-            if (isDisabled) baseClasses += ` opacity-50 cursor-not-allowed pointer-events-none`;
-        } else if (type === "ellipsis") {
-            a.textContent = text;
-            baseClasses += ` text-gray-400 cursor-default px-2`;
-        } else {
-            a.textContent = text;
-            if (isActive) {
-                baseClasses += ` text-white bg-orange-600 rounded-full shadow-sm px-3`;
+    // --- Page Memory ---
+    try {
+        const savedPage = sessionStorage.getItem('userManagementPage');
+        if (savedPage) {
+            const parsedPage = parseInt(savedPage, 10);
+            if (!isNaN(parsedPage) && parsedPage > 0) {
+                currentPage = parsedPage;
             } else {
-                baseClasses += ` text-gray-700 hover:text-orange-600 hover:bg-orange-100 rounded-full px-3`;
+                sessionStorage.removeItem('userManagementPage');
             }
         }
-        a.className = baseClasses;
-        li.appendChild(a);
-        paginationList.appendChild(li);
-    };
-
-    createPageLink("prev", `<i class="flex ph ph-caret-left text-lg"></i> Previous`, page - 1, page === 1);
-    const window = 1;
-    let pagesToShow = new Set([1, totalPages, page]);
-    for (let i = 1; i <= window; i++) {
-        if (page - i > 0) pagesToShow.add(page - i);
-        if (page + i <= totalPages) pagesToShow.add(page + i);
+    } catch (e) {
+        console.error("SessionStorage Error:", e);
+        currentPage = 1;
     }
-    const sortedPages = [...pagesToShow].sort((a, b) => a - b);
-    let lastPage = 0;
-    for (const p of sortedPages) {
-        if (p > lastPage + 1) createPageLink("ellipsis", "…", "...", true);
-        createPageLink("number", p, p, false, p === page);
-        lastPage = p;
-    }
-    createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
 
-    paginationList.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (isLoading) return;
-        const target = e.target.closest('a[data-page]');
-        if (!target) return;
-        const pageStr = target.dataset.page;
-        if (pageStr === '...') return;
-        const pageNum = parseInt(pageStr, 10);
-        if (!isNaN(pageNum) && pageNum !== currentPage) {
-            loadUsers(pageNum);
+    function updateUserCounts(usersLength, totalCountNum, page, perPage) {
+        const resultsIndicator = document.getElementById("resultsIndicator");
+        if (resultsIndicator) {
+            if (totalCountNum === 0) {
+                resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">0</span> of <span class="font-medium text-gray-800">0</span> users`;
+            } else {
+                const startItem = (page - 1) * perPage + 1;
+                const endItem = (page - 1) * perPage + usersLength;
+                resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">${startItem}-${endItem}</span> of <span class="font-medium text-gray-800">${totalCountNum.toLocaleString()}</span> users`;
+            }
         }
-    });
-  }
+    }
 
+    function renderPagination(totalPages, page) {
+        const paginationControls = document.getElementById("paginationControls");
+        const paginationList = document.getElementById("paginationList");
+
+        if (!paginationControls || !paginationList) return;
+
+        if (totalPages <= 1) {
+            paginationControls.classList.add("hidden");
+            return;
+        }
+
+        paginationControls.classList.remove("hidden");
+        paginationList.innerHTML = '';
+
+        const createPageLink = (type, text, pageNum, isDisabled = false, isActive = false) => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = "#";
+            a.setAttribute("data-page", String(pageNum));
+            let baseClasses = `flex items-center justify-center min-w-[32px] h-9 text-sm font-medium transition-all duration-200`;
+            if (type === "prev" || type === "next") {
+                a.innerHTML = text;
+                baseClasses += ` text-gray-700 hover:text-orange-600 px-3`;
+                if (isDisabled) baseClasses += ` opacity-50 cursor-not-allowed pointer-events-none`;
+            } else if (type === "ellipsis") {
+                a.textContent = text;
+                baseClasses += ` text-gray-400 cursor-default px-2`;
+            } else {
+                a.textContent = text;
+                if (isActive) {
+                    baseClasses += ` text-white bg-orange-600 rounded-full shadow-sm px-3`;
+                } else {
+                    baseClasses += ` text-gray-700 hover:text-orange-600 hover:bg-orange-100 rounded-full px-3`;
+                }
+            }
+            a.className = baseClasses;
+            li.appendChild(a);
+            paginationList.appendChild(li);
+        };
+
+        createPageLink("prev", `<i class="flex ph ph-caret-left text-lg"></i> Previous`, page - 1, page === 1);
+        const window = 1;
+        let pagesToShow = new Set([1, totalPages, page]);
+        for (let i = 1; i <= window; i++) {
+            if (page - i > 0) pagesToShow.add(page - i);
+            if (page + i <= totalPages) pagesToShow.add(page + i);
+        }
+        const sortedPages = [...pagesToShow].sort((a, b) => a - b);
+        let lastPage = 0;
+        for (const p of sortedPages) {
+            if (p > lastPage + 1) createPageLink("ellipsis", "…", "...", true);
+            createPageLink("number", p, p, false, p === page);
+            lastPage = p;
+        }
+        createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
+
+        paginationList.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isLoading) return;
+            const target = e.target.closest('a[data-page]');
+            if (!target) return;
+            const pageStr = target.dataset.page;
+            if (pageStr === '...') return;
+            const pageNum = parseInt(pageStr, 10);
+            if (!isNaN(pageNum) && pageNum !== currentPage) {
+                loadUsers(pageNum);
+            }
+        });
+    }
 
     function updateProgramDepartmentDropdown(role, selectedValue = null) {
         const wrapper = document.getElementById('addUserSingleSelectWrapper');
@@ -335,11 +343,11 @@ window.addEventListener("DOMContentLoaded", () => {
                 select.innerHTML = '<option value="">No Colleges Found</option>';
             }
 
-    } catch (err) {
-      console.error("Error loading colleges for faculty:", err);
-      select.innerHTML = '<option value="">Error loading colleges</option>';
+        } catch (err) {
+            console.error("Error loading colleges for faculty:", err);
+            select.innerHTML = '<option value="">Error loading colleges</option>';
+        }
     }
-  }
 
     toggleModules(modulesSection, userRoleValueEl.textContent || "");
 
@@ -402,7 +410,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 showSuccessToast("Import Successful", `Successfully imported ${data.imported} rows!`);
                 fileInput.value = "";
                 closeModal(modal);
-                await loadUsers();
+                await loadUsers(1);
             } else {
                 showErrorToast("Import Failed", data.message || "Failed to import CSV.");
             }
@@ -413,29 +421,29 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-  // --- Search + filters ---
-  let searchTimeout;
-  if (searchInput) {
-    searchInput.addEventListener("input", e => {
-      const query = e.target.value.trim();
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
+    // --- Search + filters ---
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener("input", e => {
+            const query = e.target.value.trim();
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                try {
+                    sessionStorage.removeItem('userManagementPage');
+                } catch (e) {}
+                loadUsers(1); // Reset to page 1 on new search
+            }, 500);
+        });
+    }
+
+    function applyFilters() {
         currentPage = 1;
         try {
             sessionStorage.removeItem('userManagementPage');
         } catch (e) {}
-        loadUsers(1); // Reset to page 1 on new search
-      }, 500);
-    });
-  }
-
-  function applyFilters() {
-    currentPage = 1;
-    try {
-        sessionStorage.removeItem('userManagementPage');
-    } catch (e) {}
-    loadUsers(1); // Reset to page 1 when filters change
-  }
+        loadUsers(1); // Reset to page 1 when filters change
+    }
 
     // --- Modal helpers for Add/Edit ---
     function closeAddUserModal() {
@@ -535,75 +543,75 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-  async function loadUsers(page = 1) {
-    if (isLoading) return;
-    isLoading = true;
-    currentPage = page;
-    if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading users...</td></tr>`;
-    document.getElementById("paginationControls")?.classList.add('hidden');
-    document.getElementById("resultsIndicator").textContent = 'Loading...';
+    async function loadUsers(page = 1) {
+        if (isLoading) return;
+        isLoading = true;
+        currentPage = page;
+        if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading users...</td></tr>`;
+        document.getElementById("paginationControls")?.classList.add('hidden');
+        document.getElementById("resultsIndicator").textContent = 'Loading...';
 
-    const offset = (page - 1) * limit;
-    const search = document.getElementById("userSearchInput").value.trim();
+        const offset = (page - 1) * limit;
+        const search = document.getElementById("userSearchInput").value.trim();
 
-    try {
-        const params = new URLSearchParams({
-            search: search,
-            role: selectedRole === 'All Roles' ? '' : selectedRole,
-            status: selectedStatus === 'All Status' ? '' : selectedStatus,
-            limit: limit,
-            offset: offset
-        });
-
-        const res = await fetch(`api/superadmin/userManagement/pagination?${params.toString()}`);
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        const data = await res.json();
-
-        if (data.success && Array.isArray(data.users)) {
-            totalUsers = data.totalCount;
-            totalPages = Math.ceil(totalUsers / limit) || 1;
-
-            if (page > totalPages && totalPages > 0) {
-                loadUsers(totalPages);
-                return;
-            }
-            
-            users = data.users.map(u => ({
-                user_id: u.user_id,
-                first_name: u.first_name,
-                middle_name: u.middle_name,
-                last_name: u.last_name,
-                name: buildFullName(u.first_name, u.middle_name, u.last_name),
-                username: u.username,
-                email: u.email,
-                role: u.role,
-                status: u.is_active == 1 ? "Active" : "Inactive",
-                joinDate: new Date(u.created_at).toLocaleDateString(),
-                modules: u.modules || []
-            }));
-
-            renderTable(users);
-            renderPagination(totalPages, currentPage);
-            updateUserCounts(users.length, totalUsers, page, limit);
-            try {
-                sessionStorage.setItem('userManagementPage', currentPage);
-            } catch (e) {
-                console.error("SessionStorage Error:", e);
-            }
-        } else {
-            throw new Error(data.message || "Invalid data format from server.");
-        }
-    } catch (err) {
-        console.error("Fetch users error:", err);
-        if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
-        updateUserCounts(0, 0, 1, limit);
         try {
-            sessionStorage.removeItem('userManagementPage');
-        } catch (e) {}
-    } finally {
-        isLoading = false;
+            const params = new URLSearchParams({
+                search: search,
+                role: selectedRole === 'All Roles' ? '' : selectedRole,
+                status: selectedStatus === 'All Status' ? '' : selectedStatus,
+                limit: limit,
+                offset: offset
+            });
+
+            const res = await fetch(`api/superadmin/userManagement/pagination?${params.toString()}`);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const data = await res.json();
+
+            if (data.success && Array.isArray(data.users)) {
+                totalUsers = data.totalCount;
+                totalPages = Math.ceil(totalUsers / limit) || 1;
+
+                if (page > totalPages && totalPages > 0) {
+                    loadUsers(totalPages);
+                    return;
+                }
+                
+                users = data.users.map(u => ({
+                    user_id: u.user_id,
+                    first_name: u.first_name,
+                    middle_name: u.middle_name,
+                    last_name: u.last_name,
+                    name: buildFullName(u.first_name, u.middle_name, u.last_name),
+                    username: u.username,
+                    email: u.email,
+                    role: u.role,
+                    status: u.is_active == 1 ? "Active" : "Inactive",
+                    joinDate: new Date(u.created_at).toLocaleDateString(),
+                    modules: u.modules || []
+                }));
+
+                renderTable(users);
+                renderPagination(totalPages, currentPage);
+                updateUserCounts(users.length, totalUsers, page, limit);
+                try {
+                    sessionStorage.setItem('userManagementPage', currentPage);
+                } catch (e) {
+                    console.error("SessionStorage Error:", e);
+                }
+            } else {
+                throw new Error(data.message || "Invalid data format from server.");
+            }
+        } catch (err) {
+            console.error("Fetch users error:", err);
+            if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
+            updateUserCounts(0, 0, 1, limit);
+            try {
+                sessionStorage.removeItem('userManagementPage');
+            } catch (e) {}
+        } finally {
+            isLoading = false;
+        }
     }
-  }
 
     function renderTable(usersToRender) {
         if (!userTableBody) return;
@@ -683,35 +691,42 @@ window.addEventListener("DOMContentLoaded", () => {
             const checkedModules = Array.from(document.querySelectorAll('input[name="modules[]"]:checked'))
                 .map(cb => cb.value);
 
-      try {
-        const res = await fetch("api/superadmin/userManagement/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            first_name: first_name,
-            middle_name: middle_name || null,
-            last_name: last_name,
-            username: username,
-            role: role,
-            ...(payloadData.course_id && { course_id: payloadData.course_id }),
-            ...(payloadData.college_id && { college_id: payloadData.college_id }),
-            modules: checkedModules
-          })
+            showLoadingModal("Adding New User...", "Creating user account and setting default password.");
+
+            try {
+                const res = await fetch("api/superadmin/userManagement/add", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        first_name: first_name,
+                        middle_name: middle_name || null,
+                        last_name: last_name,
+                        username: username,
+                        role: role,
+                        ...(payloadData.course_id && { course_id: payloadData.course_id }),
+                        ...(payloadData.college_id && { college_id: payloadData.college_id }),
+                        modules: checkedModules
+                    })
+                });
+                const data = await res.json();
+                
+                await new Promise(r => setTimeout(r, 300));
+                Swal.close();
+
+                if (data.success) {
+                    showSuccessToast("User Added Successfully!", `Account for ${first_name} ${last_name} created.`);
+                    closeAddUserModal();
+                    await loadUsers(currentPage); 
+                } else {
+                    showErrorToast("User Add Failed", data.message || "Failed to add the user.");
+                }
+            } catch (err) {
+                Swal.close();
+                console.error("Add user error:", err);
+                showErrorToast("User Add Failed", "An error occurred while adding the user.");
+            }
         });
-        const data = await res.json();
-        if (data.success) {
-          alert("User added successfully!");
-          closeAddUserModal();
-          await loadUsers(1); // Go to first page after adding
-        } else {
-          alert("Error: " + data.message);
-        }
-      } catch (err) {
-        console.error("Add user error:", err);
-        alert("An error occurred while adding the user.");
-      }
-    });
-  }
+    }
 
     if (userTableBody) {
         userTableBody.addEventListener("click", async (e) => {
@@ -757,49 +772,81 @@ window.addEventListener("DOMContentLoaded", () => {
                 document.body.classList.add("overflow-hidden");
             }
 
-      if (e.target.closest(".deleteUserBtn")) {
-        if (!confirm(`Delete user "${user.name}" (${user.role})?`)) return;
-        try {
-          const res = await fetch(`api/superadmin/userManagement/delete/${user.user_id}`, {
-            method: "POST"
-          });
-          const data = await res.json();
-          if (data.success) {
-            alert("User deleted successfully!");
-            await loadUsers(currentPage);
-          } else {
-            alert("Error: " + (data.message || "Failed to delete."));
-          }
-        } catch (err) {
-          console.error("Delete error:", err);
-          alert("An error occurred while deleting the user.");
-        }
-      }
+            if (e.target.closest(".deleteUserBtn")) {
+                // Use the FINAL CUSTOMIZED confirmation modal
+                const isConfirmed = await showConfirmationModal(
+                    "Confirm Deletion", 
+                    `Are you sure you want to delete user: ${user.name} (${user.role})? This action cannot be undone.`,
+                    "Yes, Delete!"
+                );
+                if (!isConfirmed) return;
 
-      // TOGGLE STATUS
-      if (e.target.closest(".toggle-status-btn")) {
-        if (user.role.toLowerCase() === 'superadmin') return alert("Superadmin status cannot be changed!");
-        const confirmMsg = user.status === 'Active' ? `Deactivate ${user.name}?` : `Activate ${user.name}?`;
-        if (!confirm(confirmMsg)) return;
-        try {
-          const res = await fetch(`api/superadmin/userManagement/toggleStatus/${user.user_id}`, {
-            method: "POST"
-          });
-          const data = await res.json();
-          if (data.success) {
-            alert(`${user.name} is now ${data.newStatus}.`);
-            await loadUsers(currentPage);
-          } else {
-            alert("Error: " + (data.message || "Failed to update status."));
-          }
-        } catch (err) {
-          console.error("Toggle status error:", err);
-          alert("An error occurred while updating user status.");
-        }
-      }
+                showLoadingModal("Deleting user...", `Deleting ${user.name} from the system.`);
+
+                try {
+                    const res = await fetch(`api/superadmin/userManagement/delete/${user.user_id}`, {
+                        method: "POST"
+                    });
+                    const data = await res.json();
+                    
+                    await new Promise(r => setTimeout(r, 300));
+                    Swal.close(); 
+
+                    if (data.success) {
+                        showSuccessToast("User Deleted!", `User ${user.name} was successfully removed.`);
+                        await loadUsers(currentPage);
+                    } else {
+                        showErrorToast("Deletion Failed", data.message || "Failed to delete the user.");
+                    }
+                } catch (err) {
+                    Swal.close();
+                    console.error("Delete error:", err);
+                    showErrorToast("Deletion Failed", "An error occurred while deleting the user.");
+                }
+            }
+
+            // TOGGLE STATUS
+            if (e.target.closest(".toggle-status-btn")) {
+                if (user.role.toLowerCase() === 'superadmin') return showErrorToast("Action Denied", "Superadmin status cannot be changed!");
+
+                const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
+                
+                // Use the FINAL CUSTOMIZED confirmation modal
+                const isConfirmed = await showConfirmationModal(
+                    "Confirm Status Change", 
+                    `Are you sure you want to change the status of ${user.name} to **${newStatus}**?`,
+                    `Yes, ${newStatus}`
+                );
+                if (!isConfirmed) return;
+
+                showLoadingModal("Updating Status...", `Setting status to ${newStatus}.`);
+
+                try {
+                    const res = await fetch(`api/superadmin/userManagement/toggleStatus/${user.user_id}`, {
+                        method: "POST"
+                    });
+                    const data = await res.json();
+                    
+                    await new Promise(r => setTimeout(r, 300));
+                    Swal.close();
+
+                    if (data.success) {
+                        showSuccessToast("Status Updated", `${user.name} is now ${data.newStatus}.`);
+                        await loadUsers(currentPage);
+                    } else {
+                        showErrorToast("Status Update Failed", data.message || "Failed to update user status.");
+                    }
+                } catch (err) {
+                    Swal.close();
+                    console.error("Toggle status error:", err);
+                    showErrorToast("Status Update Failed", "An error occurred while updating user status.");
+                }
+            }
 
             if (e.target.closest(".allow-edit-btn")) {
                 const userId = user.user_id;
+                
+                // Use the FINAL CUSTOMIZED confirmation modal
                 const isConfirmed = await showConfirmationModal(
                     "Allow Profile Edit?",
                     `This will temporarily allow "${user.name}" (Student) to edit their profile details once. Continue?`,
@@ -807,27 +854,32 @@ window.addEventListener("DOMContentLoaded", () => {
                 );
                 if (!isConfirmed) return;
 
-                showLoadingModal("Granting Permission...", "Sending temporary edit token.");
+                showLoadingModal("Grangting Permission...", "Sending temporary edit token.");
 
-        try {
-          const res = await fetch(`api/superadmin/userManagement/allowEdit/${userId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" }
-          });
-          const data = await res.json();
-          if (data.success) {
-            alert(data.message || "User can now edit their profile.");
-            await loadUsers(currentPage);
-          } else {
-            alert("Error: " + (data.message || "Failed to allow edit."));
-          }
-        } catch (err) {
-          console.error("Allow Edit error:", err);
-          alert("An error occurred while updating the user.");
-        }
-      }
-    });
-  }
+                try {
+                    const res = await fetch(`api/superadmin/userManagement/allowEdit/${userId}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" }
+                    });
+                    const data = await res.json();
+                    
+                    await new Promise(r => setTimeout(r, 300));
+                    Swal.close();
+
+                    if (data.success) {
+                        showSuccessToast("Permission Granted", data.message || "User can now edit their profile.");
+                        await loadUsers(currentPage);
+                    } else {
+                        showErrorToast("Permission Failed", data.message || "Failed to allow edit for the user.");
+                    }
+                } catch (err) {
+                    Swal.close();
+                    console.error("Allow Edit error:", err);
+                    showErrorToast("Permission Failed", "An error occurred while updating the user's permission.");
+                }
+            }
+        });
+    }
 
     const saveEditBtn = document.getElementById("saveEditUser");
     if (saveEditBtn) {
@@ -859,33 +911,40 @@ window.addEventListener("DOMContentLoaded", () => {
                 payload.password = newPassword;
             }
 
-      const permContainer = document.getElementById("editPermissionsContainer");
-      if (permContainer && !permContainer.classList.contains("hidden")) {
-        payload.modules = Array.from(document.querySelectorAll('input[name="editModules[]"]:checked')).map(cb => cb.value);
-      }
+            const permContainer = document.getElementById("editPermissionsContainer");
+            if (permContainer && !permContainer.classList.contains("hidden")) {
+                payload.modules = Array.from(document.querySelectorAll('input[name="editModules[]"]:checked')).map(cb => cb.value);
+            }
 
-      try {
-        const res = await fetch(`api/superadmin/userManagement/update/${currentEditingUserId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+            showLoadingModal("Saving Changes...", `Updating user details for ${payload.first_name} ${payload.last_name}.`);
+            
+            try {
+                const res = await fetch(`api/superadmin/userManagement/update/${currentEditingUserId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                
+                await new Promise(r => setTimeout(r, 300));
+                Swal.close();
+
+                if (data.success) {
+                    showSuccessToast("User Updated!", "User information saved successfully.");
+                    closeEditUserModal();
+                    await loadUsers(currentPage);
+                } else {
+                    showErrorToast("Update Failed", data.message || "Failed to update user information.");
+                }
+            } catch (err) {
+                Swal.close();
+                console.error("Update user error:", err);
+                showErrorToast("Update Failed", "An error occurred while updating the user.");
+            } finally {
+                closeEditUserModal();
+            }
         });
-        const data = await res.json();
-        if (data.success) {
-          alert("User updated successfully!");
-          closeEditUserModal();
-          await loadUsers(currentPage);
-        } else {
-          alert("Error: " + (data.message || "Failed to update user."));
-        }
-      } catch (err) {
-        console.error("Update user error:", err);
-        alert("An error occurred while updating the user.");
-      } finally {
-        closeEditUserModal();
-      }
-    });
-  }
+    }
 
     const togglePasswordCheckbox = document.getElementById('togglePassword');
     if (togglePasswordCheckbox) {
@@ -932,5 +991,5 @@ window.addEventListener("DOMContentLoaded", () => {
         return status.toLowerCase() === "active" ? `<span class="bg-green-500 text-white ${base}">Active</span>` : `<span class="bg-gray-300 text-gray-700 ${base}">Inactive</span>`;
     }
 
-  loadUsers(currentPage);
+    loadUsers(currentPage);
 });

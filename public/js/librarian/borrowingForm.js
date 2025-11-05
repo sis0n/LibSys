@@ -156,15 +156,17 @@ function showLoadingModal(message = "Processing request...", subMessage = "Pleas
         showSuccessToast('Form Cleared', 'Borrower and Item fields have been reset.');
     });
 
-    // check user button
-    document.getElementById('check-btn').addEventListener('click', async () => {
-        const userId = document.getElementById('input_user_id').value.trim();
-        if (!userId) return alert('Please enter a User ID');
+    // check user button
+    document.getElementById('check-btn').addEventListener('click', async () => {
+        const userId = document.getElementById('input_user_id').value.trim();
+        
+        // SweetAlert Fix
+        if (!userId) return showErrorToast('Input Required', 'Please enter a **User ID**.');
 
         showLoadingModal('Checking User...', 'Verifying User ID in the database.');
 
         try {
-            const res = await fetch(`api/superadmin/borrowingForm/checkUser`, {
+            const res = await fetch(`api/librarian/borrowingForm/checkUser`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ input_user_id: userId })
@@ -225,7 +227,7 @@ function showLoadingModal(message = "Processing request...", subMessage = "Pleas
         if (!formData.get('equipment_type')) formData.set('equipment_type', formData.get('item_type'));
 
         try {
-            const res = await fetch(`api/superadmin/borrowingForm/create`, {
+            const res = await fetch(`api/librarian/borrowingForm/create`, {
                 method: 'POST',
                 body: formData
             });

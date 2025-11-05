@@ -1,6 +1,10 @@
-// --- CORE CONFIRMATION FUNCTION (FINAL TEMPLATE - BLACK BORDER) ---
+// --- CORE CONFIRMATION FUNCTION (FINAL TEMPLATE - INLINE STYLE) ---
 async function showCustomConfirmationModal(title, text, confirmText = "Confirm") {
     if (typeof Swal == "undefined") return confirm(title);
+    
+    // Inline CSS Style para sa Orange Border, White BG, at Orange Shadow
+    const inlineStyle = "border: 2px solid #f97316 !important; background: white !important; box-shadow: 0 0 15px #f9731670 !important;";
+
     const result = await Swal.fire({
         background: "transparent",
         buttonsStyling: false, 
@@ -13,28 +17,22 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm")
                         <i class="ph ph-warning-circle text-3xl"></i>
                     </div>
                 </div>
-                <h3 class="text-xl font-semibold text-orange-800">${title}</h3>
-                <p class="text-[14px] text-orange-700 mt-1">${text}</p>
-            </div>b
+                <h3 class="text-xl font-semibold text-gray-800">${title}</h3>
+                <p class="text-[14px] text-gray-700 mt-1">${text}</p>
+            </div>
         `,
         showCancelButton: true,
         confirmButtonText: confirmText,
         cancelButtonText: "Cancel",
         
         customClass: {
-            // FINAL FIX: White BG + Black Border + Black Shadow
-            popup:
-                "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-900 shadow-[0_0_15px_#00000030]",
-                
-            // Confirm Button (Orange, Large, Bold)
-            confirmButton:
-                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
-            // Cancel Button (Gray, Large, Bold)
-            cancelButton:
-                "!bg-orange-200 !text-orange-800 !px-5 !py-2.5 !rounded-lg hover:!bg-orange-300 !mx-2 !font-semibold !text-base", 
-
-            actions: "!mt-4"
+            // Tanggalin ang border/shadow/bg classes, hayaan ang rounded corners at padding
+            popup: "!rounded-xl !p-6", 
         },
+        // Gamitin ang didOpen hook para i-inject ang inline style
+        didOpen: (popup) => {
+            popup.style.cssText = inlineStyle + " " + popup.style.cssText;
+        }
     });
     return result.isConfirmed;
 }
@@ -42,17 +40,18 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm")
 
 // --- SweetAlert Helper Functions for Toasts and Loaders (Shared design) ---
 
-// **FIX: Gamitin ang mas detalyadong Toast structure mula sa Cart Module at Apply Black Border**
 const showProfileToast = (icon, title, text, theme, duration = 3000) => {
     if (typeof Swal == "undefined") return alert(`${title}: ${text}`);
 
-    // Gagamitin ang theme colors para sa icon/text, pero ang border ay BLACK
     const themeMap = {
-        'warning': { color: 'text-orange-600', bg: 'bg-orange-100', icon: 'ph-warning' },
-        'error': { color: 'text-red-600', bg: 'bg-red-100', icon: 'ph-x-circle' },
-        'success': { color: 'text-green-600', bg: 'bg-green-100', icon: 'ph-check-circle' },
+        'warning': { color: 'text-orange-600', bg: 'bg-orange-100', icon: 'ph-warning', border_hex: '#f97316' },
+        'error': { color: 'text-red-600', bg: 'bg-red-100', icon: 'ph-x-circle', border_hex: '#dc2626' },
+        'success': { color: 'text-green-600', bg: 'bg-green-100', icon: 'ph-check-circle', border_hex: '#10b981' },
     };
     const selectedTheme = themeMap[theme];
+    
+    // INLINE STYLE para sa THEMED BORDER at SHADOW
+    const inlineStyle = `border: 2px solid ${selectedTheme.border_hex} !important; box-shadow: 0 0 10px ${selectedTheme.border_hex}70 !important;`; 
 
     Swal.fire({
         toast: true,
@@ -60,7 +59,8 @@ const showProfileToast = (icon, title, text, theme, duration = 3000) => {
         showConfirmButton: false,
         timer: duration,
         width: "360px",
-        background: "transparent",
+        background: "white", 
+        
         html: `
             <div class="flex flex-col text-left">
                 <div class="flex items-center gap-3 mb-2">
@@ -69,33 +69,41 @@ const showProfileToast = (icon, title, text, theme, duration = 3000) => {
                     </div>
                     <div>
                         <h3 class="text-[15px] font-semibold ${selectedTheme.color}">${title}</h3>
-                        <p class="text-[13px] text-orange-700 mt-0.5">${text}</p>
+                        <p class="text-[13px] text-gray-700 mt-0.5">${text}</p>
                     </div>
                 </div>
             </div>
         `,
         customClass: {
-            // TOAST MODAL: Black Border + Transparent BG + Black Shadow
-            popup: `!rounded-xl !shadow-md !border-2 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm !border-orange-900 shadow-[0_0_10px_#00000030]`,
+            popup: `!rounded-xl !p-4`,
+        },
+        didOpen: (toast) => {
+            toast.style.cssText = inlineStyle + " " + toast.style.cssText;
         },
     });
 };
 
 const showLoadingModal = (message = "Processing request...", subMessage = "Please wait.") => {
     if (typeof Swal == "undefined") return;
+    
+    // INLINE STYLE para sa ORANGE BORDER at ORANGE SHADOW (para sa Loading)
+    const inlineStyle = "border: 2px solid #f97316 !important; background: white !important; box-shadow: 0 0 8px #f9731670 !important;";
+
     Swal.fire({
         background: "transparent",
         html: `
             <div class="flex flex-col items-center justify-center gap-2">
                 <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
-                <p class="text-orange-700 text-[14px]">${message}<br><span class="text-sm text-orange-500">${subMessage}</span></p>
+                <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
             </div>
         `,
         allowOutsideClick: false,
         showConfirmButton: false,
         customClass: {
-            // LOADING MODAL: Black Border + Orange Spinner
-            popup: "!rounded-xl !shadow-md !border-2 !border-orange-900 !p-6 !bg-white shadow-[0_0_8px_#00000030]",
+            popup: "!rounded-xl !p-6",
+        },
+        didOpen: (popup) => {
+            popup.style.cssText = inlineStyle + " " + popup.style.cssText;
         },
     });
 };
@@ -105,6 +113,7 @@ const showLoadingModal = (message = "Processing request...", subMessage = "Pleas
 document.addEventListener('DOMContentLoaded', function () {
 
     // --- Table Elements ---
+    const booksNearDueTableBody = document.querySelector('.books-near-due-table tbody');
     const overdueBooksTableBody = document.querySelector('.overdue-books-table tbody');
 
     // --- Modal Elements ---
@@ -124,10 +133,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchTableData() {
         try {
-            const response = await fetch('api/admin/returning/getTableData');
+            const response = await fetch('api/librarian/returning/getTableData');
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
+                renderBooksNearDueTable(result.data.nearDue);
                 renderOverdueBooksTable(result.data.overdue);
             } else showTableError(result.message);
         } catch (error) {
@@ -139,29 +149,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showTableError(message) {
         const errorRow = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">${message}</td></tr>`;
+        booksNearDueTableBody.innerHTML = errorRow;
         overdueBooksTableBody.innerHTML = errorRow;
     }
 
-    function renderOverdueBooksTable(data) {
-        overdueBooksTableBody.innerHTML = '';
+    function renderBooksNearDueTable(data) {
+        booksNearDueTableBody.innerHTML = '';
         if (!data || data.length === 0) {
-            overdueBooksTableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-orange-500">No overdue books.</td></tr>`;
+            booksNearDueTableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No books near due date.</td></tr>`;
             return;
         }
         data.forEach(book => {
             const row = `
         <tr class="align-middle">
             <td class="px-6 py-4 align-middle">
-                <div class="font-semibold text-orange-800">${book.user_name}</div>
-                <div class="text-orange-500 text-xs">${book.user_id}</div>
-                <div class="text-orange-500 text-xs">${book.department_or_course}</div>
+                <div class="font-semibold text-gray-800">${book.user_name}</div>
+                <div class="text-gray-500 text-xs">${book.user_id}</div>
+                <div class="text-gray-500 text-xs">${book.department_or_course}</div>
             </td>
-            <td class="px-6 py-4 align-middle text-orange-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
-            <td class="px-6 py-4 align-middle text-orange-800">${book.date_borrowed}</td>
-            <td class="px-6 py-4 align-middle text-orange-800">${book.due_date}</td>
-            <td class="px-6 py-4 align-middle text-orange-800">${book.contact}</td>
+            <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
             <td class="px-6 py-4 align-middle">
-                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-orange-300 rounded-md shadow-sm text-sm font-medium text-orange-700 bg-white">
+                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100">
+                    <i class="ph ph-phone text-base mr-1"></i> Contact
+                </a>
+            </td>
+        </tr>`;
+            booksNearDueTableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+
+    function renderOverdueBooksTable(data) {
+        overdueBooksTableBody.innerHTML = '';
+        if (!data || data.length === 0) {
+            overdueBooksTableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No overdue books.</td></tr>`;
+            return;
+        }
+        data.forEach(book => {
+            const row = `
+        <tr class="align-middle">
+            <td class="px-6 py-4 align-middle">
+                <div class="font-semibold text-gray-800">${book.user_name}</div>
+                <div class="text-gray-500 text-xs">${book.user_id}</div>
+                <div class="text-gray-500 text-xs">${book.department_or_course}</div>
+            </td>
+            <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
+            <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
+            <td class="px-6 py-4 align-middle">
+                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
                     <i class="ph ph-phone text-base mr-1"></i> Contact
                 </a>
             </td>
@@ -306,55 +346,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (returnModal) returnModal.classList.remove('hidden');
     };
 
-    if (modalExtendButton) {
-        modalExtendButton.addEventListener('click', async () => {
-            const borrowingId = modalExtendButton.dataset.borrowingId;
-            if (!borrowingId) return;
-
-            const { value: days } = await Swal.fire({
-                title: 'Extend Due Date',
-                input: 'number',
-                inputLabel: 'Enter number of days to extend',
-                inputPlaceholder: 'e.g., 7',
-                showCancelButton: true,
-                confirmButtonText: 'Extend',
-                inputValidator: (value) => {
-                    if (!value || value <= 0) {
-                        return 'Please enter a valid number of days (1 or more).';
-                    }
-                }
-            });
-
-            if (days) {
-                try {
-                    const formData = new FormData();
-                    formData.append('borrowing_id', borrowingId);
-                    formData.append('days', days);
-
-                    const response = await fetch('api/admin/returning/extend', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        Swal.fire('Success', 'Due date extended successfully.', 'success');
-
-                        setText('modal-due-date', result.new_due_date);
-
-                        fetchTableData();
-                    } else {
-                        Swal.fire('Error', result.message || 'Could not extend due date.', 'error');
-                    }
-                } catch (error) {
-                    console.error('Error extending due date:', error);
-                    Swal.fire('Error', 'Could not connect to server.', 'error');
-                }
-            }
-        });
-    }
-
 
     const openAvailableModal = (bookData, status) => {
         const setText = (id, value) => {
@@ -376,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function () {
             statusEl.textContent = displayStatus;
             statusEl.className = displayStatus.toLowerCase() === 'available'
                 ? 'bg-green-200 text-green-800 text-xs font-semibold px-3 py-1 rounded-full'
-                : 'bg-orange-200 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full';
+                : 'bg-gray-200 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full';
         }
 
         // Borrower info (Ito ay malinis dahil ito ay available book)
@@ -507,5 +498,74 @@ document.addEventListener('DOMContentLoaded', function () {
     if (availableModalCloseButton) availableModalCloseButton.addEventListener('click', closeAvailableModal);
     if (availableModalCloseAction) availableModalCloseAction.addEventListener('click', closeAvailableModal);
     if (availableBookModal) availableBookModal.addEventListener('click', e => { if (e.target === availableBookModal) closeAvailableModal(); });
+    
+    // --- Handle "Extend Due Date" ---
+    if (modalExtendButton) {
+        modalExtendButton.addEventListener('click', async () => {
+            const borrowingId = modalExtendButton.dataset.borrowingId;
+            if (!borrowingId) return;
+            
+            // Isara ang Return Modal bago magpakita ng confirmation
+            closeReturnModal();
+
+            const { value: days } = await Swal.fire({
+                title: 'Extend Due Date',
+                input: 'number',
+                inputLabel: 'Enter number of days to extend',
+                inputPlaceholder: 'e.g., 7',
+                showCancelButton: true,
+                confirmButtonText: 'Extend',
+                inputValidator: (value) => {
+                    if (!value || value <= 0) {
+                        return 'Please enter a valid number of days (1 or more).';
+                    }
+                },
+                // Gamitin ang custom style classes para sa input field at buttons
+                customClass: {
+                    // Ito ang nagbibigay ng hitsura ng confirmation modal sa input modal
+                    popup: "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
+                    input: 'border border-orange-300 px-3 py-2 rounded-md w-full focus:ring-orange-500',
+                    confirmButton: "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !font-semibold !text-base",
+                    cancelButton: "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !font-semibold !text-base",
+                },
+            });
+
+            if (days) {
+                showLoadingModal("Extending Due Date...", `Adding ${days} days to the due date.`);
+                try {
+                    const formData = new FormData();
+                    formData.append('borrowing_id', borrowingId);
+                    formData.append('days', days); 
+
+                    const response = await fetch('api/admin/returning/extend', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    
+                    Swal.close();
+
+                    if (result.success) {
+                        showProfileToast('ph-check-circle', 'Success', 'Due date extended successfully.', 'success');
+
+                        // Update the due date shown on the modal (if the return modal is still closed, this won't show instantly)
+                        // This logic relies on fetchTableData to update the main view later.
+                        
+                        // Re-open return modal if necessary, or just rely on fetchTableData
+                        
+                        fetchTableData();
+                    } else {
+                        showProfileToast('ph-x-circle', 'Error', result.message || 'Could not extend due date.', 'error');
+                    }
+                } catch (error) {
+                    Swal.close();
+                    console.error('Error extending due date:', error);
+                    showProfileToast('ph-x-circle', 'Error', 'Could not connect to server.', 'error');
+                }
+            }
+        });
+    }
+
 
 });

@@ -21,18 +21,17 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm")
         confirmButtonText: confirmText,
         cancelButtonText: "Cancel",
         
-     customClass: {
-    popup: "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-500 !border-solid",
+      customClass: {
+        popup: "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-500 !border-solid",
 
-                
-            // Confirm Button (Orange, Large, Bold)
-            confirmButton:
-                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
-            // Cancel Button (Gray, Large, Bold)
-            cancelButton:
-                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
+        // Confirm Button (Orange, Large, Bold)
+        confirmButton:
+            "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
+        // Cancel Button (Gray, Large, Bold)
+        cancelButton:
+            "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
 
-            actions: "!mt-4"
+        actions: "!mt-4"
         },
     });
     return result.isConfirmed;
@@ -54,13 +53,16 @@ const statusValue = document.getElementById("statusFilterValue");
 // ==========================================================
 
 // Utility for showing small, auto-closing toasts (Consistent Design)
-const showLibrarianToast = (title, text, theme, duration = 3000) => {
-    const themeMap = {
-        'warning': { color: 'text-orange-600', bg: 'bg-orange-100', border: 'border-orange-400', icon: 'ph-warning' },
-        'error': { color: 'text-red-600', bg: 'bg-red-100', border: 'border-red-400', icon: 'ph-x-circle' },
-        'success': { color: 'text-green-600', bg: 'bg-green-100', border: 'border-green-400', icon: 'ph-check-circle' },
-    };
-    const selectedTheme = themeMap[theme];
+// NOTE: Hardcoded to RED/Error theme as per user request to simplify and enforce RED border.
+const showLibrarianToast = (title, text, duration = 3000) => {
+    
+    // HARDCODED RED BORDER THEME (FOR INVALID TICKET/ERROR)
+    const iconClass = 'ph-x-circle'; 
+    const contentColor = 'text-red-600'; 
+    const bgColor = 'bg-red-100'; 
+    
+    // Ang CSS na ito ang mag-e-enforce ng RED border!
+    const inlineStyle = "border: 2px solid #dc2626 !important; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);"; // #dc2626 is red-600 color
 
     Swal.fire({
         toast: true,
@@ -68,26 +70,40 @@ const showLibrarianToast = (title, text, theme, duration = 3000) => {
         showConfirmButton: false,
         timer: duration,
         width: "360px",
-        background: "transparent",
+        
+        background: "white", 
+        backdrop: `transparent`,
+        
+        // Dito natin ilalagay ang style attribute:
+        customClass: {
+            popup: `!rounded-xl !p-4 backdrop-blur-sm`, 
+        },
+        // Ginawa natin itong hiwalay na parameter, imbes na nasa customClass.popup
+        // dahil ang style ay dapat nasa top level ng Swal.fire object para sa toast.
+        // PERO dahil hindi natin alam ang buong configuration, gagamitin natin ang didOpen hook.
+        
         html: `
             <div class="flex flex-col text-left">
                 <div class="flex items-center gap-3 mb-2">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full ${selectedTheme.bg} ${selectedTheme.color}">
-                        <i class="ph ${selectedTheme.icon} text-lg"></i>
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full ${bgColor} ${contentColor}">
+                        <i class="ph ${iconClass} text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="text-[15px] font-semibold ${selectedTheme.color}">${title}</h3>
+                        <h3 class="text-[15px] font-semibold ${contentColor}">${title}</h3>
                         <p class="text-[13px] text-gray-700 mt-0.5">${text}</p>
                     </div>
                 </div>
             </div>
         `,
-        customClass: {
-            popup: `!rounded-xl !shadow-md !border-2 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm ${selectedTheme.border}`,
+        
+        // Gagamitin ang didOpen hook para i-inject ang style pagkatapos ma-render ang toast.
+        didOpen: (toast) => {
+            // I-apply ang style sa popup element
+            const popup = toast;
+            popup.style.cssText = inlineStyle + " " + popup.style.cssText;
         },
     });
 };
-
 // Custom Modal for Final Success/Error (with Progress Bar, auto-close, and fixed size)
 const showFinalLibrarianModal = (isSuccess, title, message) => {
     if (typeof Swal == "undefined") return alert(`${title}: ${message}`);
@@ -95,6 +111,7 @@ const showFinalLibrarianModal = (isSuccess, title, message) => {
     const duration = 3000;
     let timerInterval;
 
+    // HARDCODED THEMES based on isSuccess
     const theme = isSuccess ? {
         bg: 'bg-green-50',
         border: 'border-green-300',
@@ -396,8 +413,8 @@ function scanQRCode(transactionCode) {
                 document.getElementById('manualTicketInput').value = '';
             } else {
                 renderScanResult({ isValid: false, message: res.message });
-                // 🔴 Invalid Ticket Toast
-                showLibrarianToast('Invalid Ticket', res.message, 'error', 4000);
+                // 🔴 Invalid Ticket Toast - Ngayon ay RED na ang default na design
+                showLibrarianToast('Invalid Ticket', res.message, 4000); 
             }
         });
 }

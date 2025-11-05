@@ -38,6 +38,22 @@ window.addEventListener("DOMContentLoaded", () => {
   let isLoading = false;
   let searchDebounce;
 
+  // --- Page Memory ---
+  try {
+    const savedPage = sessionStorage.getItem('userManagementPage');
+    if (savedPage) {
+        const parsedPage = parseInt(savedPage, 10);
+        if (!isNaN(parsedPage) && parsedPage > 0) {
+            currentPage = parsedPage;
+        } else {
+            sessionStorage.removeItem('userManagementPage');
+        }
+    }
+  } catch (e) {
+      console.error("SessionStorage Error:", e);
+      currentPage = 1;
+  }
+
   function updateUserCounts(usersLength, totalCountNum, page, perPage) {
     const resultsIndicator = document.getElementById("resultsIndicator");
     if (resultsIndicator) {
@@ -308,12 +324,20 @@ window.addEventListener("DOMContentLoaded", () => {
       const query = e.target.value.trim();
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
+        currentPage = 1;
+        try {
+            sessionStorage.removeItem('userManagementPage');
+        } catch (e) {}
         loadUsers(1); // Reset to page 1 on new search
       }, 500);
     });
   }
 
   function applyFilters() {
+    currentPage = 1;
+    try {
+        sessionStorage.removeItem('userManagementPage');
+    } catch (e) {}
     loadUsers(1); // Reset to page 1 when filters change
   }
 
@@ -465,6 +489,11 @@ window.addEventListener("DOMContentLoaded", () => {
             renderTable(users);
             renderPagination(totalPages, currentPage);
             updateUserCounts(users.length, totalUsers, page, limit);
+            try {
+                sessionStorage.setItem('userManagementPage', currentPage);
+            } catch (e) {
+                console.error("SessionStorage Error:", e);
+            }
         } else {
             throw new Error(data.message || "Invalid data format from server.");
         }
@@ -472,6 +501,9 @@ window.addEventListener("DOMContentLoaded", () => {
         console.error("Fetch users error:", err);
         if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
         updateUserCounts(0, 0, 1, limit);
+        try {
+            sessionStorage.removeItem('userManagementPage');
+        } catch (e) {}
     } finally {
         isLoading = false;
     }
@@ -797,5 +829,5 @@ window.addEventListener("DOMContentLoaded", () => {
     return status.toLowerCase() === "active" ? `<span class="bg-green-500 text-white ${base}">Active</span>` : `<span class="bg-gray-300 text-gray-700 ${base}">Inactive</span>`;
   }
 
-  loadUsers();
+  loadUsers(currentPage);
 });

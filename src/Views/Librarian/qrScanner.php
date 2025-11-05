@@ -55,7 +55,7 @@
         </div>
     </div>
 </div>
-<script src="<?= BASE_URL ?>/js/superadmin/qrScanner.js" defer></script>
+<script src="<?= BASE_URL ?>/js/librarian/qrScanner.js" defer></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const scannerInput = document.getElementById('scannerInput');

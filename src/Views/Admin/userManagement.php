@@ -513,4 +513,4 @@
     </div>
 </div>
 
-<script src="<?= BASE_URL ?>/js/superadmin/userManagement.js" defer></script>
+<script src="<?= BASE_URL ?>/js/admin/userManagement.js" defer></script>

@@ -192,6 +192,7 @@ class UserManagementController extends Controller
 
           $validModules = [
             'book management',
+            'user management',
             'qr scanner',
             'returning',
             'borrowing form',

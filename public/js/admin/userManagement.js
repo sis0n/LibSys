@@ -18,13 +18,13 @@ window.addEventListener("DOMContentLoaded", () => {
   const bulkImportForm = document.getElementById("bulkImportForm");
   const fileInput = document.getElementById("csvFile");
   const importMessage = document.getElementById("importMessage");
-  
+
   const modulesSection = document.getElementById("modulesSection");
   const addUserUserManagementModuleWrapper = document.getElementById("addUserUserManagementModuleWrapper");
-  
+
   // BAGONG DAGDAG: ID para sa Edit Modal
   const editUserUserManagementModuleWrapper = document.getElementById("editUserUserManagementModuleWrapper");
-  
+
   const userRoleValueEl = document.getElementById("userRoleDropdownValue");
 
   let allUsers = [];
@@ -200,7 +200,7 @@ window.addEventListener("DOMContentLoaded", () => {
     select.innerHTML = '<option value="">Loading Courses...</option>';
 
     try {
-      const res = await fetch('api/superadmin/userManagement/getAllCourses');
+      const res = await fetch('api/admin/userManagement/getAllCourses');
       const data = await res.json();
 
       select.innerHTML = '<option value="">Select Course/Program</option>';
@@ -231,7 +231,7 @@ window.addEventListener("DOMContentLoaded", () => {
     select.innerHTML = '<option value="">Loading Colleges...</option>';
 
     try {
-      const res = await fetch('api/superadmin/userManagement/getColleges');
+      const res = await fetch('api/admin/userManagement/getColleges');
       const data = await res.json();
 
       select.innerHTML = '<option value="">Select College/Department</option>';
@@ -308,7 +308,7 @@ window.addEventListener("DOMContentLoaded", () => {
     formData.append("csv_file", fileInput.files[0]);
 
     try {
-      const res = await fetch("api/superadmin/userManagement/bulkImport", {
+      const res = await fetch("api/admin/userManagement/bulkImport", {
         method: "POST",
         body: formData
       });
@@ -340,7 +340,7 @@ window.addEventListener("DOMContentLoaded", () => {
         currentPage = 1;
         try {
           sessionStorage.removeItem('userManagementPage');
-        } catch (e) {}
+        } catch (e) { }
         loadUsers(1);
       }, 500);
     });
@@ -350,7 +350,7 @@ window.addEventListener("DOMContentLoaded", () => {
     currentPage = 1;
     try {
       sessionStorage.removeItem('userManagementPage');
-    } catch (e) {}
+    } catch (e) { }
     loadUsers(1);
   }
 
@@ -387,10 +387,10 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById('passwordFields')?.classList.add('hidden');
     document.getElementById('editPassword') && (document.getElementById('editPassword').value = '');
     document.getElementById('confirmPassword') && (document.getElementById('confirmPassword').value = '');
-    
+
     // BAGONG DAGDAG: Siguraduhin na nakatago rin ito pag-close
     if (editUserUserManagementModuleWrapper) {
-        editUserUserManagementModuleWrapper.classList.add('hidden');
+      editUserUserManagementModuleWrapper.classList.add('hidden');
     }
   }
   [closeEditUserBtn, cancelEditUserBtn].forEach(btn => btn?.addEventListener("click", closeEditUserModal));
@@ -491,7 +491,7 @@ window.addEventListener("DOMContentLoaded", () => {
         offset: offset
       });
 
-      const res = await fetch(`api/superadmin/userManagement/pagination?${params.toString()}`);
+      const res = await fetch(`api/admin/userManagement/pagination?${params.toString()}`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
 
@@ -535,7 +535,7 @@ window.addEventListener("DOMContentLoaded", () => {
       updateUserCounts(0, 0, 1, limit);
       try {
         sessionStorage.removeItem('userManagementPage');
-      } catch (e) {}
+      } catch (e) { }
     } finally {
       isLoading = false;
     }
@@ -620,7 +620,7 @@ window.addEventListener("DOMContentLoaded", () => {
         .map(cb => cb.value);
 
       try {
-        const res = await fetch("api/superadmin/userManagement/add", {
+        const res = await fetch("api/admin/userManagement/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -684,13 +684,13 @@ window.addEventListener("DOMContentLoaded", () => {
         if (editModulesContainer) {
           if (userRole === 'admin' || userRole === 'librarian') {
             editModulesContainer.classList.remove("hidden");
-            
+
             if (editUserUserManagementModuleWrapper) {
-                if (userRole === 'admin') {
-                    editUserUserManagementModuleWrapper.classList.remove('hidden');
-                } else { 
-                    editUserUserManagementModuleWrapper.classList.add('hidden');
-                }
+              if (userRole === 'admin') {
+                editUserUserManagementModuleWrapper.classList.remove('hidden');
+              } else {
+                editUserUserManagementModuleWrapper.classList.add('hidden');
+              }
             }
 
             editModulesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
@@ -712,7 +712,7 @@ window.addEventListener("DOMContentLoaded", () => {
       if (e.target.closest(".deleteUserBtn")) {
         if (!confirm(`Delete user "${user.name}" (${user.role})?`)) return;
         try {
-          const res = await fetch(`api/superadmin/userManagement/delete/${user.user_id}`, {
+          const res = await fetch(`api/admin/userManagement/delete/${user.user_id}`, {
             method: "POST"
           });
           const data = await res.json();
@@ -733,7 +733,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const confirmMsg = user.status === 'Active' ? `Deactivate ${user.name}?` : `Activate ${user.name}?`;
         if (!confirm(confirmMsg)) return;
         try {
-          const res = await fetch(`api/superadmin/userManagement/toggleStatus/${user.user_id}`, {
+          const res = await fetch(`api/admin/userManagement/toggleStatus/${user.user_id}`, {
             method: "POST"
           });
           const data = await res.json();
@@ -754,7 +754,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!confirm(`Allow "${user.name}" to edit their profile?`)) return;
 
         try {
-          const res = await fetch(`api/superadmin/userManagement/allowEdit/${userId}`, {
+          const res = await fetch(`api/admin/userManagement/allowEdit/${userId}`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -811,7 +811,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const res = await fetch(`api/superadmin/userManagement/update/${currentEditingUserId}`, {
+        const res = await fetch(`api/admin/userManagement/update/${currentEditingUserId}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

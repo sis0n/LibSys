@@ -49,6 +49,9 @@
   <div id="recordsContainer" class="space-y-6">
     <div class="text-center py-10 text-gray-500" id="loadingIndicator">Loading history...</div>
   </div>
+
+  <!-- Pagination Container -->
+  <div id="paginationContainer" class="pagination-wrapper text-center mt-8"></div>
 </div>
 
 <script>

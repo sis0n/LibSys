@@ -30,6 +30,114 @@ window.addEventListener("DOMContentLoaded", () => {
   let selectedStatus = "All Status";
   let currentEditingUserId = null;
 
+  // --- Pagination State ---
+  let currentPage = 1;
+  const limit = 10;
+  let totalUsers = 0;
+  let totalPages = 1;
+  let isLoading = false;
+  let searchDebounce;
+
+  // --- Page Memory ---
+  try {
+    const savedPage = sessionStorage.getItem('userManagementPage');
+    if (savedPage) {
+        const parsedPage = parseInt(savedPage, 10);
+        if (!isNaN(parsedPage) && parsedPage > 0) {
+            currentPage = parsedPage;
+        } else {
+            sessionStorage.removeItem('userManagementPage');
+        }
+    }
+  } catch (e) {
+      console.error("SessionStorage Error:", e);
+      currentPage = 1;
+  }
+
+  function updateUserCounts(usersLength, totalCountNum, page, perPage) {
+    const resultsIndicator = document.getElementById("resultsIndicator");
+    if (resultsIndicator) {
+        if (totalCountNum === 0) {
+            resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">0</span> of <span class="font-medium text-gray-800">0</span> users`;
+        } else {
+            const startItem = (page - 1) * perPage + 1;
+            const endItem = (page - 1) * perPage + usersLength;
+            resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">${startItem}-${endItem}</span> of <span class="font-medium text-gray-800">${totalCountNum.toLocaleString()}</span> users`;
+        }
+    }
+  }
+
+  function renderPagination(totalPages, page) {
+    const paginationControls = document.getElementById("paginationControls");
+    const paginationList = document.getElementById("paginationList");
+
+    if (!paginationControls || !paginationList) return;
+
+    if (totalPages <= 1) {
+        paginationControls.classList.add("hidden");
+        return;
+    }
+
+    paginationControls.classList.remove("hidden");
+    paginationList.innerHTML = '';
+
+    const createPageLink = (type, text, pageNum, isDisabled = false, isActive = false) => {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = "#";
+        a.setAttribute("data-page", String(pageNum));
+        let baseClasses = `flex items-center justify-center min-w-[32px] h-9 text-sm font-medium transition-all duration-200`;
+        if (type === "prev" || type === "next") {
+            a.innerHTML = text;
+            baseClasses += ` text-gray-700 hover:text-orange-600 px-3`;
+            if (isDisabled) baseClasses += ` opacity-50 cursor-not-allowed pointer-events-none`;
+        } else if (type === "ellipsis") {
+            a.textContent = text;
+            baseClasses += ` text-gray-400 cursor-default px-2`;
+        } else {
+            a.textContent = text;
+            if (isActive) {
+                baseClasses += ` text-white bg-orange-600 rounded-full shadow-sm px-3`;
+            } else {
+                baseClasses += ` text-gray-700 hover:text-orange-600 hover:bg-orange-100 rounded-full px-3`;
+            }
+        }
+        a.className = baseClasses;
+        li.appendChild(a);
+        paginationList.appendChild(li);
+    };
+
+    createPageLink("prev", `<i class="flex ph ph-caret-left text-lg"></i> Previous`, page - 1, page === 1);
+    const window = 1;
+    let pagesToShow = new Set([1, totalPages, page]);
+    for (let i = 1; i <= window; i++) {
+        if (page - i > 0) pagesToShow.add(page - i);
+        if (page + i <= totalPages) pagesToShow.add(page + i);
+    }
+    const sortedPages = [...pagesToShow].sort((a, b) => a - b);
+    let lastPage = 0;
+    for (const p of sortedPages) {
+        if (p > lastPage + 1) createPageLink("ellipsis", "…", "...", true);
+        createPageLink("number", p, p, false, p === page);
+        lastPage = p;
+    }
+    createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
+
+    paginationList.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (isLoading) return;
+        const target = e.target.closest('a[data-page]');
+        if (!target) return;
+        const pageStr = target.dataset.page;
+        if (pageStr === '...') return;
+        const pageNum = parseInt(pageStr, 10);
+        if (!isNaN(pageNum) && pageNum !== currentPage) {
+            loadUsers(pageNum);
+        }
+    });
+  }
+
+
   function updateProgramDepartmentDropdown(role, selectedValue = null) {
     const wrapper = document.getElementById('addUserSingleSelectWrapper');
     const label = document.getElementById('addUserSelectLabel');
@@ -210,67 +318,27 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   // --- Search + filters ---
-  async function searchUsers(query) {
-    if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Searching...</td></tr>`;
-    if (!query) {
-      await loadUsers();
-      return;
-    }
-    try {
-      const res = await fetch(`api/superadmin/userManagement/search?q=${encodeURIComponent(query)}`);
-      if (!res.ok) throw new Error(`Search request failed with status ${res.status}`);
-      const data = await res.json();
-
-      if (data.success && Array.isArray(data.users)) {
-        allUsers = data.users
-          .filter(u => u.role.toLowerCase() !== "superadmin")
-          .filter(u => u.role.toLowerCase() !== "scanner")
-          .map(u => ({
-            user_id: u.user_id,
-            first_name: u.first_name,
-            middle_name: u.middle_name,
-            last_name: u.last_name,
-            name: buildFullName(u.first_name, u.middle_name, u.last_name),
-            username: u.username,
-            email: u.email,
-            role: u.role,
-            program_department: u.program_department || null,
-            status: u.is_active == 1 ? "Active" : "Inactive",
-            joinDate: new Date(u.created_at).toLocaleDateString(),
-            modules: u.modules || []
-          }));
-      } else {
-        allUsers = [];
-      }
-    } catch (err) {
-      console.error("Search error:", err);
-      allUsers = [];
-      if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error during search: ${err.message}</td></tr>`;
-    }
-    applyFilters();
-  }
-
   let searchTimeout;
   if (searchInput) {
     searchInput.addEventListener("input", e => {
       const query = e.target.value.trim();
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
-        searchUsers(query);
+        currentPage = 1;
+        try {
+            sessionStorage.removeItem('userManagementPage');
+        } catch (e) {}
+        loadUsers(1); // Reset to page 1 on new search
       }, 500);
     });
   }
 
   function applyFilters() {
-    let filtered = [...allUsers];
-    if (selectedRole !== "All Roles") {
-      filtered = filtered.filter(u => u.role.toLowerCase() === selectedRole.toLowerCase());
-    }
-    if (selectedStatus !== "All Status") {
-      filtered = filtered.filter(u => u.status.toLowerCase() === selectedStatus.toLowerCase());
-    }
-    users = filtered;
-    renderTable(users);
+    currentPage = 1;
+    try {
+        sessionStorage.removeItem('userManagementPage');
+    } catch (e) {}
+    loadUsers(1); // Reset to page 1 when filters change
   }
 
   // --- Modal helpers for Add/Edit ---
@@ -371,33 +439,73 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function loadUsers() {
+  async function loadUsers(page = 1) {
+    if (isLoading) return;
+    isLoading = true;
+    currentPage = page;
     if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading users...</td></tr>`;
-    try {
-      const res = await fetch('api/superadmin/userManagement/getAll');
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message || "Failed to fetch users");
+    document.getElementById("paginationControls")?.classList.add('hidden');
+    document.getElementById("resultsIndicator").textContent = 'Loading...';
 
-      allUsers = data.users
-        .filter(u => u.role.toLowerCase() !== "superadmin")
-        .map(u => ({
-          user_id: u.user_id,
-          first_name: u.first_name,
-          middle_name: u.middle_name,
-          last_name: u.last_name,
-          name: buildFullName(u.first_name, u.middle_name, u.last_name),
-          username: u.username,
-          email: u.email,
-          role: u.role,
-          program_department: u.program_department || null,
-          status: u.is_active == 1 ? "Active" : "Inactive",
-          joinDate: new Date(u.created_at).toLocaleDateString(),
-          modules: u.modules || []
-        }));
-      applyFilters();
+    const offset = (page - 1) * limit;
+    const search = document.getElementById("userSearchInput").value.trim();
+
+    try {
+        const params = new URLSearchParams({
+            search: search,
+            role: selectedRole === 'All Roles' ? '' : selectedRole,
+            status: selectedStatus === 'All Status' ? '' : selectedStatus,
+            limit: limit,
+            offset: offset
+        });
+
+        const res = await fetch(`api/superadmin/userManagement/pagination?${params.toString()}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.users)) {
+            totalUsers = data.totalCount;
+            totalPages = Math.ceil(totalUsers / limit) || 1;
+
+            if (page > totalPages && totalPages > 0) {
+                loadUsers(totalPages);
+                return;
+            }
+            
+            users = data.users.map(u => ({
+                user_id: u.user_id,
+                first_name: u.first_name,
+                middle_name: u.middle_name,
+                last_name: u.last_name,
+                name: buildFullName(u.first_name, u.middle_name, u.last_name),
+                username: u.username,
+                email: u.email,
+                role: u.role,
+                status: u.is_active == 1 ? "Active" : "Inactive",
+                joinDate: new Date(u.created_at).toLocaleDateString(),
+                modules: u.modules || []
+            }));
+
+            renderTable(users);
+            renderPagination(totalPages, currentPage);
+            updateUserCounts(users.length, totalUsers, page, limit);
+            try {
+                sessionStorage.setItem('userManagementPage', currentPage);
+            } catch (e) {
+                console.error("SessionStorage Error:", e);
+            }
+        } else {
+            throw new Error(data.message || "Invalid data format from server.");
+        }
     } catch (err) {
-      console.error("Fetch users error:", err);
-      if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
+        console.error("Fetch users error:", err);
+        if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
+        updateUserCounts(0, 0, 1, limit);
+        try {
+            sessionStorage.removeItem('userManagementPage');
+        } catch (e) {}
+    } finally {
+        isLoading = false;
     }
   }
 
@@ -498,7 +606,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (data.success) {
           alert("User added successfully!");
           closeAddUserModal();
-          await loadUsers();
+          await loadUsers(1); // Go to first page after adding
         } else {
           alert("Error: " + data.message);
         }
@@ -562,7 +670,7 @@ window.addEventListener("DOMContentLoaded", () => {
           const data = await res.json();
           if (data.success) {
             alert("User deleted successfully!");
-            await loadUsers();
+            await loadUsers(currentPage);
           } else {
             alert("Error: " + (data.message || "Failed to delete."));
           }
@@ -584,7 +692,7 @@ window.addEventListener("DOMContentLoaded", () => {
           const data = await res.json();
           if (data.success) {
             alert(`${user.name} is now ${data.newStatus}.`);
-            await loadUsers();
+            await loadUsers(currentPage);
           } else {
             alert("Error: " + (data.message || "Failed to update status."));
           }
@@ -606,7 +714,7 @@ window.addEventListener("DOMContentLoaded", () => {
           const data = await res.json();
           if (data.success) {
             alert(data.message || "User can now edit their profile.");
-            await loadUsers();
+            await loadUsers(currentPage);
           } else {
             alert("Error: " + (data.message || "Failed to allow edit."));
           }
@@ -663,7 +771,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (data.success) {
           alert("User updated successfully!");
           closeEditUserModal();
-          await loadUsers();
+          await loadUsers(currentPage);
         } else {
           alert("Error: " + (data.message || "Failed to update user."));
         }
@@ -721,5 +829,5 @@ window.addEventListener("DOMContentLoaded", () => {
     return status.toLowerCase() === "active" ? `<span class="bg-green-500 text-white ${base}">Active</span>` : `<span class="bg-gray-300 text-gray-700 ${base}">Inactive</span>`;
   }
 
-  loadUsers();
+  loadUsers(currentPage);
 });

@@ -47,10 +47,14 @@
             </button>
             <div id="statusFilterMenu"
                 class="absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20 text-sm">
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All Status</div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">Borrowed</div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Returned">Returned</div>
-                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Expired">Expired</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Status">All
+                    Status</div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Borrowed">Borrowed
+                </div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Returned">Returned
+                </div>
+                <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="Expired">Expired
+                </div>
             </div>
         </div>
 
@@ -72,11 +76,12 @@
         <table class="min-w-full divide-y divide-gray-300">
             <thead class="bg-orange-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User
                         Name</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">User
+                        ID Number</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Accession
                         Number</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Accession Number</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Borrowed
                         Date/Time</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Returned
@@ -121,8 +126,8 @@
             <ul class="flex items-center gap-4 text-sm">
                 <!-- Previous -->
                 <li>
-                    <a href="#" id="prev-page"
-                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                    <a id="prev-page"
+                        class="flex items-center text-sm font-medium gap-1 text-gray-400 hover:text-orange-700 transition">
                         <i class="ph ph-caret-left"></i>
                         <span>Previous</span>
                     </a>
@@ -135,8 +140,8 @@
 
                 <!-- Next -->
                 <li>
-                    <a href="#" id="next-page"
-                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                    <a id="next-page"
+                        class="flex items-center text-sm font-medium gap-1 text-gray-400 hover:text-orange-700 transition">
                         <span>Next</span>
                         <i class="ph ph-caret-right"></i>
                     </a>

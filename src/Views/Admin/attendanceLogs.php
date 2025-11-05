@@ -9,27 +9,26 @@ date_default_timezone_set('Asia/Manila');
 
 $formattedLogs = [];
 foreach ($logs as $log) {
-    // Error handling basic
-    try {
-        $logTime = new DateTime($log['timestamp']);
-        $formattedLogs[] = [
-            'date' => $logTime->format("Y-m-d"),
-            'day' => $logTime->format("l"),
-            'studentName' => $log['full_name'],
-            'studentNumber' => $log['student_number'],
-            'time' => $logTime->format("H:i:s"),
-            'status' => "Present"
-        ];
-    } catch (Exception $e) {
+    try{
+    $logTime = new DateTime($log['timestamp']);
+    $formattedLogs[] = [
+        'date' => $logTime->format("Y-m-d"),
+        'day' => $logTime->format("l"),
+        'studentName' => $log['full_name'],
+        'studentNumber' => $log['student_number'],
+        'time' => $logTime->format("H:i:s"),
+        'status' => "Present"
+    ];
+     } catch (Exception $e) {
         error_log("Invalid timestamp in attendanceLogs: " . $log['timestamp']);
     }
 }
 ?>
 
-<body class="min-h-screen p-6">
+<body class="min-h-screen p-6 bg-gray-50">
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h2 class="text-2xl font-bold flex items-center gap-2 mb-4">
+            <h2 class="text-2xl font-bold flex items-center gap-2 text-gray-800 mb-4">
                 Attendance Logs
             </h2>
             <p class="text-gray-700 text-md">
@@ -45,22 +44,21 @@ foreach ($logs as $log) {
 
     <div class="bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-sm mb-6">
         <div class="p-4 border-b border-[var(--color-border)]">
-            <h3 class="text-md font-medium">Total Visitors</h3>
-            <p class="text-sm text-[var(--color-gray-500)]">View visitor statistics by time period</p>
+            <h3 class="text-md font-medium text-gray-800">Total Visitors</h3>
+            <p class="text-sm text-gray-500">View visitor statistics by time period</p>
         </div>
         <div class="p-4">
             <div
-                class="flex items-center border border-[var(--color-border)]  bg-[color:var(--color-muted)] p-1 justify-center mb-4 rounded-full">
+                class="flex items-center border border-orange-100 bg-orange-50/50 p-1 justify-center mb-4 rounded-full">
                 <button
-                    class="flex-1 py-2 text-sm rounded-full bg-[var(--color-popover)] hover:bg-[var(--color-popover)] font-medium period-btn"
-                    data-period="Week" data-count="0">
-                    Week
+                    class="flex-1 py-2 text-sm rounded-full text-gray-600 hover:text-orange-700 font-medium period-btn"
+                    data-period="Week" data-count="0" data-active="true"> Week
                 </button>
-                <button class="flex-1 py-2 text-sm rounded-full hover:bg-[var(--color-popover)] period-btn"
+                <button class="flex-1 py-2 text-sm rounded-full text-gray-600 hover:text-orange-700 period-btn"
                     data-period="Month" data-count="0">
                     Month
                 </button>
-                <button class="flex-1 py-2 text-sm rounded-full hover:bg-[var(--color-popover)] period-btn"
+                <button class="flex-1 py-2 text-sm rounded-full text-gray-600 hover:text-orange-700 period-btn"
                     data-period="Year" data-count="0">
                     Year
                 </button>
@@ -87,14 +85,14 @@ foreach ($logs as $log) {
             <div class="flex items-center gap-2 text-sm">
 
                 <div class="relative">
-                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2"></i>
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input type="text" id="attendanceSearchInput" placeholder="Search by student..."
-                        class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-48">
+                        class="bg-orange-50 border border-orange-200 rounded-lg pl-9 pr-3 py-2 outline-none transition text-sm w-48 focus:ring-1 focus:ring-orange-400">
                 </div>
 
                 <div class="relative">
                     <input type="date" id="datePickerInput"
-                        class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-36">
+                        class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-36 focus:ring-1 focus:ring-orange-400">
                 </div>
 
                 <div class="relative inline-block text-left">
@@ -104,7 +102,7 @@ foreach ($logs as $log) {
                         <i class="ph ph-caret-down text-xs"></i>
                     </button>
                     <div id="courseFilterMenu"
-                        class="filter-dropdown-menu absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20">
+                        class="filter-dropdown-menu absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20 text-sm">
                         <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Courses">All Courses</div>
                         <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSIT">BSIT</div>
                         <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSCS">BSCS</div>
@@ -126,14 +124,36 @@ foreach ($logs as $log) {
                     </tr>
                 </thead>
                 <tbody id="attendanceTableBody" class="divide-y divide-orange-100">
-                    <tr id="noRecordsRow" class="bg-white hidden" data-placeholder="true">
+                    <tr id="noRecordsRow" class="bg-white">
                         <td colspan="5" class="text-center text-gray-500 py-10">
                             <i class="ph ph-clipboard text-4xl block mb-2"></i>
-                            No attendance records found.
+                            Loading records...
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination-container" class="flex justify-center items-center mt-6 hidden">
+            <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
+                <ul class="flex items-center gap-4 text-sm">
+                    <li>
+                        <a id="prev-page" href="#" class="flex items-center text-sm font-medium gap-1 text-gray-400 hover:text-orange-700 transition">
+                            <i class="ph ph-caret-left"></i>
+                            <span>Previous</span>
+                        </a>
+                    </li>
+                    <div id="pagination-numbers" class="flex items-center gap-3">
+                    </div>
+                    <li>
+                        <a id="next-page" href="#" class="flex items-center text-sm font-medium gap-1 text-gray-400 hover:text-orange-700 transition">
+                            <span>Next</span>
+                            <i class="ph ph-caret-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 
@@ -142,7 +162,7 @@ foreach ($logs as $log) {
             class="bg-[var(--color-card)] rounded-xl shadow-lg border border-[var(--color-border)] w-full max-w-sm p-4 animate-fadeIn">
             <div class="flex justify-between items-start mb-4">
                 <div>
-                    <h2 id="checkinsModalTitle" class="text-lg font-semibold">Viewing Check-ins</h2>
+                    <h2 id="checkinsModalTitle" class="text-lg font-semibold text-gray-800">Viewing Check-ins</h2>
                     <p id="checkinsModalSubtitle" class="text-sm text-gray-600 mt-1">Student / Date</p>
                 </div>
                 <button id="closeCheckinsModal" class="text-gray-500 hover:text-red-700 transition">
@@ -154,14 +174,28 @@ foreach ($logs as $log) {
 
             <div class="text-right mt-4">
                 <button id="closeCheckinsModalBtn"
-                    class="mt-2 border border-[var(--color-border)] px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition text-sm font-medium">
+                    class="mt-2 border border-gray-300 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition text-sm font-medium">
                     Close
                 </button>
             </div>
         </div>
     </div>
 
-
     <script src="<?= BASE_URL ?>/js/admin/attendanceLogs.js" defer></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof initializeAttendanceLogs === 'function') {
+                initializeAttendanceLogs();
+            } else {
+                console.error("AttendanceLogs Error: Initialization function not found. Check if attendanceLogs.js loaded correctly.");
+                const tableBody = document.getElementById("attendanceTableBody");
+                if (tableBody) {
+                    const errorRow = tableBody.querySelector('#noRecordsRow') || tableBody.insertRow();
+                    errorRow.innerHTML = `<td colspan="5" class="text-center text-red-600 py-10">Error initializing page. Please refresh.</td>`;
+                    errorRow.classList.remove('hidden');
+                }
+            }
+        });
+    </script>
 </body>

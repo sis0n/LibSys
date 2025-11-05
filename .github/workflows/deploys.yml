@@ -48,11 +48,11 @@ jobs:
           dangerous-clean-slate: false
           create-remote-path: true
           exclude: |
-            */.git
-            */.github
+            **/.git/**
+            **/.github/**
             **/node_modules/**
-            checkout_test.txt
-            /docs
-            resetdata.php
-            sandbox.php
+            **/vendor/**
+            **/checkout_test.txt/**
+            **/resetdata.php/**
+            **/sandbox.php/**
             **/deploy.yml

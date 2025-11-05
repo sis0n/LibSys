@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Repositories\restoreUserRepository;
+use App\Repositories\RestoreUserRepository;
 
 class RestoreUserController extends Controller
 {

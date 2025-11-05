@@ -149,27 +149,31 @@ class BookManagementController extends Controller
         }
 
         try {
+            $book = $this->bookRepo->findBookById($bookId);
+
+            if (!$book) {
+                return $this->json(['success' => false, 'message' => 'Book not found.'], 404);
+            }
+
+            if ($book['availability'] === 'borrowed') {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Cannot delete book. It is currently borrowed.'
+                ], 409); 
+            }
+
             $result = $this->bookRepo->deleteBook($bookId, $deletedByUserId);
 
-            // Map message to proper HTTP status
-            $status = 200;
+            $status = $result['success'] ? 200 : 400;
+
             if ($result['message'] === 'Book not found.') $status = 404;
             if ($result['message'] === 'Book already deleted.') $status = 409;
-            if (!$result['success'] && $status === 200) $status = 400;
 
             return $this->json($result, $status);
         } catch (\PDOException $e) {
-            // Foreign key constraint
-            if (str_contains($e->getMessage(), 'foreign key constraint')) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Cannot delete book. It is linked to active borrowing records.'
-                ], 409);
-            }
-
             return $this->json([
                 'success' => false,
-                'message' => 'Internal server error during database operation.'
+                'message' => 'Internal server error.'
             ], 500);
         } catch (\Exception $e) {
             return $this->json([
@@ -201,8 +205,8 @@ class BookManagementController extends Controller
         $bookRepo = new \App\Repositories\BookManagementRepository();
 
         if (($handle = fopen($file, 'r')) !== false) {
-            $header = fgetcsv($handle); // skip header
-            $rowNumber = 2; // header is row 1
+            $header = fgetcsv($handle);
+            $rowNumber = 2; 
 
             while (($row = fgetcsv($handle)) !== false) {
                 $accessionNumber = trim($row[0] ?? '');

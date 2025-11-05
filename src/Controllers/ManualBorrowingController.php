@@ -25,6 +25,17 @@ class ManualBorrowingController extends Controller
     }
   }
 
+  public function getCollaterals(): void
+  {
+    try {
+      $collaterals = $this->manualRepo->getCollaterals();
+      $this->sendJson($collaterals);
+    } catch (Exception $e) {
+      $this->sendJson(['error' => 'Failed to fetch collaterals'], 500);
+    }
+  }
+
+
 
   private function sendJson(array $data, int $statusCode = 200): void
   {

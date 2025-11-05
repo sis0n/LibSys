@@ -112,6 +112,15 @@ class ManualBorrowingRepository
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
   }
 
+  // --- Get all collateral names ---
+  public function getCollaterals(): array
+  {
+    $stmt = $this->db->prepare("SELECT name FROM collaterals ORDER BY name ASC");
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_COLUMN);
+  }
+
+
 
   // --- Check book availability ---
   public function checkBook(string $accession_number): array

@@ -139,160 +139,171 @@ document.addEventListener('DOMContentLoaded', () => {
 
     handleItemTypeChange('Equipment');
 
-    const itemNameInput = document.getElementById('item_name');
-    const itemNameSuggestions = document.getElementById('item_name_suggestions');
-    const itemNameSuggestionsList = document.getElementById('item_name_suggestions_list');
-    const itemNameDropdownArrow = document.getElementById('item_name_dropdown_arrow');
+    const setupCombobox = (inputId, suggestionsId, listId, arrowId, fetchUrl, fallbackData = [], highlightClass, hoverClass) => {
+        const input = document.getElementById(inputId);
+        const suggestionsContainer = document.getElementById(suggestionsId);
+        const suggestionsList = document.getElementById(listId);
+        const dropdownArrow = document.getElementById(arrowId);
 
-    let suggestions = [];
+        if (!input || !suggestionsContainer || !suggestionsList || !dropdownArrow) {
+            // console.error(`Combobox elements not found for ${inputId}`);
+            return;
+        }
 
-    const fetchSuggestions = async () => {
-        try {
-            const response = await fetch('api/superadmin/borrowingForm/getEquipments');
-            if (response.ok) {
-                suggestions = await response.json();
-            } else {
-                console.error('Failed to fetch equipment suggestions. Using fallback data.');
-                loadFallbackSuggestions();
+        let suggestions = [];
+        let highlightedIndex = -1;
+        let wasPointerDownOnInput = false;
+
+        const fetchSuggestionsData = async () => {
+            try {
+                const response = await fetch(fetchUrl);
+                if (response.ok) {
+                    suggestions = await response.json();
+                } else {
+                    console.error(`Failed to fetch suggestions from ${fetchUrl}. Using fallback data.`);
+                    suggestions = fallbackData;
+                }
+            } catch (error) {
+                console.error(`Error fetching suggestions from ${fetchUrl}:`, error);
+                suggestions = fallbackData;
             }
-        } catch (error) {
-            console.error('Error fetching equipment suggestions:', error);
-            loadFallbackSuggestions();
+        };
+
+        if (fetchUrl) {
+            fetchSuggestionsData();
+        } else {
+            suggestions = fallbackData;
         }
-    };
 
-    const loadFallbackSuggestions = () => {
-        suggestions = [
-            'Computer',
-            'Table',
-            'Extension Cord',
-            'Whiteboard',
-            'HDMI Cable',
-            'Chess',
-            'Scrabble',
-            'Domino',
-            'Connect 4',
-        ];
-    }
-    
-    fetchSuggestions();
+        const updateHighlight = () => {
+            const items = suggestionsList.querySelectorAll('li');
+            items.forEach(item => {
+                item.classList.remove(highlightClass);
+            });
+            if (items[highlightedIndex]) {
+                items[highlightedIndex].classList.add(highlightClass);
+            }
+        };
 
-    let highlightedIndex = -1;
-    let wasPointerDownOnInput = false;
+        const showSuggestions = (filter = true) => {
+            const value = input.value.toLowerCase();
+            suggestionsList.innerHTML = '';
+            highlightedIndex = -1;
 
-    // --- Helper: highlight list item for keyboard nav
-    const updateHighlight = () => {
-    const items = itemNameSuggestionsList.querySelectorAll('li');
-    items.forEach((item, index) => {
-        item.classList.toggle('bg-emerald-100', index === highlightedIndex);
-    });
-    };
+            let filtered = suggestions;
+            if (filter && value.trim() !== '') {
+                filtered = suggestions.filter(s => s.toLowerCase().includes(value));
+            }
 
-    // --- Show dropdown ---
-    const showSuggestions = (filter = true) => {
-    const value = itemNameInput.value.toLowerCase();
-    itemNameSuggestionsList.innerHTML = '';
-    highlightedIndex = -1;
+            if (filtered.length === 0 && value.trim() !== '') {
+                suggestionsContainer.classList.add('hidden');
+                return;
+            }
 
-    let filtered = suggestions;
+            filtered.forEach(suggestion => {
+                const li = document.createElement('li');
+                li.className = `px-4 py-2 text-sm cursor-pointer ${hoverClass}`;
+                li.textContent = suggestion;
+                li.addEventListener('mousedown', e => {
+                    e.preventDefault();
+                    input.value = suggestion;
+                    hideSuggestions();
+                });
+                suggestionsList.appendChild(li);
+            });
 
-    // Only filter if value isn't empty
-    if (filter && value.trim() !== '') {
-        filtered = suggestions.filter(s => s.toLowerCase().includes(value));
-    }
+            suggestionsContainer.classList.remove('hidden');
+        };
 
-    // Don't hide if empty but no filter
-    if (filtered.length === 0 && value.trim() !== '') {
-        itemNameSuggestions.classList.add('hidden');
-        return;
-    }
+        const hideSuggestions = () => {
+            suggestionsContainer.classList.add('hidden');
+            highlightedIndex = -1;
+            wasPointerDownOnInput = false;
+        };
 
-    filtered.forEach(suggestion => {
-        const li = document.createElement('li');
-        li.className = 'px-4 py-2 text-sm hover:bg-emerald-50 cursor-pointer';
-        li.textContent = suggestion;
-        li.addEventListener('mousedown', e => {
-        e.preventDefault();
-        itemNameInput.value = suggestion;
-        hideSuggestions();
+        input.addEventListener('pointerdown', () => {
+            wasPointerDownOnInput = true;
         });
-        itemNameSuggestionsList.appendChild(li);
-    });
 
-    itemNameSuggestions.classList.remove('hidden');
+        input.addEventListener('focus', () => {
+            if (wasPointerDownOnInput) {
+                showSuggestions(false);
+            }
+        });
+
+        input.addEventListener('input', () => showSuggestions(true));
+
+        dropdownArrow.addEventListener('pointerdown', () => {
+            wasPointerDownOnInput = true;
+        });
+
+        dropdownArrow.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (suggestionsContainer.classList.contains('hidden')) {
+                showSuggestions(false);
+                input.focus();
+            } else {
+                hideSuggestions();
+            }
+        });
+
+        input.addEventListener('keydown', e => {
+            const items = suggestionsList.querySelectorAll('li');
+            if (items.length === 0) return;
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    highlightedIndex = (highlightedIndex + 1) % items.length;
+                    updateHighlight();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
+                    updateHighlight();
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (highlightedIndex > -1) {
+                        input.value = items[highlightedIndex].textContent;
+                        hideSuggestions();
+                    }
+                    break;
+                case 'Escape':
+                    hideSuggestions();
+                    break;
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !dropdownArrow.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                hideSuggestions();
+            }
+        });
     };
 
-    // --- Hide dropdown ---
-    const hideSuggestions = () => {
-    itemNameSuggestions.classList.add('hidden');
-    itemNameSuggestionsList.innerHTML = '';
-    highlightedIndex = -1;
-    wasPointerDownOnInput = false;
-    };
+    setupCombobox(
+        'item_name',
+        'item_name_suggestions',
+        'item_name_suggestions_list',
+        'item_name_dropdown_arrow',
+        'api/superadmin/borrowingForm/getEquipments',
+        ['Computer', 'Table', 'Extension Cord', 'Whiteboard', 'HDMI Cable', 'Chess', 'Scrabble', 'Domino', 'Connect 4'],
+        'bg-emerald-100',
+        'hover:bg-emerald-50'
+    );
 
-    // --- Event wiring ---
-    itemNameInput.addEventListener('pointerdown', () => {
-    wasPointerDownOnInput = true;
-    });
-
-    itemNameInput.addEventListener('focus', () => {
-    if (wasPointerDownOnInput) {
-        showSuggestions(false);
-    }
-    });
-
-    itemNameInput.addEventListener('input', () => {
-    showSuggestions(true);
-    });
-
-    itemNameDropdownArrow.addEventListener('pointerdown', () => {
-    wasPointerDownOnInput = true;
-    });
-
-    itemNameDropdownArrow.addEventListener('click', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (itemNameSuggestions.classList.contains('hidden')) {
-        showSuggestions(false);
-        itemNameInput.focus();
-    } else {
-        hideSuggestions();
-    }
-    });
-
-    itemNameInput.addEventListener('keydown', e => {
-    const items = itemNameSuggestionsList.querySelectorAll('li');
-    if (items.length === 0) return;
-
-    if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        highlightedIndex = (highlightedIndex + 1) % items.length;
-        updateHighlight();
-    } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
-        updateHighlight();
-    } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (highlightedIndex > -1) {
-        itemNameInput.value = items[highlightedIndex].textContent;
-        hideSuggestions();
-        }
-    } else if (e.key === 'Escape') {
-        hideSuggestions();
-    }
-    });
-
-    // --- Click outside to hide ---
-    document.addEventListener('click', (e) => {
-    if (
-        !itemNameInput.contains(e.target) &&
-        !itemNameDropdownArrow.contains(e.target) &&
-        !itemNameSuggestions.contains(e.target)
-    ) {
-        hideSuggestions();
-    }
-    });
+    setupCombobox(
+        'collateral_id',
+        'collateral_id_suggestions',
+        'collateral_id_suggestions_list',
+        'collateral_id_dropdown_arrow',
+        'api/superadmin/borrowingForm/getCollaterals',
+        ['School ID', 'Library ID','National ID'],
+        'bg-amber-100',
+        'hover:bg-amber-50'
+    );
 
 
 

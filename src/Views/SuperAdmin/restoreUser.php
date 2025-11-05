@@ -126,10 +126,9 @@
                     <span>Restore</span>
                 </button>
 
-                <!-- PINALITAN ANG TEXT DITO -->
                 <button
                     class="archive-btn inline-flex items-center gap-2 px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition">
-                    <i class="ph ph-archive text-base"></i> <!-- Pinalitan ang icon -->
+                    <i class="ph ph-archive text-base"></i> 
                     <span>Archive</span>
                 </button>
             </div>

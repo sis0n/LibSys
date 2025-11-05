@@ -78,29 +78,69 @@ document.addEventListener('DOMContentLoaded', () => {
         paginationNumbersDiv.innerHTML = '';
         const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-        if (totalPages <= 1) {
-            // paginationContainer.classList.add('hidden');
+        if (totalItems <= itemsPerPage || totalPages <= 1) {
+            paginationContainer.classList.add('hidden');
             return;
         }
-        // paginationContainer.classList.remove('hidden');
-
-        const makeLink = (page, isActive) => {
-            const link = document.createElement('a');
-            link.href = '#';
-            link.textContent = page;
-            link.className = `flex items-center justify-center text-sm font-medium w-8 h-8 rounded-full text-gray-700 transition ${isActive ? 'bg-orange-500 text-white font-semibold' : 'hover:bg-orange-50 hover:text-orange-600'}`;
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                goToPage(page);
-            });
-            paginationNumbersDiv.appendChild(link);
-        };
-
-        for (let i = 1; i <= totalPages; i++) makeLink(i, i === currentPage);
+        paginationContainer.classList.remove('hidden');
 
         prevPageBtn.classList.toggle('opacity-50', currentPage === 1);
+        prevPageBtn.classList.toggle('cursor-not-allowed', currentPage === 1);
         nextPageBtn.classList.toggle('opacity-50', currentPage === totalPages);
+        nextPageBtn.classList.toggle('cursor-not-allowed', currentPage === totalPages);
+
+        const maxPagesToShow = 3;
+        let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+        if (endPage - startPage + 1 < maxPagesToShow) {
+            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+
+        if (startPage > 1) {
+            createPageLink(1);
+            if (startPage > 2) createEllipsis();
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            createPageLink(i, i === currentPage);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) createEllipsis();
+            createPageLink(totalPages);
+        }
     };
+
+    const createPageLink = (pageNumber, isActive = false) => {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = pageNumber;
+        link.classList.add(
+            'flex', 'items-center', 'justify-center',
+            'w-8', 'h-8', 'rounded-full', 'text-gray-700',
+            'hover:bg-orange-50', 'hover:text-orange-600', 'transition'
+        );
+        if (isActive) {
+            link.classList.add('bg-orange-500', 'text-white', 'font-semibold');
+            link.classList.remove('hover:bg-orange-50', 'hover:text-orange-600', 'text-gray-700');
+        }
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            goToPage(pageNumber);
+        });
+        paginationNumbersDiv.appendChild(link);
+    }
+
+    const createEllipsis = () => {
+        const ellipsisSpan = document.createElement('span');
+        ellipsisSpan.textContent = '...';
+        ellipsisSpan.classList.add(
+            'flex', 'items-center', 'justify-center',
+            'w-8', 'h-8', 'text-gray-500'
+        );
+        paginationNumbersDiv.appendChild(ellipsisSpan);
+    }
 
     const goToPage = (page) => {
         const totalPages = Math.ceil(allBackupFiles.length / itemsPerPage);

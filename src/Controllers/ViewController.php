@@ -92,7 +92,9 @@ class ViewController extends Controller
       'reports' => 'reports',
       'topVisitor' => 'reports',
       'transactionHistory' => 'transaction history',
+      'backup' => 'backup',
       'restoreBooks' => 'restore books',
+      'restoreUser' => 'restore users',
       'userManagement' => 'user management' 
     ];
 

@@ -15,6 +15,28 @@ class ManualBorrowingController extends Controller
     $this->manualRepo = new ManualBorrowingRepository();
   }
 
+  public function getEquipments(): void
+  {
+    try {
+      $equipments = $this->manualRepo->getEquipments();
+      $this->sendJson($equipments);
+    } catch (Exception $e) {
+      $this->sendJson(['error' => 'Failed to fetch equipments'], 500);
+    }
+  }
+
+  public function getCollaterals(): void
+  {
+    try {
+      $collaterals = $this->manualRepo->getCollaterals();
+      $this->sendJson($collaterals);
+    } catch (Exception $e) {
+      $this->sendJson(['error' => 'Failed to fetch collaterals'], 500);
+    }
+  }
+
+
+
   private function sendJson(array $data, int $statusCode = 200): void
   {
     http_response_code($statusCode);
@@ -114,10 +136,15 @@ class ManualBorrowingController extends Controller
       $borrowData = [
         'borrower_type' => $borrowerType,
         'borrower_id'   => $borrowerId,
-        'book_id'       => $itemId,
         'collateral_id' => $data['collateral_id'],
         'librarian_id'  => $_SESSION['user_id'] ?? null
       ];
+
+      if ($data['equipment_type'] === 'Book') {
+        $borrowData['book_id'] = $itemId;
+      } else {
+        $borrowData['equipment_id'] = $itemId;
+      }
 
       $insert = $this->manualRepo->createManualBorrow($borrowData);
 

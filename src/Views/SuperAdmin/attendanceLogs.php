@@ -9,6 +9,7 @@ date_default_timezone_set('Asia/Manila');
 
 $formattedLogs = [];
 foreach ($logs as $log) {
+    try{
     $logTime = new DateTime($log['timestamp']);
     $formattedLogs[] = [
         'date' => $logTime->format("Y-m-d"),
@@ -18,6 +19,9 @@ foreach ($logs as $log) {
         'time' => $logTime->format("H:i:s"),
         'status' => "Present"
     ];
+     } catch (Exception $e) {
+        error_log("Invalid timestamp in attendanceLogs: " . $log['timestamp']);
+    }
 }
 ?>
 
@@ -128,6 +132,28 @@ foreach ($logs as $log) {
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination-container" class="flex justify-center items-center mt-6 hidden">
+            <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
+                <ul class="flex items-center gap-4 text-sm">
+                    <li>
+                        <a id="prev-page" href="#" class="flex items-center text-sm font-medium gap-1 text-gray-400 hover:text-orange-700 transition">
+                            <i class="ph ph-caret-left"></i>
+                            <span>Previous</span>
+                        </a>
+                    </li>
+                    <div id="pagination-numbers" class="flex items-center gap-3">
+                    </div>
+                    <li>
+                        <a id="next-page" href="#" class="flex items-center text-sm font-medium gap-1 text-gray-400 hover:text-orange-700 transition">
+                            <span>Next</span>
+                            <i class="ph ph-caret-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 

@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     // --- Table Elements ---
-    const booksNearDueTableBody = document.querySelector('.books-near-due-table tbody');
     const overdueBooksTableBody = document.querySelector('.overdue-books-table tbody');
 
     // --- Modal Elements ---
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
-                renderBooksNearDueTable(result.data.nearDue);
                 renderOverdueBooksTable(result.data.overdue);
             } else showTableError(result.message);
         } catch (error) {
@@ -36,38 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showTableError(message) {
         const errorRow = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">${message}</td></tr>`;
-        booksNearDueTableBody.innerHTML = errorRow;
         overdueBooksTableBody.innerHTML = errorRow;
     }
-
-    function renderBooksNearDueTable(data) {
-        booksNearDueTableBody.innerHTML = '';
-        if (!data || data.length === 0) {
-            booksNearDueTableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No books near due date.</td></tr>`;
-            return;
-        }
-        data.forEach(book => {
-            const row = `
-        <tr class="align-middle">
-            <td class="px-6 py-4 align-middle">
-                <div class="font-semibold text-gray-800">${book.user_name}</div>
-                <div class="text-gray-500 text-xs">${book.user_id}</div>
-                <div class="text-gray-500 text-xs">${book.department_or_course}</div>
-            </td>
-            <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
-            <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
-            <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
-            <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
-            <td class="px-6 py-4 align-middle">
-                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100">
-                    <i class="ph ph-phone text-base mr-1"></i> Contact
-                </a>
-            </td>
-        </tr>`;
-            booksNearDueTableBody.insertAdjacentHTML('beforeend', row);
-        });
-    }
-
 
     function renderOverdueBooksTable(data) {
         overdueBooksTableBody.innerHTML = '';
@@ -171,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
             idLabel = 'Guest ID:';
         }
 
-        let courseOrDepartment = bookData.course_or_department || 'N/A'; 
+        let courseOrDepartment = bookData.course_or_department || 'N/A';
         let yearSectionLabel = 'Year & Section:';
         let yearSectionValue = 'N/A';
 
@@ -190,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
             courseOrDepartment = bookData.course_or_department || 'N/A';
             yearSectionLabel = 'Position:';
             yearSectionValue = bookData.borrower_type?.toUpperCase() || 'N/A';
-        } else { 
+        } else {
             yearSectionLabel = 'Borrower Type:';
             yearSectionValue = bookData.borrower_type?.toUpperCase() || 'Guest';
         }
@@ -225,6 +193,55 @@ document.addEventListener('DOMContentLoaded', function () {
         // Show modal
         if (returnModal) returnModal.classList.remove('hidden');
     };
+
+    if (modalExtendButton) {
+        modalExtendButton.addEventListener('click', async () => {
+            const borrowingId = modalExtendButton.dataset.borrowingId;
+            if (!borrowingId) return;
+
+            const { value: days } = await Swal.fire({
+                title: 'Extend Due Date',
+                input: 'number',
+                inputLabel: 'Enter number of days to extend',
+                inputPlaceholder: 'e.g., 7',
+                showCancelButton: true,
+                confirmButtonText: 'Extend',
+                inputValidator: (value) => {
+                    if (!value || value <= 0) {
+                        return 'Please enter a valid number of days (1 or more).';
+                    }
+                }
+            });
+
+            if (days) {
+                try {
+                    const formData = new FormData();
+                    formData.append('borrowing_id', borrowingId);
+                    formData.append('days', days); 
+
+                    const response = await fetch('api/superadmin/returning/extend', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        Swal.fire('Success', 'Due date extended successfully.', 'success');
+
+                        setText('modal-due-date', result.new_due_date);
+
+                        fetchTableData();
+                    } else {
+                        Swal.fire('Error', result.message || 'Could not extend due date.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error extending due date:', error);
+                    Swal.fire('Error', 'Could not connect to server.', 'error');
+                }
+            }
+        });
+    }
 
 
     const openAvailableModal = (bookData, status) => {
@@ -305,15 +322,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        document.addEventListener('click', (e) => {
-            if (e.target !== accessionInput) {
-                setTimeout(() => qrCodeValueInput.focus(), 10);
-            }
-        });
+        // document.addEventListener('click', (e) => {
+        //     if (e.target !== accessionInput) {
+        //         setTimeout(() => qrCodeValueInput.focus(), 10);
+        //     }
+        // });
     }
 
 
-    // --- Manual input / Enter key ---
     if (accessionInput) {
         accessionInput.removeAttribute('readonly');
         accessionInput.addEventListener('keydown', e => {
@@ -324,7 +340,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- Handle "Mark as Returned" ---
     if (modalReturnButton) {
         modalReturnButton.addEventListener('click', async () => {
             const borrowingId = modalReturnButton.dataset.borrowingId;

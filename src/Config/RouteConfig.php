@@ -93,14 +93,14 @@ class RouteConfig
         $router->get('api/librarian/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/librarian/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
         $router->get('api/librarian/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
-        // PDF Report Generation Route
-        $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
         $router->post('api/librarian/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['borrowing form']);
         $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['borrowing form']);
         $router->get('api/librarian/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
         $router->post('api/librarian/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
         $router->post('api/librarian/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
-
+        // PDF Report Generation Route
+        $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
+        
 
 
         // --- ADMIN (AJAX/Data Routes) ---
@@ -128,14 +128,15 @@ class RouteConfig
         $router->get('api/admin/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
         $router->get('api/admin/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
-        // PDF Report Generation Route
-        $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
         $router->post('api/admin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['borrowing form']);
         $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['borrowing form']);
         $router->get('api/admin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
         $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
         $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
 
+        // PDF Report Generation Route
+        $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
+       
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
         $router->get('api/superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);

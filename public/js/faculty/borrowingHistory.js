@@ -11,6 +11,21 @@ const statReturned = document.getElementById('statReturned');
 
 // --- Pagination State ---
 let currentPage = 1;
+// --- Page Memory ---
+try {
+    const savedPage = sessionStorage.getItem('facultyBorrowingHistoryPage');
+    if (savedPage) {
+        const parsedPage = parseInt(savedPage, 10);
+        if (!isNaN(parsedPage) && parsedPage > 0) {
+            currentPage = parsedPage;
+        } else {
+            sessionStorage.removeItem('facultyBorrowingHistoryPage');
+        }
+    }
+} catch (e) {
+    console.error("SessionStorage Error:", e);
+    currentPage = 1;
+}
 const limit = 5;
 
 // --- Render Functions ---
@@ -123,6 +138,13 @@ function renderPagination(totalPages, currentPage) {
 
 // --- Data Fetching ---
 async function fetchBorrowingData(page = 1) {
+  // --- Page Memory ---
+  try {
+      sessionStorage.setItem('facultyBorrowingHistoryPage', page);
+  } catch (e) {
+      console.error("SessionStorage Error:", e);
+  }
+
   if (typeof BASE_URL_JS === 'undefined') {
     recordsContainer.innerHTML = `<div class="text-center py-10 text-red-500">Configuration error.</div>`;
     return;
@@ -170,7 +192,7 @@ async function fetchStats() {
 
 // --- Event Listeners ---
 document.addEventListener('DOMContentLoaded', () => {
-  fetchBorrowingData(1);
+  fetchBorrowingData(currentPage);
 
   paginationContainer.addEventListener('click', (e) => {
     e.preventDefault();

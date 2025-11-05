@@ -52,7 +52,7 @@ jobs:
             */.github
             **/node_modules/**
             checkout_test.txt
-            docs
+            /docs
             resetdata.php
             sandbox.php
             **/deploy.yml

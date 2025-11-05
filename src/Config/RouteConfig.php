@@ -97,6 +97,8 @@ class RouteConfig
         $router->get('api/librarian/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
         $router->post('api/librarian/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
         $router->post('api/librarian/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
+        $router->get('api/librarian/borrowingForm/getEquipments', 'ManualBorrowingController@getEquipments', ['borrowing form']);
+        $router->get('api/librarian/borrowingForm/getCollaterals', 'ManualBorrowingController@getCollaterals', ['borrowing form']);
         // PDF Report Generation Route
         $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
         
@@ -115,9 +117,11 @@ class RouteConfig
         $router->post('api/admin/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
         $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
-        // $router->get('api/admin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
-        // $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
-        // $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
+        $router->get('api/admin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
+        $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
+        $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
+        $router->get('api/admin/borrowingForm/getEquipments', 'ManualBorrowingController@getEquipments', ['borrowing form']);
+        $router->get('api/admin/borrowingForm/getCollaterals', 'ManualBorrowingController@getCollaterals', ['borrowing form']);
         $router->get('api/admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
@@ -128,11 +132,7 @@ class RouteConfig
         $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
         $router->get('api/admin/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
         $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['borrowing form']);
-        $router->get('api/admin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
-        $router->get('api/admin/borrowingForm/getEquipments', 'ManualBorrowingController@getEquipments', ['borrowing form']);
-        $router->get('api/admin/borrowingForm/getCollaterals', 'ManualBorrowingController@getCollaterals', ['borrowing form']);
-        $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser'['borrowing form']);
-        $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create'['borrowing form']);
+
 
         // PDF Report Generation Route
         $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
@@ -180,8 +180,8 @@ class RouteConfig
         $router->get('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
         $router->get('api/superadmin/borrowingForm/getEquipments', 'ManualBorrowingController@getEquipments', ['superadmin']);
         $router->get('api/superadmin/borrowingForm/getCollaterals', 'ManualBorrowingController@getCollaterals', ['superadmin']);
-        $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser'['superadmin']);
-        $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create'['superadmin']);
+        $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
+        $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
         $router->get('api/superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);
         $router->get('api/superadmin/reports/top-visitors', 'ReportController@getTopVisitors', ['superadmin']);
         $router->get('api/superadmin/reports/deleted-books', 'ReportController@getDeletedBooks', ['superadmin']);

@@ -342,17 +342,32 @@ window.addEventListener("DOMContentLoaded", () => {
 
     createPageLink("prev", `<i class="flex ph ph-caret-left text-lg gap-2s"></i> Previous`, page - 1, page === 1);
 
-    const window = 2;
-    let pagesToShow = new Set([1, totalPages, page]);
-    for (let i = 1; i <= window; i++) {
-      if (page - i > 0) pagesToShow.add(page - i);
-      if (page + i <= totalPages) pagesToShow.add(page + i);
+    // Responsive page window size
+    const isMobile = window.innerWidth < 640; 
+    let pagesToShow = new Set();
+
+    // Desktop: show first, last, current, ±2
+    // Mobile: show current ±1 only
+    if (isMobile) {
+      for (let i = -1; i <= 1; i++) {
+        const p = page + i;
+        if (p > 0 && p <= totalPages) pagesToShow.add(p);
+      }
+    } else {
+      pagesToShow.add(1);
+      pagesToShow.add(totalPages);
+      for (let i = -2; i <= 2; i++) {
+        const p = page + i;
+        if (p > 0 && p <= totalPages) pagesToShow.add(p);
+      }
     }
 
     const sortedPages = [...pagesToShow].sort((a, b) => a - b);
     let lastPage = 0;
     for (const p of sortedPages) {
-      if (p > lastPage + 1) createPageLink("ellipsis", "…", "...", true);
+      // Hide ellipsis on mobile for simplicity
+      if (!isMobile && p > lastPage + 1)
+        createPageLink("ellipsis", "…", "...", true);
       createPageLink("number", p, p, false, p === page);
       lastPage = p;
     }

@@ -45,18 +45,20 @@ switch ($role) {
     <div class="flex items-center gap-4">
         <div class="flex items-center gap-3">
 
-            <div id="headerAvatarContainer" class="w-9 h-9 rounded-full bg-orange-100 border border-orange-300 flex items-center justify-center text-orange-600 text-lg font-semibold overflow-hidden">
-                <?php if ($profilePic):
-                    // Tiyakin na walang leading slash ang path bago i-append sa BASE_URL
-                    $cleanProfilePic = ltrim($profilePic, '/');
-                ?>
-                    <img id="headerProfilePic"
-                        src="<?= BASE_URL ?>/<?= htmlspecialchars($cleanProfilePic) ?>"
-                        alt="Profile"
-                        class="w-full h-full object-cover">
-                <?php else: ?>
-                    <i id="headerProfileIcon" class="ph ph-user"></i>
-                <?php endif; ?>
+            <div class="w-9 h-9 rounded-full overflow-hidden flex-none border border-orange-300"> <!-- Outer div for shape -->
+                <div id="headerAvatarContainer" class="w-full h-full bg-orange-100 flex items-center justify-center text-orange-600 text-lg font-semibold"> <!-- Inner div for content -->
+                    <?php if ($profilePic):
+                        // Tiyakin na walang leading slash ang path bago i-append sa BASE_URL
+                        $cleanProfilePic = ltrim($profilePic, '/');
+                    ?>
+                        <img id="headerProfilePic"
+                            src="<?= BASE_URL ?>/<?= htmlspecialchars($cleanProfilePic) ?>"
+                            alt="Profile"
+                            class="w-full h-full object-cover">
+                    <?php else: ?>
+                        <i id="headerProfileIcon" class="ph ph-user"></i>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <div class="leading-tight">

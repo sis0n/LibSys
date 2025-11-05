@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Core\Database;
 use PDO;
+use PDOException;
 
 class TransactionHistoryRepository
 {
@@ -14,41 +15,61 @@ class TransactionHistoryRepository
     $this->db = Database::getInstance()->getConnection();
   }
 
-  public function getAllTransactions(?string $date = null): array
+  private function getBaseSelectQuery(): string
   {
-    $sql = "
+    return "
             SELECT 
-                bt.transaction_id,
-                bt.transaction_code,
-                bt.borrowed_at,
-                bt.due_date,
-                bt.expires_at,
+                bt.transaction_id, bt.transaction_code, bt.borrowed_at, bt.due_date, bt.expires_at,
                 bti.returned_at,
                 bt.status AS transaction_status,
 
                 librarian.user_id AS librarian_id,
                 CONCAT(librarian.first_name, ' ', COALESCE(librarian.middle_name,''), ' ', librarian.last_name) AS librarian_name,
 
-                s.student_id,
-                CONCAT(student_user.first_name, ' ', COALESCE(student_user.middle_name,''), ' ', student_user.last_name) AS studentName,
-                s.student_number,
-                s.course,
-                s.year_level,
-                s.section,
+                s.student_id, s.student_number, s.course_id, s.year_level, s.section,
+                f.faculty_id, f.unique_faculty_id, f.college_id,
+                st.staff_id, st.employee_id, st.position,
+                g.guest_id, g.first_name AS guest_first_name, g.last_name AS guest_last_name,
 
-                b.book_id,
-                b.title AS book_title,
-                b.author AS book_author,
-                b.accession_number,
-                b.call_number,
-                b.book_isbn,
-                b.cover
+                COALESCE(su.first_name, fu.first_name, stu.first_name, g.first_name) AS first_name,
+                COALESCE(su.middle_name, fu.middle_name, stu.middle_name) AS middle_name,
+                COALESCE(su.last_name, fu.last_name, stu.last_name, g.last_name) AS last_name,
+
+                b.book_id, b.title AS book_title, b.author AS book_author, b.accession_number, b.call_number, b.book_isbn, b.cover,
+                
+                c.course_code, c.course_title,
+                cl.college_code, cl.college_name
+        ";
+  }
+
+  private function getBaseFromJoinQuery(): string
+  {
+    return "
             FROM borrow_transactions bt
             JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
             JOIN books b ON bti.book_id = b.book_id
-            JOIN students s ON bt.student_id = s.student_id
+            
+            LEFT JOIN students s ON bt.student_id = s.student_id
+            LEFT JOIN faculty f ON bt.faculty_id = f.faculty_id
+            LEFT JOIN staff st ON bt.staff_id = st.staff_id
+            LEFT JOIN guests g ON bt.guest_id = g.guest_id
+            
+            -- User Details for Borrowers
+            LEFT JOIN users su ON s.user_id = su.user_id
+            LEFT JOIN users fu ON f.user_id = fu.user_id
+            LEFT JOIN users stu ON st.user_id = stu.user_id
+
+            -- Course/College Details
+            LEFT JOIN courses c ON s.course_id = c.course_id
+            LEFT JOIN colleges cl ON f.college_id = cl.college_id
+
             LEFT JOIN users librarian ON bt.librarian_id = librarian.user_id
-            LEFT JOIN users student_user ON s.user_id = student_user.user_id
+        ";
+  }
+
+  public function getAllTransactions(?string $date = null): array
+  {
+    $sql = $this->getBaseSelectQuery() . $this->getBaseFromJoinQuery() . "
             WHERE bt.status != 'Pending'
             " . ($date ? " AND DATE(bt.borrowed_at) = :date" : "") . "
             ORDER BY bt.borrowed_at DESC
@@ -63,44 +84,11 @@ class TransactionHistoryRepository
 
   public function getTransactionsByStatus(string $status, ?string $date = null): array
   {
-    // Prevent Pending from being queried
     if (strtolower($status) === 'pending') {
       return [];
     }
 
-    $sql = "
-            SELECT 
-                bt.transaction_id,
-                bt.transaction_code,
-                bt.borrowed_at,
-                bt.due_date,
-                bt.expires_at,
-                bti.returned_at,
-                bt.status AS transaction_status,
-
-                librarian.user_id AS librarian_id,
-                CONCAT(librarian.first_name, ' ', COALESCE(librarian.middle_name,''), ' ', librarian.last_name) AS librarian_name,
-
-                s.student_id,
-                CONCAT(student_user.first_name, ' ', COALESCE(student_user.middle_name,''), ' ', student_user.last_name) AS studentName,
-                s.student_number,
-                s.course,
-                s.year_level,
-                s.section,
-
-                b.book_id,
-                b.title AS book_title,
-                b.author AS book_author,
-                b.accession_number,
-                b.call_number,
-                b.book_isbn,
-                b.cover
-            FROM borrow_transactions bt
-            JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
-            JOIN books b ON bti.book_id = b.book_id
-            JOIN students s ON bt.student_id = s.student_id
-            LEFT JOIN users librarian ON bt.librarian_id = librarian.user_id
-            LEFT JOIN users student_user ON s.user_id = student_user.user_id
+    $sql = $this->getBaseSelectQuery() . $this->getBaseFromJoinQuery() . "
             WHERE bt.status = :status
             " . ($date ? " AND DATE(bt.borrowed_at) = :date" : "") . "
             ORDER BY bt.borrowed_at DESC

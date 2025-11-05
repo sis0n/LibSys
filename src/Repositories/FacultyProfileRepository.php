@@ -14,38 +14,47 @@ class FacultyProfileRepository
     $this->db = Database::getInstance()->getConnection();
   }
 
+
   public function getProfileByUserId(int $userId): ?array
   {
     $stmt = $this->db->prepare("
-            SELECT 
-                u.user_id,
-                u.username,
-                u.first_name,
-                u.middle_name,
-                u.last_name,
-                u.suffix,
-                u.email,
-                u.profile_picture,
-                u.role,
-                u.is_active,
-                f.unique_faculty_id,
-                f.department,
-                f.contact,
-                f.status,
-                f.profile_updated
-            FROM users u
-            LEFT JOIN faculty f ON u.user_id = f.user_id
-            WHERE u.user_id = :userId AND u.deleted_at IS NULL
-        ");
+        SELECT 
+            u.user_id,
+            u.username,
+            u.first_name,
+            u.middle_name,
+            u.last_name,
+            u.suffix,
+            u.email,
+            u.profile_picture,
+            u.role,
+            u.is_active,
+            f.faculty_id,
+            f.unique_faculty_id,
+            f.college_id,         
+            f.contact,
+            f.profile_updated,
+            c.college_code,         
+            c.college_name          
+        FROM users u
+        LEFT JOIN faculty f ON u.user_id = f.user_id
+        LEFT JOIN colleges c ON f.college_id = c.college_id /* JOIN sa colleges para sa pangalan */
+        WHERE u.user_id = :userId AND u.deleted_at IS NULL
+    ");
     $stmt->execute([':userId' => $userId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result && $result['college_code'] && $result['college_name']) {
+      $result['college_full_name'] = $result['college_code'] . ' - ' . $result['college_name'];
+    }
+
     return $result ?: null;
   }
 
   public function updateFacultyProfile(int $userId, array $data): bool
   {
     $allowedFields = [
-      'department',
+      'college_id',
       'contact',
       'profile_updated',
       'status'

@@ -41,63 +41,46 @@
         </div>
     </div>
 
-   <!-- First Row of Tables -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-    <!-- Library Resources Table -->
-    <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-2 flex flex-col scale-[1.02]">
-        <h3 class="text-lg font-medium mb-4 text-center mt-2">Library Resources</h3>
-        <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
-            <table class="w-full text-sm border-collapse">
-                <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
-                    <tr>
-                        <th scope="col" class="px-4 py-3 text-center">YEAR</th>
-                        <th scope="col" class="px-4 py-3 text-center">TITLE</th>
-                        <th scope="col" class="px-4 py-3 text-center">VOLUME</th>
-                        <th scope="col" class="px-4 py-3 text-center">PROCESSED</th>
-                    </tr>
-                </thead>
-                <tbody id="library-resources-tbody"></tbody>
-            </table>
-        </div>
-    </div>
+    <!-- First Row of Tables -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
 
-    <!-- Circulated Books Table -->
-    <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-2 flex flex-col scale-[1.02]">
-        <h3 class="text-lg font-medium mb-4 text-center mt-2">Circulated Books</h3>
-        <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
-            <table class="w-full text-sm border-collapse">
-                <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
-                    <tr>
-                        <th scope="col" class="px-4 py-3 text-center">Category</th>
-                        <th scope="col" class="px-4 py-3 text-center">Today</th>
-                        <th scope="col" class="px-4 py-3 text-center">Week</th>
-                        <th scope="col" class="px-4 py-3 text-center">Month</th>
-                        <th scope="col" class="px-4 py-3 text-center">Year</th>
-                    </tr>
-                </thead>
-                <tbody id="circulated-books-tbody"></tbody>
-            </table>
+        <!-- Circulated Books Table -->
+        <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-4">
+            <h3 class="text-lg font-medium mb-4 text-center mt-2">Circulated Books</h3>
+            <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
+                <table class="w-full text-sm border-collapse">
+                    <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left">Category</th>
+                            <th scope="col" class="px-4 py-3 text-center">Today</th>
+                            <th scope="col" class="px-4 py-3 text-center">Week</th>
+                            <th scope="col" class="px-4 py-3 text-center">Month</th>
+                            <th scope="col" class="px-4 py-3 text-center">Year</th>
+                        </tr>
+                    </thead>
+                    <tbody id="circulated-books-tbody"></tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <!-- Deleted Books Table -->
-    <div class="bg-white border-orange-200 rounded-lg shadow-sm p-2 flex flex-col scale-[1.02]">
-        <h3 class="text-lg font-medium mb-4 text-center mt-2">Deleted Books</h3>
-        <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
-            <table class="w-full text-sm border-collapse">
-                <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
-                    <tr>
-                        <th scope="col" class="px-4 py-3 text-center">Count</th>
-                        <th scope="col" class="px-4 py-3 text-center">Today</th>
-                        <th scope="col" class="px-4 py-3 text-center">Month</th>
-                        <th scope="col" class="px-4 py-3 text-center">Year</th>
-                    </tr>
-                </thead>
-                <tbody id="deleted-books-tbody"></tbody>
-            </table>
+        <!-- Deleted Books Table -->
+        <div class="bg-white border border-orange-200 rounded-lg shadow-sm p-4">
+            <h3 class="text-lg font-medium mb-4 text-center mt-2">Deleted Books</h3>
+            <div class="flex-1 overflow-x-auto rounded-lg border border-orange-200">
+                <table class="w-full text-sm border-collapse">
+                    <thead class="bg-orange-50 text-gray-700 border-b border-orange-100">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left">Year</th>
+                            <th scope="col" class="px-4 py-3 text-center">Month</th>
+                            <th scope="col" class="px-4 py-3 text-center">Today</th>
+                            <th scope="col" class="px-4 py-3 text-center">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deleted-books-tbody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Second Row of Tables -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -178,4 +161,7 @@
     </div>
 
 </main>
+<script>
+const BASE_URL = "<?= BASE_URL ?>";
+</script>
 <script src="<?= BASE_URL ?>/js/librarian/reports.js"></script>

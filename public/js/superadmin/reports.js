@@ -7,193 +7,187 @@ document.addEventListener('DOMContentLoaded', function () {
     const endDateInput = document.getElementById('endDate');
     const downloadReportBtn = document.getElementById('download-report-btn');
 
-    // --- Library Resources ---
-    const libraryResourcesData = [
-        { year: 2025, title: '-', volume: '-', processed: '-' },
-        { year: 2026, title: '-', volume: '-', processed: '-' },
-        { year: 2027, title: '-', volume: '-', processed: '-' },
-    ];
-
-    const libraryResourcesTbody = document.getElementById('library-resources-tbody');
-    if (libraryResourcesTbody) {
-        libraryResourcesData.forEach(data => {
-            const row = document.createElement('tr');
-            row.classList.add('border-b', 'border-orange-100');
-            row.innerHTML = `
-                <td class="px-6 py-4 text-center font-medium">${data.year}</td>
-                <td class="px-6 py-4 text-center font-medium">${data.title}</td>
-                <td class="px-6 py-4 text-center font-medium">${data.volume}</td>
-                <td class="px-6 py-4 text-center font-medium">${data.processed}</td>
-            `;
-            libraryResourcesTbody.appendChild(row);
-        });
-    }
-
     // --- Circulated Books ---
-    const circulatedBooksData = [
-        { category: 'Student', today: '-', week: '-', month: '-', year: '-' },
-        { category: 'Faculty', today: '-', week: '-', month: '-', year: '-' },
-        { category: 'Staff', today: '-', week: '-', month: '-', year: '-' }
-    ];
+        async function populateCirculatedBooks() {
+            const tbody = document.getElementById('circulated-books-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Loading...</td></tr>';
+    
+            try {
+                const response = await fetch(`${BASE_URL}/api/superadmin/reports/circulated-books`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                tbody.innerHTML = ''; // Clear loading message
+    
+                if (result.data && result.data.length > 0) {
+                    result.data.forEach(row => {
+                        const isTotalRow = row.category === 'TOTAL';
+                        const tr = document.createElement('tr');
+                        
+                        if (isTotalRow) {
+                            tr.classList.add('bg-orange-50', 'font-bold');
+                        } else {
+                            tr.classList.add('border-b', 'border-orange-100');
+                        }
+    
+                        tr.innerHTML = `
+                            <td class="px-4 py-2 text-left ${isTotalRow ? 'font-bold' : 'font-medium text-gray-700'}">${row.category}</td>
+                            <td class="px-4 py-2 text-center">${row.today || 0}</td>
+                            <td class="px-4 py-2 text-center">${row.week || 0}</td>
+                            <td class="px-4 py-2 text-center">${row.month || 0}</td>
+                            <td class="px-4 py-2 text-center">${row.year || 0}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">No data available.</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading circulated books report:', error);
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-red-500">Failed to load report. Check console for details.</td></tr>';
+            }
+        }
+    
+    
+        // --- Deleted Books ---
+        async function populateDeletedBooks() {
+            const tbody = document.getElementById('deleted-books-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">Loading...</td></tr>';
+    
+            try {
+                const response = await fetch(`${BASE_URL}/api/superadmin/reports/deleted-books`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                tbody.innerHTML = ''; // Clear loading message
+    
+                if (result.success && result.data && result.data.length > 0) {
+                    result.data.forEach(row => {
+                        const isTotalRow = row.year === 'TOTAL';
+                        const tr = document.createElement('tr');
+    
+                        if (isTotalRow) {
+                            tr.classList.add('bg-orange-50', 'font-bold');
+                        } else {
+                            tr.classList.add('border-b', 'border-orange-100');
+                        }
+    
+                        tr.innerHTML = `
+                            <td class="px-4 py-2 text-left">${row.year}</td>
+                            <td class="px-4 py-2 text-center">${row.month}</td>
+                            <td class="px-4 py-2 text-center">${row.today}</td>
+                            <td class="px-4 py-2 text-center font-medium text-gray-700">${row.count}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">No data available.</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading deleted books report:', error);
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-red-500">Failed to load report.</td></tr>';
+            }
+        }
+    
+        // --- Library Visit by Department ---
+        async function populateLibraryVisitByDepartment() {
+            const tbody = document.getElementById('library-visit-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Loading...</td></tr>';
 
-    function populateCirculatedBooks() {
-        const tbody = document.getElementById('circulated-books-tbody');
-        if (!tbody) return;
-        tbody.innerHTML = ''; // Clear existing rows
+            try {
+                const response = await fetch(`${BASE_URL}/api/superadmin/reports/library-visits-department`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                tbody.innerHTML = ''; // Clear loading message
 
-        circulatedBooksData.forEach(data => {
-            const row = document.createElement('tr');
-            row.classList.add('border-b', 'border-orange-100');
-            row.innerHTML = `
-                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.category}</td>
-                <td class="px-4 py-2 text-center">${data.today}</td>
-                <td class="px-4 py-2 text-center">${data.week}</td>
-                <td class="px-4 py-2 text-center">${data.month}</td>
-                <td class="px-4 py-2 text-center">${data.year}</td>
-            `;
-            tbody.appendChild(row);
-        });
+                if (result.success && result.data && result.data.length > 0) {
+                    result.data.forEach(row => {
+                        const isTotalRow = row.department === 'TOTAL';
+                        const tr = document.createElement('tr');
 
-        const totalRow = document.createElement('tr');
-        totalRow.classList.add('bg-orange-50', 'font-bold');
-        totalRow.innerHTML = `
-            <td class="px-4 py-2 text-left">TOTAL</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-        `;
-        tbody.appendChild(totalRow);
-    }
+                        if (isTotalRow) {
+                            tr.classList.add('bg-orange-50', 'font-bold');
+                        } else {
+                            tr.classList.add('border-b', 'border-orange-100');
+                        }
 
-
-    // --- Deleted Books ---
-    const deletedBooksData = [
-        { count: '-', today: '-', month: '-', year: '-' },
-        { count: '-', today: '-', month: '-', year: '-' },
-        { count: '-', today: '-', month: '-', year: '-' }
-    ];
-
-    function populateDeletedBooks() {
-        const tbody = document.getElementById('deleted-books-tbody');
-        if (!tbody) return;
-        tbody.innerHTML = ''; // Clear existing rows
-
-        deletedBooksData.forEach(data => {
-            const row = document.createElement('tr');
-            row.classList.add('border-b', 'border-orange-100');
-            row.innerHTML = `
-                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.count}</td>
-                <td class="px-4 py-2 text-center">${data.today}</td>
-                <td class="px-4 py-2 text-center">${data.month}</td>
-                <td class="px-4 py-2 text-center">${data.year}</td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        const totalRow = document.createElement('tr');
-        totalRow.classList.add('bg-orange-50', 'font-bold');
-        totalRow.innerHTML = `
-            <td class="px-4 py-2 text-left">TOTAL</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-            <td class="px-4 py-2 text-center">-</td>
-        `;
-        tbody.appendChild(totalRow);
-    }
-
-    // --- Library Visit by Department ---
-    const libraryVisitByDepartmentData = [
-        { department: 'CBA', today: 0, week: 0, month: 0, year: 0 },
-        { department: 'CCJE', today: 0, week: 0, month: 0, year: 0 },
-        { department: 'CLAS', today: 0, week: 0, month: 0, year: 0 },
-        { department: 'COE', today: 0, week: 0, month: 0, year: 0 },
-        { department: 'COEngr', today: 0, week: 0, month: 0, year: 0 },
-        { department: 'LAW', today: 0, week: 0, month: 0, year: 0 },
-        { department: 'GS', today: 0, week: 0, month: 0, year: 0 },
-    ];
-
-    function populateLibraryVisitByDepartment() {
-        const tbody = document.getElementById('library-visit-tbody');
-        if (!tbody) return;
-        tbody.innerHTML = ''; // Clear existing rows
-
-        let totalToday = 0;
-        let totalWeek = 0;
-        let totalMonth = 0;
-        let totalYear = 0;
-
-        libraryVisitByDepartmentData.forEach(data => {
-            const row = document.createElement('tr');
-            row.classList.add('border-b', 'border-orange-100');
-            row.innerHTML = `
-                <td class="px-4 py-2 text-left font-medium text-gray-700">${data.department}</td>
-                <td class="px-4 py-2 text-center">${data.today}</td>
-                <td class="px-4 py-2 text-center">${data.week}</td>
-                <td class="px-4 py-2 text-center">${data.month}</td>
-                <td class="px-4 py-2 text-center">${data.year}</td>
-            `;
-            tbody.appendChild(row);
-
-            totalToday += data.today;
-            totalWeek += data.week;
-            totalMonth += data.month;
-            totalYear += data.year;
-        });
-
-        const totalRow = document.createElement('tr');
-        totalRow.classList.add('bg-orange-50', 'font-bold', 'text-gray-800');
-        totalRow.innerHTML = `
-            <td class="px-4 py-2 text-left">TOTAL</td>
-            <td class="px-4 py-2 text-center">${totalToday}</td>
-            <td class="px-4 py-2 text-center">${totalWeek}</td>
-            <td class="px-4 py-2 text-center">${totalMonth}</td>
-            <td class="px-4 py-2 text-center">${totalYear}</td>
-        `;
-        tbody.appendChild(totalRow);
-    }
-
-    // --- Top 10 Visitors ---
-    const topVisitorsData = [
-        { rank: 1, name: 'Alex Johnson', id: '20230001-S', course:'BSCS', visits: '-' },
-        { rank: 2, name: 'Maria Garcia', id: '20230002-S', course:'BSCS', visits: '-' },
-        { rank: 3, name: 'David Wilson', id: '20230003-S', course:'BSCS', visits: '-' },
-        { rank: 4, name: 'Emma Davis', id: '20230004-S', course:'BSCS', visits: '-' },
-        { rank: 5, name: 'Michael Brown', id: '20230004-S', course:'BSCS', visits: '-' },
-        { rank: 6, name: 'Sophie Wilson', id: '20230004-S', course:'BSCS', visits: '-' },
-        { rank: 7, name: 'James Taylor', id: '20230004-S', course:'BSCS', visits: '-' },
-        { rank: 8, name: 'Lisa Anderson', id: '20230004-S', course:'BSCS', visits: '-' },
-        { rank: 9, name: 'Paul Walker', id: '20230004-S', course:'BSCS', visits: '-' },
-        { rank: 10, name: 'Nancy Wheeler', id: '20230004-S', course:'BSCS', visits: '-' },
-    ];
-
-    function populateTopVisitors() {
-        const tbody = document.getElementById('top-visitors-tbody');
-        if (!tbody) return;
-        
-        topVisitorsData.forEach(data => {
-        const row = document.createElement('tr');
-        row.classList.add('border-b', 'border-orange-100');
-
-        let rankColor = 'text-black font-normal';
-        if (data.rank === 1) rankColor = 'text-yellow-400 font-bold';
-        else if (data.rank === 2) rankColor = 'text-gray-400 font-bold';
-        else if (data.rank === 3) rankColor = 'text-orange-500 font-bold';
-
-        row.innerHTML = `
-            <td class="px-4 py-2 text-left">
-                <span class="inline-block text-center ${rankColor}">${data.rank}</span>
-            </td>
-            <td class="px-4 py-2 text-left font-medium text-gray-700">${data.name}</td>
-            <td class="px-4 py-2 text-center">${data.id}</td>
-            <td class="px-4 py-2 text-center">${data.course}</td>
-            <td class="px-4 py-2 text-center">${data.visits}</td>
-        `;
-        tbody.appendChild(row);
-    });
-
-    }
-
+                        tr.innerHTML = `
+                            <td class="px-4 py-2 text-left ${isTotalRow ? 'font-bold' : 'font-medium text-gray-700'}">${row.department}</td>
+                            <td class="px-4 py-2 text-center">${row.today || 0}</td>
+                            <td class="px-4 py-2 text-center">${row.week || 0}</td>
+                            <td class="px-4 py-2 text-center">${row.month || 0}</td>
+                            <td class="px-4 py-2 text-center">${row.year || 0}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">No data available.</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading library visits by department report:', error);
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-red-500">Failed to load report. Check console for details.</td></tr>';
+            }
+        }
+    
+        // --- Top 10 Visitors ---
+        async function populateTopVisitors() {
+            const tbody = document.getElementById('top-visitors-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Loading...</td></tr>';
+    
+            try {
+                const response = await fetch(`${BASE_URL}/api/superadmin/reports/top-visitors`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                tbody.innerHTML = ''; // Clear loading message
+    
+                if (result.success && result.data && result.data.length > 0) {
+                    result.data.forEach((visitor, index) => {
+                        const rank = index + 1;
+                        const tr = document.createElement('tr');
+                        tr.classList.add('border-b', 'border-orange-100');
+    
+                        let rankColor = 'text-black font-normal';
+                        if (rank === 1) rankColor = 'text-yellow-400 font-bold';
+                        else if (rank === 2) rankColor = 'text-gray-400 font-bold';
+                        else if (rank === 3) rankColor = 'text-orange-500 font-bold';
+    
+                        tr.innerHTML = `
+                            <td class="px-4 py-2 text-left">
+                                <span class="inline-block text-center ${rankColor}">${rank}</span>
+                            </td>
+                            <td class="px-4 py-2 text-left font-medium text-gray-700">${visitor.full_name}</td>
+                            <td class="px-4 py-2 text-center">${visitor.student_number}</td>
+                            <td class="px-4 py-2 text-center">${visitor.course}</td>
+                            <td class="px-4 py-2 text-center">${visitor.visits}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">No visitor data available for this year.</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading top visitors report:', error);
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-red-500">Failed to load report.</td></tr>';
+            }
+        }
     // --- Call Functions ---
     populateCirculatedBooks();
     populateDeletedBooks();
@@ -219,9 +213,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (startDate && endDate) {
                 customDateModal.classList.add('hidden');
-                
-                const reportUrl = `/LibSys/src/Views/report_pdf_template/pdfTemplate.php?start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}`;
-                window.open(reportUrl, '_blank');
+
+                // Create a form to submit the data via POST to trigger the PDF download
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `${BASE_URL}/generate-report`;
+                form.target = '_blank'; // Open in a new tab to not interrupt the user's view
+
+                const startInput = document.createElement('input');
+                startInput.type = 'hidden';
+                startInput.name = 'start_date';
+                startInput.value = startDate;
+                form.appendChild(startInput);
+
+                const endInput = document.createElement('input');
+                endInput.type = 'hidden';
+                endInput.name = 'end_date';
+                endInput.value = endDate;
+                form.appendChild(endInput);
+
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
             } else {
                 alert('Please select both start and end dates.');
             }
@@ -233,104 +246,85 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Define initializeCharts function outside DOMContentLoaded
-function initializeCharts() {
+async function initializeCharts() {
     // Top Visitors Chart
-    const topCtx = document.getElementById('topVisitorsChart');
-    if (topCtx) {
-        new Chart(topCtx.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: ['CBA', 'CCJE', 'CLAS', 'COE', 'COEngr'],
-                datasets: [{
-                    label: 'Visits',
-                    data: [15, 10, 8, 12, 9],
-                    backgroundColor: '#22c55e',
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
+    const topCtx = document.getElementById('topVisitorsChart')?.getContext('2d');
+    
     // Weekly Activity Chart
-    const weeklyCtx = document.getElementById('weeklyActivityChart');
-    if (weeklyCtx) {
-        new Chart(weeklyCtx.getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [
-                    {
-                        label: 'Visitors',
-                        data: [12, 19, 9, 14, 8, 11, 15],
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59,130,246,0.1)',
-                        tension: 0.4,
-                        fill: true,
-                    },
-                    {
-                        label: 'Checkouts',
-                        data: [8, 14, 5, 10, 6, 9, 11],
-                        borderColor: '#f97316',
-                        backgroundColor: 'rgba(249,115,22,0.1)',
-                        tension: 0.4,
-                        fill: false,
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        align: 'end',
-                        labels: {
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            boxWidth: 8,
-                            boxHeight: 8,
-                            padding: 16,
-                            font: {
-                                size: 12,
-                                weight: '500',
-                            },
+    const weeklyCtx = document.getElementById('weeklyActivityChart')?.getContext('2d');
+
+    // Fetch consolidated data
+    try {
+        const res = await fetch(`${BASE_URL}/api/superadmin/dashboard/getData`);
+        const result = await res.json();
+
+        if (!result.success) {
+            console.error("Failed to load chart data:", result.message);
+            // Optionally display an error on the chart canvases
+            return;
+        }
+
+        // === Top Visitors Chart ===
+        if (topCtx && result.topVisitors) {
+            const topLabels = result.topVisitors.map(v => v.user_name || "Unknown");
+            const topData = result.topVisitors.map(v => v.visits);
+
+            new Chart(topCtx, {
+                type: "bar",
+                data: {
+                    labels: topLabels,
+                    datasets: [{
+                        label: "Visits",
+                        data: topData,
+                        backgroundColor: "#22c55e",
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        // === Weekly Activity Chart ===
+        if (weeklyCtx && result.weeklyActivity) {
+            const weeklyLabels = result.weeklyActivity.map(w => w.day);
+            const visitorsData = result.weeklyActivity.map(w => w.visitors);
+            const borrowsData = result.weeklyActivity.map(w => w.borrows);
+
+            new Chart(weeklyCtx, {
+                type: "line",
+                data: {
+                    labels: weeklyLabels,
+                    datasets: [
+                        {
+                            label: "Visitors",
+                            data: visitorsData,
+                            borderColor: "#3b82f6",
+                            backgroundColor: "rgba(59,130,246,0.1)",
+                            tension: 0.4,
+                            fill: true
                         },
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                    },
+                        {
+                            label: "Borrows",
+                            data: borrowsData,
+                            borderColor: "#f59e0b",
+                            backgroundColor: "rgba(245,158,11,0.1)",
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: '#f3f4f6' },
-                        ticks: { color: '#4b5563' },
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#4b5563' },
-                    },
-                },
-            },
-        });
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+    } catch (err) {
+        console.error("Error loading chart data:", err);
     }
 }

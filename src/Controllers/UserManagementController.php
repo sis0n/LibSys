@@ -89,6 +89,7 @@ class UserManagementController extends Controller
     $last_name = trim($data['last_name'] ?? '');
     $username = trim($data['username'] ?? '');
     $role = strtolower(trim($data['role'] ?? ''));
+    $contact = $data['contact'] ?? 'N/A';
 
     if (!$first_name || !$last_name || !$username || !$role) {
       echo json_encode([
@@ -101,15 +102,9 @@ class UserManagementController extends Controller
     try {
       if ($role === 'student') {
         $studentNumber = $username;
-
-        if (!$studentNumber) {
-          echo json_encode(['success' => false, 'message' => 'Student Number (Username) is required for students.']);
-          return;
-        }
-
         if ($this->studentRepo->studentNumberExists($studentNumber)) {
           echo json_encode(['success' => false, 'message' => 'Student Number already exists.']);
-          return;
+          exit;
         }
       }
 
@@ -133,19 +128,32 @@ class UserManagementController extends Controller
       // roles based
       switch ($role) {
         case 'student':
+          $studentNumber = $username;
+          $courseId = filter_var($data['course_id'] ?? null, FILTER_VALIDATE_INT);
+          if (!$courseId) {
+            echo json_encode(['success' => false, 'message' => 'Course/Program selection is required']);
+            return;
+          }
           $this->studentRepo->insertStudent(
             $userId,
             $username,
-            $data['course'] ?? 'N/A',
+            $courseId,
             $data['year_level'] ?? 1,
             'enrolled'
           );
           break;
 
         case 'faculty':
-          $facultyId = $this->facultyRepo->insertFaculty(
+          $collegeId = filter_var($data['college_id'] ?? null, FILTER_VALIDATE_INT);
+
+          if (!$collegeId) {
+            echo json_encode(['success' => false, 'message' => 'Department is required!']);
+            return;
+          }
+          $this->facultyRepo->insertFaculty(
             $userId,
-            $data['department'] ?? 'N/A',
+            $collegeId,
+            $contact,
             $data['contact'] ?? 'N/A',
             'active'
           );
@@ -157,7 +165,7 @@ class UserManagementController extends Controller
             $userId,
             $data['employee_id'] ?? 'N/A',
             $data['position'] ?? 'N/A',
-            $data['contact'] ?? 'N/A',
+            $contact,
             'active'
           );
 
@@ -280,19 +288,51 @@ class UserManagementController extends Controller
     }
 
     try {
-      if (isset($data['password']) && !empty($data['password'])) {
-        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-      }
+      // Itabi ang module data
+      $modulesPayload = $data['modules'] ?? null;
+      $modulesKeyWasPresent = array_key_exists('modules', $data);
+      unset($data['modules']); // Alisin sa $data para 'di ma-save sa 'users' table
 
+      // Kunin ang role ng user mula sa database (dahil hindi ito nagbabago)
+      $currentUser = $this->userRepo->getUserById((int)$id);
+      $currentRole = strtolower($currentUser['role'] ?? '');
+
+      // Siguraduhin na hindi aksidenteng mapapalitan ang role
+      unset($data['role']);
       unset($data['user_id']);
 
-      $updated = $this->userRepo->updateUser((int)$id, $data);
-
-      if (in_array(strtolower($data['role'] ?? ''), ['admin', 'librarian']) && isset($data['modules'])) {
-        $this->userPermissionRepo->assignModules((int)$id, $data['modules']);
+      // Handle password update kung meron
+      if (isset($data['password']) && !empty($data['password'])) {
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+      } else {
+        unset($data['password']); // 'Wag i-update kung empty
       }
 
-      if ($updated) {
+      // I-update ang user details (name, email, password, etc.)
+      $userUpdated = $this->userRepo->updateUser((int)$id, $data);
+
+      // --- LOGIC PARA LANG SA MODULES ---
+      $modulesUpdated = false;
+
+      // Titingnan lang natin kung ang role NIYA TALAGA ay admin o librarian
+      if ($currentRole === 'admin' || $currentRole === 'librarian') {
+
+        // At titingnan kung sinadya bang ipadala ang 'modules' key
+        if ($modulesKeyWasPresent) {
+
+          // Kung 'null' (uncheck all) or 'di array, gawing '[]'
+          $modulesToAssign = is_array($modulesPayload) ? $modulesPayload : [];
+
+          // I-sync ang modules (I-assume na ang assignModules ay nagde-DELETE muna bago mag-INSERT)
+          $this->userPermissionRepo->assignModules((int)$id, $modulesToAssign);
+          $modulesUpdated = true;
+        }
+      }
+
+      // --- END NG LOGIC ---
+
+      if ($userUpdated || $modulesUpdated) {
+        // Mag-success kung may nagbago sa details O sa modules
         echo json_encode([
           'success' => true,
           'message' => 'User updated successfully.'

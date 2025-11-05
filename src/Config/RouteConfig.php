@@ -3,7 +3,8 @@
 namespace App\Config;
 
 use App\Core\Router;
-use App\Controllers\ViewController; // Siguraduhin na na-import
+use App\Controllers\ViewController;
+use App\Controllers\DomPdfTemplateController; // Added for PDF report generation
 
 class RouteConfig
 {
@@ -14,15 +15,25 @@ class RouteConfig
         // --- VIEW ROUTES (Walang API prefix) ---
         $router->get('landingPage', 'GuestController@guestDisplay');
         $router->get('login', 'AuthController@showLogin');
-        $router->get('forgotPassword', 'AuthController@forgotPassword');
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
 
-        // --- API / DATA ROUTES (Lahat ay may 'api/' prefix) ---
+
+        // $router->get('forgotPassword', 'AuthController@forgotPassword');
+        $router->get('forgotPassword', 'ForgotPasswordController@index');
+        $router->post('forgot-password/send-otp', 'ForgotPasswordController@sendOTP');
+
+        $router->get('verifyOTP', 'ForgotPasswordController@verifyOTPPage');
+        $router->post('verify-otp/check', 'ForgotPasswordController@checkOTP');
+        $router->post('verify-otp/resend', 'ForgotPasswordController@resendOTP');
+
+        $router->get('resetPassword', 'ForgotPasswordController@resetPasswordPage');
+        $router->post('reset-password/submit', 'ForgotPasswordController@updatePassword');
 
         // Auth API
         $router->post('login', 'AuthController@login');
         $router->post('logout', 'AuthController@logout');
-        $router->post('api/change-password', 'AuthController@changePassword', ['change password']);
+        // $router->post('api/change-password', 'AuthController@changePassword', ['admin', 'librarian', 'student', 'faculty', 'staff', 'superadmin']);
+        $router->post('api/change-password', 'AuthController@changePassword');
 
         // Scanner API
         $router->post('api/scanner/scan', 'ScannerController@attendance', ['scanner']);
@@ -46,6 +57,7 @@ class RouteConfig
         $router->get('api/faculty/myprofile/get', 'FacultyProfileController@getProfile', ['faculty']);
         $router->post('api/faculty/myprofile/update', 'FacultyProfileController@updateProfile', ['faculty']);
         $router->get('api/faculty/borrowingHistory/fetch', 'FacultyBorrowingHistoryController@fetchHistory', ['faculty']);
+        $router->get('api/data/getColleges', 'DataController@getColleges', ['faculty']);
 
         // --- STAFF (AJAX/Data Routes) ---
         $router->get('api/staff/attendance/get', 'AttendanceController@getMyAttendance', ['staff']);
@@ -75,6 +87,15 @@ class RouteConfig
         $router->post('api/librarian/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/librarian/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/librarian/returning/extend', 'ReturningController@extendDueDate', ['returning']);
+        $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
+        $router->get('api/librarian/reports/circulated-books', 'ReportController@getCirculatedBooksReport',['reports']);
+        $router->get('api/librarian/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
+        $router->get('api/librarian/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
+        $router->get('api/librarian/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
+        $router->get('api/librarian/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
+        // PDF Report Generation Route
+        $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
+
 
         // --- ADMIN (AJAX/Data Routes) ---
         $router->get('api/admin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['restore books']);
@@ -86,13 +107,23 @@ class RouteConfig
         $router->post('api/admin/bookManagement/update/{id}', 'BookManagementController@update', ['book management']);
         $router->post('api/admin/bookManagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
         $router->post('api/admin/bookManagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
-        $router->post('api/admin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
         $router->post('api/admin/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
+        $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
+        $router->get('api/admin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['borrowing form']);
+        $router->post('api/admin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser', ['borrowing form']);
+        $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
         $router->get('api/admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
+        $router->get('api/admin/reports/circulated-books', 'ReportController@getCirculatedBooksReport',['reports']);
+        $router->get('api/admin/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
+        $router->get('api/admin/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
+        $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
+        $router->get('api/admin/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
+        // PDF Report Generation Route
+        $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
 
         // --- SUPERADMIN (AJAX/Data Routes) ---
         $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
@@ -104,6 +135,8 @@ class RouteConfig
         $router->post('api/superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
         $router->post('api/superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
         $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
+        $router->get('api/superadmin/userManagement/getAllCourses', 'DataController@getAllCourses', ['superadmin']);
+        $router->get('api/superadmin/userManagement/getColleges', 'DataController@getColleges', ['superadmin']);
         $router->get('api/superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
         $router->get('api/superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
@@ -131,11 +164,18 @@ class RouteConfig
         $router->get('api/superadmin/dashboard/top-visitors', 'App\Controllers\DashboardController@getTopVisitors', ['superadmin']);
         $router->get('api/superadmin/dashboard/weekly-activity', 'App\Controllers\DashboardController@getWeeklyActivity', ['superadmin']);
         $router->get('api/superadmin/dashboard/getData', 'DashboardController@getData', ['superadmin']);
-        $router->post('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['superadmin']);
         $router->get('api/superadmin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['superadmin']);
+        $router->post('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowController@store', ['superadmin']);
         $router->get('api/superadmin/borrowingForm/manualBorrow', 'ManualBorrowingController@manualBorrow', ['superadmin']);
         $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
         $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
+        $router->get('api/superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);
+        $router->get('api/superadmin/reports/top-visitors', 'ReportController@getTopVisitors', ['superadmin']);
+        $router->get('api/superadmin/reports/deleted-books', 'ReportController@getDeletedBooks', ['superadmin']);
+        $router->get('api/superadmin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment', ['superadmin']);
+
+        // PDF Report Generation Route
+        $router->post('generate-report', 'DomPdfTemplateController@generateLibraryReport', ['superadmin']);
 
         // --- STUDENT (AJAX/Data Routes) ---
         $router->get('api/student/attendance/get', 'AttendanceController@getMyAttendance', ['student']);
@@ -151,6 +191,7 @@ class RouteConfig
         $router->get('api/student/borrowingHistory/fetch', 'StudentBorrowingHistoryController@fetchHistory', ['student']);
         $router->get('api/student/myprofile/get', 'StudentProfileController@getProfile', ['student']);
         $router->post('api/student/myprofile/update', 'StudentProfileController@updateProfile', ['student']);
+        $router->get('api/data/getAllCourses', 'DataController@getAllCourses', ['student']);
 
         // General AJAX routes
         $router->get('api/attendance/logs/ajax', 'AttendanceController@fetchLogsAjax', ['attendance logs', 'superadmin']);

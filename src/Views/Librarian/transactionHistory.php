@@ -76,8 +76,7 @@
                         Name</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Student
                         Number</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Items
-                        Borrowed</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Accession Number</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Borrowed
                         Date/Time</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">Returned

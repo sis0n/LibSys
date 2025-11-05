@@ -713,7 +713,7 @@
                     offset: offset
                 });
 
-                const res = await fetch(`api/admin/bookManagement/fetch?${params.toString()}`);
+                const res = await fetch(`<?= BASE_URL ?>/api/admin/bookManagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
 
@@ -905,7 +905,7 @@
                 return;
             }
             try {
-                const res = await fetch(`api/admin/bookManagement/store`, {
+                const res = await fetch(`<?= BASE_URL ?>/api/admin/bookManagement/store`, {
                     method: "POST",
                     body: formData
                 });
@@ -929,7 +929,7 @@
         window.viewBook = async (bookId) => {
             if (!bookId) return;
             try {
-                const res = await fetch(`api/admin/bookManagement/get/${bookId}`);
+                const res = await fetch(`/api/admin/bookManagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
 
                 const data = await res.json();

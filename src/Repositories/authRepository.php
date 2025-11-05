@@ -4,16 +4,19 @@ namespace App\Repositories;
 
 use App\Repositories\UserRepository;
 use App\Repositories\UserPermissionModuleRepository;
+use App\Repositories\CollegeCourseRepository;
 
 class AuthRepository
 {
   private UserRepository $userRepo;
   private UserPermissionModuleRepository $userModuleRepo;
+  private CollegeCourseRepository $collegeCourseRepo;
 
   public function __construct()
   {
     $this->userRepo = new UserRepository();
     $this->userModuleRepo = new UserPermissionModuleRepository();
+    $this->collegeCourseRepo = new CollegeCourseRepository();
   }
 
   public function attemptLogin(string $username, string $password): ?array
@@ -32,12 +35,21 @@ class AuthRepository
       $lastName = $user['last_name'] ?? '';
       $suffix = $user['suffix'] ?? '';
       $fullName = implode(' ', array_filter([$firstName, $middleName, $lastName, $suffix]));
-      
-      $modules = [];
 
+      $modules = [];
       $role = strtolower(trim($user['role'] ?? 'guest'));
 
-      if(in_array($role, ['admin', 'librarian'])){
+      $departmentOrCourse = null;
+
+      if ($role === 'student' && isset($user['course_id'])) {
+        $course = $this->collegeCourseRepo->getCourseById((int)$user['course_id']);
+        $departmentOrCourse = $course['course_code'] ?? 'N/A';
+      } elseif (in_array($role, ['faculty', 'staff']) && isset($user['college_id'])) {
+        $college = $this->collegeCourseRepo->getCollegeById((int)$user['college_id']);
+        $departmentOrCourse = $college['college_code'] ?? 'N/A';
+      }
+
+      if (in_array($role, ['admin', 'librarian', 'superadmin'])) {
         $modules = $this->userModuleRepo->getModulesByUserId($user['user_id']);
       }
 
@@ -46,7 +58,9 @@ class AuthRepository
         'student_id' => $user['student_id'] ?? null,
         'faculty_id' => $user['faculty_id'] ?? null,
         'staff_id' => $user['staff_id'] ?? null,
-        'department' => $user['department'] ?? null,
+
+        'program_department' => $departmentOrCourse,
+
         'username' => $user['username'] ?? $user['student_number'] ?? $username,
         'role' => !empty($user['role']) ? strtolower(trim($user['role'])) : 'guest',
         'fullname' => !empty(trim($fullName)) ? $fullName : ($_SESSION['username'] ?? 'User'),

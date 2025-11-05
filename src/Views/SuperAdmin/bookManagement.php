@@ -475,7 +475,7 @@
             console.log("Uploading file:", fileInput.files[0].name);
 
             try {
-                const res = await fetch(`booksmanagement/bulkImport`, {
+                const res = await fetch(`api/superadmin/booksmanagement/bulkImport`, {
                     method: "POST",
                     body: formData
                 });
@@ -689,7 +689,7 @@
                     offset: offset
                 });
 
-                const res = await fetch(`booksmanagement/fetch?${params.toString()}`);
+                const res = await fetch(`api/superadmin/booksmanagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
 
@@ -881,7 +881,7 @@
                 return;
             }
             try {
-                const res = await fetch(`booksmanagement/store`, {
+                const res = await fetch(`api/superadmin/booksmanagement/store`, {
                     method: "POST",
                     body: formData
                 });
@@ -905,7 +905,7 @@
         window.viewBook = async (bookId) => {
             if (!bookId) return;
             try {
-                const res = await fetch(`booksmanagement/get/${bookId}`);
+                const res = await fetch(`api/superadmin/booksmanagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
 
                 const data = await res.json();
@@ -947,7 +947,7 @@
             if (!bookId) return;
             currentEditingBookId = bookId;
             try {
-                const res = await fetch(`booksmanagement/get/${bookId}`);
+                const res = await fetch(`api/superadmin/booksmanagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
                 const data = await res.json();
                 if (data.success && data.book) {
@@ -993,7 +993,7 @@
                 return;
             }
             try {
-                const res = await fetch(`booksmanagement/update/${currentEditingBookId}`, {
+                const res = await fetch(`api/superadmin/booksmanagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
@@ -1024,7 +1024,7 @@
             });
             if (result.isConfirmed) {
                 try {
-                    const res = await fetch(`booksmanagement/delete/${bookId}`, {
+                    const res = await fetch(`api/superadmin/booksmanagement/delete/${bookId}`, {
                         method: "POST"
                     });
                     const result = await res.json();

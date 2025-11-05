@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Library Online Software' ?></title>
+    <title><?= $title ?? 'Library Management System' ?></title>
     <!-- Cropper.js -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
@@ -18,7 +18,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>const BASE_URL_JS = '<?= BASE_URL ?>';</script>
+    <script>
+    const BASE_URL_JS = '<?= rtrim(BASE_URL, '/') ?>'; 
+</script>
 
 </head>
 

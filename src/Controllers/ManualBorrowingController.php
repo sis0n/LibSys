@@ -114,10 +114,15 @@ class ManualBorrowingController extends Controller
       $borrowData = [
         'borrower_type' => $borrowerType,
         'borrower_id'   => $borrowerId,
-        'book_id'       => $itemId,
         'collateral_id' => $data['collateral_id'],
         'librarian_id'  => $_SESSION['user_id'] ?? null
       ];
+
+      if ($data['equipment_type'] === 'Book') {
+        $borrowData['book_id'] = $itemId;
+      } else {
+        $borrowData['equipment_id'] = $itemId;
+      }
 
       $insert = $this->manualRepo->createManualBorrow($borrowData);
 

@@ -194,6 +194,55 @@ document.addEventListener('DOMContentLoaded', function () {
         if (returnModal) returnModal.classList.remove('hidden');
     };
 
+    if (modalExtendButton) {
+        modalExtendButton.addEventListener('click', async () => {
+            const borrowingId = modalExtendButton.dataset.borrowingId;
+            if (!borrowingId) return;
+
+            const { value: days } = await Swal.fire({
+                title: 'Extend Due Date',
+                input: 'number',
+                inputLabel: 'Enter number of days to extend',
+                inputPlaceholder: 'e.g., 7',
+                showCancelButton: true,
+                confirmButtonText: 'Extend',
+                inputValidator: (value) => {
+                    if (!value || value <= 0) {
+                        return 'Please enter a valid number of days (1 or more).';
+                    }
+                }
+            });
+
+            if (days) {
+                try {
+                    const formData = new FormData();
+                    formData.append('borrowing_id', borrowingId);
+                    formData.append('days', days);
+
+                    const response = await fetch('api/librarian/returning/extend', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        Swal.fire('Success', 'Due date extended successfully.', 'success');
+
+                        setText('modal-due-date', result.new_due_date);
+
+                        fetchTableData();
+                    } else {
+                        Swal.fire('Error', result.message || 'Could not extend due date.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error extending due date:', error);
+                    Swal.fire('Error', 'Could not connect to server.', 'error');
+                }
+            }
+        });
+    }
+
 
     const openAvailableModal = (bookData, status) => {
         const setText = (id, value) => {

@@ -146,7 +146,7 @@
   </tr>
 </template>
 
-<script src="<?= BASE_URL ?>/js/admin/restoreBooks.js"></script>
+<script src="<?= BASE_URL ?>/js/librarian/restoreBooks.js"></script>
 
 <!-- Book Details Modal -->
 <div id="bookDetailsModal"

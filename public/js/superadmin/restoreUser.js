@@ -25,6 +25,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPage = 10;
     let currentPage = 1;
 
+    // --- Page Memory ---
+    try {
+        const savedPage = sessionStorage.getItem('restoreUserPage');
+        if (savedPage) {
+            const parsedPage = parseInt(savedPage, 10);
+            if (!isNaN(parsedPage) && parsedPage > 0) {
+                currentPage = parsedPage;
+            } else {
+                sessionStorage.removeItem('restoreUserPage');
+            }
+        }
+    } catch (e) {
+        console.error("SessionStorage Error:", e);
+        currentPage = 1;
+    }
+
     const userDetailsModal = document.getElementById('userDetailsModal');
     const closeUserDetailsModalBtn = document.getElementById('closeUserDetailsModalBtn');
     const modalUserFullName = document.getElementById('modalUserFullName');
@@ -44,12 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.success && Array.isArray(data.users)) {
                 allDeletedUsers = data.users;
-                applyFiltersAndRender();
+                applyFiltersAndRender(true); // Pass true for initial load
             } else {
                 console.error('Error fetching deleted users:', data.message);
                 showErrorState('Failed to load deleted users.');
                 allDeletedUsers = [];
-                applyFiltersAndRender();
+                applyFiltersAndRender(true); // Pass true for initial load even on error
             }
         } catch (error) {
             console.error('Network error fetching deleted users:', error);
@@ -256,6 +272,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
         currentPage = Math.max(1, Math.min(page, totalPages));
 
+        try {
+            sessionStorage.setItem('restoreUserPage', currentPage);
+        } catch (e) {
+            console.error("SessionStorage Error:", e);
+        }
+
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         const usersToRender = filteredUsers.slice(startIndex, endIndex);
@@ -263,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPagination(filteredUsers.length, itemsPerPage, currentPage);
     }
 
-    function applyFiltersAndRender() {
+    function applyFiltersAndRender(isInitialLoad = false) {
         let tempFiltered = allDeletedUsers.filter(user => {
             const searchLower = currentSearchTerm.toLowerCase();
             const matchesSearch = !currentSearchTerm ||
@@ -292,7 +314,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchesSearch && matchesRole && matchesDate;
         });
         filteredUsers = tempFiltered;
-        goToPage(1);
+        
+        if (!isInitialLoad) { // Only reset page if not initial load
+            currentPage = 1;
+            try {
+                sessionStorage.removeItem('restoreUserPage');
+            } catch (e) {}
+        }
+
+        goToPage(isInitialLoad ? currentPage : 1);
     }
 
     function openUserDetailsModal(user) {

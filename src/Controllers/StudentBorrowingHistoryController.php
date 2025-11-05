@@ -14,22 +14,40 @@ class StudentBorrowingHistoryController extends Controller
         $this->repo = new StudentBorrowingHistoryRepository();
     }
 
-    public function fetchHistory()
+    // --- Pagination Start ---
+    public function fetchPaginatedBorrowingHistory()
     {
         header('Content-Type: application/json');
 
         $userId = $_SESSION['user_data']['user_id'] ?? 0;
-
-        if (!$userId || $userId == 0) {
-            echo json_encode(['success' => false, 'message' => 'Error: User session is invalid. Please log in again.']);
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
             return;
         }
 
-        $stats = $this->repo->getBorrowingStats((int)$userId);
-        $history = $this->repo->getDetailedHistory((int)$userId);
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
+        $offset = ($page - 1) * $limit;
 
-        $formattedHistory = array_map(function ($record) {
+        $history = $this->repo->getPaginatedBorrowingHistory($userId, $limit, $offset);
+        $totalRecords = $this->repo->countBorrowingHistory($userId);
+        $totalPages = ceil($totalRecords / $limit);
 
+        $formattedHistory = $this->formatHistoryRecords($history);
+
+        echo json_encode([
+            'success' => true,
+            'borrowingHistory' => $formattedHistory,
+            'totalPages' => $totalPages,
+            'currentPage' => $page,
+            'totalRecords' => $totalRecords
+        ]);
+    }
+
+    private function formatHistoryRecords(array $history): array
+    {
+        return array_map(function ($record) {
             $dueDate = strtotime($record['due_date']);
             $returnedDate = $record['returned_at'] ? strtotime($record['returned_at']) : null;
             $now = time();
@@ -66,11 +84,28 @@ class StudentBorrowingHistoryController extends Controller
                 'isOverdue' => $isOverdue
             ];
         }, $history);
+    }
+    // --- Pagination End ---
+
+    // --- Stats Start ---
+    public function fetchStats()
+    {
+        header('Content-Type: application/json');
+
+        $userId = $_SESSION['user_data']['user_id'] ?? 0;
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $stats = $this->repo->getBorrowingStats($userId);
 
         echo json_encode([
             'success' => true,
-            'stats' => $stats,
-            'history' => $formattedHistory
+            'stats' => $stats
         ]);
     }
+    // --- Stats End ---
 }
+

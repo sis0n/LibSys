@@ -710,7 +710,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 });
                 const data = await res.json();
                 
-                await new Promise(r => setTimeout(r, 300));
+                await new Promise(r => setTimeout(r, 2000));
                 Swal.close();
 
                 if (data.success) {

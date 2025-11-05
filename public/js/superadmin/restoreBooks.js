@@ -24,6 +24,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPage = 10;
     let currentPage = 1;
 
+    // --- Page Memory ---
+    try {
+        const savedPage = sessionStorage.getItem('restoreBooksPage');
+        if (savedPage) {
+            const parsedPage = parseInt(savedPage, 10);
+            if (!isNaN(parsedPage) && parsedPage > 0) {
+                currentPage = parsedPage;
+            } else {
+                sessionStorage.removeItem('restoreBooksPage');
+            }
+        }
+    } catch (e) {
+        console.error("SessionStorage Error:", e);
+        currentPage = 1;
+    }
+
     const bookDetailsModal = document.getElementById('bookDetailsModal');
     const closeBookDetailsModalBtn = document.getElementById('closeBookDetailsModalBtn');
     const modalBookAccessionNumber = document.getElementById('modalBookAccessionNumber');
@@ -64,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Core Filtering Logic ---
-    function applySorting() {
+    function applySorting(isInitialLoad = false) {
         if (currentFilterOption === 'Title (A-Z)') {
             filteredBooks.sort((a, b) => a.title.localeCompare(b.title));
         } else if (currentFilterOption === 'Title (Z-A)') {
@@ -76,10 +92,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             filteredBooks.sort((a, b) => a.id - b.id);
         }
-        goToPage(1);
+
+        if (!isInitialLoad) {
+            currentPage = 1;
+            try {
+                sessionStorage.removeItem('restoreBooksPage');
+            } catch (e) {}
+        }
+
+        goToPage(isInitialLoad ? currentPage : 1);
     }
 
-    function filterAndSearchBooks() {
+    function filterAndSearchBooks(isInitialLoad = false) {
         let filtered = allDeletedBooks.filter(book => {
             const searchLower = currentSearchTerm.toLowerCase();
             const matchesSearch = !currentSearchTerm ||
@@ -104,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchesSearch && matchesDate;
         });
         filteredBooks = filtered;
-        applySorting();
+        applySorting(isInitialLoad);
     }
 
     function createPageLink(pageNumber, isActive = false) {
@@ -135,12 +159,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.success && Array.isArray(data.books)) {
                 allDeletedBooks = data.books;
-                filterAndSearchBooks();
+                filterAndSearchBooks(true);
             } else {
                 console.error('Error fetching deleted books:', data.message);
                 showErrorState(`Failed to load deleted books: ${data.message}`);
                 allDeletedBooks = [];
-                filterAndSearchBooks();
+                filterAndSearchBooks(true);
             }
         } catch (error) {
             console.error('Network error fetching deleted books:', error);
@@ -193,6 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function goToPage(page) {
         const totalPages = Math.ceil(filteredBooks.length / itemsPerPage);
         currentPage = Math.max(1, Math.min(page, totalPages));
+
+        try {
+            sessionStorage.setItem('restoreBooksPage', currentPage);
+        } catch (e) {
+            console.error("SessionStorage Error:", e);
+        }
 
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;

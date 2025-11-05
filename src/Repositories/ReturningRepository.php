@@ -15,10 +15,10 @@ class ReturningRepository
     $this->db = Database::getInstance()->getConnection();
   }
 
-  public function getDueSoonAndOverdue(): ?array
+  public function getOverdue(): ?array
   {
     try {
-      // --- NEAR DUE & OVERDUE BASE QUERY ---
+      // --- OVERDUE BASE QUERY ---
       $baseSelect = "
                 SELECT 
                     bti.status,
@@ -54,16 +54,6 @@ class ReturningRepository
                 LEFT JOIN colleges cl ON f.college_id = cl.college_id
             ";
 
-
-      // --- NEAR DUE QUERY ---
-      $queryNearDue = $baseSelect . $baseFrom . "
-                WHERE bti.status = 'borrowed' 
-                AND DATE(bt.due_date) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
-            ";
-      $stmtNearDue = $this->db->prepare($queryNearDue . " ORDER BY bt.due_date ASC");
-      $stmtNearDue->execute();
-      $nearDue = $stmtNearDue->fetchAll(PDO::FETCH_ASSOC);
-
       // --- OVERDUE QUERY ---
       $queryOverdue = $baseSelect . $baseFrom . "
                 WHERE bti.status = 'borrowed' 
@@ -74,7 +64,6 @@ class ReturningRepository
       $overdue = $stmtOverdue->fetchAll(PDO::FETCH_ASSOC);
 
       return [
-        'nearDue' => array_map([$this, 'formatTableData'], $nearDue),
         'overdue' => array_map([$this, 'formatTableData'], $overdue)
       ];
     } catch (PDOException $e) {

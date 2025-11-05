@@ -132,9 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const pageCount = Math.ceil(data.length / rowsPerPage);
 
         prevPageBtn.classList.toggle('text-gray-400', currentPage === 1);
-        prevPageBtn.classList.toggle('hover:text-orange-600', currentPage !== 1);
+        prevPageBtn.classList.toggle('hover:text-orange-700', currentPage !== 1);
         nextPageBtn.classList.toggle('text-gray-400', currentPage === pageCount);
-        nextPageBtn.classList.toggle('hover:text-orange-600', currentPage !== pageCount);
+        nextPageBtn.classList.toggle('hover:text-orange-700', currentPage !== pageCount);
 
         for (let i = 1; i <= pageCount; i++) {
             const pageNumber = document.createElement('a');

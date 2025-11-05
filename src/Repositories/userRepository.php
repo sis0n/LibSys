@@ -553,4 +553,87 @@ class UserRepository
       return null;
     }
   }
+
+  // Pagination Start
+  public function getPaginatedUsers(int $limit, int $offset, string $search, string $role, string $status): array
+  {
+    $baseQuery = "
+        FROM users u
+        LEFT JOIN user_module_permissions um ON um.user_id = u.user_id
+        WHERE u.deleted_at IS NULL AND u.role NOT IN ('superadmin')
+    ";
+    $params = [];
+
+    if ($search !== '') {
+        $baseQuery .= " AND (u.first_name LIKE ? OR u.last_name LIKE ? OR u.username LIKE ? OR u.email LIKE ?)";
+        $searchTerm = "%$search%";
+        array_push($params, $searchTerm, $searchTerm, $searchTerm, $searchTerm);
+    }
+
+    if ($role !== '' && strtolower($role) !== 'all roles') {
+        $baseQuery .= " AND u.role = ?";
+        $params[] = $role;
+    }
+
+    if ($status !== '' && strtolower($status) !== 'all status') {
+        $baseQuery .= " AND u.is_active = ?";
+        $params[] = ($status === 'Active' ? 1 : 0);
+    }
+
+    $orderBy = " ORDER BY u.created_at DESC";
+    $limitOffset = " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
+
+    $query = "
+        SELECT 
+            u.user_id, u.username, u.first_name, u.middle_name, u.last_name, u.suffix,
+            u.email, u.role, u.is_active, u.created_at,
+            GROUP_CONCAT(um.module_name) AS modules
+        " . $baseQuery . " GROUP BY u.user_id" . $orderBy . $limitOffset;
+
+    try {
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($users as &$user) {
+            $user['modules'] = $user['modules'] ? explode(',', $user['modules']) : [];
+        }
+        return $users;
+    } catch (PDOException $e) {
+        error_log('[UserRepository::getPaginatedUsers] ' . $e->getMessage());
+        return [];
+    }
+  }
+
+  public function countPaginatedUsers(string $search, string $role, string $status): int
+  {
+    $query = "SELECT COUNT(DISTINCT u.user_id) FROM users u WHERE u.deleted_at IS NULL AND u.role NOT IN ('superadmin')";
+    $params = [];
+
+    if ($search !== '') {
+        $query .= " AND (u.first_name LIKE ? OR u.last_name LIKE ? OR u.username LIKE ? OR u.email LIKE ?)";
+        $searchTerm = "%$search%";
+        array_push($params, $searchTerm, $searchTerm, $searchTerm, $searchTerm);
+    }
+
+    if ($role !== '' && strtolower($role) !== 'all roles') {
+        $query .= " AND u.role = ?";
+        $params[] = $role;
+    }
+
+    if ($status !== '' && strtolower($status) !== 'all status') {
+        $query .= " AND u.is_active = ?";
+        $params[] = ($status === 'Active' ? 1 : 0);
+    }
+
+    try {
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        return (int) $stmt->fetchColumn();
+    } catch (PDOException $e) {
+        error_log('[UserRepository::countPaginatedUsers] ' . $e->getMessage());
+        return 0;
+    }
+  }
+  // Pagination End
 }

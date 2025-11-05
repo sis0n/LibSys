@@ -22,9 +22,9 @@ class ReturningController extends Controller
     exit; // optional: prevents further HTML output
   }
 
-  public function getDueSoonAndOverdue()
+  public function getOverdue()
   {
-    $data = $this->returningRepo->getDueSoonAndOverdue();
+    $data = $this->returningRepo->getOverdue();
 
     if ($data === null) {
       $this->sendJson(['success' => false, 'message' => 'Failed to retrieve data from server.'], 500);

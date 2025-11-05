@@ -47,3 +47,5 @@ Thumbs.db
 /public/qrcodes/
 
 backups/
+
+/docs/collaboration.md/

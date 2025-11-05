@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
             idLabel = 'Guest ID:';
         }
 
-        let courseOrDepartment = bookData.course_or_department || 'N/A'; 
+        let courseOrDepartment = bookData.course_or_department || 'N/A';
         let yearSectionLabel = 'Year & Section:';
         let yearSectionValue = 'N/A';
 
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
             courseOrDepartment = bookData.course_or_department || 'N/A';
             yearSectionLabel = 'Position:';
             yearSectionValue = bookData.borrower_type?.toUpperCase() || 'N/A';
-        } else { 
+        } else {
             yearSectionLabel = 'Borrower Type:';
             yearSectionValue = bookData.borrower_type?.toUpperCase() || 'Guest';
         }
@@ -225,6 +225,55 @@ document.addEventListener('DOMContentLoaded', function () {
         // Show modal
         if (returnModal) returnModal.classList.remove('hidden');
     };
+
+    if (modalExtendButton) {
+        modalExtendButton.addEventListener('click', async () => {
+            const borrowingId = modalExtendButton.dataset.borrowingId;
+            if (!borrowingId) return;
+
+            const { value: days } = await Swal.fire({
+                title: 'Extend Due Date',
+                input: 'number',
+                inputLabel: 'Enter number of days to extend',
+                inputPlaceholder: 'e.g., 7',
+                showCancelButton: true,
+                confirmButtonText: 'Extend',
+                inputValidator: (value) => {
+                    if (!value || value <= 0) {
+                        return 'Please enter a valid number of days (1 or more).';
+                    }
+                }
+            });
+
+            if (days) {
+                try {
+                    const formData = new FormData();
+                    formData.append('borrowing_id', borrowingId);
+                    formData.append('days', days); 
+
+                    const response = await fetch('api/superadmin/returning/extend', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        Swal.fire('Success', 'Due date extended successfully.', 'success');
+
+                        setText('modal-due-date', result.new_due_date);
+
+                        fetchTableData();
+                    } else {
+                        Swal.fire('Error', result.message || 'Could not extend due date.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error extending due date:', error);
+                    Swal.fire('Error', 'Could not connect to server.', 'error');
+                }
+            }
+        });
+    }
 
 
     const openAvailableModal = (bookData, status) => {
@@ -305,15 +354,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        document.addEventListener('click', (e) => {
-            if (e.target !== accessionInput) {
-                setTimeout(() => qrCodeValueInput.focus(), 10);
-            }
-        });
+        // document.addEventListener('click', (e) => {
+        //     if (e.target !== accessionInput) {
+        //         setTimeout(() => qrCodeValueInput.focus(), 10);
+        //     }
+        // });
     }
 
 
-    // --- Manual input / Enter key ---
     if (accessionInput) {
         accessionInput.removeAttribute('readonly');
         accessionInput.addEventListener('keydown', e => {
@@ -324,7 +372,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- Handle "Mark as Returned" ---
     if (modalReturnButton) {
         modalReturnButton.addEventListener('click', async () => {
             const borrowingId = modalReturnButton.dataset.borrowingId;

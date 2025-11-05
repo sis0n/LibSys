@@ -1,3 +1,107 @@
+// --- CORE CONFIRMATION FUNCTION (FINAL TEMPLATE - BLACK BORDER) ---
+async function showCustomConfirmationModal(title, text, confirmText = "Confirm") {
+    if (typeof Swal == "undefined") return confirm(title);
+    const result = await Swal.fire({
+        background: "transparent",
+        buttonsStyling: false, 
+        width: '450px', 
+        
+        html: `
+            <div class="flex flex-col text-center">
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-orange-600">
+                        <i class="ph ph-warning-circle text-3xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">${title}</h3>
+                <p class="text-[14px] text-gray-700 mt-1">${text}</p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: confirmText,
+        cancelButtonText: "Cancel",
+        
+        customClass: {
+            // FINAL FIX: White BG + Black Border + Black Shadow
+            popup:
+                "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-gray-900 shadow-[0_0_15px_#00000030]",
+                
+            // Confirm Button (Orange, Large, Bold)
+            confirmButton:
+                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
+            // Cancel Button (Gray, Large, Bold)
+            cancelButton:
+                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
+
+            actions: "!mt-4"
+        },
+    });
+    return result.isConfirmed;
+}
+// ----------------------------------------------------
+
+// --- SweetAlert Helper Functions for Toasts and Loaders (Shared design) ---
+
+// **FIX: Gamitin ang mas detalyadong Toast structure mula sa Cart Module at Apply Black Border**
+const showProfileToast = (icon, title, text, theme, duration = 3000) => {
+    if (typeof Swal == "undefined") return alert(`${title}: ${text}`);
+
+    // Gagamitin ang theme colors para sa icon/text, pero ang border ay BLACK
+    const themeMap = {
+        'warning': { color: 'text-orange-600', bg: 'bg-orange-100', icon: 'ph-warning' },
+        'error': { color: 'text-red-600', bg: 'bg-red-100', icon: 'ph-x-circle' },
+        'success': { color: 'text-green-600', bg: 'bg-green-100', icon: 'ph-check-circle' },
+    };
+    const selectedTheme = themeMap[theme];
+
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: duration,
+        width: "360px",
+        background: "transparent",
+        html: `
+            <div class="flex flex-col text-left">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full ${selectedTheme.bg} ${selectedTheme.color}">
+                        <i class="ph ${selectedTheme.icon} text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-[15px] font-semibold ${selectedTheme.color}">${title}</h3>
+                        <p class="text-[13px] text-gray-700 mt-0.5">${text}</p>
+                    </div>
+                </div>
+            </div>
+        `,
+        customClass: {
+            // TOAST MODAL: Black Border + Transparent BG + Black Shadow
+            popup: `!rounded-xl !shadow-md !border-2 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm !border-gray-900 shadow-[0_0_10px_#00000030]`,
+        },
+    });
+};
+
+const showLoadingModal = (message = "Processing request...", subMessage = "Please wait.") => {
+    if (typeof Swal == "undefined") return;
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            // LOADING MODAL: Black Border + Orange Spinner
+            popup: "!rounded-xl !shadow-md !border-2 !border-gray-900 !p-6 !bg-white shadow-[0_0_8px_#00000030]",
+        },
+    });
+};
+// --- End Shared SweetAlert Helpers ---
+
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // --- Table Elements ---
@@ -30,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else showTableError(result.message);
         } catch (error) {
             console.error('Error fetching table data:', error);
+            showProfileToast('ph-x-circle', 'Data Fetch Failed', 'Could not connect to server to load overdue lists.', 'error');
             showTableError('Could not connect to server.');
         }
     }
@@ -105,6 +210,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!accessionNumber || scanInProgress) return;
         scanInProgress = true;
 
+        showLoadingModal("Checking Book Status...", "Please wait while we verify the Accession Number.");
+        
         try {
             const formData = new FormData();
             formData.append('accession_number', accessionNumber);
@@ -121,20 +228,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const result = await response.json();
 
+            await new Promise(r => setTimeout(r, 300));
+            Swal.close();
+
             if (result.success) {
                 const data = result.data;
 
-                console.log('Book Data Received:', result.data);
-
                 if (data.status === 'borrowed' && data.details) openReturnModal(data.details);
                 else if (data.status === 'available' && data.details) openAvailableModal(data.details, data.status);
-                else Swal.fire('Not Found', 'No book found with that Accession Number.', 'warning');
+                // Replaced generic Swal.fire with custom toast
+                else showProfileToast('ph-warning', 'Not Found', 'No book found with that Accession Number.', 'warning');
             } else {
-                Swal.fire('Error', result.message || 'An error occurred.', 'error');
+                 // Replaced generic Swal.fire with custom toast
+                showProfileToast('ph-x-circle', 'Error', result.message || 'An error occurred.', 'error');
             }
         } catch (error) {
+            Swal.close();
             console.error('Error checking book:', error);
-            Swal.fire('Error', error.message || 'Could not connect to the server.', 'error');
+             // Replaced generic Swal.fire with custom toast
+            showProfileToast('ph-x-circle', 'Error', error.message || 'Could not connect to the server.', 'error');
         }
 
         if (accessionInput) accessionInput.value = '';
@@ -330,6 +442,16 @@ document.addEventListener('DOMContentLoaded', function () {
             const borrowingId = modalReturnButton.dataset.borrowingId;
             if (!borrowingId) return;
 
+            // 1. CONFIRMATION
+            const isConfirmed = await showCustomConfirmationModal(
+                'Confirm Return',
+                'Are you sure you want to mark this book as returned?',
+                'Yes, Return Book!'
+            );
+            if (!isConfirmed) return;
+
+            showLoadingModal("Marking as Returned...", "Processing book return transaction.");
+
             try {
                 const formData = new FormData();
                 formData.append('borrowing_id', borrowingId);
@@ -341,16 +463,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const result = await response.json();
 
+                await new Promise(r => setTimeout(r, 300));
+                Swal.close();
+
                 if (result.success) {
-                    Swal.fire('Success', 'Book marked as returned successfully.', 'success');
+                    showProfileToast('ph-check-circle', 'Success', 'Book marked as returned successfully.', 'success');
                     closeReturnModal();
                     fetchTableData();
                 } else {
-                    Swal.fire('Error', result.message || 'Could not mark as returned.', 'error');
+                    showProfileToast('ph-x-circle', 'Error', result.message || 'Could not mark as returned.', 'error');
                 }
             } catch (error) {
+                Swal.close();
                 console.error('Error marking book as returned:', error);
-                Swal.fire('Error', 'Could not connect to server.', 'error');
+                showProfileToast('ph-x-circle', 'Error', 'Could not connect to server.', 'error');
             }
         });
     }

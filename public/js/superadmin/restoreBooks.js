@@ -1,3 +1,105 @@
+// --- CORE CONFIRMATION FUNCTION (ORANGE BORDER, FINAL DESIGN) ---
+async function showCustomConfirmationModal(title, text, confirmText = "Confirm") {
+    if (typeof Swal == "undefined") return confirm(title);
+    const result = await Swal.fire({
+        background: "transparent",
+        buttonsStyling: false, 
+        width: '450px', 
+        
+        html: `
+            <div class="flex flex-col text-center">
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-orange-600">
+                        <i class="ph ph-warning-circle text-3xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">${title}</h3>
+                <p class="text-[14px] text-gray-700 mt-1">${text}</p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: confirmText,
+        cancelButtonText: "Cancel",
+        
+        customClass: {
+            // FINAL FIX: Orange Border + White BG + Orange Shadow
+            popup:
+                "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
+                
+            // Confirm Button (Orange, Large, Bold)
+            confirmButton:
+                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
+            // Cancel Button (Gray, Large, Bold)
+            cancelButton:
+                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
+
+            actions: "!mt-4"
+        },
+    });
+    return result.isConfirmed;
+}
+// ----------------------------------------------------
+
+// --- SweetAlert Helper Functions for Toasts and Loaders ---
+
+const showProfileToast = (icon, title, text, theme, duration = 3000) => {
+    if (typeof Swal == "undefined") return alert(`${title}: ${text}`);
+
+    // FINAL FIX: Ginamit ang theme-based borders at shadows
+    const themeMap = {
+        'warning': { color: 'text-orange-600', bg: 'bg-orange-100', border: 'border-orange-500', icon: 'ph-warning', shadow: 'shadow-[0_0_10px_#ff8c3770]' },
+        'error': { color: 'text-red-600', bg: 'bg-red-100', border: 'border-red-500', icon: 'ph-x-circle', shadow: 'shadow-[0_0_10px_#f4433670]' },
+        'success': { color: 'text-green-600', bg: 'bg-green-100', border: 'border-green-500', icon: 'ph-check-circle', shadow: 'shadow-[0_0_10px_#4CAF5070]' },
+    };
+    const selectedTheme = themeMap[theme];
+
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: duration,
+        width: "360px",
+        background: "transparent",
+        html: `
+            <div class="flex flex-col text-left">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full ${selectedTheme.bg} ${selectedTheme.color}">
+                        <i class="ph ${selectedTheme.icon} text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-[15px] font-semibold ${selectedTheme.color}">${title}</h3>
+                        <p class="text-[13px] text-gray-700 mt-0.5">${text}</p>
+                    </div>
+                </div>
+            </div>
+        `,
+        customClass: {
+            // TOAST MODAL: Theme Border + Transparent BG + Theme Shadow
+            popup: `!rounded-xl !shadow-md !border-2 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm ${selectedTheme.border} ${selectedTheme.shadow}`,
+        },
+    });
+};
+
+const showLoadingModal = (message = "Processing request...", subMessage = "Please wait.") => {
+    if (typeof Swal == "undefined") return;
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            // LOADING MODAL: Orange Border + Orange Spinner
+            popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-white shadow-[0_0_8px_#ffb34770]",
+        },
+    });
+};
+// --- End Shared SweetAlert Helpers ---
+
 document.addEventListener('DOMContentLoaded', () => {
     const bookSearchInput = document.getElementById('bookSearchInput');
     const bookFilterDropdownBtn = document.getElementById('bookFilterDropdownBtn');
@@ -251,8 +353,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleRestore(bookId, title, buttonEl) {
-        if (!confirm(`Are you sure you want to restore "${title}"?`)) return;
+        // Confirmation Modal
+        const isConfirmed = await showCustomConfirmationModal(
+            "Confirm Restoration",
+            `Are you sure you want to restore "${title}"? This book will be available in the catalog again.`,
+            "Yes, Restore!"
+        );
+        if (!isConfirmed) return;
 
+        showLoadingModal("Restoring Book...", `Restoring "${title}" to the active catalog.`);
         buttonEl.disabled = true;
         buttonEl.classList.add('opacity-50');
 
@@ -266,15 +375,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ book_id: bookId })
             });
             const result = await response.json();
+            
+            Swal.close(); // Close loading modal
 
             if (result.success) {
-                alert(result.message);
+                showProfileToast('ph-check-circle', 'Success', result.message, 'success');
                 fetchDeletedBooks();
             } else {
-                alert(`Restore failed: ${result.message}`);
+                showProfileToast('ph-x-circle', 'Restoration Failed', `Restore failed: ${result.message}`, 'error');
             }
         } catch (error) {
-            alert('An error occurred during restoration.');
+            Swal.close();
+            showProfileToast('ph-x-circle', 'Error', 'An error occurred during restoration.', 'error');
         } finally {
             buttonEl.disabled = false;
             buttonEl.classList.remove('opacity-50');
@@ -282,8 +394,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleArchive(bookId, title, buttonEl) {
-        if (!confirm(`ARCHIVE "${title}"? This will copy the record to the deleted_books table for good.`)) return;
+        // Confirmation Modal
+        const isConfirmed = await showCustomConfirmationModal(
+            "Confirm Permanent Archive",
+            `ARCHIVE "${title}"? This will permanently delete the record from the trash list. This action cannot be undone.`,
+            "Yes, Permanently Archive"
+        );
+        if (!isConfirmed) return;
 
+        showLoadingModal("Archiving Record...", `Archiving "${title}" permanently.`);
         buttonEl.disabled = true;
         buttonEl.classList.add('opacity-50');
 
@@ -297,14 +416,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
 
+            Swal.close(); // Close loading modal
+
             if (result.success) {
-                alert(result.message);
+                showProfileToast('ph-check-circle', 'Success', result.message, 'success');
                 fetchDeletedBooks();
             } else {
-                alert(`Archive failed: ${result.message}`);
+                showProfileToast('ph-x-circle', 'Archive Failed', `Archive failed: ${result.message}`, 'error');
             }
         } catch (error) {
-            alert('An error occurred during archiving.');
+            Swal.close();
+            showProfileToast('ph-x-circle', 'Error', 'An error occurred during archiving.', 'error');
         } finally {
             buttonEl.disabled = false;
             buttonEl.classList.remove('opacity-50');

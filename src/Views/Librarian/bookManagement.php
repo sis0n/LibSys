@@ -376,6 +376,90 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    // --- SweetAlert Helper Functions (Para ma-maintain ang design consistency) ---
+    // Note: Sa production code, dapat naka-declare na ito bago ang DOMContentLoaded
+    
+    function showSuccessToast(title, body = "") {
+        if (typeof Swal == "undefined") return alert(title);
+        Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 3000,
+            width: "360px",
+            background: "transparent",
+            html: `<div class="flex flex-col text-left"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600"><i class="ph ph-check-circle text-lg"></i></div><div><h3 class="text-[15px] font-semibold text-green-600">${title}</h3><p class="text-[13px] text-gray-700 mt-0.5">${body}</p></div></div></div>`,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
+            },
+        });
+    }
+
+    function showErrorToast(title, body = "An error occurred during processing.") {
+        if (typeof Swal == "undefined") return alert(title);
+        Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            showConfirmButton: false,
+            timer: 4000,
+            width: "360px",
+            background: "transparent",
+            html: `<div class="flex flex-col text-left"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600"><i class="ph ph-x-circle text-lg"></i></div><div><h3 class="text-[15px] font-semibold text-red-600">${title}</h3><p class="text-[13px] text-gray-700 mt-0.5">${body}</p></div></div></div>`,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+            },
+        });
+    }
+    
+    function showLoadingModal(message = "Processing request...", subMessage = "Please wait.") {
+        if (typeof Swal == "undefined") return;
+        Swal.fire({
+            background: "transparent",
+            html: `
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                    <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
+                </div>
+            `,
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+            },
+        });
+    }
+
+    async function showConfirmationModal(title, text, confirmText = "Confirm", icon = "ph-warning-circle") {
+        if (typeof Swal == "undefined") return confirm(title);
+        const result = await Swal.fire({
+            background: "transparent",
+            html: `
+                <div class="flex flex-col text-center">
+                    <div class="flex justify-center mb-3">
+                        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                            <i class="ph ${icon} text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-[17px] font-semibold text-orange-700">${title}</h3>
+                    <p class="text-[14px] text-gray-700 mt-1">${text}</p>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: confirmText,
+            cancelButtonText: "Cancel",
+            customClass: {
+                popup:
+                    "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+                confirmButton:
+                    "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+                cancelButton:
+                    "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+            },
+        });
+        return result.isConfirmed;
+    }
+    // --- End SweetAlert Helper Functions ---
+
     document.addEventListener("DOMContentLoaded", () => {
         // ==========================
         // ELEMENT REFERENCES
@@ -405,6 +489,7 @@
         const editPreviewImage = document.getElementById('editPreviewImage');
 
         // --- View Modal Elements ---
+        // Note: Modal elements are kept in the HTML/DOM but the JS logic to open/view is removed.
         const viewBookModal = document.getElementById("viewBookModal");
         const viewBookModalContent = document.getElementById("viewBookModalContent");
         const closeViewModal = document.getElementById("closeViewModal");
@@ -466,21 +551,24 @@
 
         bulkImportForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            console.log("Submit fired!");
-            console.log("Files:", fileInput.files);
-            if (!fileInput.files.length) return;
+            
+            if (!fileInput.files.length) return showErrorToast("Import Error", "Please select a CSV file.");
+
+            showLoadingModal("Importing Books...", "Uploading and processing CSV file.");
 
             const formData = new FormData();
             formData.append("csv_file", fileInput.files[0]);
-            console.log("Uploading file:", fileInput.files[0].name);
-
+            
             try {
-                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/bulkImport`, {
+                const res = await fetch(`api/librarian/booksmanagement/bulkImport`, {
                     method: "POST",
                     body: formData
                 });
 
                 const data = await res.json();
+                
+                await new Promise(r => setTimeout(r, 300));
+                Swal.close();
 
                 if (data.success) {
                     if (importMessage) {
@@ -488,17 +576,17 @@
                         importMessage.classList.remove("hidden");
                         setTimeout(() => importMessage.classList.add("hidden"), 5000);
                     }
-
+                    showSuccessToast("Import Successful", `Successfully imported ${data.imported} books!`);
                     fileInput.value = "";
                     closeModal(document.getElementById("importModal"));
-
-                    if (typeof loadUsers === "function") await loadUsers();
+                    await loadBooks(1);
                 } else {
-                    alert("Error: " + (data.message || "Failed to import CSV."));
+                    showErrorToast("Import Failed", data.message || "Failed to import CSV.");
                 }
             } catch (err) {
+                Swal.close();
                 console.error("Error importing CSV:", err);
-                alert("Error importing CSV.");
+                showErrorToast("Import Failed", "An error occurred during CSV import.");
             }
         });
 
@@ -514,31 +602,7 @@
             console.error("SessionStorage Error:", e);
             currentPage = 1;
         }
-
-        // ==========================
-        // DYNAMIC URL HELPER
-        // ==========================
-        function getApiBaseUrl() {
-            if (currentApiBaseUrl) return currentApiBaseUrl;
-
-            const path = window.location.pathname;
-
-            if (path.includes('/superadmin/')) {
-                currentApiBaseUrl = '/libsys/public/superadmin';
-            } else if (path.includes('/admin/')) {
-                currentApiBaseUrl = '/libsys/public/admin';
-            } else if (path.includes('/librarian/')) {
-                currentApiBaseUrl = '/libsys/public/librarian';
-            } else {
-                console.error("CRITICAL: Cannot determine user role from URL path.");
-                currentApiBaseUrl = '/libsys/public/superadmin'; // Fallback
-            }
-            return currentApiBaseUrl;
-        }
-
-        // ==========================
-        // MODAL HELPERS & LISTENERS
-        // ==========================
+        
         function openModal(modal) {
             if (modal) {
                 modal.classList.remove("hidden");
@@ -578,18 +642,19 @@
             if (e.target === editBookModal) closeModal(editBookModal);
         });
 
-        closeViewModal?.addEventListener("click", () => closeModal(viewBookModal));
-        closeViewModalBtn?.addEventListener("click", () => closeModal(viewBookModal));
-        viewBookModal?.addEventListener("click", e => {
-            if (e.target === viewBookModal) closeModal(viewBookModal);
-        });
+        // TANGGALIN NATIN ANG LOGIC SA VIEW MODAL (JS PART)
+        // closeViewModal?.addEventListener("click", () => closeModal(viewBookModal));
+        // closeViewModalBtn?.addEventListener("click", () => closeModal(viewBookModal));
+        // viewBookModal?.addEventListener("click", e => {
+        //     if (e.target === viewBookModal) closeModal(viewBookModal);
+        // });
 
         input?.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const allowedTypes = ['image/jpeg', 'image/png'];
             if (!allowedTypes.includes(file.type)) {
-                alert('Invalid file type! Please upload only JPG or PNG files.');
+                showErrorToast('Invalid File Type', 'Please upload only JPG or PNG files.');
                 input.value = '';
                 uploadText.textContent = 'Upload Image';
                 previewContainer.classList.add('hidden');
@@ -610,7 +675,7 @@
             if (!file) return;
             const allowedTypes = ['image/jpeg', 'image/png'];
             if (!allowedTypes.includes(file.type)) {
-                alert('Invalid file type! Please upload only JPG or PNG files.');
+                showErrorToast('Invalid File Type', 'Please upload only JPG or PNG files.');
                 editInput.value = '';
                 editUploadText.textContent = 'Upload Image';
                 editPreviewContainer.classList.add('hidden');
@@ -702,8 +767,7 @@
             paginationControls.classList.add('hidden');
             resultsIndicator.textContent = 'Loading...';
             const offset = (page - 1) * limit;
-            const apiBaseUrl = getApiBaseUrl(); // Kunin ang tamang role prefix
-
+            
             try {
                 const params = new URLSearchParams({
                     search: currentSearch,
@@ -713,7 +777,7 @@
                     offset: offset
                 });
 
-                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/fetch?${params.toString()}`);
+                const res = await fetch(`api/librarian/booksmanagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
 
@@ -738,6 +802,7 @@
                 console.error("Fetch books error:", err);
                 bookTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="7" class="text-center text-red-500 py-10">Error loading books: ${err.message}</td></tr>`;
                 updateBookCounts(0, 0, 1, limit);
+                showErrorToast("Data Load Failed", "Could not retrieve book list data.");
                 try {
                     sessionStorage.removeItem('bookManagementPage');
                 } catch (e) {}
@@ -763,7 +828,7 @@
                         </div>
                     </td>
                 </tr>
-            `;
+                `;
                 return;
             }
 
@@ -895,85 +960,62 @@
         }
 
         // ==========================
-        // ACTIONS (ADD, EDIT, DELETE, VIEW)
+        // ACTIONS (ADD, EDIT, DELETE)
         // ==========================
         addBookForm?.addEventListener("submit", async (e) => {
             e.preventDefault();
             const formData = new FormData(addBookForm);
             if (!formData.get('accession_number') || !formData.get('call_number') || !formData.get('title') || !formData.get('author')) {
-                Swal.fire('Missing Info', 'Please fill in all required fields (*).', 'warning');
+                showErrorToast('Missing Information', 'Please fill in all required fields (*).');
                 return;
             }
+            
+            showLoadingModal("Adding Book...", "Saving new record to catalog.");
+
             try {
-                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/store`, {
+                const res = await fetch(`api/librarian/booksmanagement/store`, {
                     method: "POST",
                     body: formData
                 });
                 const result = await res.json();
+                
+                await new Promise(r => setTimeout(r, 300));
+                Swal.close();
+
                 if (result.success) {
-                    Swal.fire('Success!', result.message || 'Book added!', 'success');
+                    showSuccessToast('Success!', result.message || 'Book added successfully!');
                     closeModal(addBookModal);
                     addBookForm.reset();
                     previewContainer.classList.add('hidden');
                     uploadText.textContent = 'Upload Image';
                     loadBooks(1);
                 } else {
-                    Swal.fire('Error', result.message || 'Failed to add book.', 'error');
+                    showErrorToast('Error', result.message || 'Failed to add book.');
                 }
             } catch (err) {
+                Swal.close();
                 console.error("Add book error:", err);
-                Swal.fire('Error', 'An error occurred.', 'error');
+                showErrorToast('Error', 'An error occurred while adding the book.');
             }
         });
 
-        window.viewBook = async (bookId) => {
-            if (!bookId) return;
-            try {
-                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/get/${bookId}`);
-                if (!res.ok) throw new Error("Failed to fetch book details.");
-
-                const data = await res.json();
-                if (data.success && data.book) {
-                    const book = data.book;
-                    if (book.cover) {
-                        viewModalImg.src = book.cover;
-                        viewModalImg.classList.remove("hidden");
-                    } else {
-                        viewModalImg.classList.add("hidden");
-                        viewModalImg.src = '';
-                    }
-                    viewModalTitle.textContent = book.title || 'No Title';
-                    viewModalAuthor.textContent = "by " + (book.author || "Unknown");
-                    const availabilityText = (book.availability || "unknown").toUpperCase();
-                    viewModalStatus.textContent = availabilityText;
-                    viewModalStatus.className = `font-semibold text-sm ${availabilityText === "AVAILABLE" ? "text-green-600" : "text-orange-600"}`;
-                    viewModalCallNumber.textContent = book.call_number || "N/A";
-                    viewModalAccessionNumber.textContent = book.accession_number || "N/A";
-                    viewModalIsbn.textContent = book.book_isbn || "N/A";
-                    viewModalSubject.textContent = book.subject || "N/A";
-                    viewModalPlace.textContent = book.book_place || "N/A";
-                    viewModalPublisher.textContent = book.book_publisher || "N/A";
-                    viewModalYear.textContent = book.year || "N/A";
-                    viewModalEdition.textContent = book.book_edition || "N/A";
-                    viewModalSupplementary.textContent = book.book_supplementary || "N/A";
-                    viewModalDescription.textContent = book.description || "No description available.";
-                    openModal(viewBookModal);
-                } else {
-                    Swal.fire('Error', data.message || 'Could not find book details.', 'error');
-                }
-            } catch (err) {
-                console.error("View book fetch error:", err);
-                Swal.fire('Error', 'An error occurred while fetching book data.', 'error');
-            }
-        };
+        // TANGGALIN NATIN ANG VIEW BOOK FUNCTION
+        // window.viewBook = async (bookId) => { ... };
 
         window.editBook = async (bookId) => {
             if (!bookId) return;
             currentEditingBookId = bookId;
+            
+            showLoadingModal("Loading Book Data...", "Preparing form for editing.");
+            
             try {
-                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/get/${bookId}`);
+                const res = await fetch(`api/librarian/booksmanagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
                 const data = await res.json();
+                
+                await new Promise(r => setTimeout(r, 300));
+                Swal.close();
+
                 if (data.success && data.book) {
                     const book = data.book;
                     document.getElementById("edit_book_id").value = book.book_id || '';
@@ -1000,11 +1042,12 @@
                     }
                     openModal(editBookModal);
                 } else {
-                    Swal.fire('Error', data.message || 'Could not find book details.', 'error');
+                    showErrorToast('Error', data.message || 'Could not find book details.');
                 }
             } catch (err) {
+                Swal.close();
                 console.error("Edit book fetch error:", err);
-                Swal.fire('Error', 'Error fetching book data.', 'error');
+                showErrorToast('Error', 'Error fetching book data.');
             }
         };
 
@@ -1013,55 +1056,68 @@
             if (!currentEditingBookId) return;
             const formData = new FormData(editBookForm);
             if (!formData.get('accession_number') || !formData.get('call_number') || !formData.get('title') || !formData.get('author')) {
-                Swal.fire('Missing Info', 'Please fill in all required fields (*).', 'warning');
+                showErrorToast('Missing Information', 'Please fill in all required fields (*).');
                 return;
             }
+            
+            showLoadingModal("Saving Changes...", "Updating book record.");
+
             try {
-                const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/update/${currentEditingBookId}`, {
+                const res = await fetch(`api/librarian/booksmanagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
                 const result = await res.json();
+                
+                await new Promise(r => setTimeout(r, 300));
+                Swal.close();
+
                 if (result.success) {
-                    Swal.fire('Success!', result.message || 'Book updated!', 'success');
+                    showSuccessToast('Success!', result.message || 'Book updated successfully!');
                     closeModal(editBookModal);
                     loadBooks(currentPage);
                 } else {
-                    Swal.fire('Error', result.message || 'Failed to update book.', 'error');
+                    showErrorToast('Error', result.message || 'Failed to update book.');
                 }
             } catch (err) {
+                Swal.close();
                 console.error("Update book error:", err);
-                Swal.fire('Error', 'An error occurred.', 'error');
+                showErrorToast('Error', 'An error occurred while updating the book.');
             }
         });
 
         window.deleteBook = async (bookId, title) => {
             if (!bookId) return;
-            const result = await Swal.fire({
-                title: 'Are you sure?',
-                text: `Delete "${title}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!'
-            });
-            if (result.isConfirmed) {
-                try {
-                    const res = await fetch(`<?= BASE_URL ?>/api/librarian/booksmanagement/delete/${bookId}`, {
-                        method: "POST"
-                    });
-                    const result = await res.json();
-                    if (result.success) {
-                        Swal.fire('Deleted!', result.message || 'Book deleted.', 'success');
-                        loadBooks(currentPage);
-                    } else {
-                        Swal.fire('Error', result.message || 'Failed to delete.', 'error');
-                    }
-                } catch (err) {
-                    console.error("Delete book error:", err);
-                    Swal.fire('Error', 'An error occurred.', 'error');
+            
+            const isConfirmed = await showConfirmationModal(
+                'Confirm Deletion',
+                `Are you sure you want to delete the book: **${title}**? This action cannot be undone.`,
+                'Yes, Delete It!'
+            );
+
+            if (!isConfirmed) return;
+            
+            showLoadingModal("Deleting Book...", "Removing book record from the system.");
+
+            try {
+                const res = await fetch(`api/librarian/booksmanagement/delete/${bookId}`, {
+                    method: "POST"
+                });
+                const result = await res.json();
+                
+                await new Promise(r => setTimeout(r, 300));
+                Swal.close();
+
+                if (result.success) {
+                    showSuccessToast('Deleted!', result.message || 'Book deleted successfully.');
+                    loadBooks(currentPage);
+                } else {
+                    showErrorToast('Error', result.message || 'Failed to delete the book.');
                 }
+            } catch (err) {
+                Swal.close();
+                console.error("Delete book error:", err);
+                showErrorToast('Error', 'An error occurred during deletion.');
             }
         };
 

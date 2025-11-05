@@ -1,3 +1,44 @@
+// --- CORE CONFIRMATION FUNCTION (FINAL TEMPLATE) ---
+async function showCustomConfirmationModal(title, text, confirmText = "Confirm") {
+    if (typeof Swal == "undefined") return confirm(title);
+    const result = await Swal.fire({
+        background: "transparent",
+        buttonsStyling: false, 
+        width: '450px', 
+        
+        html: `
+            <div class="flex flex-col text-center">
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-orange-600">
+                        <i class="ph ph-warning-circle text-3xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">${title}</h3>
+                <p class="text-[14px] text-gray-700 mt-1">${text}</p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: confirmText,
+        cancelButtonText: "Cancel",
+        
+     customClass: {
+    popup: "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-500 !border-solid",
+
+                
+            // Confirm Button (Orange, Large, Bold)
+            confirmButton:
+                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
+            // Cancel Button (Gray, Large, Bold)
+            cancelButton:
+                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
+
+            actions: "!mt-4"
+        },
+    });
+    return result.isConfirmed;
+}
+// ----------------------------------------------------
+
 const scanResultCard = document.getElementById('scanResultCard');
 const transactionHistoryTableBody = document.getElementById('transactionHistoryTableBody');
 const defaultAvatar = `/LibSys/public/img/default_avatar.png`;
@@ -49,6 +90,8 @@ const showLibrarianToast = (title, text, theme, duration = 3000) => {
 
 // Custom Modal for Final Success/Error (with Progress Bar, auto-close, and fixed size)
 const showFinalLibrarianModal = (isSuccess, title, message) => {
+    if (typeof Swal == "undefined") return alert(`${title}: ${message}`);
+    
     const duration = 3000;
     let timerInterval;
 
@@ -75,6 +118,8 @@ const showFinalLibrarianModal = (isSuccess, title, message) => {
         showCancelButton: false,
         buttonsStyling: false,
         
+        width: '450px', 
+        
         backdrop: `rgba(0,0,0,0.3) backdrop-filter: blur(6px)`,
         timer: duration, 
         
@@ -93,7 +138,7 @@ const showFinalLibrarianModal = (isSuccess, title, message) => {
         },
 
         html: `
-            <div class="w-[450px] ${theme.bg} border-2 ${theme.border} rounded-2xl p-8 shadow-xl text-center">
+            <div class="w-full ${theme.bg} border-2 ${theme.border} rounded-2xl p-8 shadow-xl text-center">
                 <div class="flex items-center justify-center w-16 h-16 rounded-full ${theme.iconBg} mx-auto mb-4">
                     <i class="ph ${theme.iconClass} ${theme.iconColor} text-3xl"></i>
                 </div>
@@ -282,43 +327,13 @@ function renderTransactionHistory(transactions) {
 function processTransaction(transactionCode, action) {
     const actionText = 'finalize this borrowing transaction';
 
-    // 🟠 Confirmation Modal (Aligned to Orange theme)
-    Swal.fire({
-        title: `Borrow Transaction?`,
-        text: `Are you sure you want to ${actionText} for ticket ${transactionCode}?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: `Yes, Process Borrow!`,
-        cancelButtonText: `Cancel`,
-
-        // Use custom buttons and styling
-        buttonsStyling: false, 
-        customClass: {
-            // Orange Border, Shadow, and Background Gradient (Same as your Confirmation Modals)
-            popup: 
-                "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
-            
-            // Custom Orange Confirm Button
-            confirmButton: 
-                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2",
-            
-            // Custom Gray Cancel Button
-            cancelButton: 
-                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2",
-            
-            // Ensure Title and Content font/size are correct
-            title: 'text-2xl font-bold text-gray-800',
-            htmlContainer: 'text-base text-gray-700',
-        },
-        // Ensure icon is visible and buttons are centered (overriding default Swalert margins)
-        didOpen: (popup) => {
-            const icon = popup.querySelector('.swal2-icon');
-            if (icon) icon.style.margin = '0 auto 10px';
-            const actions = popup.querySelector('.swal2-actions');
-            if (actions) actions.style.marginTop = '1rem';
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
+    // 🟠 Confirmation Modal (Using the custom function to match design)
+    showCustomConfirmationModal(
+        `Borrow Transaction?`,
+        `Are you sure you want to ${actionText} for ticket ${transactionCode}?`,
+        `Yes, Process Borrow!`
+    ).then((isConfirmed) => {
+        if (isConfirmed) {
             // 🟠 Loading Animation
             Swal.fire({
                 background: "transparent",
@@ -351,6 +366,7 @@ function processTransaction(transactionCode, action) {
                     // 🟢 Success Modal (Custom size/style with timer)
                     showFinalLibrarianModal(true, 'Success!', res.message);
                     renderScanResult(null); 
+                    document.getElementById('scannerInput').value = '';
                     document.getElementById('scannerInput').focus();
                 } else {
                     // 🔴 Error Modal (Custom size/style with timer)

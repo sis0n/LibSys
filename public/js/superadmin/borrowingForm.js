@@ -139,23 +139,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     handleItemTypeChange('Equipment');
 
-   // ✅ ComboBox logic for Equipment Name (click-to-open, stays open when empty)
     const itemNameInput = document.getElementById('item_name');
     const itemNameSuggestions = document.getElementById('item_name_suggestions');
     const itemNameSuggestionsList = document.getElementById('item_name_suggestions_list');
     const itemNameDropdownArrow = document.getElementById('item_name_dropdown_arrow');
 
-    const suggestions = [
-    'Computer',
-    'Table',
-    'Extension Cord',
-    'Whiteboard',
-    'HDMI Cable',
-    'Chess',
-    'Scabble',
-    'Domino',
-    'Connect 4',
-    ];
+    let suggestions = [];
+
+    const fetchSuggestions = async () => {
+        try {
+            const response = await fetch('api/superadmin/borrowingForm/getEquipments');
+            if (response.ok) {
+                suggestions = await response.json();
+            } else {
+                console.error('Failed to fetch equipment suggestions. Using fallback data.');
+                loadFallbackSuggestions();
+            }
+        } catch (error) {
+            console.error('Error fetching equipment suggestions:', error);
+            loadFallbackSuggestions();
+        }
+    };
+
+    const loadFallbackSuggestions = () => {
+        suggestions = [
+            'Computer',
+            'Table',
+            'Extension Cord',
+            'Whiteboard',
+            'HDMI Cable',
+            'Chess',
+            'Scrabble',
+            'Domino',
+            'Connect 4',
+        ];
+    }
+    
+    fetchSuggestions();
 
     let highlightedIndex = -1;
     let wasPointerDownOnInput = false;

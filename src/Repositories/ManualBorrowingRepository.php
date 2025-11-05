@@ -104,6 +104,15 @@ class ManualBorrowingRepository
     return $this->db->lastInsertId();
   }
 
+  // --- Get all equipment names ---
+  public function getEquipments(): array
+  {
+    $stmt = $this->db->prepare("SELECT DISTINCT name FROM equipments ORDER BY name ASC");
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_COLUMN);
+  }
+
+
   // --- Check book availability ---
   public function checkBook(string $accession_number): array
   {

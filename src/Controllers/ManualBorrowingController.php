@@ -15,6 +15,17 @@ class ManualBorrowingController extends Controller
     $this->manualRepo = new ManualBorrowingRepository();
   }
 
+  public function getEquipments(): void
+  {
+    try {
+      $equipments = $this->manualRepo->getEquipments();
+      $this->sendJson($equipments);
+    } catch (Exception $e) {
+      $this->sendJson(['error' => 'Failed to fetch equipments'], 500);
+    }
+  }
+
+
   private function sendJson(array $data, int $statusCode = 200): void
   {
     http_response_code($statusCode);

@@ -220,6 +220,21 @@ if (isset($_SESSION['user_id'])) {
 
         // --- State ---
         let currentPage = 1;
+        // --- Page Memory ---
+        try {
+            const savedPage = sessionStorage.getItem('guestLandingPage');
+            if (savedPage) {
+                const parsedPage = parseInt(savedPage, 10);
+                if (!isNaN(parsedPage) && parsedPage > 0) {
+                    currentPage = parsedPage;
+                } else {
+                    sessionStorage.removeItem('guestLandingPage');
+                }
+            }
+        } catch (e) {
+            console.error("SessionStorage Error:", e);
+            currentPage = 1;
+        }
         const limit = 30;
         let totalBooks = 0;
         let totalPages = 1;
@@ -233,6 +248,13 @@ if (isset($_SESSION['user_id'])) {
             if (isLoading) return;
             isLoading = true;
             currentPage = page;
+
+            // --- Page Memory ---
+            try {
+                sessionStorage.setItem('guestLandingPage', currentPage);
+            } catch (e) {
+                console.error("SessionStorage Error:", e);
+            }
 
             // Show loading state
             bookGrid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-3xl"></i><p class="mt-2">Loading Books...</p></div>`;
@@ -392,6 +414,9 @@ if (isset($_SESSION['user_id'])) {
             currentSearch = e.target.value.trim();
             clearTimeout(searchDebounce);
             searchDebounce = setTimeout(() => {
+                try {
+                    sessionStorage.removeItem('guestLandingPage');
+                } catch (e) {}
                 loadBooks(1);
             }, 500);
         });
@@ -478,6 +503,9 @@ if (isset($_SESSION['user_id'])) {
             document.querySelectorAll(".status-item").forEach(btn => btn.classList.remove("bg-orange-100", "text-orange-700", "font-medium"));
             el.classList.add("bg-orange-100", "text-orange-700", "font-medium");
             currentStatus = val;
+            try {
+                sessionStorage.removeItem('guestLandingPage');
+            } catch (e) {}
             loadBooks(1);
         };
 
@@ -490,7 +518,7 @@ if (isset($_SESSION['user_id'])) {
         document.addEventListener("click", () => statusMenu.classList.add("hidden"));
 
         // --- Initial Load ---
-        loadBooks(1);
+        loadBooks(currentPage);
     });
     </script>
 

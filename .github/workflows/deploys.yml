@@ -51,9 +51,8 @@ jobs:
             */.git
             */.github
             **/node_modules/**
-            **/vendor/**
-            /checkout_test.txt/
-            /docs/
+            checkout_test.txt
+            docs
             resetdata.php
             sandbox.php
             **/deploy.yml

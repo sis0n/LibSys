@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'collateral_id_suggestions_list',
         'collateral_id_dropdown_arrow',
         'api/superadmin/borrowingForm/getCollaterals',
-        ['School ID', 'Library ID','National ID'],
+        ['School ID', 'Library ID','Valid ID'],
         'bg-amber-100',
         'hover:bg-amber-50'
     );

@@ -107,4 +107,24 @@ class ReportController extends Controller
             echo json_encode(['success' => false, 'message' => 'Error fetching deleted books report: ' . $e->getMessage()]);
         }
     }
+
+    public function getReportGraphData()
+    {
+        header('Content-Type: application/json');
+        try {
+            $repository = new ReportRepository();
+            $response = [
+                'success' => true,
+                'topVisitors' => $repository->getTopVisitors(),
+                'weeklyActivity' => $repository->getWeeklyActivity(),
+            ];
+            echo json_encode($response);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to load graph data: ' . $e->getMessage(),
+            ]);
+        }
+    }
 }

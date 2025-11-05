@@ -1,242 +1,317 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const statusBtn = document.getElementById('statusFilterBtn');
-    const statusMenu = document.getElementById('statusFilterMenu');
-    const statusValue = document.getElementById('statusFilterValue');
-    const tableBody = document.getElementById('transactionHistoryTableBody');
-    const noTransactionsMessage = document.getElementById('no-transactions-found');
-    const rowTemplate = document.getElementById('transaction-row-template').content;
+function initializeAttendanceLogs() {
+    // --- DOM ELEMENTS ---
+    const buttons = document.querySelectorAll('.period-btn');
+    const label = document.getElementById('visitor-label');
+    const count = document.getElementById('visitor-count');
+    const searchInput = document.getElementById("attendanceSearchInput");
+    const dateInput = document.getElementById("datePickerInput");
+    const courseBtn = document.getElementById("courseFilterBtn");
+    const courseMenu = document.getElementById("courseFilterMenu");
+    const courseValueSpan = document.getElementById("courseFilterValue");
+    const tableBody = document.getElementById("attendanceTableBody");
+    const noRecordsRow = document.getElementById("noRecordsRow");
+    const checkinsModal = document.getElementById("viewCheckinsModal");
+    const closeCheckinsBtn1 = document.getElementById("closeCheckinsModal");
+    const closeCheckinsBtn2 = document.getElementById("closeCheckinsModalBtn");
+    const checkinsModalTitle = document.getElementById("checkinsModalTitle");
+    const checkinsModalSubtitle = document.getElementById("checkinsModalSubtitle");
+    const checkinsList = document.getElementById("checkinsList");
+
+    // Pagination Elements
     const paginationContainer = document.getElementById('pagination-container');
     const paginationNumbers = document.getElementById('pagination-numbers');
     const prevPageBtn = document.getElementById('prev-page');
     const nextPageBtn = document.getElementById('next-page');
-    const modal = document.getElementById('transactionDetailsModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
 
-    const searchInput = document.getElementById('transactionSearchInput');
-    const dateInput = document.getElementById('transactionDate');
+    // --- VALIDATION ---
+    if (!searchInput || !dateInput || !courseBtn || !tableBody || !noRecordsRow || !checkinsModal || !paginationContainer) {
+        console.error("AttendanceLogs Error: Critical elements are missing.");
+        if (tableBody) {
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-red-500 py-10">Page components failed to load. Please refresh.</td></tr>`;
+        }
+        return;
+    }
 
+    // --- STATE ---
+    let currentSearch = "";
+    let currentDate = "";
+    let currentCourse = "All Courses";
+    let currentGroupedLogs = []; // Holds the result of groupLogs()
+
+    // Pagination State
     let currentPage = 1;
-    const rowsPerPage = 5;
-    let allTransactions = [];
-    let currentFilteredTransactions = [];
+    const rowsPerPage = 10;
 
-    async function loadTransactions() {
+    // --- HELPERS ---
+    const timezone = "Asia/Manila";
+    function getPhDate(date = new Date()) {
         try {
-            const response = await fetch('api/librarian/transactionHistory/json');
-            allTransactions = await response.json();
-            currentFilteredTransactions = allTransactions;
-            applyAndRenderFilters();
-        } catch (error) {
-            console.error('Error fetching transactions:', error);
+            return new Date(date.toLocaleString("en-US", { timeZone: timezone }));
+        } catch (e) {
+            return new Date();
         }
     }
 
-    function applyAndRenderFilters() {
-        const status = statusValue.textContent;
-        const searchTerm = searchInput.value.toLowerCase();
-        const date = dateInput.value;
-
-        currentFilteredTransactions = allTransactions.filter(transaction => {
-            const statusMatch = status === 'All Status' || (transaction.transaction_status && transaction.transaction_status.toLowerCase() === status.toLowerCase());
-            const searchMatch = !searchTerm ||
-                (transaction.studentName && transaction.studentName.toLowerCase().includes(searchTerm)) ||
-                (transaction.studentNumber && transaction.studentNumber.toLowerCase().includes(searchTerm)) ||
-                (transaction.book_title && transaction.book_title.toLowerCase().includes(searchTerm));
-            const dateMatch = !date ||
-                (transaction.borrowed_at && transaction.borrowed_at.startsWith(date)) ||
-                (transaction.returned_at && transaction.returned_at.startsWith(date));
-
-            return statusMatch && searchMatch && dateMatch;
-        });
-
-        currentPage = 1;
-        renderTable(currentFilteredTransactions, currentPage);
-        renderPagination(currentFilteredTransactions);
+    function formatDate(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+    
+    function formatTo12Hour(dateStr, timeStr) {
+        try {
+            const dateTime = new Date(`${dateStr}T${timeStr}`);
+            return dateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        } catch (e) {
+            return timeStr;
+        }
     }
 
-    statusBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        statusMenu.classList.toggle('hidden');
-    });
-    document.addEventListener('click', () => statusMenu.classList.add('hidden'));
-
-    statusMenu.querySelectorAll('.dropdown-item').forEach(item => {
-        item.addEventListener('click', () => {
-            statusValue.textContent = item.dataset.value;
-            statusMenu.classList.add('hidden');
-            applyAndRenderFilters();
+    // --- DATA PROCESSING ---
+    function groupLogs(logs) {
+        const studentMap = {};
+        logs.forEach(log => {
+            const key = `${log.studentNumber}-${log.date}`;
+            const checkInTime = formatTo12Hour(log.date, log.time);
+            if (!studentMap[key]) {
+                studentMap[key] = {
+                    studentName: log.studentName,
+                    studentNumber: log.studentNumber,
+                    date: log.date,
+                    firstCheckIn: checkInTime,
+                    totalCheckIns: 1,
+                    allCheckIns: [checkInTime]
+                };
+            } else {
+                studentMap[key].totalCheckIns++;
+                studentMap[key].allCheckIns.push(checkInTime);
+            }
         });
-    });
+        return Object.values(studentMap).sort((a, b) => new Date(b.date + ' ' + b.firstCheckIn) - new Date(a.date + ' ' + a.firstCheckIn));
+    }
 
-    searchInput.addEventListener('input', applyAndRenderFilters);
-    dateInput.addEventListener('change', applyAndRenderFilters);
-
-    function renderTable(data, page) {
+    // --- RENDERING ---
+    function renderTable() {
         tableBody.innerHTML = '';
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const paginatedData = data.slice(start, end);
+        noRecordsRow.classList.add('hidden');
 
-        if (paginatedData.length === 0 && page === 1) {
-            tableBody.appendChild(noTransactionsMessage.cloneNode(true));
+        if (currentGroupedLogs.length === 0) {
+            tableBody.appendChild(noRecordsRow);
+            noRecordsRow.classList.remove('hidden');
             paginationContainer.classList.add('hidden');
             return;
         }
 
         paginationContainer.classList.remove('hidden');
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedData = currentGroupedLogs.slice(start, end);
 
-        paginatedData.forEach(transaction => {
-            const newRow = rowTemplate.cloneNode(true);
-            const tr = newRow.querySelector('tr');
-            tr.dataset.transactionId = transaction.transaction_id;
-            tr.classList.add('transaction-row');
+        const fragment = document.createDocumentFragment();
+        paginatedData.forEach(log => {
+            const row = document.createElement('tr');
+            row.className = 'bg-white';
+            const studentName = log.studentName ? log.studentName.replace(/</g, "&lt;") : 'N/A';
+            const studentNumber = log.studentNumber ? log.studentNumber.replace(/</g, "&lt;") : 'N/A';
+            const date = log.date ? log.date.replace(/</g, "&lt;") : 'N/A';
+            const firstCheckIn = log.firstCheckIn ? log.firstCheckIn.replace(/</g, "&lt;") : 'N/A';
 
-            const cells = newRow.querySelectorAll('td');
-
-            const borrowerName = transaction.studentName || `${transaction.first_name || ''} ${transaction.last_name || ''}`;
-            const borrowerId = transaction.student_number || transaction.unique_faculty_id || transaction.employee_id || transaction.guest_id || 'N/A';
-
-            cells[0].textContent = borrowerName;
-            cells[1].textContent = borrowerId;
-
-            cells[2].textContent = transaction.accession_number || 'N/A';
-
-            cells[3].textContent = transaction.borrowed_at || '';
-            cells[4].textContent = transaction.returned_at ? transaction.returned_at : 'Not yet returned';
-
-            const statusCell = cells[5].querySelector('span');
-            const statusText = transaction.transaction_status ? transaction.transaction_status.toLowerCase() : 'unknown';
-            statusCell.textContent = transaction.transaction_status || 'N/A';
-            statusCell.className = 'px-3 py-1 rounded-full font-medium text-xs';
-
-            if (statusText === 'borrowed') {
-                statusCell.classList.add('bg-red-100', 'text-red-800');
-            } else if (statusText === 'returned') {
-                statusCell.classList.add('bg-green-100', 'text-green-800');
-            } else if (statusText === 'expired') {
-                statusCell.classList.add('bg-gray-100', 'text-gray-800');
-            } else {
-                statusCell.classList.add('bg-gray-100', 'text-gray-500');
-            }
-
-            tableBody.appendChild(newRow);
+            row.innerHTML = `
+                <td class="px-4 py-3"><p class="font-medium text-gray-800">${studentName}</p><p class="text-gray-500 text-xs">${studentNumber}</p></td>
+                <td class="px-4 py-3 text-gray-700">${date}</td>
+                <td class="px-4 py-3 text-gray-700">${firstCheckIn}</td>
+                <td class="px-4 py-3 text-gray-700"><span class="bg-orange-100 text-orange-700 text-xs font-medium px-2 py-0.5 rounded-full">${log.totalCheckIns || 0}</span></td>
+                <td class="px-4 py-3">
+                    <button class="viewCheckinsBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition" 
+                        data-student-name="${studentName.replace(/"/g, "&quot;")}" 
+                        data-date="${date.replace(/"/g, "&quot;")}"
+                        data-checkins='${JSON.stringify(log.allCheckIns || [])}'>
+                        <i class="ph ph-eye text-base"></i><span>View All</span>
+                    </button>
+                </td>`;
+            fragment.appendChild(row);
         });
+        tableBody.appendChild(fragment);
     }
 
-    // Pagination
-    function renderPagination(data) {
+    function renderPagination() {
         paginationNumbers.innerHTML = '';
-        const pageCount = Math.ceil(data.length / rowsPerPage);
+        const pageCount = Math.ceil(currentGroupedLogs.length / rowsPerPage);
+
+        if (pageCount <= 1) {
+            paginationContainer.classList.add('hidden');
+            return;
+        }
+        paginationContainer.classList.remove('hidden');
 
         prevPageBtn.classList.toggle('text-gray-400', currentPage === 1);
-        prevPageBtn.classList.toggle('hover:text-orange-600', currentPage !== 1);
+        prevPageBtn.classList.toggle('pointer-events-none', currentPage === 1);
         nextPageBtn.classList.toggle('text-gray-400', currentPage === pageCount);
-        nextPageBtn.classList.toggle('hover:text-orange-600', currentPage !== pageCount);
+        nextPageBtn.classList.toggle('pointer-events-none', currentPage === pageCount);
 
         for (let i = 1; i <= pageCount; i++) {
             const pageNumber = document.createElement('a');
             pageNumber.href = '#';
             pageNumber.textContent = i;
             pageNumber.classList.add('px-4', 'py-1.5', 'rounded-full', 'transition', 'duration-200');
-            if (i === currentPage) pageNumber.classList.add('bg-orange-500', 'text-white', 'shadow-sm');
-            else pageNumber.classList.add('text-gray-700', 'hover:text-orange-600', 'hover:bg-orange-50');
+            if (i === currentPage) {
+                pageNumber.classList.add('bg-orange-500', 'text-white', 'shadow-sm');
+            } else {
+                pageNumber.classList.add('text-gray-700', 'hover:text-orange-600', 'hover:bg-orange-50');
+            }
 
             pageNumber.addEventListener('click', e => {
                 e.preventDefault();
                 currentPage = i;
-                renderTable(currentFilteredTransactions, currentPage);
-                renderPagination(currentFilteredTransactions);
+                renderTable();
+                renderPagination();
             });
             paginationNumbers.appendChild(pageNumber);
         }
     }
 
+    // --- DATA FETCHING ---
+    function fetchLogs() {
+        const todayStr = formatDate(getPhDate());
+        const yesterdayStr = formatDate(new Date(getPhDate().setDate(getPhDate().getDate() - 1)));
+
+        let periodToSend = 'All dates';
+        let dateToFilter = currentDate;
+
+        if (currentDate === todayStr) {
+            periodToSend = 'Today';
+            dateToFilter = null;
+        } else if (currentDate === yesterdayStr) {
+            periodToSend = 'Yesterday';
+            dateToFilter = null;
+        }
+
+        let url = `${BASE_URL_JS}/api/attendance/logs/ajax?period=${periodToSend}&search=${currentSearch}`;
+        if (currentCourse !== "All Courses") {
+            url += `&course=${currentCourse}`;
+        }
+
+        fetch(url)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                let filteredData = data;
+                if (dateToFilter) {
+                    filteredData = data.filter(log => log.date === dateToFilter);
+                }
+                currentGroupedLogs = groupLogs(filteredData);
+                currentPage = 1;
+                renderTable();
+                renderPagination();
+            })
+            .catch(err => {
+                console.error("Failed to fetch logs:", err);
+                currentGroupedLogs = [];
+                renderTable();
+                renderPagination();
+                noRecordsRow.querySelector('td').textContent = 'Error loading data. Please try again.';
+            });
+    }
+
+    // --- EVENT LISTENERS ---
+    // Visitor card (unchanged)
+    if (buttons.length > 0 && label && count) {
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const period = btn.dataset.period;
+                const visitorCount = btn.dataset.count;
+                label.textContent = `This ${period}`;
+                count.textContent = visitorCount;
+                buttons.forEach(b => b.classList.remove('bg-[var(--color-popover)]', 'font-medium'));
+                btn.classList.add('bg-[var(--color-popover)]', 'font-medium');
+            });
+        });
+    }
+
+    // Filters
+    function setupDropdown(btn, menu, valueSpan, stateKey) {
+        if (!btn || !menu || !valueSpan) return;
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            menu.classList.toggle("hidden");
+        });
+        menu.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const value = item.getAttribute('data-value');
+                valueSpan.textContent = value;
+                menu.classList.add('hidden');
+                if (stateKey === 'course') currentCourse = value;
+                fetchLogs();
+            });
+        });
+    }
+    setupDropdown(courseBtn, courseMenu, courseValueSpan, 'course');
+    document.addEventListener("click", () => { if (courseMenu) courseMenu.classList.add("hidden"); });
+
+    searchInput.addEventListener("input", () => { currentSearch = searchInput.value.trim(); fetchLogs(); });
+    dateInput.addEventListener("change", () => { currentDate = dateInput.value; fetchLogs(); });
+
+    // Pagination buttons
     prevPageBtn.addEventListener('click', e => {
         e.preventDefault();
         if (currentPage > 1) {
             currentPage--;
-            renderTable(currentFilteredTransactions, currentPage);
-            renderPagination(currentFilteredTransactions);
+            renderTable();
+            renderPagination();
         }
     });
 
     nextPageBtn.addEventListener('click', e => {
         e.preventDefault();
-        const pageCount = Math.ceil(currentFilteredTransactions.length / rowsPerPage);
+        const pageCount = Math.ceil(currentGroupedLogs.length / rowsPerPage);
         if (currentPage < pageCount) {
             currentPage++;
-            renderTable(currentFilteredTransactions, currentPage);
-            renderPagination(currentFilteredTransactions);
+            renderTable();
+            renderPagination();
         }
     });
 
-    // Modal
-    closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
-    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.add('hidden'); });
-
-    tableBody.addEventListener('click', e => {
-        const row = e.target.closest('.transaction-row');
-        if (!row) return;
-        const transactionId = parseInt(row.dataset.transactionId, 10);
-        const transaction = allTransactions.find(t => t.transaction_id === transactionId);
-        if (transaction) openModalWithTransaction(transaction);
-    });
-
-    function openModalWithTransaction(transaction) {
-        const isStudent = !!transaction.student_id;
-        const isFaculty = !!transaction.faculty_id;
-        const isStaff = !!transaction.staff_id;
-
-        const borrowerName = transaction.studentName || `${transaction.first_name || ''} ${transaction.last_name || ''}`;
-        const borrowerId = transaction.student_number || transaction.unique_faculty_id || transaction.employee_id || transaction.guest_id || 'N/A';
-
-        let courseOrDepartment = 'N/A';
-        let yearOrPosition = 'N/A';
-
-        if (isStudent) {
-            courseOrDepartment = `${transaction.course_code || ''} - ${transaction.course_title || ''}`;
-            yearOrPosition = `${transaction.year_level || ''} ${transaction.section || ''}`;
-        } else if (isFaculty) {
-            courseOrDepartment = `${transaction.college_code || ''} - ${transaction.college_name || ''}`;
-            yearOrPosition = 'Faculty';
-        } else if (isStaff) {
-            courseOrDepartment = transaction.position || 'N/A';
-            yearOrPosition = 'Staff';
+    // Modal (unchanged)
+    function closeCheckinsModal() {
+        if (checkinsModal) {
+            checkinsModal.classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
         }
-
-        document.getElementById('modalStudentName').textContent = borrowerName;
-        document.getElementById('modalStudentId').textContent = borrowerId;
-
-        document.getElementById('modalCourse').textContent = courseOrDepartment;
-        document.getElementById('modalYear').textContent = yearOrPosition;
-        document.getElementById('modalSection').textContent = transaction.section || (isFaculty ? 'N/A' : (transaction.employee_id ? 'Staff' : 'N/A'));
-
-        document.getElementById('modalItemTitle').textContent = transaction.book_title || '';
-        document.getElementById('modalItemAuthor').textContent = transaction.book_author || '';
-        document.getElementById('modalItemAccession').textContent = transaction.accession_number || '';
-        document.getElementById('modalItemCallNo').textContent = transaction.call_number || '';
-        document.getElementById('modalItemISBN').textContent = transaction.book_isbn || '';
-        document.getElementById('modalBorrowedDate').textContent = transaction.borrowed_at || '';
-        document.getElementById('modalReturnedDate').textContent = transaction.returned_at ?? 'Not yet returned';
-        document.getElementById('modalProcessedBy').textContent = transaction.librarian_name ?? 'Not yet processed';
-
-        const statusEl = document.getElementById('modalStatus');
-        statusEl.innerHTML = '';
-        const statusSpan = document.createElement('span');
-        const statusText = transaction.transaction_status ? transaction.transaction_status.toLowerCase() : 'unknown';
-        statusSpan.textContent = transaction.transaction_status?.toUpperCase() || 'N/A';
-        statusSpan.classList.add('font-semibold', 'tracking-wide');
-
-        if (statusText === 'borrowed') statusSpan.classList.add('text-orange-600');
-        else if (statusText === 'returned') statusSpan.classList.add('text-green-600');
-        else if (statusText === 'expired') statusSpan.classList.add('text-gray-600');
-
-        statusEl.appendChild(statusSpan);
-        modal.classList.remove('hidden');
     }
+    [closeCheckinsBtn1, closeCheckinsBtn2].forEach(btn => btn?.addEventListener("click", closeCheckinsModal));
+    checkinsModal?.addEventListener("click", e => { if (e.target === checkinsModal) closeCheckinsModal(); });
 
-    const today = new Date();
-    dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    tableBody.addEventListener("click", (e) => {
+        const viewBtn = e.target.closest(".viewCheckinsBtn");
+        if (viewBtn) {
+            try {
+                const studentName = viewBtn.dataset.studentName;
+                const date = viewBtn.dataset.date;
+                const checkins = JSON.parse(viewBtn.dataset.checkins);
+                checkinsModalTitle.textContent = `Check-ins for: ${studentName}`;
+                checkinsModalSubtitle.textContent = `Date: ${date}`;
+                checkinsList.innerHTML = '';
+                if (checkins && checkins.length > 0) {
+                    checkins.forEach((time, index) => {
+                        checkinsList.innerHTML += `<div class="flex justify-between items-center bg-orange-50 border border-orange-200 px-3 py-2 rounded-lg"><p class="font-medium text-gray-800 text-sm">Check-in #${index + 1}</p><span class="text-sm font-semibold text-orange-700">${time}</span></div>`;
+                    });
+                } else {
+                    checkinsList.innerHTML = `<p class="text-gray-500 text-sm text-center">No individual check-in times recorded.</p>`;
+                }
+                checkinsModal.classList.remove("hidden");
+                document.body.classList.add("overflow-hidden");
+            } catch (parseError) {
+                console.error("Error opening modal, could not parse check-in data:", parseError);
+                alert("Error: Could not display check-in details.");
+            }
+        }
+    });
 
-    loadTransactions();
-});
+    // --- INITIALIZATION ---
+    currentDate = formatDate(getPhDate());
+    dateInput.value = currentDate;
+    fetchLogs();
+}

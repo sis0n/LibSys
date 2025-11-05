@@ -32,17 +32,27 @@ class UserManagementController extends Controller
     ]);
   }
 
-  public function getAll()
+  // Pagination Start
+  public function fetchPaginatedUsers()
   {
     header('Content-Type: application/json');
     try {
-      $users = $this->userRepo->getAllUsers();
-      echo json_encode(['success' => true, 'users' => $users]);
+        $limit = (int)($_GET['limit'] ?? 10);
+        $offset = (int)($_GET['offset'] ?? 0);
+        $search = $_GET['search'] ?? '';
+        $role = $_GET['role'] ?? 'All Roles';
+        $status = $_GET['status'] ?? 'All Status';
+
+        $users = $this->userRepo->getPaginatedUsers($limit, $offset, $search, $role, $status);
+        $totalCount = $this->userRepo->countPaginatedUsers($search, $role, $status);
+
+        echo json_encode(['success' => true, 'users' => $users, 'totalCount' => $totalCount]);
     } catch (\Exception $e) {
-      echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     exit;
   }
+  // Pagination End
 
   public function getUserById($id)
   {

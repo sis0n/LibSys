@@ -81,6 +81,7 @@ class RouteConfig
         $router->post('api/librarian/booksmanagement/store', 'BookManagementController@store', ['book management']);
         $router->post('api/librarian/booksmanagement/update/{id}', 'BookManagementController@update', ['book management']);
         $router->post('api/librarian/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
+        $router->post('api/librarian/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
         $router->post('api/librarian/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/librarian/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
         $router->get('api/librarian/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);
@@ -93,6 +94,8 @@ class RouteConfig
         $router->get('api/librarian/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/librarian/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
         $router->get('api/librarian/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
+        $router->post('api/librarian/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
+
         // PDF Report Generation Route
         $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
 

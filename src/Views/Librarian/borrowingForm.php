@@ -141,5 +141,5 @@
         </div>
     </form>
 
-    <script src="/js/librarian/borrowingForm.js" defer></script>
+    <script src="<?= BASE_URL?>/js/librarian/borrowingForm.js" defer></script>
 </main>

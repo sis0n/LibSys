@@ -560,7 +560,7 @@
             formData.append("csv_file", fileInput.files[0]);
             
             try {
-                const res = await fetch(`api/admin/booksmanagement/bulkImport`, {
+                const res = await fetch(`api/admin/bookManagement/bulkImport`, {
                     method: "POST",
                     body: formData
                 });
@@ -777,7 +777,7 @@
                     offset: offset
                 });
 
-                const res = await fetch(`api/admin/booksmanagement/fetch?${params.toString()}`);
+                const res = await fetch(`api/admin/bookManagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
 
@@ -973,7 +973,7 @@
             showLoadingModal("Adding Book...", "Saving new record to catalog.");
 
             try {
-                const res = await fetch(`api/admin/booksmanagement/store`, {
+                const res = await fetch(`api/admin/bookManagement/store`, {
                     method: "POST",
                     body: formData
                 });
@@ -1009,7 +1009,7 @@
             showLoadingModal("Loading Book Data...", "Preparing form for editing.");
             
             try {
-                const res = await fetch(`api/admin/booksmanagement/get/${bookId}`);
+                const res = await fetch(`api/admin/bookManagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
                 const data = await res.json();
                 
@@ -1063,7 +1063,7 @@
             showLoadingModal("Saving Changes...", "Updating book record.");
 
             try {
-                const res = await fetch(`api/admin/booksmanagement/update/${currentEditingBookId}`, {
+                const res = await fetch(`api/admin/bookManagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
@@ -1100,7 +1100,7 @@
             showLoadingModal("Deleting Book...", "Removing book record from the system.");
 
             try {
-                const res = await fetch(`api/admin/booksmanagement/delete/${bookId}`, {
+                const res = await fetch(`api/admin/bookManagement/delete/${bookId}`, {
                     method: "POST"
                 });
                 const result = await res.json();

@@ -24,7 +24,7 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm")
         customClass: {
             // FINAL FIX: White BG + Black Border + Black Shadow
             popup:
-                "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-gray-900 shadow-[0_0_15px_#00000030]",
+                "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-500 shadow-[0_0_15px_#00000030]",
                 
             // Confirm Button (Orange, Large, Bold)
             confirmButton:

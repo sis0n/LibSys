@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchTableData() {
         try {
-            const response = await fetch('api/librarian/returning/getTableData');
+            const response = await fetch('api/admin/returning/getTableData');
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else showTableError(result.message);
         } catch (error) {
             console.error('Error fetching table data:', error);
-            showProfileToast('ph-x-circle', 'Data Fetch Failed', 'Could not connect to server to load overdue lists.', 'error');
+           showProfileToast('ph-x-circle', 'List Load Error', 'Could not connect to server to load the overdue list.', 'error');
             showTableError('Could not connect to server.');
         }
     }

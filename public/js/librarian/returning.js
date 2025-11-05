@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else showTableError(result.message);
         } catch (error) {
             console.error('Error fetching table data:', error);
-            showProfileToast('ph-x-circle', 'Data Fetch Failed', 'Could not connect to server to load overdue lists.', 'error');
+            showProfileToast('ph-x-circle', 'List Load Error', 'Could not connect to server to load the overdue list.', 'error');
             showTableError('Could not connect to server.');
         }
     }

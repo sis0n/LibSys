@@ -18,6 +18,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPage = 10;
     let currentPage = 1;
 
+    // --- Page Memory ---
+    try {
+        const savedPage = sessionStorage.getItem('backupPage');
+        if (savedPage) {
+            const parsedPage = parseInt(savedPage, 10);
+            if (!isNaN(parsedPage) && parsedPage > 0) {
+                currentPage = parsedPage;
+            } else {
+                sessionStorage.removeItem('backupPage');
+            }
+        }
+    } catch (e) {
+        console.error("SessionStorage Error:", e);
+        currentPage = 1;
+    }
+
     // ====== HELPERS ======
     const showLoadingState = () => {
         backupFilesTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-gray-500">Loading...</td></tr>';
@@ -145,6 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const goToPage = (page) => {
         const totalPages = Math.ceil(allBackupFiles.length / itemsPerPage);
         currentPage = Math.min(Math.max(1, page), totalPages);
+
+        try {
+            sessionStorage.setItem('backupPage', currentPage);
+        } catch (e) {
+            console.error("SessionStorage Error:", e);
+        }
+
         const start = (currentPage - 1) * itemsPerPage;
         const filesToShow = allBackupFiles.slice(start, start + itemsPerPage);
         renderBackupFiles(filesToShow);
@@ -169,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     downloadLink: `backup/secure_download/${encodeURIComponent(log.file_name)}`
                 }));
 
-                goToPage(1);
+                goToPage(currentPage);
             } else {
                 showErrorState('Failed to load backup logs.');
             }

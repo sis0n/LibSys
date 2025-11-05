@@ -78,6 +78,9 @@ class RouteConfig
         $router->get('api/staff/borrowing-history/stats', 'StaffBorrowingHistoryController@fetchStats', ['staff']);
 
         // --- LIBRARIAN (AJAX/Data Routes) ---
+        $router->get('api/librarian/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['restore books']);
+        $router->post('api/librarian/restoreBooks/restore', 'RestoreBookController@restore', ['restore books']);
+        $router->post('api/librarian/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['restore books']);
         $router->get('api/librarian/booksmanagement/fetch', 'BookManagementController@fetch', ['book management']);
         $router->get('api/librarian/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['book management']);
         $router->post('api/librarian/booksmanagement/store', 'BookManagementController@store', ['book management']);

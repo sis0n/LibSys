@@ -64,101 +64,87 @@
         </div>
         <p class="text-gray-600 mb-6">Books that have been soft-deleted can be restored or permanently archived.</p>
 
-        <div class="overflow-x-auto rounded-lg border border-orange-200">
             <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200 text-sm table-fixed"> <!-- Added table-fixed -->
-                    <thead class="bg-orange-100">
-                        <tr>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[28%]">
-                                Book Title
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
-                                Author
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
-                                Accession Number
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
-                                Deleted Date
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">
-                                Deleted By
-                            </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="deletedBooksTableBody" class="bg-white divide-y divide-gray-200"></tbody>
-                </table>
+              <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-orange-100">
+                  <tr>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[30%]">
+                      Book Title
+                    </th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+                      Author
+                    </th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+                      Accession No.
+                    </th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+                      Deleted Date
+                    </th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+                      Deleted By
+                    </th>
+                    <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="deletedBooksTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+              </table>
+              <div id="noDeletedBooksFound" class="hidden">
+                <div class="flex flex-col items-center justify-center text-gray-500 py-10">
+                  <i class="ph ph-book-open-text text-4xl block mb-2 text-gray-400"></i>
+                  <p>No deleted books found.</p>
+                </div>
+              </div>
             </div>
-            <p id="noDeletedBooksFound" class="text-gray-500 text-center w-full py-10 hidden">
-                <i class="ph ph-book-open-text text-4xl block mb-2 text-gray-400"></i>
-                No deleted books found.
-            </p>
-        </div>
-
-        <!-- Pagination Controls -->
-        <div id="pagination-container" class="flex justify-center items-center mt-6 hidden">
-            <nav class="bg-white px-8 py-3 rounded-full shadow-md border border-gray-200">
-                <ul class="flex items-center gap-4 text-sm">
-                    <!-- Previous -->
-                    <li>
-                        <a href="#" id="prev-page"
-                            class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
-                            <i class="ph ph-caret-left"></i>
-                            <span>Previous</span>
-                        </a>
-                    </li>
-
-                    <!-- Page Numbers -->
-                    <div id="pagination-numbers" class="flex items-center gap-3">
-                        <!-- JS will insert page numbers here -->
-                    </div>
-
-                    <!-- Next -->
-                    <li>
-                        <a href="#" id="next-page"
-                            class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
-                            <span>Next</span>
-                            <i class="ph ph-caret-right"></i>
-                        </a>
-                    </li>
+        
+            <!-- Pagination Controls -->
+            <div id="pagination-container" class="flex justify-center items-center mt-6 hidden">
+              <nav class="bg-white px-6 py-2 rounded-full shadow-sm border border-gray-200">
+                <ul class="flex items-center gap-2 text-sm">
+                  <li>
+                    <a href="#" id="prev-page" class="flex items-center gap-1 text-gray-500 hover:text-gray-800 transition p-2">
+                      <i class="ph ph-caret-left"></i>
+                      <span>Previous</span>
+                    </a>
+                  </li>
+                  <div id="pagination-numbers" class="flex items-center gap-1">
+                  </div>
+                  <li>
+                    <a href="#" id="next-page" class="flex items-center gap-1 text-gray-500 hover:text-gray-800 transition p-2">
+                      <span>Next</span>
+                      <i class="ph ph-caret-right"></i>
+                    </a>
+                  </li>
                 </ul>
-            </nav>
-        </div>
-    </div>
-</main>
-
+              </nav>
+            </div>
+          </div>
+        </main>
+        
+        
 <template id="deleted-book-row-template">
-    <tr class="hover:bg-orange-50 cursor-pointer deleted-book-row">
-        <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900 book-title"></div>
-            <div class="text-xs text-gray-500 book-isbn"></div>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 book-author"></td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 book-accession-number"></td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 book-deleted-date"></td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 book-deleted-by"></td>
-        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <button
+          <tr class="hover:bg-orange-50/50 cursor-pointer deleted-book-row">
+            <td class="px-4 py-3 align-top">
+              <p class="font-medium text-gray-800 break-words book-title"></p>
+              <p class="text-xs text-gray-500 book-isbn"></p>
+            </td>
+            <td class="px-4 py-3 align-top text-gray-600 break-words book-author"></td>
+            <td class="px-4 py-3 align-top text-gray-600 book-accession-number"></td>
+            <td class="px-4 py-3 align-top text-gray-600 book-deleted-date"></td>
+            <td class="px-4 py-3 align-top text-gray-600 book-deleted-by"></td>
+            <td class="px-4 py-3 align-top text-center inline-flex">
+              <button
                 class="restore-btn inline-flex items-center px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-2">
                 <i class="ph ph-arrow-counter-clockwise text-lg mr-1"></i> Restore
-            </button>
-            <button
+              </button>
+              <button
                 class="archive-btn inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
                 <i class="ph ph-archive text-lg mr-1"></i> Archive
-            </button>
-        </td>
-    </tr>
-</template>
-
+              </button>
+            </td>
+          </tr>
+        </template>
 <script src="<?= BASE_URL ?>/js/superadmin/restoreBooks.js"></script>
 
 <!-- Book Details Modal -->

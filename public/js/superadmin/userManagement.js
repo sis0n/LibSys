@@ -227,42 +227,11 @@ window.addEventListener("DOMContentLoaded", () => {
                 select.innerHTML = '<option value="">No Colleges Found</option>';
             }
 
-        } catch (err) {
-            console.error("Error loading colleges for faculty:", err);
-            select.innerHTML = '<option value="">Error loading colleges</option>';
-        }
+    } catch (err) {
+      console.error("Error loading colleges for faculty:", err);
+      select.innerHTML = '<option value="">Error loading colleges</option>';
     }
-
-    // async function loadDepartments(selectedValue = null) {
-    //   const select = document.getElementById('addUserSelectField');
-    //   if (!select) return;
-
-    //   select.innerHTML = '<option value="">Loading Departments...</option>';
-
-    //   try {
-    //     const res = await fetch('api/superadmin/userManagement/getColleges');
-    //     const data = await res.json();
-
-    //     select.innerHTML = '<option value="">Select Department</option>';
-
-    //     if (data.success && Array.isArray(data.colleges) && data.colleges.length > 0) {
-    //       data.colleges.forEach(college => {
-    //         const option = new Option(`${college.college_code} - ${college.college_name}`, `${college.college_code} - ${college.college_name}`);
-    //         select.add(option);
-    //       });
-
-    //       if (selectedValue) {
-    //         select.value = selectedValue;
-    //       }
-    //     } else {
-    //       select.innerHTML = '<option value="">No Departments Found</option>';
-    //     }
-
-    //   } catch (err) {
-    //     console.error("Error loading departments (colleges):", err);
-    //     select.innerHTML = '<option value="">Error loading departments</option>';
-    //   }
-    // }
+  }
 
     toggleModules(modulesSection, userRoleValueEl.textContent || "");
 

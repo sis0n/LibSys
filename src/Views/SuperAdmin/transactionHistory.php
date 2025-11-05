@@ -121,8 +121,8 @@
             <ul class="flex items-center gap-4 text-sm">
                 <!-- Previous -->
                 <li>
-                    <a href="#" id="prev-page"
-                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                    <a id="prev-page"
+                        class="flex items-center text-sm font-medium gap-1 text-gray-400 hover:text-orange-700 transition">
                         <i class="ph ph-caret-left"></i>
                         <span>Previous</span>
                     </a>
@@ -135,8 +135,8 @@
 
                 <!-- Next -->
                 <li>
-                    <a href="#" id="next-page"
-                        class="flex items-center gap-1 text-gray-400 hover:text-gray-600 transition">
+                    <a id="next-page"
+                        class="flex items-center text-sm font-medium gap-1 text-gray-400 hover:text-orange-700 transition">
                         <span>Next</span>
                         <i class="ph ph-caret-right"></i>
                     </a>

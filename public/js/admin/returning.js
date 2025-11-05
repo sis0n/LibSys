@@ -105,7 +105,6 @@ const showLoadingModal = (message = "Processing request...", subMessage = "Pleas
 document.addEventListener('DOMContentLoaded', function () {
 
     // --- Table Elements ---
-    const booksNearDueTableBody = document.querySelector('.books-near-due-table tbody');
     const overdueBooksTableBody = document.querySelector('.overdue-books-table tbody');
 
     // --- Modal Elements ---
@@ -129,7 +128,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
-                renderBooksNearDueTable(result.data.nearDue);
                 renderOverdueBooksTable(result.data.overdue);
             } else showTableError(result.message);
         } catch (error) {
@@ -141,38 +139,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showTableError(message) {
         const errorRow = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">${message}</td></tr>`;
-        booksNearDueTableBody.innerHTML = errorRow;
         overdueBooksTableBody.innerHTML = errorRow;
     }
-
-    function renderBooksNearDueTable(data) {
-        booksNearDueTableBody.innerHTML = '';
-        if (!data || data.length === 0) {
-            booksNearDueTableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-orange-500">No books near due date.</td></tr>`;
-            return;
-        }
-        data.forEach(book => {
-            const row = `
-        <tr class="align-middle">
-            <td class="px-6 py-4 align-middle">
-                <div class="font-semibold text-orange-800">${book.user_name}</div>
-                <div class="text-orange-500 text-xs">${book.user_id}</div>
-                <div class="text-orange-500 text-xs">${book.department_or_course}</div>
-            </td>
-            <td class="px-6 py-4 align-middle text-orange-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
-            <td class="px-6 py-4 align-middle text-orange-800">${book.date_borrowed}</td>
-            <td class="px-6 py-4 align-middle text-orange-800">${book.due_date}</td>
-            <td class="px-6 py-4 align-middle text-orange-800">${book.contact}</td>
-            <td class="px-6 py-4 align-middle">
-                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-orange-600 rounded-md shadow-sm text-sm font-medium text-orange-700 bg-white hover:bg-orange-100">
-                    <i class="ph ph-phone text-base mr-1"></i> Contact
-                </a>
-            </td>
-        </tr>`;
-            booksNearDueTableBody.insertAdjacentHTML('beforeend', row);
-        });
-    }
-
 
     function renderOverdueBooksTable(data) {
         overdueBooksTableBody.innerHTML = '';

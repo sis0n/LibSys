@@ -46,11 +46,13 @@
         Complete history of your book borrowings with detailed information
     </p>
 
-    <div id="recordsContainer" class="space-y-6">
+      <div id="recordsContainer" class="space-y-6">
         <div class="text-center py-10 text-gray-500" id="loadingIndicator">Loading history...</div>
+      </div>
+    
+      <!-- Pagination Container -->
+      <div id="paginationContainer" class="pagination-wrapper text-center mt-8"></div>
     </div>
-</div>
-
 <script>
     const CURRENT_STAFF_ID = <?= $_SESSION['user_data']['user_id'] ?? 0 ?>;
 </script>

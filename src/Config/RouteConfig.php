@@ -127,7 +127,7 @@ class RouteConfig
         $router->post('api/admin/borrowingForm/create', 'ManualBorrowingController@create', ['borrowing form']);
         $router->get('api/admin/borrowingForm/getEquipments', 'ManualBorrowingController@getEquipments', ['borrowing form']);
         $router->get('api/admin/borrowingForm/getCollaterals', 'ManualBorrowingController@getCollaterals', ['borrowing form']);
-        $router->get('api/admin/returning/getTableData', 'ReturningController@getDueSoonAndOverdue', ['returning']);
+        $router->get('api/admin/returning/getTableData', 'ReturningController@getOverdue', ['returning']);
         $router->post('api/admin/returning/checkBook', 'ReturningController@checkBookStatus', ['returning']);
         $router->post('api/admin/returning/markReturned', 'ReturningController@returnBook', ['returning']);
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
@@ -137,13 +137,24 @@ class RouteConfig
         $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
         $router->get('api/admin/reports/getGraphData', 'ReportController@getReportGraphData', ['reports']);
         $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['borrowing form']);
+        $router->get('api/admin/userManagement/pagination', 'UserManagementController@fetchPaginatedUsers', ['user management']); // Pagination Route
+        $router->get('api/admin/userManagement/get/{id}', 'UserManagementController@getUserById', ['user management']);
+        $router->get('api/admin/userManagement/search', 'UserManagementController@search', ['user management']);
+        $router->post('api/admin/userManagement/add', 'UserManagementController@addUser', ['user management']);
+        $router->post('api/admin/userManagement/update/{id}', 'UserManagementController@updateUser', ['user management']);
+        $router->post('api/admin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['user management']);
+        $router->post('api/admin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['user management']);
+        $router->post('api/admin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['user management']);
+        $router->post('api/admin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['user management']);
+        $router->get('api/admin/userManagement/getAllCourses', 'DataController@getAllCourses', ['user management']);
+        $router->get('api/admin/userManagement/getColleges', 'DataController@getColleges', ['user management']);
 
 
         // PDF Report Generation Route
         $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
        
         // --- SUPERADMIN (AJAX/Data Routes) ---
-        $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
+        // $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
         $router->get('api/superadmin/userManagement/pagination', 'UserManagementController@fetchPaginatedUsers', ['superadmin']); // Pagination Route
         $router->get('api/superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
         $router->get('api/superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);

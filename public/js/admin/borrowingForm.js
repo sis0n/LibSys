@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         handleItemTypeChange('Equipment');
     });
 
-    // check user button erp
+    // check user button
     document.getElementById('check-btn').addEventListener('click', async () => {
         const userId = document.getElementById('input_user_id').value.trim();
         if (!userId) return alert('Please enter a User ID');
@@ -138,5 +138,173 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     handleItemTypeChange('Equipment');
+
+    const setupCombobox = (inputId, suggestionsId, listId, arrowId, fetchUrl, fallbackData = [], highlightClass, hoverClass) => {
+        const input = document.getElementById(inputId);
+        const suggestionsContainer = document.getElementById(suggestionsId);
+        const suggestionsList = document.getElementById(listId);
+        const dropdownArrow = document.getElementById(arrowId);
+
+        if (!input || !suggestionsContainer || !suggestionsList || !dropdownArrow) {
+            // console.error(`Combobox elements not found for ${inputId}`);
+            return;
+        }
+
+        let suggestions = [];
+        let highlightedIndex = -1;
+        let wasPointerDownOnInput = false;
+
+        const fetchSuggestionsData = async () => {
+            try {
+                const response = await fetch(fetchUrl);
+                if (response.ok) {
+                    suggestions = await response.json();
+                } else {
+                    console.error(`Failed to fetch suggestions from ${fetchUrl}. Using fallback data.`);
+                    suggestions = fallbackData;
+                }
+            } catch (error) {
+                console.error(`Error fetching suggestions from ${fetchUrl}:`, error);
+                suggestions = fallbackData;
+            }
+        };
+
+        if (fetchUrl) {
+            fetchSuggestionsData();
+        } else {
+            suggestions = fallbackData;
+        }
+
+        const updateHighlight = () => {
+            const items = suggestionsList.querySelectorAll('li');
+            items.forEach(item => {
+                item.classList.remove(highlightClass);
+            });
+            if (items[highlightedIndex]) {
+                items[highlightedIndex].classList.add(highlightClass);
+            }
+        };
+
+        const showSuggestions = (filter = true) => {
+            const value = input.value.toLowerCase();
+            suggestionsList.innerHTML = '';
+            highlightedIndex = -1;
+
+            let filtered = suggestions;
+            if (filter && value.trim() !== '') {
+                filtered = suggestions.filter(s => s.toLowerCase().includes(value));
+            }
+
+            if (filtered.length === 0 && value.trim() !== '') {
+                suggestionsContainer.classList.add('hidden');
+                return;
+            }
+
+            filtered.forEach(suggestion => {
+                const li = document.createElement('li');
+                li.className = `px-4 py-2 text-sm cursor-pointer ${hoverClass}`;
+                li.textContent = suggestion;
+                li.addEventListener('mousedown', e => {
+                    e.preventDefault();
+                    input.value = suggestion;
+                    hideSuggestions();
+                });
+                suggestionsList.appendChild(li);
+            });
+
+            suggestionsContainer.classList.remove('hidden');
+        };
+
+        const hideSuggestions = () => {
+            suggestionsContainer.classList.add('hidden');
+            highlightedIndex = -1;
+            wasPointerDownOnInput = false;
+        };
+
+        input.addEventListener('pointerdown', () => {
+            wasPointerDownOnInput = true;
+        });
+
+        input.addEventListener('focus', () => {
+            if (wasPointerDownOnInput) {
+                showSuggestions(false);
+            }
+        });
+
+        input.addEventListener('input', () => showSuggestions(true));
+
+        dropdownArrow.addEventListener('pointerdown', () => {
+            wasPointerDownOnInput = true;
+        });
+
+        dropdownArrow.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (suggestionsContainer.classList.contains('hidden')) {
+                showSuggestions(false);
+                input.focus();
+            } else {
+                hideSuggestions();
+            }
+        });
+
+        input.addEventListener('keydown', e => {
+            const items = suggestionsList.querySelectorAll('li');
+            if (items.length === 0) return;
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    highlightedIndex = (highlightedIndex + 1) % items.length;
+                    updateHighlight();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
+                    updateHighlight();
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (highlightedIndex > -1) {
+                        input.value = items[highlightedIndex].textContent;
+                        hideSuggestions();
+                    }
+                    break;
+                case 'Escape':
+                    hideSuggestions();
+                    break;
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !dropdownArrow.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                hideSuggestions();
+            }
+        });
+    };
+
+    setupCombobox(
+        'item_name',
+        'item_name_suggestions',
+        'item_name_suggestions_list',
+        'item_name_dropdown_arrow',
+        'api/admin/borrowingForm/getEquipments',
+        ['Computer', 'Table', 'Extension Cord', 'Whiteboard', 'HDMI Cable', 'Chess', 'Scrabble', 'Domino', 'Connect 4'],
+        'bg-emerald-100',
+        'hover:bg-emerald-50'
+    );
+
+    setupCombobox(
+        'collateral_id',
+        'collateral_id_suggestions',
+        'collateral_id_suggestions_list',
+        'collateral_id_dropdown_arrow',
+        'api/admin/borrowingForm/getCollaterals',
+        ['School ID', 'Library ID','Valid ID'],
+        'bg-amber-100',
+        'hover:bg-amber-50'
+    );
+
+
 
 });

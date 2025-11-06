@@ -107,6 +107,8 @@ class ViewController extends Controller
       'borrowingHistory',
       'myAttendance',
       'dashboard',
+      'attendance'
+
     ];
 
     if (array_key_exists($action, $protectedModules)) {

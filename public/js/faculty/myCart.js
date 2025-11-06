@@ -109,7 +109,7 @@ function renderCart() {
 
         cartCount.textContent = `${cart.length} total item(s)`;
         const cartIcon = document.createElement("i");
-        cartIcon.className = "ph ph-shopping-cart text-xs";
+        cartIcon.className = "ph ph-shopping-cart text-sm";
         cartCount.insertBefore(cartIcon, cartCount.firstChild);
 
         cart.forEach(item => {
@@ -233,7 +233,7 @@ function renderCart() {
         selectedItemsSection.classList.add("hidden");
         cartCount.textContent = "0 total items";
         const cartIcon = document.createElement("i");
-        cartIcon.className = "ph ph-shopping-cart text-xs";
+        cartIcon.className = "ph ph-shopping-cart text-sm";
         cartCount.insertBefore(cartIcon, cartCount.firstChild);
     }
 

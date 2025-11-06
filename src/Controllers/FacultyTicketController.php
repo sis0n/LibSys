@@ -321,14 +321,12 @@ class FacultyTicketController extends Controller
       exit;
     }
 
-    // Expire any old pending transactions
     $this->ticketRepo->expireOldPendingTransactionsFaculty();
 
-    // Get full faculty info (including college)
     $facultyDetails = $this->ticketRepo->getFacultyFullInfo($facultyId);
 
     $facultyInfo = [
-      'faculty_id' => $facultyDetails['faculty_id'] ?? null,
+      'faculty_id' => $facultyDetails['unique_faculty_id'] ?? null,
       'name' => $this->getFullName($facultyDetails),
       'college' => $facultyDetails['college_name'] ?? 'N/A',
       'contact' => $facultyDetails['contact'] ?? null

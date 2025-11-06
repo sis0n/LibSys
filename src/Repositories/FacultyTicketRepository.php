@@ -23,10 +23,11 @@ class FacultyTicketRepository
   }
 
   public function getFacultyFullInfo(int $facultyId): ?array
-  {
+{
     $stmt = $this->db->prepare("
         SELECT 
             f.faculty_id,
+            f.unique_faculty_id,
             f.college_id,
             f.contact,
             u.first_name,
@@ -43,7 +44,8 @@ class FacultyTicketRepository
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
     return $data ?: null;
-  }
+}
+
 
 
 

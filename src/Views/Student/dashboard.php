@@ -98,7 +98,7 @@ foreach ($allHistoryRecords as $record) {
                     <p>You have no borrowed books.</p>
                 </div>
             <?php else: ?>
-                <?php foreach ($currentBorrowedBooks as $book): ?>
+                <?php foreach (array_slice($currentBorrowedBooks, 0, 3) as $book): ?>
                     <?php
                         // Check ulit kung overdue para sa badge
                         $dueDate = new DateTime($book['due_date']);
@@ -119,6 +119,14 @@ foreach ($allHistoryRecords as $record) {
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
+
+                <?php if (count($currentBorrowedBooks) > 3): ?>
+                    <div class="mt-4 text-center">
+                        <a href="borrowingHistory" class="text-sm font-medium text-orange-600 hover:underline">
+                            View All (<?= count($currentBorrowedBooks) ?>)
+                        </a>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
 
@@ -127,7 +135,7 @@ foreach ($allHistoryRecords as $record) {
             <h4 class="text-lg font-semibold mb-2">Quick Actions</h4>
             <p class="text-sm text-gray-600 mb-4">Common tasks</p>
             <div class="space-y-3">
-                <a href="<?= BASE_URL ?>/student/bookCatalog"
+                <a href="bookCatalog"
                     class="flex items-start gap-3 bg-[var(--color-orange-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-orange-100)] transition">
                     <i class="ph ph-magnifying-glass text-lg mt-0.5"></i>
                     <span>
@@ -135,7 +143,7 @@ foreach ($allHistoryRecords as $record) {
                         <span class="block text-xs text-gray-500">Find books in our catalog</span>
                     </span>
                 </a>
-                <a href="<?= BASE_URL ?>/student/qrBorrowingTicket"
+                <a href="qrBorrowingTicket"
                     class="flex items-start gap-3 bg-[var(--color-green-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-green-100)] transition">
                     <i class="ph ph-qr-code text-lg mt-0.5"></i>
                     <span>
@@ -143,7 +151,7 @@ foreach ($allHistoryRecords as $record) {
                         <span class="block text-xs text-gray-500">For borrowing books</span>
                     </span>
                 </a>
-                <a href="<?= BASE_URL ?>/student/borrowingHistory"
+                <a href="borrowingHistory"
                     class="flex items-start gap-3 bg-[var(--color-amber-50)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-amber-100)] transition">
                     <i class="ph ph-clock-counter-clockwise text-lg mt-0.5"></i>
                     <span>
@@ -151,7 +159,7 @@ foreach ($allHistoryRecords as $record) {
                         <span class="block text-xs text-gray-500">Check your borrowing history</span>
                     </span>
                 </a>
-                <a href="<?= BASE_URL ?>/student/myAttendance"
+                <a href="myAttendance"
                     class="flex items-start gap-3 bg-[var(--color-green-100)] border border-[var(--color-border)] rounded-md p-3 hover:bg-[var(--color-green-200)] transition">
                     <i class="ph ph-user-check text-lg mt-0.5"></i>
                     <span>

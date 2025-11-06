@@ -1,14 +1,14 @@
 <body class="min-h-screen p-6">
 
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-            <h2 class="text-2xl font-bold mb-4">My Cart</h2>
+            <h2 class="text-2xl font-bold mb-4 sm:mb-0">My Cart</h2>
             <p class="text-gray-700">Review and checkout your selected items.</p>
         </div>
-        <span id="cart-count"
-            class="px-[var(--spacing-3)] py-[var(--spacing-1)] rounded-md border text-[var(--font-size-sm)] 
-                   text-[var(--color-foreground)] border-[var(--color-border)] bg-white shadow-sm flex items-center gap-[var(--spacing-1)]">
-            <i class="ph ph-shopping-cart text-xs"></i> 0 total items
+        <span id="cart-count" class="mt-3 sm:mt-0 self-end sm:self-auto px-[var(--spacing-3)] py-[var(--spacing-1)] rounded-md border 
+           text-[var(--font-size-sm)] text-[var(--color-foreground)] border-[var(--color-border)] bg-white 
+           shadow-sm flex items-center gap-[var(--spacing-1)]">
+            <i class="ph ph-shopping-cart text-sm"></i> 0 total items
         </span>
     </div>
 
@@ -16,7 +16,7 @@
         class="mt-2 border rounded-[var(--radius-lg)] border-[var(--color-border)] bg-white shadow-sm flex flex-col items-center justify-center py-9">
         <i class="ph ph-shopping-cart text-6xl text-amber-700 mb-3"></i>
         <p class="text-[var(--color-foreground)] font-medium text-[var(--font-size-base)]">Your cart is empty</p>
-        <p class="text-amber-700 text-[var(--font-size-sm)]">
+        <p class="text-amber-700 text-[var(--font-size-sm)] p-3">
             Add books or equipment from the catalog to get started.
         </p>
     </div>

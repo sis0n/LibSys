@@ -9,12 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const dateInput = document.getElementById('attendanceDate');
-    const methodSelect = document.getElementById('attendanceMethod');
-    const tableBody = document.getElementById('attendanceTableBody');
-    const loadingRow = document.getElementById('tableLoadingRow');
-    const noRecordsRow = document.getElementById('tableNoRecordsRow');
-    const errorDiv = document.getElementById('attendance-error');
+  const dateInput = document.getElementById('attendanceDate');
+  const methodSelect = document.getElementById('attendanceMethod');
+  const tableBody = document.getElementById('attendanceListContainer');
+  const loadingRow = document.getElementById('tableLoadingRow');
+  const noRecordsRow = document.getElementById('tableNoRecordsRow');
+  const errorDiv = document.getElementById('attendance-error');
 
     function formatDate(dateString) {
         try {
@@ -59,15 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedDate = dateInput.value;
         const selectedMethod = methodSelect.value;
 
-        // Clear previous non-placeholder rows
-        tableBody.querySelectorAll("tr:not([data-placeholder])").forEach(row => row.remove());
-        loadingRow.classList.add('hidden');
-        noRecordsRow.classList.add('hidden');
-        if (errorDiv) errorDiv.classList.add('hidden');
-        
-        // **********************************************
-        // TANGGAL NA ANG SWEETALERT LOADING MODAL LOGIC DITO
-        // **********************************************
+    tableBody.querySelectorAll(".attendance-card").forEach(card => card.remove());
+    loadingRow.classList.add('hidden');
+    noRecordsRow.classList.add('hidden');
+    if (errorDiv) errorDiv.classList.add('hidden');
 
         if (!/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
             console.error("Invalid date format selected:", selectedDate);
@@ -100,20 +95,30 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const fragment = document.createDocumentFragment();
-        filteredLogs.forEach(log => {
-            const row = document.createElement("tr");
-            row.className = "hover:bg-orange-50 transition-colors";
-            row.innerHTML = `
-                              <td class="px-4 py-3 text-gray-700">${formatDate(log.timestamp)}</td>
-                              <td class="px-4 py-3 text-gray-600">${formatDay(log.timestamp)}</td>
-                              <td class="px-4 py-3 text-gray-800 font-medium">${formatTime(log.timestamp)}</td>
-                              <td class="px-4 py-3 text-gray-600 capitalize">${log.method || 'N/A'}</td>
-                            `;
-            fragment.appendChild(row);
-        });
-        tableBody.appendChild(fragment);
-    }
+    const fragment = document.createDocumentFragment();
+    filteredLogs.forEach(log => {
+      const card = document.createElement("div");
+      card.className = "attendance-card grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 p-4 border-b border-orange-100 last:border-b-0 md:border-none md:p-3 md:px-4 md:items-center hover:bg-orange-50/50 transition-colors";
+
+      card.innerHTML = `
+            <!-- Mobile Label (hidden on md screens and up) -->
+            <div class="text-xs text-gray-500 md:hidden">Date</div>
+            <!-- Value -->
+            <div class="font-medium text-gray-800 col-span-1 md:col-span-1">${formatDate(log.timestamp)}</div>
+
+            <div class="text-xs text-gray-500 md:hidden">Day</div>
+            <div class="text-gray-600 col-span-1 md:col-span-1">${formatDay(log.timestamp)}</div>
+
+            <div class="text-xs text-gray-500 md:hidden">Check-in Time</div>
+            <div class="font-medium text-gray-800 col-span-1 md:col-span-1">${formatTime(log.timestamp)}</div>
+
+            <div class="text-xs text-gray-500 md:hidden">Method</div>
+            <div class="text-gray-600 capitalize col-span-1 md:col-span-1">${log.method || 'N/A'}</div>
+        `;
+      fragment.appendChild(card);
+    });
+    tableBody.appendChild(fragment);
+  }
 
     if (errorDiv && errorDiv.textContent.trim() && !errorDiv.classList.contains('hidden')) {
         if (loadingRow) loadingRow.classList.add('hidden');

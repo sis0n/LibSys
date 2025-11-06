@@ -185,7 +185,7 @@ class StaffTicketController extends Controller
     if (session_status() === PHP_SESSION_NONE) session_start();
     $userId = $_SESSION['user_id'] ?? null;
     if (!$userId) {
-      header("Location: ". BASE_URL . "/login");
+      header("Location: " . BASE_URL . "/login");
       exit;
     }
 
@@ -321,39 +321,74 @@ class StaffTicketController extends Controller
       exit;
     }
 
+    // Expire old pending transactions
     $this->ticketRepo->expireOldPendingTransactionsStaff();
 
-    $pendingTransaction = $this->ticketRepo->getPendingTransactionByStaffId($staffId);
+    // Get full staff info by staff_id
+    $staffDetails = $this->ticketRepo->getStaffFullInfoByStaffId($staffId);
+    $staffData = [
+      'employee_id' => $staffDetails['employee_id'] ?? 'N/A',
+      'staff_name' => trim(
+        ($staffDetails['first_name'] ?? '') . ' ' .
+          ($staffDetails['middle_name'] ?? '') . ' ' .
+          ($staffDetails['last_name'] ?? '')
+      ),
+      'position' => $staffDetails['position'] ?? 'N/A'
+    ];
 
+    // Default response
+    $response = [
+      'success' => true,
+      'status' => 'none',
+      'transaction_code' => null,
+      'generated_at' => null,
+      'expires_at' => null,
+      'items' => [],
+      'employee_id' => $staffData['employee_id'],
+      'staff_name' => $staffData['staff_name'],
+      'position' => $staffData['position'],
+      'books_count' => 0
+    ];
+
+    // Check pending transaction
+    $pendingTransaction = $this->ticketRepo->getPendingTransactionByStaffId($staffId);
     if ($pendingTransaction) {
       $status = $pendingTransaction['status'];
-
       if ($status === 'pending' && strtotime($pendingTransaction['expires_at'] ?? '9999-01-01') <= time()) {
         $status = 'expired';
       }
 
-      echo  json_encode([
-        'success' => true,
-        'status' => $status,
-        'transaction_code' => $pendingTransaction['transaction_code'],
-        'generated_at' => $pendingTransaction['generated_at'],
-        'expires_at' => $pendingTransaction['expires_at']
-      ]);
-    } else {
-      $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByStaffId($staffId);
-      if ($borrowedTransaction) {
-        echo json_encode([
-          'success' => true,
-          'status' => 'borrowed',
-          'transaction_code' => $borrowedTransaction['transaction_code'],
-          'due_date' => $borrowedTransaction['due_date']
-        ]);
-      } else {
-        echo json_encode([
-          'success' => true,
-          'status' => 'none'
-        ]);
-      }
+      $items = $this->ticketRepo->getTransactionItems((int)$pendingTransaction['transaction_id']);
+
+      $response['status'] = $status;
+      $response['transaction_code'] = $pendingTransaction['transaction_code'];
+      $response['generated_at'] = $pendingTransaction['generated_at'];
+      $response['expires_at'] = $pendingTransaction['expires_at'];
+      $response['items'] = $items;
+      $response['books_count'] = count($items);
+
+      echo json_encode($response);
+      exit;
     }
+
+    // Check borrowed transaction
+    $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByStaffId($staffId);
+    if ($borrowedTransaction) {
+      $items = $this->ticketRepo->getTransactionItems((int)$borrowedTransaction['transaction_id']);
+
+      $response['status'] = 'borrowed';
+      $response['transaction_code'] = $borrowedTransaction['transaction_code'];
+      $response['generated_at'] = $borrowedTransaction['generated_at'] ?? null;
+      $response['expires_at'] = $borrowedTransaction['expires_at'] ?? null;
+      $response['items'] = $items;
+      $response['books_count'] = count($items);
+
+      echo json_encode($response);
+      exit;
+    }
+
+    // No transaction found
+    echo json_encode($response);
+    exit;
   }
 }

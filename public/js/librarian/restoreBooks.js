@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showLoadingState() {
         // Updated to only clear the table and hide elements, SweetAlert2 handles the visual loading
-        deletedBooksTableBody.innerHTML = ''; 
+        deletedBooksTableBody.innerHTML = '';
         noDeletedBooksFound.classList.add('hidden');
         paginationContainer.classList.add('hidden');
     }
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof showLoadingModal !== 'undefined') {
              showLoadingModal("Loading Deleted Books...", "Retrieving archive data.");
         }
-        showLoadingState(); 
+        showLoadingState();
 
         try {
             const response = await fetch('api/librarian/restoreBooks/fetch');
@@ -414,12 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             
             const elapsed = Date.now() - startTime;
-            if (elapsed < 300) await new Promise(r => setTimeout(r, 300 - elapsed));
+            if (elapsed < 500) await new Promise(r => setTimeout(r, 500 - elapsed)); // Min 500ms for Restore
             Swal.close(); // Close loading modal
 
             if (result.success) {
                 showSuccessToast('Success!', result.message || 'Book restored successfully!');
-                fetchDeletedBooks();
+                // Siguraduhin na ang kasunod na fetch ay walang loading modal
+                fetchDeletedUsers(false); 
             } else {
                 showErrorToast('Restoration Failed', `Restore failed: ${result.message}`);
             }
@@ -432,6 +433,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // =========================================================================
+    // MODIFIED: handleArchive - Inalis ang full loading, ginawang 500ms processing
+    // =========================================================================
     async function handleArchive(bookId, title, buttonEl) {
         // Confirmation Modal
         const isConfirmed = await showCustomConfirmationModal(
@@ -441,7 +445,8 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         if (!isConfirmed) return;
 
-        showLoadingModal("Archiving Record...", `Archiving "${title}" permanently.`);
+        // 🟠 START LOADING FOR ARCHIVE (MABILIS, 500ms MINIMAL DISPLAY)
+        showLoadingModal("Deleting Record...", `Deleting "${title}" permanently. Please wait.`);
         const startTime = Date.now();
         buttonEl.disabled = true;
         buttonEl.classList.add('opacity-50');
@@ -456,13 +461,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
 
+            // CLOSE LOADING (500ms MINIMAL DISPLAY)
             const elapsed = Date.now() - startTime;
-            if (elapsed < 300) await new Promise(r => setTimeout(r, 300 - elapsed));
+            const minModalDisplay = 500;
+            if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
             Swal.close(); // Close loading modal
 
             if (result.success) {
                 showSuccessToast('Success', result.message || 'Book archived successfully.');
-                fetchDeletedBooks();
+                // Siguraduhin na ang kasunod na fetch ay walang loading modal
+                fetchDeletedUsers(false);
             } else {
                 showErrorToast('Archive Failed', `Archive failed: ${result.message}`);
             }
@@ -474,6 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
             buttonEl.classList.remove('opacity-50');
         }
     }
+    // =========================================================================
 
     function openBookDetailsModal(book) {
         modalBookAccessionNumber.textContent = book.accession_number || 'N/A';

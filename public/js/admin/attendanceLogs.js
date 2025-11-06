@@ -124,6 +124,7 @@ function initializeAttendanceLogs() {
     let currentDate = "";
     let currentCourse = "All Courses";
     let currentGroupedLogs = []; // Holds the result of groupLogs()
+    let searchTimeout; // For debounce
 
     // Pagination State
     let currentPage = 1;
@@ -259,12 +260,12 @@ function initializeAttendanceLogs() {
     }
 
     // --- DATA FETCHING (GINAWANG ASYNC) ---
-    async function fetchLogs() {
+    async function fetchLogs(showLoading = true) {
         // 1. Start timer for minimum delay
         const startTime = Date.now(); 
         
-        // 2. 🟠 SHOW LOADING MODAL 
-        if (typeof showLoadingModal !== 'undefined') {
+        // 2. 🟠 SHOW LOADING MODAL (ONLY IF showLoading is true)
+        if (showLoading && typeof showLoadingModal !== 'undefined') {
             showLoadingModal("Loading Attendance Logs...", "Fetching and processing visitor data.");
         }
         
@@ -297,13 +298,15 @@ function initializeAttendanceLogs() {
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             const data = await res.json();
             
-            // 4. Implement Minimum Delay
-            const elapsed = Date.now() - startTime;
-            const minDelay = 500; // 500ms minimum loading time
-            if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
-            
+            // 4. Implement Minimum Delay and Close Modal
+            if (showLoading) {
+                 const elapsed = Date.now() - startTime;
+                 const minDelay = 500; // 500ms minimum loading time
+                 if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+            }
+           
             // 5. Close Loading Modal (SUCCESS)
-            if (typeof Swal !== 'undefined') Swal.close();
+            if (showLoading && typeof Swal !== 'undefined') Swal.close();
             
             let filteredData = data;
             if (dateToFilter) {
@@ -318,7 +321,7 @@ function initializeAttendanceLogs() {
             console.error("Failed to fetch logs:", err);
             
             // 6. Close Loading Modal and show error (ERROR)
-            if (typeof Swal !== 'undefined') {
+            if (showLoading && typeof Swal !== 'undefined') {
                 Swal.close();
                 // Optional: Show error toast if available
                 if (typeof showErrorToast !== 'undefined') showErrorToast("Data Load Failed", "Could not fetch attendance data.");
@@ -362,15 +365,29 @@ function initializeAttendanceLogs() {
                 valueSpan.textContent = value;
                 menu.classList.add('hidden');
                 if (stateKey === 'course') currentCourse = value;
-                fetchLogs();
+                // WALANG LOADING MODAL SA DROPDOWN
+                fetchLogs(false); 
             });
         });
     }
     setupDropdown(courseBtn, courseMenu, courseValueSpan, 'course');
     document.addEventListener("click", () => { if (courseMenu) courseMenu.classList.add("hidden"); });
 
-    searchInput.addEventListener("input", () => { currentSearch = searchInput.value.trim(); fetchLogs(); });
-    dateInput.addEventListener("change", () => { currentDate = dateInput.value; fetchLogs(); });
+    // Walang debounce sa search input para mabilis ang response
+    searchInput.addEventListener("input", () => { 
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentSearch = searchInput.value.trim(); 
+            // WALANG LOADING MODAL SA SEARCH
+            fetchLogs(false); 
+        }, 300); // Gumamit ng 300ms debounce para hindi masyadong madalas mag-fetch
+    }); 
+    
+    // WALANG LOADING MODAL SA DATE PICKER
+    dateInput.addEventListener("change", () => { 
+        currentDate = dateInput.value; 
+        fetchLogs(false); 
+    }); 
 
     // Pagination buttons
     prevPageBtn.addEventListener('click', e => {
@@ -431,5 +448,6 @@ function initializeAttendanceLogs() {
     // --- INITIALIZATION ---
     currentDate = formatDate(getPhDate());
     dateInput.value = currentDate;
-    fetchLogs();
+    // Initial load (default: may loading modal)
+    fetchLogs(); 
 }

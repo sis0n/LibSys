@@ -109,6 +109,7 @@ class RouteConfig
         $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
         //report dashboard
           $router->get('api/librarian/dashboard/getData', 'DashboardController@getData', ['reports']);
+          
         
 
 

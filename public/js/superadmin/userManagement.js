@@ -230,6 +230,7 @@ window.addEventListener("DOMContentLoaded", () => {
             if (pageStr === '...') return;
             const pageNum = parseInt(pageStr, 10);
             if (!isNaN(pageNum) && pageNum !== currentPage) {
+                // Gumamit ng default behavior (may loading modal) kapag nagpapalit ng page number
                 loadUsers(pageNum);
             }
         });
@@ -385,18 +386,16 @@ window.addEventListener("DOMContentLoaded", () => {
         if (editModulesContainer) {
             if (normalizedRole === 'admin' || normalizedRole === 'librarian') {
                 editModulesContainer.classList.remove("hidden");
-                // For a proper edit, we'd ideally fetch the permissions template for the new role here,
-                // but for now, we just ensure visibility is correct.
+                
+                if (editUserUserManagementModuleWrapper) {
+                    if (normalizedRole === 'admin') {
+                        editUserUserManagementModuleWrapper.classList.remove('hidden');
+                    } else { 
+                        editUserUserManagementModuleWrapper.classList.add('hidden');
+                    }
+                }
             } else {
                 editModulesContainer.classList.add("hidden");
-            }
-
-            if (editUserUserManagementModuleWrapper) {
-                if (normalizedRole === 'admin') {
-                    editUserUserManagementModuleWrapper.classList.remove('hidden');
-                } else { 
-                    editUserUserManagementModuleWrapper.classList.add('hidden');
-                }
             }
         }
         
@@ -439,7 +438,7 @@ window.addEventListener("DOMContentLoaded", () => {
             });
             const data = await res.json();
             
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r => setTimeout(r, 1000)); // Minimum delay 1000ms
             Swal.close();
 
             if (data.success) {
@@ -451,7 +450,8 @@ window.addEventListener("DOMContentLoaded", () => {
                 showSuccessToast("Import Successful", `Successfully imported ${data.imported} rows!`);
                 fileInput.value = "";
                 closeModal(modal);
-                await loadUsers(1);
+                // I-load ang users pagkatapos mag-import, gumagamit ng loading modal
+                await loadUsers(1, true); 
             } else {
                 showErrorToast("Import Failed", data.message || "Failed to import CSV.");
             }
@@ -472,7 +472,8 @@ window.addEventListener("DOMContentLoaded", () => {
                 try {
                     sessionStorage.removeItem('userManagementPage');
                 } catch (e) {}
-                loadUsers(1);
+                // Hindi gagamit ng loading modal para sa search
+                loadUsers(1, false); 
             }, 500);
         });
     }
@@ -482,7 +483,8 @@ window.addEventListener("DOMContentLoaded", () => {
         try {
             sessionStorage.removeItem('userManagementPage');
         } catch (e) {}
-        loadUsers(1);
+        // Hindi gagamit ng loading modal para sa dropdown filters
+        loadUsers(1, false); 
     }
 
     function closeAddUserModal() {
@@ -610,20 +612,23 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    async function loadUsers(page = 1) {
+    // Binago ang loadUsers function para tanggapin ang isShowLoadingModal flag
+    async function loadUsers(page = 1, isShowLoadingModal = true) {
         if (isLoading) return;
         isLoading = true;
         currentPage = page;
         
         // --- 1. SET START TIME FOR DELAY CHECK ---
         const startTime = Date.now();
-      
+        
         document.getElementById("paginationControls")?.classList.add('hidden');
         // document.getElementById("resultsIndicator").textContent = 'Loading...';
-        if (userTableBody) userTableBody.innerHTML = "";  
-
-        // --- 2. SHOW SWEETALERT LOADING MODAL ---
-        showLoadingModal("Loading User List...", "Fetching data for page " + page);
+        if (userTableBody) userTableBody.innerHTML = ""; 
+        
+        // --- 2. SHOW SWEETALERT LOADING MODAL (KUNG KAILANGAN) ---
+        if (isShowLoadingModal) {
+            showLoadingModal("Loading User List...", "Fetching data for page " + page);
+        }
         
 
         const offset = (page - 1) * limit;
@@ -643,10 +648,12 @@ window.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
             
             // --- 3. CLOSE LOADING MODAL (SUCCESS PATH) ---
-            const elapsed = Date.now() - startTime;
-            const minDelay = 3000; // Minimum 300ms delay
-            if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
-            if (typeof Swal != "undefined") Swal.close();
+            if (isShowLoadingModal) { // Kung nagpakita ng modal, isara ito
+                const elapsed = Date.now() - startTime;
+                const minDelay = 500; // Minimum 500ms delay for table load
+                if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+                if (typeof Swal != "undefined") Swal.close();
+            }
 
 
             if (data.success && Array.isArray(data.users)) {
@@ -654,7 +661,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 totalPages = Math.ceil(totalUsers / limit) || 1;
 
                 if (page > totalPages && totalPages > 0) {
-                    loadUsers(totalPages);
+                    loadUsers(totalPages, isShowLoadingModal); 
                     return;
                 }
 
@@ -685,7 +692,7 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         } catch (err) {
             // --- 4. CLOSE LOADING MODAL (ERROR PATH) ---
-            if (typeof Swal != "undefined") Swal.close(); 
+            if (isShowLoadingModal && typeof Swal != "undefined") Swal.close(); // Kung nagpakita ng modal, isara ito
             
             console.error("Fetch users error:", err);
             if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
@@ -780,6 +787,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
             // 1. Show Loading SweetAlert (UPDATED TO USE SWEETALERT)
             showLoadingModal("Adding New User...", `Creating user account for ${first_name} ${last_name}.`);
+            const addStartTime = Date.now();
 
             try {
                 const res = await fetch("api/superadmin/userManagement/add", {
@@ -804,8 +812,10 @@ window.addEventListener("DOMContentLoaded", () => {
                 });
                 const data = await res.json();
                 
-                // Maghintay sandali at isara ang loading modal
-                await new Promise(r => setTimeout(r, 300));
+                // MABILIS NA PAGSARA
+                const elapsed = Date.now() - addStartTime;
+                const minModalDisplay = 500; // Minimum 500ms display time
+                if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
                 Swal.close();
 
                 if (data.success) {
@@ -889,7 +899,9 @@ window.addEventListener("DOMContentLoaded", () => {
                 );
                 if (!isConfirmed) return;
 
+                // 🟠 START LOADING (Minimal display)
                 showLoadingModal("Deleting user...", `Deleting ${user.name} from the system.`);
+                const deleteStartTime = Date.now();
 
                 try {
                     const res = await fetch(`api/superadmin/userManagement/delete/${user.user_id}`, {
@@ -897,12 +909,16 @@ window.addEventListener("DOMContentLoaded", () => {
                     });
                     const data = await res.json();
                     
-                    await new Promise(r => setTimeout(r, 300));
+                    // CLOSE LOADING (Minimal display: 500ms)
+                    const elapsed = Date.now() - deleteStartTime;
+                    const minModalDisplay = 500;
+                    if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
                     Swal.close(); 
 
                     if (data.success) {
                         showSuccessToast("User Deleted!", `User ${user.name} was successfully removed.`);
-                        await loadUsers(currentPage);
+                        // REFRESH TABLE W/O LOADING MODAL
+                        await loadUsers(currentPage, false); 
                     } else {
                         showErrorToast("Deletion Failed", data.message || "Failed to delete the user.");
                     }
@@ -927,7 +943,9 @@ window.addEventListener("DOMContentLoaded", () => {
                 );
                 if (!isConfirmed) return;
 
-                showLoadingModal("Updating Status...", `Setting status to ${newStatus}.`);
+                // --- BAGONG LOGIC PARA SA MABILIS NA LOADING ---
+                showLoadingModal("Updating Status...", `Setting status to ${newStatus}.`); 
+                const statusStartTime = Date.now();
 
                 try {
                     const res = await fetch(`api/superadmin/userManagement/toggleStatus/${user.user_id}`, {
@@ -935,17 +953,21 @@ window.addEventListener("DOMContentLoaded", () => {
                     });
                     const data = await res.json();
                     
-                    await new Promise(r => setTimeout(r, 300));
-                    Swal.close();
+                    // Isara agad ang loading modal (minimal delay lang para makita ang animation)
+                    const elapsed = Date.now() - statusStartTime;
+                    const minModalDisplay = 500; // 500ms minimum display time
+                    if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
+                    Swal.close(); 
 
                     if (data.success) {
                         showSuccessToast("Status Updated", `${user.name} is now ${data.newStatus}.`);
-                        await loadUsers(currentPage);
+                        // I-reload ang users nang walang loading modal para mas mabilis (false parameter)
+                        await loadUsers(currentPage, false); 
                     } else {
                         showErrorToast("Status Update Failed", data.message || "Failed to update user status.");
                     }
                 } catch (err) {
-                    Swal.close();
+                    Swal.close(); // Isara ang modal kung may error
                     console.error("Toggle status error:", err);
                     showErrorToast("Status Update Failed", "An error occurred while updating user status.");
                 }
@@ -971,7 +993,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     });
                     const data = await res.json();
                     
-                    await new Promise(r => setTimeout(r, 300));
+                    await new Promise(r => setTimeout(r, 1000)); // Minimum delay 1000ms
                     Swal.close();
 
                     if (data.success) {
@@ -1025,6 +1047,7 @@ window.addEventListener("DOMContentLoaded", () => {
             }
 
             showLoadingModal("Saving Changes...", `Updating user details for ${payload.first_name} ${payload.last_name}.`);
+            const editStartTime = Date.now();
             
             try {
                 const res = await fetch(`api/superadmin/userManagement/update/${currentEditingUserId}`, {
@@ -1034,7 +1057,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 });
                 const data = await res.json();
                 
-                await new Promise(r => setTimeout(r, 300));
+                await new Promise(r => setTimeout(r, 1000)); // Minimum delay 1000ms
                 Swal.close();
 
                 if (data.success) {
@@ -1049,7 +1072,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 console.error("Update user error:", err);
                 showErrorToast("Update Failed", "An error occurred while updating the user.");
             } finally {
-                // closeEditUserModal(); // Removed this line here since it's redundant if success/fail path already closes it, but if you want to ensure it closes even on connection error, you can keep it.
+                // closeEditUserModal(); 
             }
         });
     }

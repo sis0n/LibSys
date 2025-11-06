@@ -49,8 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // GINAWA NATING ASYNC ANG FUNCTION DITO 👇
-    async function renderTable() {
+    // GINAWA NATING SYNCHRONOUS ULIT ANG FUNCTION AT INALIS ANG SWEETALERT LOGIC
+    function renderTable() {
         if (!tableBody || !loadingRow || !noRecordsRow || !dateInput || !methodSelect) {
             console.error("myAttendance.js Error: Required elements not found.");
             return;
@@ -59,43 +59,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedDate = dateInput.value;
         const selectedMethod = methodSelect.value;
 
+        // Clear previous non-placeholder rows
         tableBody.querySelectorAll("tr:not([data-placeholder])").forEach(row => row.remove());
         loadingRow.classList.add('hidden');
         noRecordsRow.classList.add('hidden');
         if (errorDiv) errorDiv.classList.add('hidden');
-
-        // 1. 🟠 SweetAlert2 Loading Animation (Start)
-        const loadingPromise = new Promise(async (resolve) => {
-            if (typeof Swal != 'undefined') {
-                Swal.fire({
-                    background: "transparent",
-                    html: `
-                        <div class="flex flex-col items-center justify-center gap-2">
-                            <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
-                            <p class="text-gray-700 text-[14px]">Filtering records...<br><span class="text-sm text-gray-500">Just a moment.</span></p>
-                        </div>
-                    `,
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                    customClass: {
-                        // Orange theme styling
-                        popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
-                    },
-                });
-            }
-            
-            // Forced small delay (100ms) para lang makita ng user ang loading spinner
-            await new Promise(r => setTimeout(r, 2000)); 
-
-            resolve();
-        });
-
-        // 2. Wait for the forced delay to complete before proceeding
-        await loadingPromise; 
         
-        // 3. Close the modal after the delay
-        if (typeof Swal != 'undefined') Swal.close();
-        
+        // **********************************************
+        // TANGGAL NA ANG SWEETALERT LOADING MODAL LOGIC DITO
+        // **********************************************
 
         if (!/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
             console.error("Invalid date format selected:", selectedDate);
@@ -122,9 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
             noRecordsRow.classList.remove('hidden');
             const noRecordsCell = noRecordsRow.querySelector('td');
             if (noRecordsCell) noRecordsCell.innerHTML = `
-                             <i class="ph ph-clipboard text-4xl block mb-2"></i>
-                             No attendance records found for the selected criteria.
-                         `;
+                               <i class="ph ph-clipboard text-4xl block mb-2"></i>
+                               No attendance records found for the selected criteria.
+                             `;
             return;
         }
 
@@ -133,11 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = document.createElement("tr");
             row.className = "hover:bg-orange-50 transition-colors";
             row.innerHTML = `
-                         <td class="px-4 py-3 text-gray-700">${formatDate(log.timestamp)}</td>
-                         <td class="px-4 py-3 text-gray-600">${formatDay(log.timestamp)}</td>
-                         <td class="px-4 py-3 text-gray-800 font-medium">${formatTime(log.timestamp)}</td>
-                         <td class="px-4 py-3 text-gray-600 capitalize">${log.method || 'N/A'}</td>
-                     `;
+                              <td class="px-4 py-3 text-gray-700">${formatDate(log.timestamp)}</td>
+                              <td class="px-4 py-3 text-gray-600">${formatDay(log.timestamp)}</td>
+                              <td class="px-4 py-3 text-gray-800 font-medium">${formatTime(log.timestamp)}</td>
+                              <td class="px-4 py-3 text-gray-600 capitalize">${log.method || 'N/A'}</td>
+                            `;
             fragment.appendChild(row);
         });
         tableBody.appendChild(fragment);
@@ -147,8 +119,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loadingRow) loadingRow.classList.add('hidden');
     } else if (dateInput && methodSelect) {
 
-        renderTable();
+        // Pag-alis ng loading sa initial render (first load)
+        // Inalis ang `loadingRow.classList.remove('hidden');` sa labas ng renderTable
+        
+        renderTable(); 
 
+        // Tiyakin na walang loading modal sa filters
         dateInput.addEventListener('change', renderTable);
         methodSelect.addEventListener('change', renderTable);
     } else {

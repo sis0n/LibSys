@@ -51,6 +51,7 @@ function showLoadingModal(message = "Processing request...", subMessage = "Pleas
     });
 }
 
+
 // 🟠 CONFIRMATION MODAL (ORANGE THEME)
 async function showCustomConfirmationModal(title, text, confirmText = "Confirm", icon = "ph-warning-circle") {
     if (typeof Swal == "undefined") return confirm(title);
@@ -59,7 +60,7 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm",
         html: `
             <div class="flex flex-col text-center">
                 <div class="flex justify-center mb-3">
-                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-xl bg-orange-100 text-orange-600">
                         <i class="ph ${icon} text-2xl"></i>
                     </div>
                 </div>
@@ -81,6 +82,8 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm",
     });
     return result.isConfirmed;
 }
+
+
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -245,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchDeletedBooks() {
         // 1. 🟠 START LOADING SWEETALERT MODAL
         const startTime = Date.now();
+        const minDelay = 500; // 👈 500ms minimum delay added
         if (typeof showLoadingModal !== 'undefined') {
              showLoadingModal("Loading Deleted Books...", "Retrieving archive data.");
         }
@@ -258,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 2. CLOSE LOADING with minimum delay
             const elapsed = Date.now() - startTime;
-            const minDelay = 500;
             if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
             if (typeof Swal != 'undefined') Swal.close();
 
@@ -397,8 +400,10 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         if (!isConfirmed) return;
 
+        // 🛑 START LOADING
         showLoadingModal("Restoring Book...", `Restoring "${title}" to the active catalog.`);
         const startTime = Date.now();
+        const minDelay = 500; // 👈 500ms minimum delay added
         buttonEl.disabled = true;
         buttonEl.classList.add('opacity-50');
 
@@ -413,13 +418,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
             
+            // 2. CLOSE LOADING with minimum delay (500ms)
             const elapsed = Date.now() - startTime;
-            if (elapsed < 300) await new Promise(r => setTimeout(r, 300 - elapsed));
+            if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
             Swal.close(); // Close loading modal
 
             if (result.success) {
                 showSuccessToast('Success!', result.message || 'Book restored successfully!');
-                fetchDeletedBooks();
+                
+                // ✅ Manual update ng data at re-render
+                allDeletedBooks = allDeletedBooks.filter(book => book.id !== bookId);
+                filterAndSearchBooks(); 
+                
             } else {
                 showErrorToast('Restoration Failed', `Restore failed: ${result.message}`);
             }
@@ -443,6 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showLoadingModal("Archiving Record...", `Archiving "${title}" permanently.`);
         const startTime = Date.now();
+        const minDelay = 500; // 👈 500ms minimum delay added
         buttonEl.disabled = true;
         buttonEl.classList.add('opacity-50');
 
@@ -456,8 +467,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
 
+            // 2. CLOSE LOADING with minimum delay (500ms)
             const elapsed = Date.now() - startTime;
-            if (elapsed < 300) await new Promise(r => setTimeout(r, 300 - elapsed));
+            if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
             Swal.close(); // Close loading modal
 
             if (result.success) {

@@ -76,14 +76,15 @@ class AuthController extends Controller
 
         $user = $this->AuthRepository->attemptLogin($username, $password);
 
+        // dito sa deactivated account
         if ($user && isset($user['is_active']) && !$user['is_active']) {
             echo json_encode([
                 'status' => 'error',
-                'message' => 'Your account has been deactivated by the administrator.'
+                'error_type' => 'deactivated', // Idagdag ito para makilala
+                'message' => 'Your account has been deactivated by the administrator.' // Palitan sa mas pormal na mensahe
             ]);
             return;
         }
-
         if ($user) {
             $redirect = '';
             $userRole = strtolower($user['role'] ?? '');

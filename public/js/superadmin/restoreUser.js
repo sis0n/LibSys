@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalUserDeletedBy = document.getElementById('modalUserDeletedBy');
 
     // =========================================================================
-    // MODIFIED: fetchDeletedUsers (Added SweetAlert loading)
+    // MODIFIED: fetchDeletedUsers (Initial load, retains loading modal)
     // =========================================================================
     async function fetchDeletedUsers() {
         // 1. 🟠 START LOADING SWEETALERT MODAL
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
                 if (!isConfirmed) return;
                 
-                // 🟠 START LOADING FOR RESTORE
+                // 🟠 START LOADING FOR RESTORE (MINIMAL DELAY)
                 showLoadingModal("Restoring User...", `Restoring ${user.fullname || user.username} account.`);
                 const restoreStartTime = Date.now();
                 
@@ -275,7 +275,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // CLOSE LOADING
                     const restoreElapsed = Date.now() - restoreStartTime;
-                    if (restoreElapsed < 300) await new Promise(r => setTimeout(r, 300 - restoreElapsed));
+                    const minModalDisplay = 500; // 500ms minimal processing time
+                    if (restoreElapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - restoreElapsed));
                     if (typeof Swal != 'undefined') Swal.close();
                     
                     if (result.success) {
@@ -306,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
                 if (!isConfirmed) return;
                 
-                // 🟠 START LOADING FOR ARCHIVE
+                // 🟠 START LOADING FOR ARCHIVE (MINIMAL DELAY - 500ms)
                 showLoadingModal("Archiving Record...", `Permanently archiving deletion record.`);
                 const archiveStartTime = Date.now();
                 
@@ -325,7 +326,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // CLOSE LOADING
                     const archiveElapsed = Date.now() - archiveStartTime;
-                    if (archiveElapsed < 300) await new Promise(r => setTimeout(r, 300 - archiveElapsed));
+                    const minModalDisplay = 500; // 500ms minimal processing time
+                    if (archiveElapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - archiveElapsed));
                     if (typeof Swal != 'undefined') Swal.close();
                     
                     if (result.success) {
@@ -490,6 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userDetailsModal.classList.add('hidden');
     }
 
+    // Walang loading modal sa filters/search
     userSearchInput.addEventListener('input', (e) => {
         currentSearchTerm = e.target.value;
         applyFiltersAndRender();
@@ -514,6 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentDateFilter = e.target.value;
         applyFiltersAndRender();
     });
+    // End Walang loading modal sa filters/search
 
     document.addEventListener('click', (e) => {
         if (!roleFilterDropdownBtn.contains(e.target) && !roleFilterDropdownMenu.contains(e.target)) {
@@ -566,4 +570,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     fetchDeletedUsers();
-}); 
+});

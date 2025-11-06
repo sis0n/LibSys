@@ -185,7 +185,7 @@ class FacultyTicketController extends Controller
     if (session_status() === PHP_SESSION_NONE) session_start();
     $userId = $_SESSION['user_id'] ?? null;
     if (!$userId) {
-      header("Location: " . BASE_URL ."/login");
+      header("Location: " . BASE_URL . "/login");
       exit;
     }
 
@@ -321,39 +321,63 @@ class FacultyTicketController extends Controller
       exit;
     }
 
+    // Expire any old pending transactions
     $this->ticketRepo->expireOldPendingTransactionsFaculty();
 
+    // Get full faculty info (including college)
+    $facultyDetails = $this->ticketRepo->getFacultyFullInfo($facultyId);
+
+    $facultyInfo = [
+      'faculty_id' => $facultyDetails['faculty_id'] ?? null,
+      'name' => $this->getFullName($facultyDetails),
+      'college' => $facultyDetails['college_name'] ?? 'N/A',
+      'contact' => $facultyDetails['contact'] ?? null
+    ];
+
+    // Check for pending transaction
     $pendingTransaction = $this->ticketRepo->getPendingTransactionByFacultyId($facultyId);
 
     if ($pendingTransaction) {
       $status = $pendingTransaction['status'];
-
       if ($status === 'pending' && strtotime($pendingTransaction['expires_at'] ?? '9999-01-01') <= time()) {
         $status = 'expired';
       }
 
-      echo  json_encode([
+      $items = $this->ticketRepo->getTransactionItems((int)$pendingTransaction['transaction_id']);
+
+      echo json_encode([
         'success' => true,
         'status' => $status,
         'transaction_code' => $pendingTransaction['transaction_code'],
         'generated_at' => $pendingTransaction['generated_at'],
-        'expires_at' => $pendingTransaction['expires_at']
+        'expires_at' => $pendingTransaction['expires_at'],
+        'items' => $items,
+        'faculty' => $facultyInfo
       ]);
-    } else {
-      $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByFacultyId($facultyId);
-      if ($borrowedTransaction) {
-        echo json_encode([
-          'success' => true,
-          'status' => 'borrowed',
-          'transaction_code' => $borrowedTransaction['transaction_code'],
-          'due_date' => $borrowedTransaction['due_date']
-        ]);
-      } else {
-        echo json_encode([
-          'success' => true,
-          'status' => 'none'
-        ]);
-      }
+      exit;
     }
+
+    // Check for borrowed transaction if no pending
+    $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByFacultyId($facultyId);
+    if ($borrowedTransaction) {
+      $items = $this->ticketRepo->getTransactionItems((int)$borrowedTransaction['transaction_id']);
+      echo json_encode([
+        'success' => true,
+        'status' => 'borrowed',
+        'transaction_code' => $borrowedTransaction['transaction_code'],
+        'due_date' => $borrowedTransaction['due_date'],
+        'items' => $items,
+        'faculty' => $facultyInfo
+      ]);
+      exit;
+    }
+
+    // No transaction found
+    echo json_encode([
+      'success' => true,
+      'status' => 'none',
+      'items' => [],
+      'faculty' => $facultyInfo
+    ]);
   }
 }

@@ -374,11 +374,25 @@ $baseUrl = BASE_URL;
                     </div>
                 </div>
 
-                <a href="<?= $baseUrl ?>/changePassword"
-                    class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                    <i class="ph ph-key text-2xl"></i>
-                    <span class="text-base">Change Password</span>
-                </a>
+                <div class="sidebar-dropdown" data-pages='["myProfile", "changePassword"]'>
+                    <button class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition <?= (in_array($currentPage, ["myProfile", "changePassword"])) ? 'bg-orange-100 text-orange-900' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <span class="flex items-center gap-x-3">
+                            <i class="ph ph-user-gear text-2xl"></i>
+                            <span class="text-base">Account Settings</span>
+                        </span>
+                        <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
+                    </button>
+                    <div class="pl-5 pt-1 space-y-1 hidden">
+                        <a href="<?= BASE_URL ?>/myProfile" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myProfile') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                            <i class="ph ph-user-circle text-xl"></i>
+                            <span class="text-base text-sm">Profile</span>
+                        </a>
+                        <a href="<?= BASE_URL ?>/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                            <i class="ph ph-key text-xl"></i>
+                            <span class="text-base text-sm">Change Password</span>
+                        </a>
+                    </div>
+                </div>
 
             <?php elseif ($role === 'admin' || $role === 'librarian'): ?>
                 <?php if ($hasPermission('user management')): ?>

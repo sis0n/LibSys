@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // *** AYOS DITO: Kunin ang pangalan mula sa response ***
                     createdByName: log.created_by_name, // Assume backend sends this
                     // createdBy: log.created_by, // Keep ID if needed elsewhere
-                    downloadLink: `backup/secure_download/${encodeURIComponent(log.file_name)}`
+                    downloadLink: `${BASE_URL_JS}/api/superadmin/backup/secure_download/${encodeURIComponent(log.file_name)}`
                 }));
 
                 goToPage(currentPage);

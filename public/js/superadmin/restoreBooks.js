@@ -45,11 +45,27 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm")
 const showProfileToast = (icon, title, text, theme, duration = 3000) => {
     if (typeof Swal == "undefined") return alert(`${title}: ${text}`);
 
-    // FINAL FIX: Ginamit ang theme-based borders at shadows
+    // Nagdagdag ng 'style' property para sa inline CSS (Border at Shadow)
     const themeMap = {
-        'warning': { color: 'text-orange-600', bg: 'bg-orange-100', border: 'border-orange-500', icon: 'ph-warning', shadow: 'shadow-[0_0_10px_#ff8c3770]' },
-        'error': { color: 'text-red-600', bg: 'bg-red-100', border: 'border-red-500', icon: 'ph-x-circle', shadow: 'shadow-[0_0_10px_#f4433670]' },
-        'success': { color: 'text-green-600', bg: 'bg-green-100', border: 'border-green-500', icon: 'ph-check-circle', shadow: 'shadow-[0_0_10px_#4CAF5070]' },
+        'warning': { 
+            color: 'text-orange-600', 
+            bg: 'bg-orange-100', 
+            icon: 'ph-warning', 
+            style: 'border: 2px solid #fb923c; box-shadow: 0 0 10px rgba(251, 146, 60, 0.5); background: linear-gradient(180deg, #fffdfb, #fff6ef) !important;' 
+        },
+        'error': { 
+            color: 'text-red-600', 
+            bg: 'bg-red-100', 
+            icon: 'ph-x-circle', 
+            style: 'border: 2px solid #f87171; box-shadow: 0 0 10px rgba(248, 113, 113, 0.5); background: linear-gradient(180deg, #fffafa, #fff0f0) !important;' 
+        },
+        // Ginawang inline style ang border at shadow ayon sa request: Green Border (#10B981)
+        'success': { 
+            color: 'text-green-600', 
+            bg: 'bg-green-100', 
+            icon: 'ph-check-circle', 
+            style: 'border: 2px solid #10B981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); background: linear-gradient(180deg, #fafffa, #f0fff0) !important;' 
+        },
     };
     const selectedTheme = themeMap[theme];
 
@@ -74,9 +90,14 @@ const showProfileToast = (icon, title, text, theme, duration = 3000) => {
             </div>
         `,
         customClass: {
-            // TOAST MODAL: Theme Border + Transparent BG + Theme Shadow
-            popup: `!rounded-xl !shadow-md !border-2 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm ${selectedTheme.border} ${selectedTheme.shadow}`,
+            // Inalis ang theme-based border at shadow classes dito.
+            popup: `!rounded-xl !shadow-md !p-4 !bg-transparent backdrop-blur-sm`,
         },
+        // Ginamit ang didOpen hook para i-apply ang inline style.
+        didOpen: (toastElement) => {
+            // In-apply ang inline styles (kasama na ang background, border, at shadow)
+            toastElement.style.cssText += selectedTheme.style;
+        }
     });
 };
 

@@ -763,9 +763,16 @@
             if (isLoading) return;
             isLoading = true;
             currentPage = page;
-            bookTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="7" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading books...</td></tr>`;
-            paginationControls.classList.add('hidden');
-            resultsIndicator.textContent = 'Loading...';
+
+            const startTime = Date.now();   
+
+            if (bookTableBody) bookTableBody.innerHTML = "";
+    paginationControls.classList.add('hidden');
+    resultsIndicator.textContent = 'Loading...';
+           
+    if (typeof Swal != 'undefined') {
+        showLoadingModal("Loading Book Catalog...", "Retrieving library records.");
+    }
             const offset = (page - 1) * limit;
             
             try {
@@ -780,6 +787,12 @@
                 const res = await fetch(`api/superadmin/booksmanagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
+
+                const elapsed = Date.now() - startTime;
+                //loading animaton minimum delay
+        const minDelay = 2000; // Minimum delay para kita ang loading
+        if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+        if (typeof Swal != 'undefined') Swal.close();
 
                 if (data.success && Array.isArray(data.books)) {
                     totalBooks = data.totalCount;
@@ -803,6 +816,7 @@
                 bookTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="7" class="text-center text-red-500 py-10">Error loading books: ${err.message}</td></tr>`;
                 updateBookCounts(0, 0, 1, limit);
                 showErrorToast("Data Load Failed", "Could not retrieve book list data.");
+                if (typeof Swal != 'undefined') Swal.close();
                 try {
                     sessionStorage.removeItem('bookManagementPage');
                 } catch (e) {}

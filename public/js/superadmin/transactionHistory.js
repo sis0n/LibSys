@@ -1,4 +1,43 @@
-document.addEventListener('DOMContentLoaded', () => {
+// --- SweetAlert Helper Functions (Kailangan para gumana ang loading modal) ---
+
+function showErrorToast(title, body = "An error occurred during processing.") {
+    if (typeof Swal == "undefined") return alert(title);
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 4000,
+        width: "360px",
+        background: "transparent",
+        html: `<div class="flex flex-col text-left"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600"><i class="ph ph-x-circle text-lg"></i></div><div><h3 class="text-[15px] font-semibold text-red-600">${title}</h3><p class="text-[13px] text-gray-700 mt-0.5">${body}</p></div></div></div>`,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+        },
+    });
+}
+
+// 🟠 LOADING MODAL (ORANGE THEME)
+function showLoadingModal(message = "Processing request...", subMessage = "Please wait.") {
+    if (typeof Swal == "undefined") return;
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+        },
+    });
+}
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+document.addEventListener('DOMContentLoaded', function () {
     const statusBtn = document.getElementById('statusFilterBtn');
     const statusMenu = document.getElementById('statusFilterMenu');
     const statusValue = document.getElementById('statusFilterValue');
@@ -21,14 +60,42 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentFilteredTransactions = [];
 
     async function loadTransactions() {
+        // 1. 🟠 START LOADING
+        const startTime = Date.now();
+        showLoadingModal("Loading Transaction History...", "Retrieving records.");
+
+        // Clear table body before loading
+        if (tableBody) tableBody.innerHTML = '';
+        if (paginationContainer) paginationContainer.classList.add('hidden');
+        
         try {
-            // NOTE: Kung ang API ay nagre-return ng unique row per BOOK/ITEM, ito ay OK.
             const response = await fetch('api/superadmin/transactionHistory/json');
+            if (!response.ok) throw new Error("Failed to fetch data.");
+            
             allTransactions = await response.json();
+            
+            // 2. CLOSE LOADING with minimum delay
+            const elapsed = Date.now() - startTime;
+            const minDelay = 500;
+            if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+            if (typeof Swal != 'undefined') Swal.close();
+            
             currentFilteredTransactions = allTransactions;
             applyAndRenderFilters();
+            
         } catch (error) {
             console.error('Error fetching transactions:', error);
+            
+            // 3. CLOSE LOADING and SHOW ERROR
+            if (typeof Swal != 'undefined') Swal.close();
+            showErrorToast('Data Load Failed', 'Could not retrieve transaction history from the server.');
+            
+            // Display error message in the table
+            if (tableBody && noTransactionsMessage) {
+                 tableBody.appendChild(noTransactionsMessage.cloneNode(true));
+                 const errorText = tableBody.querySelector('#no-transactions-found td');
+                 if (errorText) errorText.textContent = "Error loading history. Please try again.";
+            }
         }
     }
 

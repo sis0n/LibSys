@@ -527,10 +527,13 @@ window.addEventListener("DOMContentLoaded", () => {
             const res = await fetch(`api/student/bookCatalog/fetch?${params.toString()}`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
+            //Loading timer
+            
             
             // Wait for slight delay before closing loading modal
+            //timer to ensure at least 3 seconds
             const elapsed = Date.now() - start;
-            if (elapsed < 300) await new Promise(r => setTimeout(r, 300 - elapsed));
+            if (elapsed < 3000) await new Promise(r => setTimeout(r, 3000 - elapsed));
             Swal.close(); 
 
             let books;

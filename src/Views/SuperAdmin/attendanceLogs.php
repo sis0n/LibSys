@@ -125,10 +125,10 @@ foreach ($logs as $log) {
                 </thead>
                 <tbody id="attendanceTableBody" class="divide-y divide-orange-100">
                     <tr id="noRecordsRow" class="bg-white">
-                        <td colspan="5" class="text-center text-gray-500 py-10">
+                        <!-- <td colspan="5" class="text-center text-gray-500 py-10">
                             <i class="ph ph-clipboard text-4xl block mb-2"></i>
                             Loading records...
-                        </td>
+                        </td> -->
                     </tr>
                 </tbody>
             </table>

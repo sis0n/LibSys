@@ -209,9 +209,15 @@ document.addEventListener('DOMContentLoaded', () => {
         courseSelect.innerHTML = '<option value="">Loading Courses...</option>';
         courseSelect.disabled = true;
 
+        // 🟠 START LOADING FOR COURSE OPTIONS
+        showLoadingModal("Loading course options...", "Fetching data."); 
+
         try {
             const res = await fetch('api/data/getAllCourses');
             const data = await res.json();
+
+            // 🟠 CLOSE LOADING (SUCCESS PATH)
+            if (typeof Swal != "undefined") Swal.close(); 
 
             courseSelect.innerHTML = '';
             const defaultOption = new Option('Select a Course', '');
@@ -230,19 +236,31 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isEditing) courseSelect.disabled = true;
 
         } catch (err) {
+            // 🟠 CLOSE LOADING (ERROR PATH)
+            if (typeof Swal != "undefined") Swal.close(); 
             console.error("Error fetching course options:", err);
             courseSelect.innerHTML = `<option value="${currentCourseId || ''}">Error loading courses</option>`;
             courseSelect.disabled = true;
+            showProfileToast('ph-x-circle', 'Error', 'Failed to load course list.', 'error', 3000);
         }
     }
 
     async function loadProfile() {
+        // 🟠 START LOADING FOR PROFILE
+        showLoadingModal("Loading profile data...", "Retrieving your latest information.");
+
         try {
             const res = await fetch('api/student/myprofile/get');
             if (!res.ok) {
                 const errData = await res.json().catch(() => null);
                 throw new Error(errData?.message || `Failed to fetch profile. Status: ${res.status}`);
             }
+            // Forced delay to ensure loading modal is visible
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds delay bago close
+Swal.close();
+
+            // 🟠 CLOSE LOADING (SUCCESS PATH)
+            if (typeof Swal != "undefined") Swal.close(); 
 
             const data = await res.json();
             if (data.success && data.profile) {
@@ -303,6 +321,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Could not parse profile data.');
             }
         } catch (err) {
+            // 🟠 CLOSE LOADING (ERROR PATH)
+            if (typeof Swal != "undefined") Swal.close(); 
             console.error("Load profile error:", err);
             showProfileToast('ph-x-circle', 'Error', 'Could not load your profile. ' + err.message, 'error', 5000);
         }

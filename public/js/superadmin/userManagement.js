@@ -99,71 +99,71 @@ window.addEventListener("DOMContentLoaded", () => {
     const programs = {};
     const departments = [];
 
-  const modal = document.getElementById("importModal");
-  const openBtn = document.getElementById("bulkImportBtn");
-  const closeBtn = document.getElementById("closeImportModal");
-  const cancelBtn = document.getElementById("cancelImport");
-  const searchInput = document.getElementById("userSearchInput");
-  const userTableBody = document.getElementById("userTableBody");
-  const addUserModal = document.getElementById("addUserModal");
-  const openAddUserBtn = document.getElementById("addUserBtn");
-  const closeAddUserBtn = document.getElementById("closeAddUserModal");
-  const cancelAddUserBtn = document.getElementById("cancelAddUser");
-  const editUserModal = document.getElementById("editUserModal");
-  const closeEditUserBtn = document.getElementById("closeEditUserModal");
-  const cancelEditUserBtn = document.getElementById("cancelEditUser");
-  const bulkImportForm = document.getElementById("bulkImportForm");
-  const fileInput = document.getElementById("csvFile");
-  const importMessage = document.getElementById("importMessage");
-  
-  const modulesSection = document.getElementById("modulesSection");
-  const addUserUserManagementModuleWrapper = document.getElementById("addUserUserManagementModuleWrapper");
-  
-  // BAGONG DAGDAG: ID para sa Edit Modal
-  const editUserUserManagementModuleWrapper = document.getElementById("editUserUserManagementModuleWrapper");
-  
-  const userRoleValueEl = document.getElementById("userRoleDropdownValue");
+    const modal = document.getElementById("importModal");
+    const openBtn = document.getElementById("bulkImportBtn");
+    const closeBtn = document.getElementById("closeImportModal");
+    const cancelBtn = document.getElementById("cancelImport");
+    const searchInput = document.getElementById("userSearchInput");
+    const userTableBody = document.getElementById("userTableBody");
+    const addUserModal = document.getElementById("addUserModal");
+    const openAddUserBtn = document.getElementById("addUserBtn");
+    const closeAddUserBtn = document.getElementById("closeAddUserModal");
+    const cancelAddUserBtn = document.getElementById("cancelAddUser");
+    const editUserModal = document.getElementById("editUserModal");
+    const closeEditUserBtn = document.getElementById("closeEditUserModal");
+    const cancelEditUserBtn = document.getElementById("cancelEditUser");
+    const bulkImportForm = document.getElementById("bulkImportForm");
+    const fileInput = document.getElementById("csvFile");
+    const importMessage = document.getElementById("importMessage");
+    
+    const modulesSection = document.getElementById("modulesSection");
+    const addUserUserManagementModuleWrapper = document.getElementById("addUserUserManagementModuleWrapper");
+    
+    // BAGONG DAGDAG: ID para sa Edit Modal
+    const editUserUserManagementModuleWrapper = document.getElementById("editUserUserManagementModuleWrapper");
+    
+    const userRoleValueEl = document.getElementById("userRoleDropdownValue");
 
-  let allUsers = [];
-  let users = [];
-  let selectedRole = "All Roles";
-  let selectedStatus = "All Status";
-  let currentEditingUserId = null;
+    let allUsers = [];
+    let users = [];
+    let selectedRole = "All Roles";
+    let selectedStatus = "All Status";
+    let currentEditingUserId = null;
 
-  let currentPage = 1;
-  const limit = 10;
-  let totalUsers = 0;
-  let totalPages = 1;
-  let isLoading = false;
-  let searchDebounce;
+    let currentPage = 1;
+    const limit = 10;
+    let totalUsers = 0;
+    let totalPages = 1;
+    let isLoading = false;
+    let searchDebounce;
 
-  try {
-    const savedPage = sessionStorage.getItem('userManagementPage');
-    if (savedPage) {
-      const parsedPage = parseInt(savedPage, 10);
-      if (!isNaN(parsedPage) && parsedPage > 0) {
-        currentPage = parsedPage;
-      } else {
-        sessionStorage.removeItem('userManagementPage');
-      }
+    try {
+        const savedPage = sessionStorage.getItem('userManagementPage');
+        if (savedPage) {
+            const parsedPage = parseInt(savedPage, 10);
+            if (!isNaN(parsedPage) && parsedPage > 0) {
+                currentPage = parsedPage;
+            } else {
+                sessionStorage.removeItem('userManagementPage');
+            }
+        }
+    } catch (e) {
+        console.error("SessionStorage Error:", e);
+        currentPage = 1;
     }
-  } catch (e) {
-    console.error("SessionStorage Error:", e);
-    currentPage = 1;
-  }
 
-  function updateUserCounts(usersLength, totalCountNum, page, perPage) {
-    const resultsIndicator = document.getElementById("resultsIndicator");
-    if (resultsIndicator) {
-      if (totalCountNum === 0) {
-        resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">0</span> of <span class="font-medium text-gray-800">0</span> users`;
-      } else {
-        const startItem = (page - 1) * perPage + 1;
-        const endItem = (page - 1) * perPage + usersLength;
-        resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">${startItem}-${endItem}</span> of <span class="font-medium text-gray-800">${totalCountNum.toLocaleString()}</span> users`;
-      }
+    function updateUserCounts(usersLength, totalCountNum, page, perPage) {
+        const resultsIndicator = document.getElementById("resultsIndicator");
+        if (resultsIndicator) {
+            if (totalCountNum === 0) {
+                resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">0</span> of <span class="font-medium text-gray-800">0</span> users`;
+            } else {
+                const startItem = (page - 1) * perPage + 1;
+                const endItem = (page - 1) * perPage + usersLength;
+                resultsIndicator.innerHTML = `Showing <span class="font-medium text-gray-800">${startItem}-${endItem}</span> of <span class="font-medium text-gray-800">${totalCountNum.toLocaleString()}</span> users`;
+            }
+        }
     }
-  }
 
     function renderPagination(totalPages, page) {
         const paginationControls = document.getElementById("paginationControls");
@@ -171,69 +171,69 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (!paginationControls || !paginationList) return;
 
-    if (totalPages <= 1) {
-      paginationControls.classList.add("hidden");
-      return;
-    }
+        if (totalPages <= 1) {
+            paginationControls.classList.add("hidden");
+            return;
+        }
 
         paginationControls.classList.remove("hidden");
         paginationList.innerHTML = '';
 
-    const createPageLink = (type, text, pageNum, isDisabled = false, isActive = false) => {
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.href = "#";
-      a.setAttribute("data-page", String(pageNum));
-      let baseClasses = `flex items-center justify-center min-w-[32px] h-9 text-sm font-medium transition-all duration-200`;
-      if (type === "prev" || type === "next") {
-        a.innerHTML = text;
-        baseClasses += ` text-gray-700 hover:text-orange-600 px-3`;
-        if (isDisabled) baseClasses += ` opacity-50 cursor-not-allowed pointer-events-none`;
-      } else if (type === "ellipsis") {
-        a.textContent = text;
-        baseClasses += ` text-gray-400 cursor-default px-2`;
-      } else {
-        a.textContent = text;
-        if (isActive) {
-          baseClasses += ` text-white bg-orange-600 rounded-full shadow-sm px-3`;
-        } else {
-          baseClasses += ` text-gray-700 hover:text-orange-600 hover:bg-orange-100 rounded-full px-3`;
+        const createPageLink = (type, text, pageNum, isDisabled = false, isActive = false) => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = "#";
+            a.setAttribute("data-page", String(pageNum));
+            let baseClasses = `flex items-center justify-center min-w-[32px] h-9 text-sm font-medium transition-all duration-200`;
+            if (type === "prev" || type === "next") {
+                a.innerHTML = text;
+                baseClasses += ` text-gray-700 hover:text-orange-600 px-3`;
+                if (isDisabled) baseClasses += ` opacity-50 cursor-not-allowed pointer-events-none`;
+            } else if (type === "ellipsis") {
+                a.textContent = text;
+                baseClasses += ` text-gray-400 cursor-default px-2`;
+            } else {
+                a.textContent = text;
+                if (isActive) {
+                    baseClasses += ` text-white bg-orange-600 rounded-full shadow-sm px-3`;
+                } else {
+                    baseClasses += ` text-gray-700 hover:text-orange-600 hover:bg-orange-100 rounded-full px-3`;
+                }
+            }
+            a.className = baseClasses;
+            li.appendChild(a);
+            paginationList.appendChild(li);
+        };
+
+        createPageLink("prev", `<i class="flex ph ph-caret-left text-lg"></i> Previous`, page - 1, page === 1);
+        const window = 1;
+        let pagesToShow = new Set([1, totalPages, page]);
+        for (let i = 1; i <= window; i++) {
+            if (page - i > 0) pagesToShow.add(page - i);
+            if (page + i <= totalPages) pagesToShow.add(page + i);
         }
-      }
-      a.className = baseClasses;
-      li.appendChild(a);
-      paginationList.appendChild(li);
-    };
+        const sortedPages = [...pagesToShow].sort((a, b) => a - b);
+        let lastPage = 0;
+        for (const p of sortedPages) {
+            if (p > lastPage + 1) createPageLink("ellipsis", "…", "...", true);
+            createPageLink("number", p, p, false, p === page);
+            lastPage = p;
+        }
+        createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
 
-    createPageLink("prev", `<i class="flex ph ph-caret-left text-lg"></i> Previous`, page - 1, page === 1);
-    const window = 1;
-    let pagesToShow = new Set([1, totalPages, page]);
-    for (let i = 1; i <= window; i++) {
-      if (page - i > 0) pagesToShow.add(page - i);
-      if (page + i <= totalPages) pagesToShow.add(page + i);
+        paginationList.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isLoading) return;
+            const target = e.target.closest('a[data-page]');
+            if (!target) return;
+            const pageStr = target.dataset.page;
+            if (pageStr === '...') return;
+            const pageNum = parseInt(pageStr, 10);
+            if (!isNaN(pageNum) && pageNum !== currentPage) {
+                loadUsers(pageNum);
+            }
+        });
     }
-    const sortedPages = [...pagesToShow].sort((a, b) => a - b);
-    let lastPage = 0;
-    for (const p of sortedPages) {
-      if (p > lastPage + 1) createPageLink("ellipsis", "…", "...", true);
-      createPageLink("number", p, p, false, p === page);
-      lastPage = p;
-    }
-    createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
-
-    paginationList.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (isLoading) return;
-      const target = e.target.closest('a[data-page]');
-      if (!target) return;
-      const pageStr = target.dataset.page;
-      if (pageStr === '...') return;
-      const pageNum = parseInt(pageStr, 10);
-      if (!isNaN(pageNum) && pageNum !== currentPage) {
-        loadUsers(pageNum);
-      }
-    });
-  }
 
 
     function updateProgramDepartmentDropdown(role, selectedValue = null) {
@@ -246,22 +246,22 @@ window.addEventListener("DOMContentLoaded", () => {
 
         wrapper.classList.add('hidden');
 
-    if (normalizedRole === 'student') {
-      label.innerHTML = 'Course/Program <span class="text-red-500">*</span>';
-      wrapper.classList.remove('hidden');
-      loadCoursesForStudent(selectedValue);
+        if (normalizedRole === 'student') {
+            label.innerHTML = 'Course/Program <span class="text-red-500">*</span>';
+            wrapper.classList.remove('hidden');
+            loadCoursesForStudent(selectedValue);
 
-    } else if (normalizedRole === 'faculty') {
-      label.innerHTML = 'College/Department <span class="text-red-500">*</span>';
-      wrapper.classList.remove('hidden');
-      loadDepartments(selectedValue);
+        } else if (normalizedRole === 'faculty') {
+            label.innerHTML = 'College/Department <span class="text-red-500">*</span>';
+            wrapper.classList.remove('hidden');
+            loadDepartments(selectedValue);
 
-    } else {
-      wrapper.classList.add('hidden');
-      const select = document.getElementById('addUserSelectField');
-      if (select) select.innerHTML = '';
+        } else {
+            wrapper.classList.add('hidden');
+            const select = document.getElementById('addUserSelectField');
+            if (select) select.innerHTML = '';
+        }
     }
-  }
 
     function closeModal(modalEl) {
         if (!modalEl) return;
@@ -354,41 +354,66 @@ window.addEventListener("DOMContentLoaded", () => {
 
     toggleModules(modulesSection, userRoleValueEl.textContent || "");
 
-  window.selectUserRole = (el, val) => {
-    const normalizedRole = (val || "").trim().toLowerCase();
+    window.selectUserRole = (el, val) => {
+        const normalizedRole = (val || "").trim().toLowerCase();
 
-    if (userRoleValueEl) userRoleValueEl.textContent = val;
-    setActiveOption("userRoleDropdownMenu", el);
+        if (userRoleValueEl) userRoleValueEl.textContent = val;
+        setActiveOption("userRoleDropdownMenu", el);
 
-    toggleModules(modulesSection, normalizedRole);
+        toggleModules(modulesSection, normalizedRole);
 
-    if (addUserUserManagementModuleWrapper) {
-      if (normalizedRole === 'admin') {
-        addUserUserManagementModuleWrapper.classList.remove('hidden');
-      } else {
-        addUserUserManagementModuleWrapper.classList.add('hidden');
-      }
-    }
-    updateProgramDepartmentDropdown(normalizedRole);
-  };
+        if (addUserUserManagementModuleWrapper) {
+            if (normalizedRole === 'admin') {
+                addUserUserManagementModuleWrapper.classList.remove('hidden');
+            } else {
+                addUserUserManagementModuleWrapper.classList.add('hidden');
+            }
+        }
+        updateProgramDepartmentDropdown(normalizedRole);
+    };
 
     window.selectEditRole = (el, val) => {
         const valueEl = document.getElementById("editRoleDropdownValue");
         if (valueEl) valueEl.textContent = val;
         const editModulesContainer = document.getElementById("editPermissionsContainer");
         const user = users.find(u => u.user_id === currentEditingUserId);
-        toggleModules(editModulesContainer, user.role, user?.modules || []);
+        // We might need to reload user data here if user object is stale, but we rely on `users` array for simplicity
+        // For accurate module status on role change in the modal, we'd need more logic, 
+        // but sticking to the current structure, we just toggle visibility based on the *new* role selected.
+        const normalizedRole = (val || "").trim().toLowerCase();
+        
+        if (editModulesContainer) {
+            if (normalizedRole === 'admin' || normalizedRole === 'librarian') {
+                editModulesContainer.classList.remove("hidden");
+                // For a proper edit, we'd ideally fetch the permissions template for the new role here,
+                // but for now, we just ensure visibility is correct.
+            } else {
+                editModulesContainer.classList.add("hidden");
+            }
+
+            if (editUserUserManagementModuleWrapper) {
+                if (normalizedRole === 'admin') {
+                    editUserUserManagementModuleWrapper.classList.remove('hidden');
+                } else { 
+                    editUserUserManagementModuleWrapper.classList.add('hidden');
+                }
+            }
+        }
+        
+        // This is necessary to visually mark the selected option
+        setActiveOption("editRoleDropdownMenu", el);
     };
 
-  if (openBtn) openBtn.addEventListener("click", () => {
-    modal?.classList.remove("hidden");
-    document.body.classList.add("overflow-hidden");
-  });
-  if (closeBtn) closeBtn.addEventListener("click", () => closeModal(modal));
-  if (cancelBtn) cancelBtn.addEventListener("click", () => closeModal(modal));
-  modal?.addEventListener("click", e => {
-    if (e.target === modal) closeModal(modal);
-  });
+
+    if (openBtn) openBtn.addEventListener("click", () => {
+        modal?.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+    });
+    if (closeBtn) closeBtn.addEventListener("click", () => closeModal(modal));
+    if (cancelBtn) cancelBtn.addEventListener("click", () => closeModal(modal));
+    modal?.addEventListener("click", e => {
+        if (e.target === modal) closeModal(modal);
+    });
 
     fileInput?.addEventListener("change", () => {
         if (fileInput.files.length) {
@@ -437,72 +462,80 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-  let searchTimeout;
-  if (searchInput) {
-    searchInput.addEventListener("input", e => {
-      const query = e.target.value.trim();
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener("input", e => {
+            const query = e.target.value.trim();
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                try {
+                    sessionStorage.removeItem('userManagementPage');
+                } catch (e) {}
+                loadUsers(1);
+            }, 500);
+        });
+    }
+
+    function applyFilters() {
         currentPage = 1;
         try {
-          sessionStorage.removeItem('userManagementPage');
+            sessionStorage.removeItem('userManagementPage');
         } catch (e) {}
         loadUsers(1);
-      }, 500);
+    }
+
+    function closeAddUserModal() {
+        closeModal(addUserModal);
+        document.getElementById("addFirstName") && (document.getElementById("addFirstName").value = "");
+        document.getElementById("addMiddleName") && (document.getElementById("addMiddleName").value = "");
+        document.getElementById("addLastName") && (document.getElementById("addLastName").value = "");
+        document.getElementById("addUsername") && (document.getElementById("addUsername").value = "");
+        document.getElementById("addUserSelectField") && (document.getElementById("addUserSelectField").value = ""); // Clear select field
+        if (userRoleValueEl) userRoleValueEl.textContent = "Select Role";
+
+        if (addUserUserManagementModuleWrapper) {
+            addUserUserManagementModuleWrapper.classList.add('hidden');
+        }
+        if (modulesSection) {
+            modulesSection.classList.add('hidden');
+            modulesSection.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+    }
+    if (openAddUserBtn) openAddUserBtn.addEventListener("click", () => {
+        addUserModal?.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+        // Reset role and fields when opening
+        if (userRoleValueEl) userRoleValueEl.textContent = "Select Role";
+        updateProgramDepartmentDropdown(""); // Hide program/department dropdown
     });
-  }
+    [closeAddUserBtn, cancelAddUserBtn].forEach(btn => btn?.addEventListener("click", closeAddUserModal));
+    addUserModal?.addEventListener("click", e => {
+        if (e.target === addUserModal) closeAddUserModal();
+    });
 
-  function applyFilters() {
-    currentPage = 1;
-    try {
-      sessionStorage.removeItem('userManagementPage');
-    } catch (e) {}
-    loadUsers(1);
-  }
-
-  function closeAddUserModal() {
-    closeModal(addUserModal);
-    document.getElementById("addFirstName") && (document.getElementById("addFirstName").value = "");
-    document.getElementById("addMiddleName") && (document.getElementById("addMiddleName").value = "");
-    document.getElementById("addLastName") && (document.getElementById("addLastName").value = "");
-    document.getElementById("addUsername") && (document.getElementById("addUsername").value = "");
-    if (userRoleValueEl) userRoleValueEl.textContent = "Select Role";
-
-    if (addUserUserManagementModuleWrapper) {
-      addUserUserManagementModuleWrapper.classList.add('hidden');
+    function closeEditUserModal() {
+        closeModal(editUserModal);
+        currentEditingUserId = null;
+        const changePasswordCheckbox = document.getElementById("togglePassword");
+        if (changePasswordCheckbox) changePasswordCheckbox.checked = false;
+        document.getElementById('passwordFields')?.classList.add('hidden');
+        document.getElementById('editPassword') && (document.getElementById('editPassword').value = '');
+        document.getElementById('confirmPassword') && (document.getElementById('confirmPassword').value = '');
+        
+        // BAGONG DAGDAG: Siguraduhin na nakatago rin ito pag-close
+        if (editUserUserManagementModuleWrapper) {
+            editUserUserManagementModuleWrapper.classList.add('hidden');
+        }
+        const editModulesContainer = document.getElementById("editPermissionsContainer");
+        if (editModulesContainer) {
+             editModulesContainer.classList.add('hidden');
+        }
     }
-    if (modulesSection) {
-      modulesSection.classList.add('hidden');
-      modulesSection.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-    }
-  }
-  if (openAddUserBtn) openAddUserBtn.addEventListener("click", () => {
-    addUserModal?.classList.remove("hidden");
-    document.body.classList.add("overflow-hidden");
-  });
-  [closeAddUserBtn, cancelAddUserBtn].forEach(btn => btn?.addEventListener("click", closeAddUserModal));
-  addUserModal?.addEventListener("click", e => {
-    if (e.target === addUserModal) closeAddUserModal();
-  });
-
-  function closeEditUserModal() {
-    closeModal(editUserModal);
-    currentEditingUserId = null;
-    const changePasswordCheckbox = document.getElementById("togglePassword");
-    if (changePasswordCheckbox) changePasswordCheckbox.checked = false;
-    document.getElementById('passwordFields')?.classList.add('hidden');
-    document.getElementById('editPassword') && (document.getElementById('editPassword').value = '');
-    document.getElementById('confirmPassword') && (document.getElementById('confirmPassword').value = '');
-    
-    // BAGONG DAGDAG: Siguraduhin na nakatago rin ito pag-close
-    if (editUserUserManagementModuleWrapper) {
-        editUserUserManagementModuleWrapper.classList.add('hidden');
-    }
-  }
-  [closeEditUserBtn, cancelEditUserBtn].forEach(btn => btn?.addEventListener("click", closeEditUserModal));
-  editUserModal?.addEventListener("click", e => {
-    if (e.target === editUserModal) closeEditUserModal();
-  });
+    [closeEditUserBtn, cancelEditUserBtn].forEach(btn => btn?.addEventListener("click", closeEditUserModal));
+    editUserModal?.addEventListener("click", e => {
+        if (e.target === editUserModal) closeEditUserModal();
+    });
 
     function setupDropdownToggle(buttonId, menuId) {
         const btn = document.getElementById(buttonId);
@@ -581,71 +614,91 @@ window.addEventListener("DOMContentLoaded", () => {
         if (isLoading) return;
         isLoading = true;
         currentPage = page;
-        if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading users...</td></tr>`;
+        
+        // --- 1. SET START TIME FOR DELAY CHECK ---
+        const startTime = Date.now();
+      
         document.getElementById("paginationControls")?.classList.add('hidden');
-        document.getElementById("resultsIndicator").textContent = 'Loading...';
+        // document.getElementById("resultsIndicator").textContent = 'Loading...';
+        if (userTableBody) userTableBody.innerHTML = "";  
+
+        // --- 2. SHOW SWEETALERT LOADING MODAL ---
+        showLoadingModal("Loading User List...", "Fetching data for page " + page);
+        
 
         const offset = (page - 1) * limit;
         const search = document.getElementById("userSearchInput").value.trim();
 
-    try {
-      const params = new URLSearchParams({
-        search: search,
-        role: selectedRole === 'All Roles' ? '' : selectedRole,
-        status: selectedStatus === 'All Status' ? '' : selectedStatus,
-        limit: limit,
-        offset: offset
-      });
-
-      const res = await fetch(`api/superadmin/userManagement/pagination?${params.toString()}`);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
-
-      if (data.success && Array.isArray(data.users)) {
-        totalUsers = data.totalCount;
-        totalPages = Math.ceil(totalUsers / limit) || 1;
-
-        if (page > totalPages && totalPages > 0) {
-          loadUsers(totalPages);
-          return;
-        }
-
-        users = data.users.map(u => ({
-          user_id: u.user_id,
-          first_name: u.first_name,
-          middle_name: u.middle_name,
-          last_name: u.last_name,
-          name: buildFullName(u.first_name, u.middle_name, u.last_name),
-          username: u.username,
-          email: u.email,
-          role: u.role,
-          status: u.is_active == 1 ? "Active" : "Inactive",
-          joinDate: new Date(u.created_at).toLocaleDateString(),
-          modules: u.modules || []
-        }));
-
-        renderTable(users);
-        renderPagination(totalPages, currentPage);
-        updateUserCounts(users.length, totalUsers, page, limit);
         try {
-          sessionStorage.setItem('userManagementPage', currentPage);
-        } catch (e) {
-          console.error("SessionStorage Error:", e);
+            const params = new URLSearchParams({
+                search: search,
+                role: selectedRole === 'All Roles' ? '' : selectedRole,
+                status: selectedStatus === 'All Status' ? '' : selectedStatus,
+                limit: limit,
+                offset: offset
+            });
+
+            const res = await fetch(`api/superadmin/userManagement/pagination?${params.toString()}`);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const data = await res.json();
+            
+            // --- 3. CLOSE LOADING MODAL (SUCCESS PATH) ---
+            const elapsed = Date.now() - startTime;
+            const minDelay = 3000; // Minimum 300ms delay
+            if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+            if (typeof Swal != "undefined") Swal.close();
+
+
+            if (data.success && Array.isArray(data.users)) {
+                totalUsers = data.totalCount;
+                totalPages = Math.ceil(totalUsers / limit) || 1;
+
+                if (page > totalPages && totalPages > 0) {
+                    loadUsers(totalPages);
+                    return;
+                }
+
+                users = data.users.map(u => ({
+                    user_id: u.user_id,
+                    first_name: u.first_name,
+                    middle_name: u.middle_name,
+                    last_name: u.last_name,
+                    name: buildFullName(u.first_name, u.middle_name, u.last_name),
+                    username: u.username,
+                    email: u.email,
+                    role: u.role,
+                    status: u.is_active == 1 ? "Active" : "Inactive",
+                    joinDate: new Date(u.created_at).toLocaleDateString(),
+                    modules: u.modules || []
+                }));
+
+                renderTable(users);
+                renderPagination(totalPages, currentPage);
+                updateUserCounts(users.length, totalUsers, page, limit);
+                try {
+                    sessionStorage.setItem('userManagementPage', currentPage);
+                } catch (e) {
+                    console.error("SessionStorage Error:", e);
+                }
+            } else {
+                throw new Error(data.message || "Invalid data format from server.");
+            }
+        } catch (err) {
+            // --- 4. CLOSE LOADING MODAL (ERROR PATH) ---
+            if (typeof Swal != "undefined") Swal.close(); 
+            
+            console.error("Fetch users error:", err);
+            if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
+            updateUserCounts(0, 0, 1, limit);
+            showErrorToast("Loading Failed", "Could not retrieve user list. Check your connection.");
+            
+            try {
+                sessionStorage.removeItem('userManagementPage');
+            } catch (e) {}
+        } finally {
+            isLoading = false;
         }
-      } else {
-        throw new Error(data.message || "Invalid data format from server.");
-      }
-    } catch (err) {
-      console.error("Fetch users error:", err);
-      if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
-      updateUserCounts(0, 0, 1, limit);
-      try {
-        sessionStorage.removeItem('userManagementPage');
-      } catch (e) {}
-    } finally {
-      isLoading = false;
     }
-  }
 
     function renderTable(usersToRender) {
         if (!userTableBody) return;
@@ -725,41 +778,53 @@ window.addEventListener("DOMContentLoaded", () => {
             const checkedModules = Array.from(document.querySelectorAll('input[name="modules[]"]:checked'))
                 .map(cb => cb.value);
 
-      try {
-        const res = await fetch("api/superadmin/userManagement/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            first_name: first_name,
-            middle_name: middle_name || null,
-            last_name: last_name,
-            username: username,
-            role: role,
-            ...(payloadData.course_id && {
-              course_id: payloadData.course_id
-            }),
-            ...(payloadData.college_id && {
-              college_id: payloadData.college_id
-            }),
-            modules: checkedModules
-          })
+            // 1. Show Loading SweetAlert (UPDATED TO USE SWEETALERT)
+            showLoadingModal("Adding New User...", `Creating user account for ${first_name} ${last_name}.`);
+
+            try {
+                const res = await fetch("api/superadmin/userManagement/add", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        first_name: first_name,
+                        middle_name: middle_name || null,
+                        last_name: last_name,
+                        username: username,
+                        role: role,
+                        ...(payloadData.course_id && {
+                            course_id: payloadData.course_id
+                        }),
+                        ...(payloadData.college_id && {
+                            college_id: payloadData.college_id
+                        }),
+                        modules: checkedModules
+                    })
+                });
+                const data = await res.json();
+                
+                // Maghintay sandali at isara ang loading modal
+                await new Promise(r => setTimeout(r, 300));
+                Swal.close();
+
+                if (data.success) {
+                    // 2. Show Success Toast (UPDATED TO USE SWEETALERT)
+                    showSuccessToast("User Added Successfully!", `${first_name} ${last_name} has been added.`);
+                    closeAddUserModal();
+                    await loadUsers(1);
+                } else {
+                    // 3. Show Error Toast (UPDATED TO USE SWEETALERT)
+                    showErrorToast("Adding User Failed", data.message || "An unexpected error occurred.");
+                }
+            } catch (err) {
+                console.error("Add user error:", err);
+                // Isara ang loading modal at magpakita ng Error Toast
+                Swal.close();
+                showErrorToast("Adding User Failed", "An error occurred while connecting to the server.");
+            }
         });
-        const data = await res.json();
-        if (data.success) {
-          alert("User added successfully!");
-          closeAddUserModal();
-          await loadUsers(1);
-        } else {
-          alert("Error: " + data.message);
-        }
-      } catch (err) {
-        console.error("Add user error:", err);
-        alert("An error occurred while adding the user.");
-      }
-    });
-  }
+    }
 
     if (userTableBody) {
         userTableBody.addEventListener("click", async (e) => {
@@ -773,9 +838,9 @@ window.addEventListener("DOMContentLoaded", () => {
             const user = users[index];
             if (!user) return;
 
-      if (e.target.closest(".editUserBtn")) {
-        currentEditingUserId = user.user_id;
-        const userRole = user.role.toLowerCase();
+            if (e.target.closest(".editUserBtn")) {
+                currentEditingUserId = user.user_id;
+                const userRole = user.role.toLowerCase();
 
                 document.getElementById("editFirstName").value = user.first_name || '';
                 document.getElementById("editMiddleName").value = user.middle_name || '';
@@ -786,30 +851,30 @@ window.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("editStatusDropdownValue").textContent = user.status;
                 document.querySelector("#editUserTitle span").textContent = user.name;
 
-        const editModulesContainer = document.getElementById("editPermissionsContainer");
-        if (editModulesContainer) {
-          if (userRole === 'admin' || userRole === 'librarian') {
-            editModulesContainer.classList.remove("hidden");
-            
-            if (editUserUserManagementModuleWrapper) {
-                if (userRole === 'admin') {
-                    editUserUserManagementModuleWrapper.classList.remove('hidden');
-                } else { 
-                    editUserUserManagementModuleWrapper.classList.add('hidden');
+                const editModulesContainer = document.getElementById("editPermissionsContainer");
+                if (editModulesContainer) {
+                    if (userRole === 'admin' || userRole === 'librarian') {
+                        editModulesContainer.classList.remove("hidden");
+                        
+                        if (editUserUserManagementModuleWrapper) {
+                            if (userRole === 'admin') {
+                                editUserUserManagementModuleWrapper.classList.remove('hidden');
+                            } else { 
+                                editUserUserManagementModuleWrapper.classList.add('hidden');
+                            }
+                        }
+
+                        editModulesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                            cb.checked = user.modules?.some(
+                                m => m.toLowerCase().trim() === cb.value.toLowerCase().trim()
+                            ) || false;
+                        });
+
+                    } else {
+                        editModulesContainer.classList.add("hidden");
+                        editModulesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                    }
                 }
-            }
-
-            editModulesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-              cb.checked = user.modules?.some(
-                m => m.toLowerCase().trim() === cb.value.toLowerCase().trim()
-              ) || false;
-            });
-
-          } else {
-            editModulesContainer.classList.add("hidden");
-            editModulesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-          }
-        }
 
                 editUserModal.classList.remove("hidden");
                 document.body.classList.add("overflow-hidden");
@@ -984,7 +1049,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 console.error("Update user error:", err);
                 showErrorToast("Update Failed", "An error occurred while updating the user.");
             } finally {
-                closeEditUserModal();
+                // closeEditUserModal(); // Removed this line here since it's redundant if success/fail path already closes it, but if you want to ensure it closes even on connection error, you can keep it.
             }
         });
     }
@@ -1016,30 +1081,30 @@ window.addEventListener("DOMContentLoaded", () => {
     const toggleConfirmPass = document.getElementById('toggleConfirmPass');
     if (toggleConfirmPass) toggleConfirmPass.addEventListener('click', () => togglePassword('confirmPassword', toggleConfirmPass));
 
-  function getRoleBadge(role) {
-    const base = "px-2 py-1 text-xs rounded-md font-medium";
-    switch (role.toLowerCase()) {
-      case "student":
-        return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
-      case "librarian":
-        return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
-      case "admin":
-        return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
-      case "faculty":
-        return `<span class="bg-emerald-600 text-white ${base}">${role}</span>`;
-      case "staff":
-        return `<span class="bg-teal-600 text-white ${base}">${role}</span>`;
-      case "superadmin":
-        return `<span class="bg-purple-600 text-white ${base}">${role}</span>`;
-      default:
-        return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
+    function getRoleBadge(role) {
+        const base = "px-2 py-1 text-xs rounded-md font-medium";
+        switch (role.toLowerCase()) {
+            case "student":
+                return `<span class="bg-green-500 text-white ${base}">${role}</span>`;
+            case "librarian":
+                return `<span class="bg-amber-500 text-white ${base}">${role}</span>`;
+            case "admin":
+                return `<span class="bg-orange-600 text-white ${base}">${role}</span>`;
+            case "faculty":
+                return `<span class="bg-emerald-600 text-white ${base}">${role}</span>`;
+            case "staff":
+                return `<span class="bg-teal-600 text-white ${base}">${role}</span>`;
+            case "superadmin":
+                return `<span class="bg-purple-600 text-white ${base}">${role}</span>`;
+            default:
+                return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
+        }
     }
-  }
 
-  function getStatusBadge(status) {
-    const base = "px-2 py-1 text-xs rounded-md font-medium";
-    return status.toLowerCase() === "active" ? `<span class="bg-green-500 text-white ${base}">Active</span>` : `<span class="bg-gray-300 text-gray-700 ${base}">Inactive</span>`;
-  }
+    function getStatusBadge(status) {
+        const base = "px-2 py-1 text-xs rounded-md font-medium";
+        return status.toLowerCase() === "active" ? `<span class="bg-green-500 text-white ${base}">Active</span>` : `<span class="bg-gray-300 text-gray-700 ${base}">Inactive</span>`;
+    }
 
     loadUsers(currentPage);
 });

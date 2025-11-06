@@ -1,3 +1,89 @@
+// --- SweetAlert Helper Functions (Global Declarations) ---
+
+function showSuccessToast(title, body = "") {
+    if (typeof Swal == "undefined") return alert(title);
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 3000,
+        width: "360px",
+        background: "transparent",
+        html: `<div class="flex flex-col text-left"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600"><i class="ph ph-check-circle text-lg"></i></div><div><h3 class="text-[15px] font-semibold text-green-600">${title}</h3><p class="text-[13px] text-gray-700 mt-0.5">${body}</p></div></div></div>`,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
+        },
+    });
+}
+
+function showErrorToast(title, body = "An error occurred during processing.") {
+    if (typeof Swal == "undefined") return alert(title);
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 4000,
+        width: "360px",
+        background: "transparent",
+        html: `<div class="flex flex-col text-left"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600"><i class="ph ph-x-circle text-lg"></i></div><div><h3 class="text-[15px] font-semibold text-red-600">${title}</h3><p class="text-[13px] text-gray-700 mt-0.5">${body}</p></div></div></div>`,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+        },
+    });
+}
+
+// 🟠 LOADING MODAL (ORANGE THEME)
+function showLoadingModal(message = "Processing request...", subMessage = "Please wait.") {
+    if (typeof Swal == "undefined") return;
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+        },
+    });
+}
+
+// 🟠 CONFIRMATION MODAL (ORANGE THEME)
+async function showConfirmationModal(title, text, confirmText = "Confirm", icon = "ph-warning-circle") {
+    if (typeof Swal == "undefined") return confirm(title);
+    const result = await Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col text-center">
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                        <i class="ph ${icon} text-2xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-[17px] font-semibold text-orange-700">${title}</h3>
+                <p class="text-[14px] text-gray-700 mt-1">${text}</p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: confirmText,
+        cancelButtonText: "Cancel",
+        customClass: {
+            popup:
+                "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+            confirmButton:
+                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+            cancelButton:
+                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+        },
+    });
+    return result.isConfirmed;
+}
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const userSearchInput = document.getElementById('userSearchInput');
     const roleFilterDropdownBtn = document.getElementById('roleFilterDropdownBtn');
@@ -52,12 +138,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalUserDeletedDate = document.getElementById('modalUserDeletedDate');
     const modalUserDeletedBy = document.getElementById('modalUserDeletedBy');
 
+    // =========================================================================
+    // MODIFIED: fetchDeletedUsers (Added SweetAlert loading)
+    // =========================================================================
     async function fetchDeletedUsers() {
-        showLoadingState();
+        // 1. 🟠 START LOADING SWEETALERT MODAL
+        const startTime = Date.now();
+        if (typeof showLoadingModal !== 'undefined') {
+             showLoadingModal("Loading Deleted Users...", "Retrieving archive data.");
+        }
+        showLoadingState(); // Keep default table loading temporarily
+
         try {
             const response = await fetch('api/superadmin/restoreUser/fetch');
+            if (!response.ok) throw new Error("Failed to fetch data.");
+            
             const data = await response.json();
 
+            // 2. CLOSE LOADING with minimum delay
+            const elapsed = Date.now() - startTime;
+            const minDelay = 500;
+            if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+            if (typeof Swal != 'undefined') Swal.close();
+            
+            
             if (data.success && Array.isArray(data.users)) {
                 allDeletedUsers = data.users;
                 applyFiltersAndRender(true); // Pass true for initial load
@@ -68,24 +172,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 applyFiltersAndRender(true); // Pass true for initial load even on error
             }
         } catch (error) {
+            // 3. CLOSE LOADING and SHOW ERROR
+            if (typeof Swal != 'undefined') Swal.close();
             console.error('Network error fetching deleted users:', error);
             showErrorState('Network error. Could not load deleted users.');
             allDeletedUsers = [];
             applyFiltersAndRender();
         }
     }
+    // =========================================================================
 
     function showLoadingState() {
-        deletedUsersTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-gray-500">Loading...</td></tr>';
+        // Updated to show a spinning icon for better UX during loading
+        deletedUsersTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-gray-500"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading...</td></tr>';
         noDeletedUsersFound.classList.add('hidden');
         paginationContainer.classList.add('hidden');
     }
 
     function showErrorState(message) {
+        // Tiyakin na magsara ang SweetAlert2 bago mag-display ng error
+        if (typeof Swal != 'undefined') Swal.close();
+        
         deletedUsersTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500">${message}</td></tr>`;
         noDeletedUsersFound.classList.add('hidden');
         paginationContainer.classList.add('hidden');
         deletedUsersCount.textContent = 0;
+        showErrorToast('Load Failed', message);
     }
 
     function formatDate(dateString) {
@@ -124,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newRow = deletedUserRowTemplate.cloneNode(true);
             const tr = newRow.querySelector('tr');
             tr.dataset.userId = user.id;
+            tr.classList.add('deleted-user-row');
 
             newRow.querySelector('.user-fullname').textContent = user.fullname || 'N/A';
             newRow.querySelector('.user-username').textContent = user.username || 'N/A';
@@ -134,65 +247,101 @@ document.addEventListener('DOMContentLoaded', () => {
             const restoreBtn = newRow.querySelector('.restore-btn');
             restoreBtn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                if (confirm(`Are you sure you want to restore ${user.fullname || user.username}?`)) {
-                    restoreBtn.disabled = true;
-                    restoreBtn.classList.add('opacity-50');
-                    try {
-                        const response = await fetch('api/superadmin/restoreUser/restore', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': csrfTokenInput ? csrfTokenInput.value : ''
-                            },
-                            body: JSON.stringify({ user_id: user.id })
-                        });
-                        const result = await response.json();
-                        if (result.success) {
-                            alert(result.message);
-                            fetchDeletedUsers();
-                        } else {
-                            alert(`Restore failed: ${result.message}`);
-                            restoreBtn.disabled = false;
-                            restoreBtn.classList.remove('opacity-50');
-                        }
-                    } catch (error) {
-                        console.error('Error restoring user:', error);
-                        alert('An error occurred during restoration.');
+                
+                const isConfirmed = await showConfirmationModal(
+                    "Confirm Restoration",
+                    `Are you sure you want to restore ${user.fullname || user.username}? This user will regain access.`,
+                    "Yes, Restore"
+                );
+                if (!isConfirmed) return;
+                
+                // 🟠 START LOADING FOR RESTORE
+                showLoadingModal("Restoring User...", `Restoring ${user.fullname || user.username} account.`);
+                const restoreStartTime = Date.now();
+                
+                restoreBtn.disabled = true;
+                restoreBtn.classList.add('opacity-50');
+                
+                try {
+                    const response = await fetch('api/superadmin/restoreUser/restore', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfTokenInput ? csrfTokenInput.value : ''
+                        },
+                        body: JSON.stringify({ user_id: user.id })
+                    });
+                    const result = await response.json();
+                    
+                    // CLOSE LOADING
+                    const restoreElapsed = Date.now() - restoreStartTime;
+                    if (restoreElapsed < 300) await new Promise(r => setTimeout(r, 300 - restoreElapsed));
+                    if (typeof Swal != 'undefined') Swal.close();
+                    
+                    if (result.success) {
+                        showSuccessToast('Restored Successfully', `User ${user.fullname || user.username} has been restored.`);
+                        fetchDeletedUsers();
+                    } else {
+                        showErrorToast('Restore Failed', result.message);
                         restoreBtn.disabled = false;
                         restoreBtn.classList.remove('opacity-50');
                     }
+                } catch (error) {
+                    if (typeof Swal != 'undefined') Swal.close();
+                    console.error('Error restoring user:', error);
+                    showErrorToast('Restoration Error', 'An error occurred during restoration.');
+                    restoreBtn.disabled = false;
+                    restoreBtn.classList.remove('opacity-50');
                 }
             });
 
             const archiveBtn = newRow.querySelector('.archive-btn');
             archiveBtn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                if (confirm(`ARCHIVE ${user.fullname || user.username}? This will copy the record to the archive tables for reporting.`)) {
-                    archiveBtn.disabled = true;
-                    archiveBtn.classList.add('opacity-50');
-                    try {
-                        const response = await fetch(`api/superadmin/restoreUser/delete/${user.id}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': csrfTokenInput ? csrfTokenInput.value : ''
-                            }
-                        });
-                        const result = await response.json();
-                        if (result.success) {
-                            alert(result.message);
-                            fetchDeletedUsers();
-                        } else {
-                            alert(`Archive failed: ${result.message}`);
-                            archiveBtn.disabled = false;
-                            archiveBtn.classList.remove('opacity-50');
+                
+                const isConfirmed = await showConfirmationModal(
+                    "Confirm Archiving",
+                    `ARCHIVE ${user.fullname || user.username}? This will permanently remove the deletion record from this list.`,
+                    "Yes, Archive"
+                );
+                if (!isConfirmed) return;
+                
+                // 🟠 START LOADING FOR ARCHIVE
+                showLoadingModal("Archiving Record...", `Permanently archiving deletion record.`);
+                const archiveStartTime = Date.now();
+                
+                archiveBtn.disabled = true;
+                archiveBtn.classList.add('opacity-50');
+                
+                try {
+                    const response = await fetch(`api/superadmin/restoreUser/delete/${user.id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfTokenInput ? csrfTokenInput.value : ''
                         }
-                    } catch (error) {
-                        console.error('Error archiving user:', error);
-                        alert('An error occurred during archiving.');
+                    });
+                    const result = await response.json();
+                    
+                    // CLOSE LOADING
+                    const archiveElapsed = Date.now() - archiveStartTime;
+                    if (archiveElapsed < 300) await new Promise(r => setTimeout(r, 300 - archiveElapsed));
+                    if (typeof Swal != 'undefined') Swal.close();
+                    
+                    if (result.success) {
+                        showSuccessToast('Archived Successfully', result.message);
+                        fetchDeletedUsers();
+                    } else {
+                        showErrorToast('Archiving Failed', result.message);
                         archiveBtn.disabled = false;
                         archiveBtn.classList.remove('opacity-50');
                     }
+                } catch (error) {
+                    if (typeof Swal != 'undefined') Swal.close();
+                    console.error('Error archiving user:', error);
+                    showErrorToast('Archiving Error', 'An error occurred during archiving.');
+                    archiveBtn.disabled = false;
+                    archiveBtn.classList.remove('opacity-50');
                 }
             });
 
@@ -417,5 +566,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     fetchDeletedUsers();
-});
-
+}); 

@@ -85,7 +85,7 @@
                     <dd id="detailsStaffName" class="text-right"><?= htmlspecialchars($staff["name"] ?? "Staff Name") ?></dd>
                 </div>
                 <div class="flex justify-between items-center">
-                    <dt class="text-amber-700 font-medium">Department:</dt>
+                    <dt class="text-amber-700 font-medium">Position:</dt>
                     <dd id="detailsStaffDept" class="text-right"><?= htmlspecialchars($staff["department"] ?? "N/A") ?></dd>
                 </div>
                 <div class="flex justify-between items-center">
@@ -108,36 +108,51 @@
     </div>
 
     <!-- Book List Section -->
-    <div id="bookListSection" class="w-full max-w-4xl mx-auto bg-[var(--color-card)] rounded-[var(--radius-lg)] shadow-md border border-[var(--color-border)] p-6 mt-6 <?= (empty($items)) ? 'hidden' : '' ?>">
-        <h3 class="text-lg font-semibold mb-4">Books Included in this Ticket (<span id="bookListCount"><?= !empty($items) ? count($items) : 0 ?></span>)</h3>
-
-        <?php if (!empty($items)): ?>
-            <ul id="bookListUL" class="divide-y divide-[var(--color-border)]">
-                <?php foreach ($items as $item): ?>
-                    <li class="py-3 flex justify-between items-center text-sm">
-                        <div>
-                            <p class="font-medium text-gray-800">
-                                <?= htmlspecialchars($item['title'] ?? 'Title Missing') ?>
-                            </p>
-                            <p class="text-xs text-gray-600">
-                                by <?= htmlspecialchars($item['author'] ?? 'Author Unknown') ?>
-                            </p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-mono text-xs text-amber-700">
-                                Accession No.: <?= htmlspecialchars($item['accession_number'] ?? 'N/A') ?>
-                            </p>
-                        </div>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php else: ?>
-            <div id="noBooksMessage" class="p-3 text-sm text-center text-gray-500 bg-gray-50 rounded">
-                No books currently associated with this ticket.
+    <div id="checkedOutSection" class="space-y-6 mt-6">
+        <?php if (!empty($books) && count($books) > 0): ?>
+            <div class="p-4 border border-amber-200 bg-amber-50 rounded-lg flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="ph ph-qr-code text-2xl text-amber-600"></i>
+                    <div>
+                        <h3 class="font-medium text-amber-900">Checked Out Items</h3>
+                        <p class="text-sm text-amber-700">Items included in this QR checkout ticket</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-2xl font-bold text-amber-700"><?= count($books) ?></p>
+                    <p class="text-xs text-amber-600">Total Item(s)</p>
+                </div>
             </div>
-        <?php endif; ?>
-        <?php if (empty($items)): ?>
-            <ul id="bookListUL" class="divide-y divide-[var(--color-border)] hidden"></ul>
+
+            <div class="border-t border-x border-green-300 bg-green-50 rounded-xl">
+                <div class="p-4 flex items-center justify-between border-b border-green-200">
+                    <h4 class="font-medium text-green-700 flex items-center gap-2">
+                        <i class="ph ph-book text-lg"></i> Books (<?= count($books) ?>)
+                    </h4>
+                </div>
+
+                <?php foreach ($books as $index => $book): ?>
+                    <div class="bg-white p-4 flex gap-3 rounded-b-lg border-b border-green-300 ">
+                        <div class="flex items-center">
+                            <i class="ph ph-book-open text-3xl text-green-500"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium"><?= htmlspecialchars($book["title"]) ?></p>
+                            <p class="text-sm text-gray-600">by <?= htmlspecialchars($book["author"]) ?></p>
+                            <div class="flex flex-wrap gap-2 mt-2 text-xs">
+                                <span class="px-2 py-1 bg-gray-100 rounded">Accession #:
+                                    <?= htmlspecialchars($book["accession_number"] ?? "N/A") ?></span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">Call #:
+                                    <?= htmlspecialchars($book["call_number"] ?? "N/A") ?></span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Subject:
+                                    <?= htmlspecialchars($book["subject"] ?? "N/A") ?></span>
+                            </div>
+                        </div>
+                        <span
+                            class="w-6 h-6 flex items-center justify-center rounded-full bg-green-600 text-white text-xs font-bold"><?= $index + 1 ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
     </div>
 
@@ -155,32 +170,43 @@
             const detailsStaffDept = document.getElementById('detailsStaffDept');
             const detailsBookCount = document.getElementById('detailsBookCount');
 
-            const bookListSection = document.getElementById('bookListSection');
+            const checkedOutSection = document.getElementById('checkedOutSection');
+
+            function createMessageElement(text, classes, iconClass) {
+                const p = document.createElement('p');
+                p.className = `font-semibold text-lg flex items-center justify-center gap-2 ${classes}`;
+                if (iconClass) {
+                    const i = document.createElement('i');
+                    i.className = `${iconClass} text-2xl`;
+                    p.appendChild(i);
+                }
+                p.appendChild(document.createTextNode(text));
+                return p;
+            }
 
             function displayMessage(text, type = 'info') {
                 ticketMessageContainer.innerHTML = '';
-                const p = document.createElement('p');
-                p.className = `font-semibold text-lg flex items-center justify-center gap-2 ${
-                    type === 'error' || type === 'expired' ? 'text-red-500' :
-                    type === 'success' || type === 'borrowed' ? 'text-green-600' :
-                    'text-gray-500'
-                }`;
-                const icon = document.createElement('i');
-                icon.className = type === 'error' || type === 'expired' ? 'ph ph-x-circle text-2xl' :
-                    type === 'success' || type === 'borrowed' ? 'ph ph-check-circle text-2xl' : 'ph ph-info text-2xl';
-                p.appendChild(icon);
-                p.appendChild(document.createTextNode(text));
-                ticketMessageContainer.appendChild(p);
+                let el;
+                if (type === 'error' || type === 'expired') {
+                    el = createMessageElement(text, 'text-red-500', 'ph ph-x-circle');
+                } else if (type === 'success' || type === 'borrowed') {
+                    el = createMessageElement(text, 'text-green-600', 'ph ph-check-circle');
+                } else {
+                    el = createMessageElement(text, 'text-gray-500', 'ph ph-info');
+                }
+                ticketMessageContainer.appendChild(el);
 
                 if (qrImage) qrImage.classList.add('hidden');
                 if (downloadButton) downloadButton.classList.add('hidden', 'opacity-50', 'cursor-not-allowed', 'pointer-events-none');
                 if (generatedDateP) generatedDateP.classList.add('hidden');
                 if (dueDateP) dueDateP.classList.add('hidden');
+
                 if (detailsStaffId) detailsStaffId.textContent = 'N/A';
                 if (detailsStaffName) detailsStaffName.textContent = 'N/A';
                 if (detailsStaffDept) detailsStaffDept.textContent = 'N/A';
                 if (detailsBookCount) detailsBookCount.textContent = '0 Book(s)';
-                if (bookListSection) bookListSection.classList.add('hidden');
+
+                if (checkedOutSection) checkedOutSection.innerHTML = '';
             }
 
             function showQR(ticket) {
@@ -206,11 +232,58 @@
                     dueDateP.classList.add('hidden');
                 }
 
-                if (ticket.items && ticket.items.length > 0 && bookListSection) {
-                    bookListSection.classList.remove('hidden');
-                } else if (bookListSection) {
-                    bookListSection.classList.add('hidden');
+                if (detailsStaffId) detailsStaffId.textContent = ticket.employee_id || 'N/A';
+                if (detailsStaffName) detailsStaffName.textContent = ticket.staff_name || 'N/A';
+                if (detailsStaffDept) detailsStaffDept.textContent = ticket.position || 'N/A';
+                if (detailsBookCount) detailsBookCount.textContent = (ticket.items ? ticket.items.length : 0) + ' Book(s)';
+
+                if (ticket.items && ticket.items.length > 0 && checkedOutSection) {
+                    checkedOutSection.innerHTML = `
+                            <div class="p-4 border border-amber-200 bg-amber-50 rounded-lg flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <i class="ph ph-qr-code text-2xl text-amber-600"></i>
+                                    <div>
+                                        <h3 class="font-medium text-amber-900">Checked Out Items</h3>
+                                        <p class="text-sm text-amber-700">Items included in this QR checkout ticket</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-2xl font-bold text-amber-700">${ticket.items.length}</p>
+                                    <p class="text-xs text-amber-600">Total Item(s)</p>
+                                </div>
+                            </div>
+                            <div class="border-t border-x border-green-300 bg-green-50 rounded-xl">
+                                <div class="p-4 flex items-center justify-between border-b border-green-200">
+                                    <h4 class="font-medium text-green-700 flex items-center gap-2">
+                                        <i class="ph ph-book text-lg"></i> Books (${ticket.items.length})
+                                    </h4>
+                                </div>
+                                ${ticket.items.map((book, index) => `
+                                <div class="bg-white p-4 flex gap-3 rounded-b-lg border-b border-green-300">
+                                    <div class="flex items-center">
+                                        <i class="ph ph-book-open text-3xl text-green-500"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium">${book.title}</p>
+                                        <p class="text-sm text-gray-600">by ${book.author}</p>
+                                        <div class="flex flex-wrap gap-2 mt-2 text-xs">
+                                            <span class="px-2 py-1 bg-gray-100 rounded">Accession #: ${book.accession_number || 'N/A'}</span>
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">Call #: ${book.call_number || 'N/A'}</span>
+                                            <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Subject: ${book.subject || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                    <span class="w-6 h-6 flex items-center justify-center rounded-full bg-green-600 text-white text-xs font-bold">${index + 1}</span>
+                                </div>`).join('')}
+                            </div>`;
+                    checkedOutSection.classList.remove('hidden');
+                } else if (checkedOutSection) {
+                    checkedOutSection.innerHTML = '';
+                    checkedOutSection.classList.add('hidden');
                 }
+            }
+
+            function resetToDefault(message = "No active borrowing ticket.") {
+                displayMessage(message, 'info');
             }
 
             let isChecking = false;
@@ -218,24 +291,23 @@
             async function checkTicketStatus() {
                 if (isChecking) return;
                 isChecking = true;
+
                 try {
                     const res = await fetch('api/staff/qrBorrowingTicket/checkStatus');
                     const data = await res.json();
+
                     if (!data.success) return;
 
                     if (data.status === 'pending') {
-                        showQR({
-                            transaction_code: data.transaction_code,
-                            generated_at: data.generated_at,
-                            expires_at: data.expires_at
-                        });
+                        showQR(data);
                     } else if (data.status === 'borrowed') {
                         displayMessage('QR Code Successfully Scanned!', 'success');
                     } else if (data.status === 'expired') {
                         displayMessage('QR Code Ticket Expired', 'expired');
                     } else {
-                        displayMessage('No active borrowing ticket.', 'info');
+                        resetToDefault();
                     }
+
                 } catch (err) {
                     console.error('Error checking ticket status:', err);
                 } finally {
@@ -244,7 +316,9 @@
             }
 
             setInterval(checkTicketStatus, 2000);
-            checkTicketStatus();
+            checkTicketStatus(); // Initial load
         });
     </script>
+
+
 </main>

@@ -22,6 +22,68 @@ class StaffTicketRepository
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
+    public function getStaffFullInfoByStaffId(int $staffId): ?array
+    {
+        $stmt = $this->db->prepare("
+        SELECT 
+            s.employee_id,
+            s.position,
+            u.first_name,
+            u.middle_name,
+            u.last_name
+        FROM staff s
+        JOIN users u ON s.user_id = u.user_id
+        WHERE s.staff_id = :sid
+        LIMIT 1
+    ");
+        $stmt->execute(['sid' => $staffId]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $data ?: null;
+    }
+
+
+    public function getStaffFullInfoByUserId(int $userId): ?array
+    {
+        $stmt = $this->db->prepare("
+        SELECT 
+            s.employee_id,
+            s.position,
+            u.first_name,
+            u.middle_name,
+            u.last_name
+        FROM staff s
+        JOIN users u ON s.user_id = u.user_id
+        WHERE s.user_id = :uid
+        LIMIT 1
+    ");
+        $stmt->execute(['uid' => $userId]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $data ?: null;
+    }
+
+
+    public function getStaffInfoByEmployeeId(int $employeeId): ?array
+    {
+        $stmt = $this->db->prepare("
+        SELECT 
+            s.employee_id, 
+            s.position, 
+            u.first_name, 
+            u.middle_name, 
+            u.last_name
+        FROM staff s
+        JOIN users u ON s.user_id = u.user_id
+        WHERE s.employee_id = :eid
+        LIMIT 1
+    ");
+        $stmt->execute(['eid' => $employeeId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+
+
     public function getTransactionItems(int $transactionId): array
     {
         $stmt = $this->db->prepare("

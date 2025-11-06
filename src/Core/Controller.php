@@ -2,8 +2,28 @@
 
 namespace App\Core;
 
+use App\Repositories\UserRepository;
+
 class Controller
 {
+    private $UserRepository;
+
+
+
+    public function __construct()
+    {
+        if (isset($_SESSION['user_id'])) {
+            $this->UserRepository = new UserRepository();
+            $currentUser = $this->UserRepository->getUserById($_SESSION['user_id']);
+
+            if (!$currentUser || !$currentUser['is_active']) {
+                session_unset();
+                session_destroy();
+                header("Location: " . BASE_URL . "/login?error=deactivated");
+                exit;
+            }
+        }
+    }
     /**
      * Render a view with optional header/footer layout
      *
@@ -70,9 +90,7 @@ class Controller
             echo '</div>'; // close right side
             echo '</div>'; // close flex wrapper
             echo '</body>';
-        }
-
-        else {
+        } else {
             if (file_exists($viewPath)) {
                 include $viewPath;
             } else {

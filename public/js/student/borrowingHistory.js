@@ -172,7 +172,7 @@ async function fetchBorrowingData(page = 1) {
 
         // 3. Close Loading Modal with Minimum Delay
         const elapsed = Date.now() - start;
-        const minDelay = 2000; // Minimum 300ms loading time
+        const minDelay = 500; // Minimum 300ms loading time
         if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
         if (typeof Swal != 'undefined') Swal.close();
 

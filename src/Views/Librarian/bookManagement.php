@@ -376,9 +376,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // --- SweetAlert Helper Functions (Para ma-maintain ang design consistency) ---
-    // Note: Sa production code, dapat naka-declare na ito bago ang DOMContentLoaded
-    
+    // --- SweetAlert Helper Functions (Global Declarations) ---
+
     function showSuccessToast(title, body = "") {
         if (typeof Swal == "undefined") return alert(title);
         Swal.fire({
@@ -410,7 +409,8 @@
             },
         });
     }
-    
+
+    // 🟠 LOADING MODAL (ORANGE THEME)
     function showLoadingModal(message = "Processing request...", subMessage = "Please wait.") {
         if (typeof Swal == "undefined") return;
         Swal.fire({
@@ -460,6 +460,7 @@
     }
     // --- End SweetAlert Helper Functions ---
 
+
     document.addEventListener("DOMContentLoaded", () => {
         // ==========================
         // ELEMENT REFERENCES
@@ -489,30 +490,13 @@
         const editPreviewImage = document.getElementById('editPreviewImage');
 
         // --- View Modal Elements ---
-        // Note: Modal elements are kept in the HTML/DOM but the JS logic to open/view is removed.
         const viewBookModal = document.getElementById("viewBookModal");
-        const viewBookModalContent = document.getElementById("viewBookModalContent");
         const closeViewModal = document.getElementById("closeViewModal");
         const closeViewModalBtn = document.getElementById("closeViewModalBtn");
-        const viewModalImg = document.getElementById("viewModalImg");
-        const viewModalTitle = document.getElementById("viewModalTitle");
-        const viewModalAuthor = document.getElementById("viewModalAuthor");
-        const viewModalStatus = document.getElementById("viewModalStatus");
-        const viewModalCallNumber = document.getElementById("viewModalCallNumber");
-        const viewModalAccessionNumber = document.getElementById("viewModalAccessionNumber");
-        const viewModalIsbn = document.getElementById("viewModalIsbn");
-        const viewModalSubject = document.getElementById("viewModalSubject");
-        const viewModalPlace = document.getElementById("viewModalPlace");
-        const viewModalPublisher = document.getElementById("viewModalPublisher");
-        const viewModalYear = document.getElementById("viewModalYear");
-        const viewModalEdition = document.getElementById("viewModalEdition");
-        const viewModalSupplementary = document.getElementById("viewModalSupplementary");
-        const viewModalDescription = document.getElementById("viewModalDescription");
+        // (Other view modal elements declarations removed for brevity)
 
         const searchInput = document.getElementById("bookSearchInput");
         const bookTableBody = document.getElementById("bookTableBody");
-        const bookCountSpan = document.getElementById("bookCount");
-        const bookTotalSpan = document.getElementById("bookTotal");
         const resultsIndicator = document.getElementById("resultsIndicator");
 
         const paginationControls = document.getElementById("paginationControls");
@@ -555,20 +539,22 @@
             if (!fileInput.files.length) return showErrorToast("Import Error", "Please select a CSV file.");
 
             showLoadingModal("Importing Books...", "Uploading and processing CSV file.");
+            const startTime = Date.now();
 
             const formData = new FormData();
             formData.append("csv_file", fileInput.files[0]);
             
             try {
-                const res = await fetch(`api/librarian/booksmanagement/bulkImport`, {
+                const res = await fetch(`api/admin/bookManagement/bulkImport`, {
                     method: "POST",
                     body: formData
                 });
 
                 const data = await res.json();
                 
-                await new Promise(r => setTimeout(r, 300));
-                Swal.close();
+                const elapsed = Date.now() - startTime;
+                if (elapsed < 300) await new Promise(r => setTimeout(r, 300 - elapsed));
+                if (typeof Swal != 'undefined') Swal.close();
 
                 if (data.success) {
                     if (importMessage) {
@@ -646,7 +632,7 @@
         // closeViewModal?.addEventListener("click", () => closeModal(viewBookModal));
         // closeViewModalBtn?.addEventListener("click", () => closeModal(viewBookModal));
         // viewBookModal?.addEventListener("click", e => {
-        //     if (e.target === viewBookModal) closeModal(viewBookModal);
+        //   if (e.target === viewBookModal) closeModal(viewBookModal);
         // });
 
         input?.addEventListener('change', (e) => {
@@ -763,11 +749,21 @@
             if (isLoading) return;
             isLoading = true;
             currentPage = page;
-            bookTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="7" class="text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-2xl"></i> Loading books...</td></tr>`;
+
+            const startTime = Date.now();
+            
+            // Clear old content
+            if (bookTableBody) bookTableBody.innerHTML = "";
             paginationControls.classList.add('hidden');
             resultsIndicator.textContent = 'Loading...';
-            const offset = (page - 1) * limit;
+
+            // 🟠 SHOW SWEETALERT LOADING MODAL (Initial Load)
+            if (typeof Swal != 'undefined') {
+                showLoadingModal("Loading Book Catalog...", "Retrieving library records.");
+            }
             
+            const offset = (page - 1) * limit;
+
             try {
                 const params = new URLSearchParams({
                     search: currentSearch,
@@ -777,9 +773,16 @@
                     offset: offset
                 });
 
-                const res = await fetch(`api/librarian/booksmanagement/fetch?${params.toString()}`);
+                const res = await fetch(`api/admin/bookManagement/fetch?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
+
+                // CLOSE LOADING with minimum delay
+                const elapsed = Date.now() - startTime;
+                const minDelay = 2000; // Minimum delay set to 2 seconds
+                if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+                if (typeof Swal != 'undefined') Swal.close();
+
 
                 if (data.success && Array.isArray(data.books)) {
                     totalBooks = data.totalCount;
@@ -803,6 +806,7 @@
                 bookTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="7" class="text-center text-red-500 py-10">Error loading books: ${err.message}</td></tr>`;
                 updateBookCounts(0, 0, 1, limit);
                 showErrorToast("Data Load Failed", "Could not retrieve book list data.");
+                if (typeof Swal != 'undefined') Swal.close();
                 try {
                     sessionStorage.removeItem('bookManagementPage');
                 } catch (e) {}
@@ -971,9 +975,10 @@
             }
             
             showLoadingModal("Adding Book...", "Saving new record to catalog.");
+            const startTime = Date.now();
 
             try {
-                const res = await fetch(`api/librarian/booksmanagement/store`, {
+                const res = await fetch(`api/admin/bookManagement/store`, {
                     method: "POST",
                     body: formData
                 });
@@ -1007,9 +1012,10 @@
             currentEditingBookId = bookId;
             
             showLoadingModal("Loading Book Data...", "Preparing form for editing.");
+            const startTime = Date.now();
             
             try {
-                const res = await fetch(`api/librarian/booksmanagement/get/${bookId}`);
+                const res = await fetch(`api/admin/bookManagement/get/${bookId}`);
                 if (!res.ok) throw new Error("Failed to fetch book details.");
                 const data = await res.json();
                 
@@ -1061,9 +1067,10 @@
             }
             
             showLoadingModal("Saving Changes...", "Updating book record.");
+            const startTime = Date.now();
 
             try {
-                const res = await fetch(`api/librarian/booksmanagement/update/${currentEditingBookId}`, {
+                const res = await fetch(`api/admin/bookManagement/update/${currentEditingBookId}`, {
                     method: "POST",
                     body: formData
                 });
@@ -1098,9 +1105,10 @@
             if (!isConfirmed) return;
             
             showLoadingModal("Deleting Book...", "Removing book record from the system.");
+            const startTime = Date.now();
 
             try {
-                const res = await fetch(`api/librarian/booksmanagement/delete/${bookId}`, {
+                const res = await fetch(`api/admin/bookManagement/delete/${bookId}`, {
                     method: "POST"
                 });
                 const result = await res.json();

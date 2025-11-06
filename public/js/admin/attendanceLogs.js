@@ -1,3 +1,90 @@
+// --- SweetAlert Helper Functions (Para ma-maintain ang design consistency) ---
+
+function showSuccessToast(title, body = "") {
+    if (typeof Swal == "undefined") return alert(title);
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 3000,
+        width: "360px",
+        background: "transparent",
+        html: `<div class="flex flex-col text-left"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600"><i class="ph ph-check-circle text-lg"></i></div><div><h3 class="text-[15px] font-semibold text-green-600">${title}</h3><p class="text-[13px] text-gray-700 mt-0.5">${body}</p></div></div></div>`,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
+        },
+    });
+}
+
+function showErrorToast(title, body = "An error occurred during processing.") {
+    if (typeof Swal == "undefined") return alert(title);
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 4000,
+        width: "360px",
+        background: "transparent",
+        html: `<div class="flex flex-col text-left"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600"><i class="ph ph-x-circle text-lg"></i></div><div><h3 class="text-[15px] font-semibold text-red-600">${title}</h3><p class="text-[13px] text-gray-700 mt-0.5">${body}</p></div></div></div>`,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+        },
+    });
+}
+
+// 🟠 LOADING MODAL (ORANGE THEME)
+function showLoadingModal(message = "Processing request...", subMessage = "Please wait.") {
+    if (typeof Swal == "undefined") return;
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            // ORANGE THEME DESIGN
+            popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+        },
+    });
+}
+
+// 🟠 CONFIRMATION MODAL (ORANGE THEME)
+async function showConfirmationModal(title, text, confirmText = "Confirm", icon = "ph-warning-circle") {
+    if (typeof Swal == "undefined") return confirm(title);
+    const result = await Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col text-center">
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                        <i class="ph ${icon} text-2xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-[17px] font-semibold text-orange-700">${title}</h3>
+                <p class="text-[14px] text-gray-700 mt-1">${text}</p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: confirmText,
+        cancelButtonText: "Cancel",
+        customClass: {
+            popup:
+                "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+            confirmButton:
+                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+            cancelButton:
+                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+        },
+    });
+    return result.isConfirmed;
+}
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 function initializeAttendanceLogs() {
     // --- DOM ELEMENTS ---
     const buttons = document.querySelectorAll('.period-btn');
@@ -171,8 +258,21 @@ function initializeAttendanceLogs() {
         }
     }
 
-    // --- DATA FETCHING ---
-    function fetchLogs() {
+    // --- DATA FETCHING (GINAWANG ASYNC) ---
+    async function fetchLogs() {
+        // 1. Start timer for minimum delay
+        const startTime = Date.now(); 
+        
+        // 2. 🟠 SHOW LOADING MODAL 
+        if (typeof showLoadingModal !== 'undefined') {
+            showLoadingModal("Loading Attendance Logs...", "Fetching and processing visitor data.");
+        }
+        
+        // 3. Clear table while loading
+        tableBody.innerHTML = '';
+        noRecordsRow.classList.add('hidden');
+        paginationContainer.classList.add('hidden');
+
         const todayStr = formatDate(getPhDate());
         const yesterdayStr = formatDate(new Date(getPhDate().setDate(getPhDate().getDate() - 1)));
 
@@ -192,28 +292,46 @@ function initializeAttendanceLogs() {
             url += `&course=${currentCourse}`;
         }
 
-        fetch(url)
-            .then(res => {
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                return res.json();
-            })
-            .then(data => {
-                let filteredData = data;
-                if (dateToFilter) {
-                    filteredData = data.filter(log => log.date === dateToFilter);
-                }
-                currentGroupedLogs = groupLogs(filteredData);
-                currentPage = 1;
-                renderTable();
-                renderPagination();
-            })
-            .catch(err => {
-                console.error("Failed to fetch logs:", err);
-                currentGroupedLogs = [];
-                renderTable();
-                renderPagination();
-                noRecordsRow.querySelector('td').textContent = 'Error loading data. Please try again.';
-            });
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const data = await res.json();
+            
+            // 4. Implement Minimum Delay
+            const elapsed = Date.now() - startTime;
+            const minDelay = 500; // 500ms minimum loading time
+            if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+            
+            // 5. Close Loading Modal (SUCCESS)
+            if (typeof Swal !== 'undefined') Swal.close();
+            
+            let filteredData = data;
+            if (dateToFilter) {
+                filteredData = data.filter(log => log.date === dateToFilter);
+            }
+            currentGroupedLogs = groupLogs(filteredData);
+            currentPage = 1;
+            renderTable();
+            renderPagination();
+            
+        } catch (err) {
+            console.error("Failed to fetch logs:", err);
+            
+            // 6. Close Loading Modal and show error (ERROR)
+            if (typeof Swal !== 'undefined') {
+                Swal.close();
+                // Optional: Show error toast if available
+                if (typeof showErrorToast !== 'undefined') showErrorToast("Data Load Failed", "Could not fetch attendance data.");
+            }
+            
+            currentGroupedLogs = [];
+            renderTable();
+            renderPagination();
+            // Show permanent error message in the table
+            noRecordsRow.querySelector('td').textContent = 'Error loading data. Please try again.';
+            noRecordsRow.classList.remove('hidden'); 
+            tableBody.innerHTML = ''; 
+        }
     }
 
     // --- EVENT LISTENERS ---

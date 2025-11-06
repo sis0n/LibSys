@@ -531,9 +531,9 @@ window.addEventListener("DOMContentLoaded", () => {
             
             
             // Wait for slight delay before closing loading modal
-            //timer to ensure at least 3 seconds
+            //timer to ensure at least 2 seconds
             const elapsed = Date.now() - start;
-            if (elapsed < 3000) await new Promise(r => setTimeout(r, 3000 - elapsed));
+            if (elapsed < 1000) await new Promise(r => setTimeout(r, 1000 - elapsed));
             Swal.close(); 
 
             let books;
@@ -562,7 +562,11 @@ window.addEventListener("DOMContentLoaded", () => {
             renderPagination(totalPages, currentPage);
             try {
                 sessionStorage.setItem('bookCatalogPage', currentPage);
-            } catch (e) { }
+            } catch (e) { 
+                console.error("Load Cart error:", e.message); 
+            cart = [];
+            updateCartBadge();
+            }
         } catch (err) {
             console.error("LoadBooks error:", err);
             Swal.close(); // Ensure loading closes on error

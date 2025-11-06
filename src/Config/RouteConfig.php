@@ -107,6 +107,8 @@ class RouteConfig
         $router->get('api/librarian/borrowingForm/getCollaterals', 'ManualBorrowingController@getCollaterals', ['borrowing form']);
         // PDF Report Generation Route
         $router->post('api/librarian/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
+        //report dashboard
+          $router->get('api/librarian/dashboard/getData', 'DashboardController@getData', ['reports']);
         
 
 
@@ -149,6 +151,8 @@ class RouteConfig
         $router->post('api/admin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['user management']);
         $router->get('api/admin/userManagement/getAllCourses', 'DataController@getAllCourses', ['user management']);
         $router->get('api/admin/userManagement/getColleges', 'DataController@getColleges', ['user management']);
+        //report dashboard
+         $router->get('api/admin/dashboard/getData', 'DashboardController@getData', ['reports']);
 
 
         // PDF Report Generation Route

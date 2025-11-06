@@ -328,31 +328,57 @@ class TicketController extends Controller
 
     $this->ticketRepo->expireOldPendingTransactions();
 
-    $pendingTransaction = $this->ticketRepo->getPendingTransactionByStudentId($studentId);
+    // ✅ Check Pending Transaction
+    $pending = $this->ticketRepo->getPendingTransactionByStudentId($studentId);
+    if ($pending) {
+      $student = $this->ticketRepo->getStudentDetailsById($studentId);
+      $books = $this->ticketRepo->getBooksByTransactionCode($pending['transaction_code']);
 
-    if ($pendingTransaction) {
       echo json_encode([
         'success' => true,
         'status' => 'pending',
-        'transaction_code' => $pendingTransaction['transaction_code'],
-        'generated_at' => $pendingTransaction['generated_at'],
-        'expires_at' => isset($pendingTransaction['expires_at']) ? $pendingTransaction['expires_at'] : null
+        'transaction_code' => $pending['transaction_code'],
+        'generated_at' => $pending['generated_at'],
+        'expires_at' => $pending['expires_at'] ?? null,
+        'student' => [
+          'student_number' => $student['student_number'] ?? 'N/A',
+          'name' => trim(($student['first_name'] ?? '') . ' ' . ($student['middle_name'][0] ?? '') . '. ' . ($student['last_name'] ?? '')),
+          'year_level' => $student['year_level'] ?? '',
+          'section' => $student['section'] ?? '',
+          'course' => $student['course'] ?? 'N/A'
+        ],
+        'books' => $books ?? []
       ]);
-    } else {
-      $borrowedTransaction = $this->ticketRepo->getBorrowedTransactionByStudentId($studentId);
-      if ($borrowedTransaction) {
-        echo json_encode([
-          'success' => true,
-          'status' => 'borrowed',
-          'transaction_code' => $borrowedTransaction['transaction_code'],
-          'due_date' => $borrowedTransaction['due_date']
-        ]);
-      } else {
-        echo json_encode([
-          'success' => true,
-          'status' => 'expired'
-        ]);
-      }
+      exit;
     }
+
+    // ✅ Check Borrowed Transaction
+    $borrowed = $this->ticketRepo->getBorrowedTransactionByStudentId($studentId);
+    if ($borrowed) {
+      $student = $this->ticketRepo->getStudentDetailsById($studentId);
+      $books = $this->ticketRepo->getBooksByTransactionCode($borrowed['transaction_code']);
+
+      echo json_encode([
+        'success' => true,
+        'status' => 'borrowed',
+        'transaction_code' => $borrowed['transaction_code'],
+        'due_date' => $borrowed['due_date'],
+        'student' => [
+          'student_number' => $student['student_number'] ?? 'N/A',
+          'name' => trim(($student['first_name'] ?? '') . ' ' . ($student['middle_name'][0] ?? '') . '. ' . ($student['last_name'] ?? '')),
+          'year_level' => $student['year_level'] ?? '',
+          'section' => $student['section'] ?? '',
+          'course' => $student['course'] ?? 'N/A'
+        ],
+        'books' => $books ?? []
+      ]);
+      exit;
+    }
+
+    // ❌ No Active Transaction
+    echo json_encode([
+      'success' => true,
+      'status' => 'expired'
+    ]);
   }
 }

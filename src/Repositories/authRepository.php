@@ -21,15 +21,9 @@ class AuthRepository
 
   public function attemptLogin(string $username, string $password): ?array
   {
-    if (session_status() === PHP_SESSION_NONE) {
-      session_start();
-    }
-
     $user = $this->userRepo->findByIdentifier($username);
 
     if ($user && isset($user['password']) && password_verify($password, $user['password'])) {
-      session_regenerate_id(true);
-
       $firstName = $user['first_name'] ?? '';
       $middleName = $user['middle_name'] ?? '';
       $lastName = $user['last_name'] ?? '';
@@ -53,28 +47,31 @@ class AuthRepository
         $modules = $this->userModuleRepo->getModulesByUserId($user['user_id']);
       }
 
-      $_SESSION['user_data'] = [
-        'user_id' => $user['user_id'],
-        'student_id' => $user['student_id'] ?? null,
-        'faculty_id' => $user['faculty_id'] ?? null,
-        'staff_id' => $user['staff_id'] ?? null,
+      $finalUsername = $user['username'] ?? $user['student_number'] ?? $username;
+      $finalFullname = !empty(trim($fullName)) ? $fullName : 'User';
 
-        'program_department' => $departmentOrCourse,
-
-        'username' => $user['username'] ?? $user['student_number'] ?? $username,
-        'role' => !empty($user['role']) ? strtolower(trim($user['role'])) : 'guest',
-        'fullname' => !empty(trim($fullName)) ? $fullName : ($_SESSION['username'] ?? 'User'),
-        'profile_picture' => $user['profile_picture'] ?? null,
-        'is_active' => $user['is_active'] ?? 0,
-        'modules' => $modules,
+      return [
+        'raw_user' => $user,
+        'session_payload' => [
+          'user_data' => [
+            'user_id' => $user['user_id'],
+            'student_id' => $user['student_id'] ?? null,
+            'faculty_id' => $user['faculty_id'] ?? null,
+            'staff_id' => $user['staff_id'] ?? null,
+            'program_department' => $departmentOrCourse,
+            'username' => $finalUsername,
+            'role' => $role,
+            'fullname' => $finalFullname,
+            'profile_picture' => $user['profile_picture'] ?? null,
+            'is_active' => $user['is_active'] ?? 0,
+            'modules' => $modules,
+          ],
+          'user_id' => $user['user_id'],
+          'username' => $finalUsername,
+          'role' => $role,
+          'user_permissions' => $modules
+        ]
       ];
-
-      $_SESSION['user_id'] = $user['user_id'];
-      $_SESSION['username'] = $_SESSION['user_data']['username'];
-      $_SESSION['role'] = $_SESSION['user_data']['role'];
-      $_SESSION['user_permissions'] = $modules;
-
-      return $user;
     }
     return null;
   }

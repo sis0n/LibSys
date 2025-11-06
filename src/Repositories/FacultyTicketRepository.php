@@ -22,6 +22,33 @@ class FacultyTicketRepository
     return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
   }
 
+  public function getFacultyFullInfo(int $facultyId): ?array
+{
+    $stmt = $this->db->prepare("
+        SELECT 
+            f.faculty_id,
+            f.unique_faculty_id,
+            f.college_id,
+            f.contact,
+            u.first_name,
+            u.last_name,
+            u.middle_name,
+            c.college_name
+        FROM faculty f
+        JOIN users u ON f.user_id = u.user_id
+        LEFT JOIN colleges c ON f.college_id = c.college_id
+        WHERE f.faculty_id = :fid
+        LIMIT 1
+    ");
+    $stmt->execute(['fid' => $facultyId]);
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $data ?: null;
+}
+
+
+
+
   public function getTransactionItems(int $transactionId): array
   {
     $stmt = $this->db->prepare("

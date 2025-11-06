@@ -209,7 +209,34 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <script>
+   <script>
+    // --- SweetAlert Helper Functions (Para sa Loading Modal) ---
+    // (Galing ito sa SweetAlert design na ginamit mo sa nakaraang query)
+    function showLoadingModal(message = "Processing request...", subMessage = "Please wait.") {
+        if (typeof Swal == "undefined") return;
+        Swal.fire({
+            background: "transparent",
+            html: `
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                    <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
+                </div>
+            `,
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            customClass: {
+                popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+            },
+        });
+    }
+
+    // Isama na rin natin ang isang dummy toast para hindi mag-error ang ibang SweetAlert calls (kahit hindi ginamit dito)
+    function showErrorToast(title, body = "Error occurred.") {
+        if (typeof Swal == "undefined") return alert(title);
+        Swal.fire({ toast: true, position: "bottom-end", showConfirmButton: false, timer: 3000, title: title, text: body, icon: 'error' });
+    }
+
+    // --- DOM Content Loaded ---
     document.addEventListener("DOMContentLoaded", () => {
         // --- DOM Elements ---
         const bookGrid = document.getElementById('bookGrid');
@@ -243,11 +270,14 @@ if (isset($_SESSION['user_id'])) {
         let isLoading = false;
         let searchDebounce;
 
-        // --- Data Fetching ---
-        async function loadBooks(page = 1) {
+        // --- Data Fetching (BINAGO PARA TANGGAPIN ANG isShowLoadingModal) ---
+        async function loadBooks(page = 1, isShowLoadingModal = true) {
             if (isLoading) return;
             isLoading = true;
             currentPage = page;
+
+            // --- 1. SET START TIME FOR DELAY CHECK ---
+            const startTime = Date.now();
 
             // --- Page Memory ---
             try {
@@ -256,11 +286,16 @@ if (isset($_SESSION['user_id'])) {
                 console.error("SessionStorage Error:", e);
             }
 
-            // Show loading state
+            // Show loading state sa page/table
             bookGrid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10"><i class="ph ph-spinner animate-spin text-3xl"></i><p class="mt-2">Loading Books...</p></div>`;
             paginationControls.classList.add('hidden');
             resultsIndicator.textContent = 'Loading...';
 
+            // --- 2. SHOW SWEETALERT LOADING MODAL (KUNG KAILANGAN) ---
+            if (isShowLoadingModal) {
+                showLoadingModal("Loading Books...", "Fetching the current book list.");
+            }
+            
             const offset = (page - 1) * limit;
             const params = new URLSearchParams({
                 search: currentSearch,
@@ -274,13 +309,22 @@ if (isset($_SESSION['user_id'])) {
                 const res = await fetch(`${BASE_URL_JS}/api/guest/fetchBooks?${params.toString()}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
+                
+                // --- 3. CLOSE LOADING MODAL (SUCCESS PATH) ---
+                if (isShowLoadingModal) { // Kung nagpakita ng modal, isara ito
+                    const elapsed = Date.now() - startTime;
+                    const minDelay = 500; // Minimum 500ms display
+                    if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+                    if (typeof Swal != "undefined") Swal.close();
+                }
 
                 if (data.books) {
                     totalBooks = data.totalCount;
                     totalPages = Math.ceil(totalBooks / limit) || 1;
                     
                     if (page > totalPages && totalPages > 0) {
-                        loadBooks(totalPages); // a little recursion if page is out of bounds
+                        // Tawagin ulit ang loadBooks, pero gamitin ang loading modal (true)
+                        loadBooks(totalPages, isShowLoadingModal); 
                         return;
                     }
 
@@ -291,15 +335,21 @@ if (isset($_SESSION['user_id'])) {
                     throw new Error(data.message || "Invalid data format from server.");
                 }
             } catch (err) {
+                // --- 4. CLOSE LOADING MODAL (ERROR PATH) ---
+                if (isShowLoadingModal && typeof Swal != "undefined") Swal.close(); 
+                
                 console.error("Fetch books error:", err);
                 bookGrid.innerHTML = `<div class="col-span-full text-center text-red-500 py-10"><i class="ph ph-warning-circle text-3xl"></i><p class="mt-2">Error loading books.</p></div>`;
                 updateResultsIndicator(0, 0, 1, limit);
+                // Optionally show error toast if you have the helper function defined
+                // showErrorToast("Loading Failed", "Could not retrieve book list. Check your connection.");
             } finally {
                 isLoading = false;
             }
         }
 
         // --- Rendering ---
+        // ... (Omitted renderBooks, createBookCard, renderPagination, updateResultsIndicator - Walang pagbabago dito)
         function renderBooks(books) {
             bookGrid.innerHTML = ""; // Clear loading/previous state
             if (!books || books.length === 0) {
@@ -382,13 +432,9 @@ if (isset($_SESSION['user_id'])) {
                 paginationList.appendChild(li);
             };
 
-            createPageLink("prev", `<i class="flex ph ph-caret-left text-lg"></i> Previous`, page - 1, page === 1);
-            // Responsive page window size
             const isMobile = window.innerWidth < 640; 
             let pagesToShow = new Set();
 
-            // Desktop: show first, last, current, ±2
-            // Mobile: show current ±1 only
             if (isMobile) {
               for (let i = -1; i <= 1; i++) {
                 const p = page + i;
@@ -406,7 +452,6 @@ if (isset($_SESSION['user_id'])) {
             const sortedPages = [...pagesToShow].sort((a, b) => a - b);
             let lastPage = 0;
             for (const p of sortedPages) {
-              // Hide ellipsis on mobile for simplicity
               if (!isMobile && p > lastPage + 1)
                 createPageLink("ellipsis", "…", "...", true);
               createPageLink("number", p, p, false, p === page);
@@ -425,7 +470,7 @@ if (isset($_SESSION['user_id'])) {
             }
         }
 
-        // --- Event Listeners ---
+        // --- Event Listeners (Gawin nating walang loading modal ang search at filter) ---
         searchInput.addEventListener("input", e => {
             currentSearch = e.target.value.trim();
             clearTimeout(searchDebounce);
@@ -433,7 +478,8 @@ if (isset($_SESSION['user_id'])) {
                 try {
                     sessionStorage.removeItem('guestLandingPage');
                 } catch (e) {}
-                loadBooks(1);
+                // Load nang walang loading modal
+                loadBooks(1, false); 
             }, 500);
         });
 
@@ -446,7 +492,8 @@ if (isset($_SESSION['user_id'])) {
             if (pageStr === '...') return;
             const pageNum = parseInt(pageStr, 10);
             if (!isNaN(pageNum) && pageNum !== currentPage) {
-                loadBooks(pageNum);
+                // Load nang walang loading modal
+                loadBooks(pageNum, false); 
                 window.scrollTo({ top: bookGrid.offsetTop - 80, behavior: 'smooth' });
             }
         });
@@ -512,7 +559,7 @@ if (isset($_SESSION['user_id'])) {
         modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
         document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
-        // --- Dropdown Logic ---
+        // --- Dropdown Logic (Gawin nating walang loading modal ang filter) ---
         window.selectStatus = (el, val) => {
             document.getElementById("statusDropdownValue").textContent = val;
             document.getElementById("statusDropdownMenu").classList.add("hidden");
@@ -522,7 +569,8 @@ if (isset($_SESSION['user_id'])) {
             try {
                 sessionStorage.removeItem('guestLandingPage');
             } catch (e) {}
-            loadBooks(1);
+            // Load nang walang loading modal
+            loadBooks(1, false); 
         };
 
         const statusBtn = document.getElementById("statusDropdownBtn");
@@ -534,6 +582,7 @@ if (isset($_SESSION['user_id'])) {
         document.addEventListener("click", () => statusMenu.classList.add("hidden"));
 
         // --- Initial Load ---
+        // Ito ang magpapakita ng loading modal (default parameter is true)
         loadBooks(currentPage);
     });
     </script>

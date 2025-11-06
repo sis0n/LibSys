@@ -65,6 +65,7 @@ window.addEventListener("DOMContentLoaded", () => {
             if (sortMenu) sortMenu.classList.add("hidden");
             statusMenu.classList.toggle("hidden");
         });
+        // Gamitin ang loadBooks (walang popup)
         window.selectStatus = function (el, value) {
             statusValue.textContent = value;
             statusValueFilter = value;
@@ -75,7 +76,7 @@ window.addEventListener("DOMContentLoaded", () => {
             try {
                 sessionStorage.removeItem('bookCatalogPage');
             } catch (e) { }
-            loadBooks(1);
+            loadBooks(1); // Gumagamit ng loadBooks na walang Swal.fire
         }
         const defaultStatus = statusMenu.querySelector(".status-item");
         if (defaultStatus) defaultStatus.classList.add("bg-[var(--color-orange-200)]", "font-semibold");
@@ -87,6 +88,7 @@ window.addEventListener("DOMContentLoaded", () => {
             if (statusMenu) statusMenu.classList.add("hidden");
             sortMenu.classList.toggle("hidden");
         });
+        // Gamitin ang loadBooks (walang popup)
         window.selectSort = function (el, value, text) {
             sortValue.textContent = text;
             sortValueFilter = value;
@@ -97,7 +99,7 @@ window.addEventListener("DOMContentLoaded", () => {
             try {
                 sessionStorage.removeItem('bookCatalogPage');
             } catch (e) { }
-            loadBooks(1);
+            loadBooks(1); // Gumagamit ng loadBooks na walang Swal.fire
         }
         const defaultSort = sortMenu.querySelector(".sort-item");
         if (defaultSort) defaultSort.classList.add("bg-[var(--color-orange-200)]", "font-semibold");
@@ -486,8 +488,11 @@ window.addEventListener("DOMContentLoaded", () => {
         const id = addToCartBtn.dataset.id;
         if (id) addToCart(id);
     });
-
-    async function loadBooks(page = 1) {
+    
+    // =========================================================================
+    // BAGONG FUNCTION PARA SA INITIAL/REFRESH LOAD (May Swal.fire)
+    // =========================================================================
+    async function loadBooksInitial(page = 1) {
         if (isLoading || typeof page !== 'number' || page < 1) return;
         isLoading = true;
         currentPage = page;
@@ -499,7 +504,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const start = Date.now();
         const offset = (page - 1) * limit;
 
-        // 🟠 Loading Animation - Naka-align sa ORANGE theme (Adjusted from the original blue/generic theme)
+        // 🟠 LOADING POPUP PARA SA INITIAL LOAD/REFRESH ONLY
         Swal.fire({
             background: "transparent",
             html: `
@@ -511,30 +516,26 @@ window.addEventListener("DOMContentLoaded", () => {
             allowOutsideClick: false,
             showConfirmButton: false,
             customClass: {
-                // Eto ang inayos para maging ORANGE theme
                 popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
             },
         });
         
         try {
             const params = new URLSearchParams({
-                limit,
-                offset,
-                search: searchValue
+                limit, offset, search: searchValue
             });
             if (statusValueFilter !== "All Status") params.set('status', statusValueFilter.toLowerCase());
-            if (sortValueFilter !== "default") params.set('sort', sortValueFilter); // Send sort
+            if (sortValueFilter !== "default") params.set('sort', sortValueFilter);
             const res = await fetch(`api/student/bookCatalog/fetch?${params.toString()}`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
-            //Loading timer
             
             
-            // Wait for slight delay before closing loading modal
-            //timer to ensure at least 2 seconds
+            // Tiyakin na may minimal delay bago isara ang popup
             const elapsed = Date.now() - start;
             if (elapsed < 1000) await new Promise(r => setTimeout(r, 1000 - elapsed));
             Swal.close(); 
+            
 
             let books;
             if (data?.books && Array.isArray(data.books) && typeof data.totalCount === 'number') {
@@ -563,12 +564,10 @@ window.addEventListener("DOMContentLoaded", () => {
             try {
                 sessionStorage.setItem('bookCatalogPage', currentPage);
             } catch (e) { 
-                console.error("Load Cart error:", e.message); 
-            cart = [];
-            updateCartBadge();
+                console.error("SessionStorage error:", e.message); 
             }
         } catch (err) {
-            console.error("LoadBooks error:", err);
+            console.error("LoadBooksInitial error:", err);
             Swal.close(); // Ensure loading closes on error
             skeletons.style.display = "none";
             noBooksFound.classList.remove("hidden");
@@ -608,6 +607,105 @@ window.addEventListener("DOMContentLoaded", () => {
             isLoading = false;
         }
     }
+    
+    // =========================================================================
+    // ORIGINAL loadBooks FUNCTION (Walang Swal.fire, gamit lang ang skeleton)
+    // =========================================================================
+    async function loadBooks(page = 1) {
+        if (isLoading || typeof page !== 'number' || page < 1) return;
+        isLoading = true;
+        currentPage = page;
+        grid.innerHTML = "";
+        noBooksFound.classList.add("hidden");
+        // Gumamit lang ng skeleton at indicator loading
+        skeletons.style.display = "grid"; 
+        paginationControls.style.display = "none";
+        resultsIndicator.textContent = 'Loading...';
+        const offset = (page - 1) * limit;
+
+        try {
+            const params = new URLSearchParams({
+                limit, offset, search: searchValue
+            });
+            if (statusValueFilter !== "All Status") params.set('status', statusValueFilter.toLowerCase());
+            if (sortValueFilter !== "default") params.set('sort', sortValueFilter);
+            const res = await fetch(`api/student/bookCatalog/fetch?${params.toString()}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            
+            let books;
+            if (data?.books && Array.isArray(data.books) && typeof data.totalCount === 'number') {
+                books = data.books;
+                totalCount = data.totalCount;
+            } else {
+                console.error("Bad response:", data);
+                books = [];
+                totalCount = 0;
+                noBooksFound.textContent = "Invalid data.";
+                noBooksFound.classList.remove("hidden");
+            }
+            totalPages = Math.ceil(totalCount / limit) || 1;
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+            skeletons.style.display = "none";
+            if (!books || books.length === 0) {
+                noBooksFound.classList.add("hidden");
+                updateResultsIndicator(0, totalCount);
+            } else {
+                noBooksFound.classList.add("hidden");
+                renderBooks(books);
+                updateResultsIndicator(books.length, totalCount);
+            }
+            renderPagination(totalPages, currentPage);
+            try {
+                sessionStorage.setItem('bookCatalogPage', currentPage);
+            } catch (e) { 
+                console.error("SessionStorage error:", e.message); 
+            }
+        } catch (err) {
+            console.error("LoadBooks error:", err);
+            // Walang Swal.close() dahil walang Swal.fire
+            skeletons.style.display = "none";
+            noBooksFound.classList.remove("hidden");
+            noBooksFound.textContent = "Error loading.";
+            resultsIndicator.textContent = 'Error!';
+            
+            // 🔴 Error Toast for LoadBooks failure (Hindi inalis dahil kailangan pa rin)
+            if (typeof Swal != 'undefined') {
+                 Swal.fire({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 4000,
+                    width: "360px",
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-left">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                    <i class="ph ph-x-circle text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-[15px] font-semibold text-red-600">Loading Failed</h3>
+                                    <p class="text-[13px] text-gray-700 mt-0.5">Could not retrieve book catalog data.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                    },
+                });
+            }
+            
+            try {
+                sessionStorage.removeItem('bookCatalogPage');
+            } catch (e) { }
+        } finally {
+            isLoading = false;
+        }
+    }
+    // =========================================================================
 
     function updateResultsIndicator(booksLength, currentTotal) {
         if (typeof currentTotal !== 'number') currentTotal = 0;
@@ -708,7 +806,8 @@ window.addEventListener("DOMContentLoaded", () => {
         const pageStr = target.dataset.page;
         if (pageStr === "...") return;
         const page = parseInt(pageStr, 10);
-        if (!isNaN(page) && page !== currentPage) loadBooks(page);
+        // Gumagamit ng loadBooks na walang Swal.fire
+        if (!isNaN(page) && page !== currentPage) loadBooks(page); 
     });
 
 
@@ -868,7 +967,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 try {
                     sessionStorage.removeItem('bookCatalogPage');
                 } catch (e) { }
-                loadBooks(1);
+                loadBooks(1); // Gumagamit ng loadBooks na walang Swal.fire
             }, 500);
         });
     } else {
@@ -877,6 +976,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
     loadAvailableCount();
     loadCart().then(() => {
-        loadBooks(currentPage);
+        // --- ITO LANG ANG GAGAMIT NG loadBooksInitial (May Swal.fire) ---
+        loadBooksInitial(currentPage); 
+        // ---------------------------------------------------------------
     });
 });

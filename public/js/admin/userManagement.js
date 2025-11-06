@@ -822,7 +822,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     // 2. Show Success Toast (UPDATED TO USE SWEETALERT)
                     showSuccessToast("User Added Successfully!", `${first_name} ${last_name} has been added.`);
                     closeAddUserModal();
-                    await loadUsers(1);
+                    
                 } else {
                     // 3. Show Error Toast (UPDATED TO USE SWEETALERT)
                     showErrorToast("Adding User Failed", data.message || "An unexpected error occurred.");
@@ -998,7 +998,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
                     if (data.success) {
                         showSuccessToast("Permission Granted", data.message || "User can now edit their profile.");
-                        await loadUsers(currentPage);
+                        
                     } else {
                         showErrorToast("Permission Failed", data.message || "Failed to allow edit for the user.");
                     }
@@ -1063,7 +1063,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 if (data.success) {
                     showSuccessToast("User Updated!", "User information saved successfully.");
                     closeEditUserModal();
-                    await loadUsers(currentPage);
+                   
                 } else {
                     showErrorToast("Update Failed", data.message || "Failed to update user information.");
                 }

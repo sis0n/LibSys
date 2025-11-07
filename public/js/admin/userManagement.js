@@ -59,9 +59,9 @@ window.addEventListener("DOMContentLoaded", () => {
         if (typeof Swal == "undefined") return confirm(title);
         const result = await Swal.fire({
             background: "transparent",
-            buttonsStyling: false,
-            width: '450px',
-
+            buttonsStyling: false, 
+            width: '450px', 
+            
             html: `
                 <div class="flex flex-col text-center">
                     <div class="flex justify-center mb-3">
@@ -76,18 +76,18 @@ window.addEventListener("DOMContentLoaded", () => {
             showCancelButton: true,
             confirmButtonText: confirmText,
             cancelButtonText: "Cancel",
-
+            
             customClass: {
                 // FINAL FIX: Orange Border + White BG + Orange Shadow (Matching the theme)
                 popup:
                     "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
-
+                    
                 // Confirm Button (Orange, Large, Bold)
                 confirmButton:
-                    "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base",
+                    "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
                 // Cancel Button (Gray, Large, Bold)
                 cancelButton:
-                    "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base",
+                    "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
 
                 actions: "!mt-4"
             },
@@ -115,13 +115,13 @@ window.addEventListener("DOMContentLoaded", () => {
     const bulkImportForm = document.getElementById("bulkImportForm");
     const fileInput = document.getElementById("csvFile");
     const importMessage = document.getElementById("importMessage");
-
+    
     const modulesSection = document.getElementById("modulesSection");
     const addUserUserManagementModuleWrapper = document.getElementById("addUserUserManagementModuleWrapper");
-
+    
     // BAGONG DAGDAG: ID para sa Edit Modal
     const editUserUserManagementModuleWrapper = document.getElementById("editUserUserManagementModuleWrapper");
-
+    
     const userRoleValueEl = document.getElementById("userRoleDropdownValue");
 
     let allUsers = [];
@@ -277,30 +277,15 @@ window.addEventListener("DOMContentLoaded", () => {
     function toggleModules(container, role, userModules = []) {
         if (!container) return;
         const normalizedRole = (role || "").trim().toLowerCase();
-        // console.log("toggleModules:", normalizedRole, userModules); // For debugging
-
-        container.classList.add("hidden");
-        const userMgmtWrapper = container.querySelector('#addUserUserManagementModuleWrapper') || document.getElementById('addUserUserManagementModuleWrapper');
-        const restoreUserWrapper = container.querySelector('#addUserRestoreUserModuleWrapper') || document.getElementById('addUserRestoreUserModuleWrapper');
-
-        if (userMgmtWrapper) userMgmtWrapper.classList.add('hidden');
-        if (restoreUserWrapper) restoreUserWrapper.classList.add('hidden');
+        console.log("toggleModules:", normalizedRole, userModules);
 
         if (normalizedRole === "admin" || normalizedRole === "librarian") {
             container.classList.remove("hidden");
-
             container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                 cb.checked = userModules.some(m => m.toLowerCase().trim() === cb.value.toLowerCase().trim()) || false;
             });
-
-            if (normalizedRole === 'admin') {
-                if (userMgmtWrapper) userMgmtWrapper.classList.remove('hidden');
-                if (restoreUserWrapper) restoreUserWrapper.classList.remove('hidden');
-            } else if (normalizedRole === 'librarian') {
-                if (userMgmtWrapper) userMgmtWrapper.classList.remove('hidden');
-            }
         } else {
-            // Kung hindi admin/librarian, siguraduhing naka-uncheck lahat
+            container.classList.add("hidden");
             container.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
     }
@@ -313,7 +298,7 @@ window.addEventListener("DOMContentLoaded", () => {
         select.innerHTML = '<option value="">Loading Courses...</option>';
 
         try {
-            const res = await fetch('api/superadmin/userManagement/getAllCourses');
+            const res = await fetch('api/admin/userManagement/getAllCourses');
             const data = await res.json();
 
             select.innerHTML = '<option value="">Select Course/Program</option>';
@@ -344,7 +329,7 @@ window.addEventListener("DOMContentLoaded", () => {
         select.innerHTML = '<option value="">Loading Colleges...</option>';
 
         try {
-            const res = await fetch('api/superadmin/userManagement/getColleges');
+            const res = await fetch('api/admin/userManagement/getColleges');
             const data = await res.json();
 
             select.innerHTML = '<option value="">Select College/Department</option>';
@@ -397,15 +382,15 @@ window.addEventListener("DOMContentLoaded", () => {
         // For accurate module status on role change in the modal, we'd need more logic, 
         // but sticking to the current structure, we just toggle visibility based on the *new* role selected.
         const normalizedRole = (val || "").trim().toLowerCase();
-
+        
         if (editModulesContainer) {
             if (normalizedRole === 'admin' || normalizedRole === 'librarian') {
                 editModulesContainer.classList.remove("hidden");
-
+                
                 if (editUserUserManagementModuleWrapper) {
                     if (normalizedRole === 'admin') {
                         editUserUserManagementModuleWrapper.classList.remove('hidden');
-                    } else {
+                    } else { 
                         editUserUserManagementModuleWrapper.classList.add('hidden');
                     }
                 }
@@ -413,7 +398,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 editModulesContainer.classList.add("hidden");
             }
         }
-
+        
         // This is necessary to visually mark the selected option
         setActiveOption("editRoleDropdownMenu", el);
     };
@@ -437,7 +422,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     bulkImportForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-
+        
         if (!fileInput) return showErrorToast("Import Error", "No file input found for bulk import.");
         if (!fileInput.files.length) return showErrorToast("Import Error", "Please pick a CSV file for bulk import.");
 
@@ -447,12 +432,12 @@ window.addEventListener("DOMContentLoaded", () => {
         formData.append("csv_file", fileInput.files[0]);
 
         try {
-            const res = await fetch("api/superadmin/userManagement/bulkImport", {
+            const res = await fetch("api/admin/userManagement/bulkImport", {
                 method: "POST",
                 body: formData
             });
             const data = await res.json();
-
+            
             await new Promise(r => setTimeout(r, 1000)); // Minimum delay 1000ms
             Swal.close();
 
@@ -466,7 +451,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 fileInput.value = "";
                 closeModal(modal);
                 // I-load ang users pagkatapos mag-import, gumagamit ng loading modal
-                await loadUsers(1, true);
+                await loadUsers(1, true); 
             } else {
                 showErrorToast("Import Failed", data.message || "Failed to import CSV.");
             }
@@ -486,9 +471,9 @@ window.addEventListener("DOMContentLoaded", () => {
                 currentPage = 1;
                 try {
                     sessionStorage.removeItem('userManagementPage');
-                } catch (e) { }
+                } catch (e) {}
                 // Hindi gagamit ng loading modal para sa search
-                loadUsers(1, false);
+                loadUsers(1, false); 
             }, 500);
         });
     }
@@ -497,9 +482,9 @@ window.addEventListener("DOMContentLoaded", () => {
         currentPage = 1;
         try {
             sessionStorage.removeItem('userManagementPage');
-        } catch (e) { }
+        } catch (e) {}
         // Hindi gagamit ng loading modal para sa dropdown filters
-        loadUsers(1, false);
+        loadUsers(1, false); 
     }
 
     function closeAddUserModal() {
@@ -539,14 +524,14 @@ window.addEventListener("DOMContentLoaded", () => {
         document.getElementById('passwordFields')?.classList.add('hidden');
         document.getElementById('editPassword') && (document.getElementById('editPassword').value = '');
         document.getElementById('confirmPassword') && (document.getElementById('confirmPassword').value = '');
-
+        
         // BAGONG DAGDAG: Siguraduhin na nakatago rin ito pag-close
         if (editUserUserManagementModuleWrapper) {
             editUserUserManagementModuleWrapper.classList.add('hidden');
         }
         const editModulesContainer = document.getElementById("editPermissionsContainer");
         if (editModulesContainer) {
-            editModulesContainer.classList.add('hidden');
+             editModulesContainer.classList.add('hidden');
         }
     }
     [closeEditUserBtn, cancelEditUserBtn].forEach(btn => btn?.addEventListener("click", closeEditUserModal));
@@ -632,19 +617,19 @@ window.addEventListener("DOMContentLoaded", () => {
         if (isLoading) return;
         isLoading = true;
         currentPage = page;
-
+        
         // --- 1. SET START TIME FOR DELAY CHECK ---
         const startTime = Date.now();
-
+        
         document.getElementById("paginationControls")?.classList.add('hidden');
         // document.getElementById("resultsIndicator").textContent = 'Loading...';
-        if (userTableBody) userTableBody.innerHTML = "";
-
+        if (userTableBody) userTableBody.innerHTML = ""; 
+        
         // --- 2. SHOW SWEETALERT LOADING MODAL (KUNG KAILANGAN) ---
         if (isShowLoadingModal) {
             showLoadingModal("Loading User List...", "Fetching data for page " + page);
         }
-
+        
 
         const offset = (page - 1) * limit;
         const search = document.getElementById("userSearchInput").value.trim();
@@ -658,10 +643,10 @@ window.addEventListener("DOMContentLoaded", () => {
                 offset: offset
             });
 
-            const res = await fetch(`api/superadmin/userManagement/pagination?${params.toString()}`);
+            const res = await fetch(`api/admin/userManagement/pagination?${params.toString()}`);
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             const data = await res.json();
-
+            
             // --- 3. CLOSE LOADING MODAL (SUCCESS PATH) ---
             if (isShowLoadingModal) { // Kung nagpakita ng modal, isara ito
                 const elapsed = Date.now() - startTime;
@@ -676,7 +661,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 totalPages = Math.ceil(totalUsers / limit) || 1;
 
                 if (page > totalPages && totalPages > 0) {
-                    loadUsers(totalPages, isShowLoadingModal);
+                    loadUsers(totalPages, isShowLoadingModal); 
                     return;
                 }
 
@@ -708,15 +693,15 @@ window.addEventListener("DOMContentLoaded", () => {
         } catch (err) {
             // --- 4. CLOSE LOADING MODAL (ERROR PATH) ---
             if (isShowLoadingModal && typeof Swal != "undefined") Swal.close(); // Kung nagpakita ng modal, isara ito
-
+            
             console.error("Fetch users error:", err);
             if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
             updateUserCounts(0, 0, 1, limit);
             showErrorToast("Loading Failed", "Could not retrieve user list. Check your connection.");
-
+            
             try {
                 sessionStorage.removeItem('userManagementPage');
-            } catch (e) { }
+            } catch (e) {}
         } finally {
             isLoading = false;
         }
@@ -805,7 +790,7 @@ window.addEventListener("DOMContentLoaded", () => {
             const addStartTime = Date.now();
 
             try {
-                const res = await fetch("api/superadmin/userManagement/add", {
+                const res = await fetch("api/admin/userManagement/add", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -826,7 +811,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     })
                 });
                 const data = await res.json();
-
+                
                 // MABILIS NA PAGSARA
                 const elapsed = Date.now() - addStartTime;
                 const minModalDisplay = 500; // Minimum 500ms display time
@@ -838,6 +823,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     showSuccessToast("User Added Successfully!", `${first_name} ${last_name} has been added.`);
                     closeAddUserModal();
                     await loadUsers(currentPage);
+                    
                 } else {
                     // 3. Show Error Toast (UPDATED TO USE SWEETALERT)
                     showErrorToast("Adding User Failed", data.message || "An unexpected error occurred.");
@@ -880,11 +866,11 @@ window.addEventListener("DOMContentLoaded", () => {
                 if (editModulesContainer) {
                     if (userRole === 'admin' || userRole === 'librarian') {
                         editModulesContainer.classList.remove("hidden");
-
+                        
                         if (editUserUserManagementModuleWrapper) {
                             if (userRole === 'admin') {
                                 editUserUserManagementModuleWrapper.classList.remove('hidden');
-                            } else {
+                            } else { 
                                 editUserUserManagementModuleWrapper.classList.add('hidden');
                             }
                         }
@@ -908,7 +894,7 @@ window.addEventListener("DOMContentLoaded", () => {
             if (e.target.closest(".deleteUserBtn")) {
                 // Use the FINAL CUSTOMIZED confirmation modal
                 const isConfirmed = await showConfirmationModal(
-                    "Confirm Deletion",
+                    "Confirm Deletion", 
                     `Are you sure you want to delete user: ${user.name} (${user.role})? This action cannot be undone.`,
                     "Yes, Delete!"
                 );
@@ -919,21 +905,21 @@ window.addEventListener("DOMContentLoaded", () => {
                 const deleteStartTime = Date.now();
 
                 try {
-                    const res = await fetch(`api/superadmin/userManagement/delete/${user.user_id}`, {
+                    const res = await fetch(`api/admin/userManagement/delete/${user.user_id}`, {
                         method: "POST"
                     });
                     const data = await res.json();
-
+                    
                     // CLOSE LOADING (Minimal display: 500ms)
                     const elapsed = Date.now() - deleteStartTime;
                     const minModalDisplay = 500;
                     if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
-                    Swal.close();
+                    Swal.close(); 
 
                     if (data.success) {
                         showSuccessToast("User Deleted!", `User ${user.name} was successfully removed.`);
                         // REFRESH TABLE W/O LOADING MODAL
-                        await loadUsers(currentPage, false);
+                        await loadUsers(currentPage, false); 
                     } else {
                         showErrorToast("Deletion Failed", data.message || "Failed to delete the user.");
                     }
@@ -946,38 +932,38 @@ window.addEventListener("DOMContentLoaded", () => {
 
             // TOGGLE STATUS
             if (e.target.closest(".toggle-status-btn")) {
-                if (user.role.toLowerCase() === 'superadmin') return showErrorToast("Action Denied", "Superadmin status cannot be changed!");
+                if (user.role.toLowerCase() === 'admin') return showErrorToast("Action Denied", "Superadmin status cannot be changed!");
 
                 const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
-
+                
                 // Use the FINAL CUSTOMIZED confirmation modal
                 const isConfirmed = await showConfirmationModal(
-                    "Confirm Status Change",
+                    "Confirm Status Change", 
                     `Are you sure you want to change the status of ${user.name} to **${newStatus}**?`,
                     `Yes, ${newStatus}`
                 );
                 if (!isConfirmed) return;
 
                 // --- BAGONG LOGIC PARA SA MABILIS NA LOADING ---
-                showLoadingModal("Updating Status...", `Setting status to ${newStatus}.`);
+                showLoadingModal("Updating Status...", `Setting status to ${newStatus}.`); 
                 const statusStartTime = Date.now();
 
                 try {
-                    const res = await fetch(`api/superadmin/userManagement/toggleStatus/${user.user_id}`, {
+                    const res = await fetch(`api/admin/userManagement/toggleStatus/${user.user_id}`, {
                         method: "POST"
                     });
                     const data = await res.json();
-
+                    
                     // Isara agad ang loading modal (minimal delay lang para makita ang animation)
                     const elapsed = Date.now() - statusStartTime;
                     const minModalDisplay = 500; // 500ms minimum display time
                     if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
-                    Swal.close();
+                    Swal.close(); 
 
                     if (data.success) {
                         showSuccessToast("Status Updated", `${user.name} is now ${data.newStatus}.`);
                         // I-reload ang users nang walang loading modal para mas mabilis (false parameter)
-                        await loadUsers(currentPage, false);
+                        await loadUsers(currentPage, false); 
                     } else {
                         showErrorToast("Status Update Failed", data.message || "Failed to update user status.");
                     }
@@ -990,7 +976,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
             if (e.target.closest(".allow-edit-btn")) {
                 const userId = user.user_id;
-
+                
                 // Use the FINAL CUSTOMIZED confirmation modal
                 const isConfirmed = await showConfirmationModal(
                     "Allow Profile Edit?",
@@ -1002,18 +988,18 @@ window.addEventListener("DOMContentLoaded", () => {
                 showLoadingModal("Grangting Permission...", "Sending temporary edit token.");
 
                 try {
-                    const res = await fetch(`api/superadmin/userManagement/allowEdit/${userId}`, {
+                    const res = await fetch(`api/admin/userManagement/allowEdit/${userId}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" }
                     });
                     const data = await res.json();
-
+                    
                     await new Promise(r => setTimeout(r, 1000)); // Minimum delay 1000ms
                     Swal.close();
 
                     if (data.success) {
                         showSuccessToast("Permission Granted", data.message || "User can now edit their profile.");
-
+                        
                     } else {
                         showErrorToast("Permission Failed", data.message || "Failed to allow edit for the user.");
                     }
@@ -1063,22 +1049,22 @@ window.addEventListener("DOMContentLoaded", () => {
 
             showLoadingModal("Saving Changes...", `Updating user details for ${payload.first_name} ${payload.last_name}.`);
             const editStartTime = Date.now();
-
+            
             try {
-                const res = await fetch(`api/superadmin/userManagement/update/${currentEditingUserId}`, {
+                const res = await fetch(`api/admin/userManagement/update/${currentEditingUserId}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-
+                
                 await new Promise(r => setTimeout(r, 1000)); // Minimum delay 1000ms
                 Swal.close();
 
                 if (data.success) {
                     showSuccessToast("User Updated!", "User information saved successfully.");
                     closeEditUserModal();
-
+                   
                 } else {
                     showErrorToast("Update Failed", data.message || "Failed to update user information.");
                 }
@@ -1132,7 +1118,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 return `<span class="bg-emerald-600 text-white ${base}">${role}</span>`;
             case "staff":
                 return `<span class="bg-teal-600 text-white ${base}">${role}</span>`;
-            case "superadmin":
+            case "admin":
                 return `<span class="bg-purple-600 text-white ${base}">${role}</span>`;
             default:
                 return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;

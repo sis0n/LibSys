@@ -61,8 +61,6 @@ class AuthController extends Controller
             return;
         }
 
-        session_regenerate_id(true);
-
         $username = htmlspecialchars(trim($_POST['username'] ?? ''));
         $password = $_POST['password'] ?? '';
 
@@ -74,62 +72,64 @@ class AuthController extends Controller
             return;
         }
 
-        $user = $this->AuthRepository->attemptLogin($username, $password);
+        $loginResult = $this->AuthRepository->attemptLogin($username, $password);
 
-        if ($user && isset($user['is_active']) && !$user['is_active']) {
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Your account has been deactivated by the administrator.'
-            ]);
-            return;
-        }
-
-        if ($user) {
-            $redirect = '';
-            $userRole = strtolower($user['role'] ?? '');
-
-            $finalPath = '';
-
-            // 1. Admin/Librarian (based on permissions)
-            if (User::isAdmin($user) || User::isLibrarian($user)) {
-                $permissions = $_SESSION['user_permissions'] ?? [];
-                $finalPath = User::getFirstAccessibleModuleUrl($userRole, $permissions);
-
-                // 2. Scanner Isolation (Priority)
-            } elseif (User::isScanner($user)) {
-                $finalPath = BASE_URL . '/attendance'; // <<< DITO ANG TAMA
-
-                // 3. Superadmin, Student, Faculty, Staff (Default to Dashboard)
-            } elseif (User::isSuperadmin($user) || User::isStudent($user) || User::isFaculty($user) || User::isStaff($user)) {
-                $finalPath = BASE_URL . '/dashboard';
-            }
-
-            if (empty($finalPath)) {
-                echo json_encode(['status' => 'error', 'message' => 'Role not recognized or no accessible module.']);
-                return;
-            }
-
-            echo json_encode([
-                'status' => 'success',
-                'redirect' => $finalPath
-            ]);
-            return;
-        } else {
+        if (!$loginResult) {
             echo json_encode([
                 'status' => 'error',
                 'message' => 'Invalid username or password.'
             ]);
             return;
         }
+
+        $user = $loginResult['raw_user'];
+
+        if (isset($user['is_active']) && !$user['is_active']) {
+            echo json_encode([
+                'status' => 'error',
+                'error_type' => 'deactivated', // Idagdag ito para makilala
+                'message' => 'Your account has been deactivated by the administrator.' // Palitan sa mas pormal na mensahe
+            ]);
+            return;
+        }
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        session_regenerate_id(true);
+
+        foreach ($loginResult['session_payload'] as $key => $value) {
+            $_SESSION[$key] = $value;
+        }
+
+        $redirect = '';
+        $userRole = $_SESSION['role'] ?? '';
+        $finalPath = '';
+
+        if (User::isAdmin($user) || User::isLibrarian($user)) {
+            $permissions = $_SESSION['user_permissions'] ?? [];
+            $finalPath = User::getFirstAccessibleModuleUrl($userRole, $permissions);
+        } elseif (User::isScanner($user)) {
+            $finalPath = BASE_URL . '/attendance';
+        } elseif (User::isSuperadmin($user) || User::isStudent($user) || User::isFaculty($user) || User::isStaff($user)) {
+            $finalPath = BASE_URL . '/dashboard';
+        }
+
+        if (empty($finalPath)) {
+            echo json_encode(['status' => 'error', 'message' => 'Role not recognized or no accessible module.']);
+            return;
+        }
+
+        echo json_encode([
+            'status' => 'success',
+            'redirect' => $finalPath
+        ]);
     }
 
     public function logout()
     {
         session_start();
         $this->AuthRepository->logout();
-
-        // === [BINAGO DITO] ===
-        // Gumamit ng BASE_URL para sa tamang redirect path
         header("Location: " . BASE_URL . "/login");
     }
 
@@ -241,8 +241,5 @@ class AuthController extends Controller
             "title" => "Verify OTP",
             "csrf_token" => $_SESSION['csrf_token']
         ], false);
-        
     }
-
-    
 }

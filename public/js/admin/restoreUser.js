@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoadingState(); // Keep default table loading temporarily
 
         try {
-            const response = await fetch('api/superadmin/restoreUser/fetch');
+            const response = await fetch('api/admin/restoreUser/fetch');
             if (!response.ok) throw new Error("Failed to fetch data.");
             
             const data = await response.json();
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 restoreBtn.classList.add('opacity-50');
                 
                 try {
-                    const response = await fetch('api/superadmin/restoreUser/restore', {
+                    const response = await fetch('api/admin/restoreUser/restore', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 archiveBtn.classList.add('opacity-50');
                 
                 try {
-                    const response = await fetch(`api/superadmin/restoreUser/delete/${user.id}`, {
+                    const response = await fetch(`api/admin/restoreUser/delete/${user.id}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

@@ -121,20 +121,20 @@ class RestoreUserRepository
 
 
       if (isset($userData['role']) && strtolower($userData['role']) === 'student') {
-        $stmtGetStudent = $this->db->prepare("SELECT student_id, user_id, student_number, course, year_level, section, status, deleted_at FROM students WHERE user_id = :id AND deleted_at IS NOT NULL");
+        $stmtGetStudent = $this->db->prepare("SELECT student_id, user_id, student_number, course_id, year_level, section, status, deleted_at FROM students WHERE user_id = :id AND deleted_at IS NOT NULL");
         $stmtGetStudent->execute(['id' => $userId]);
         $studentData = $stmtGetStudent->fetch(PDO::FETCH_ASSOC);
 
         if ($studentData) {
           $stmtInsertDeletedStudent = $this->db->prepare(
-            "INSERT INTO deleted_students (student_id, user_id, student_number, course, year_level, section, status, deleted_at, deleted_by)
-                         VALUES (:student_id, :user_id, :student_number, :course, :year_level, :section, :status, :deleted_at, :deleted_by)"
+            "INSERT INTO deleted_students (student_id, user_id, student_number, course_id, year_level, section, status, deleted_at, deleted_by)
+                            VALUES (:student_id, :user_id, :student_number, :course_id, :year_level, :section, :status, :deleted_at, :deleted_by)"
           );
           $insertSuccessStudent = $stmtInsertDeletedStudent->execute([
             ':student_id' => $studentData['student_id'],
             ':user_id' => $studentData['user_id'],
             ':student_number' => $studentData['student_number'],
-            ':course' => $studentData['course'],
+            ':course_id' => $studentData['course_id'],
             ':year_level' => $studentData['year_level'],
             ':section' => $studentData['section'] ?? null,
             ':status' => $studentData['status'],

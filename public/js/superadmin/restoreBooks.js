@@ -1,3 +1,89 @@
+// --- SweetAlert Helper Functions (Global Declarations) ---
+
+function showSuccessToast(title, body = "") {
+    if (typeof Swal == "undefined") return alert(title);
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 3000,
+        width: "360px",
+        background: "transparent",
+        html: `<div class="flex flex-col text-left"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600"><i class="ph ph-check-circle text-lg"></i></div><div><h3 class="text-[15px] font-semibold text-green-600">${title}</h3><p class="text-[13px] text-gray-700 mt-0.5">${body}</p></div></div></div>`,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-green-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#f0fff5] shadow-[0_0_8px_#22c55e70]",
+        },
+    });
+}
+
+function showErrorToast(title, body = "An error occurred during processing.") {
+    if (typeof Swal == "undefined") return alert(title);
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 4000,
+        width: "360px",
+        background: "transparent",
+        html: `<div class="flex flex-col text-left"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600"><i class="ph ph-x-circle text-lg"></i></div><div><h3 class="text-[15px] font-semibold text-red-600">${title}</h3><p class="text-[13px] text-gray-700 mt-0.5">${body}</p></div></div></div>`,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+        },
+    });
+}
+
+// 🟠 LOADING MODAL (ORANGE THEME)
+function showLoadingModal(message = "Processing request...", subMessage = "Please wait.") {
+    if (typeof Swal == "undefined") return;
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+        },
+    });
+}
+
+// 🟠 CONFIRMATION MODAL (ORANGE THEME)
+async function showCustomConfirmationModal(title, text, confirmText = "Confirm", icon = "ph-warning-circle") {
+    if (typeof Swal == "undefined") return confirm(title);
+    const result = await Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col text-center">
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600">
+                        <i class="ph ${icon} text-2xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-[17px] font-semibold text-orange-700">${title}</h3>
+                <p class="text-[14px] text-gray-700 mt-1">${text}</p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: confirmText,
+        cancelButtonText: "Cancel",
+        customClass: {
+            popup:
+                "!rounded-xl !shadow-md !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] !border-2 !border-orange-400 shadow-[0_0_8px_#ffb34770]",
+            confirmButton:
+                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700",
+            cancelButton:
+                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300",
+        },
+    });
+    return result.isConfirmed;
+}
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const bookSearchInput = document.getElementById('bookSearchInput');
     const bookFilterDropdownBtn = document.getElementById('bookFilterDropdownBtn');
@@ -67,14 +153,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showLoadingState() {
-        deletedBooksTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-gray-500">Loading...</td></tr>';
+        // Updated to only clear the table and hide elements, SweetAlert2 handles the visual loading
+        deletedBooksTableBody.innerHTML = '';
         noDeletedBooksFound.classList.add('hidden');
         paginationContainer.classList.add('hidden');
     }
 
     function showErrorState(message) {
+        // Tiyakin na magsara ang SweetAlert2 bago mag-display ng error
+        if (typeof Swal != 'undefined') Swal.close();
+        showErrorToast('Load Failed', message);
+
         deletedBooksTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500">${message}</td></tr>`;
-        noDeletedBooksFound.classList.remove('hidden');
+        noDeletedBooksFound.classList.add('hidden');
         paginationContainer.classList.add('hidden');
         deletedBooksCount.textContent = 0;
     }
@@ -97,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPage = 1;
             try {
                 sessionStorage.removeItem('restoreBooksPage');
-            } catch (e) {}
+            } catch (e) { }
         }
 
         goToPage(isInitialLoad ? currentPage : 1);
@@ -152,10 +243,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchDeletedBooks() {
+        // 1. 🟠 START LOADING SWEETALERT MODAL
+        const startTime = Date.now();
+        if (typeof showLoadingModal !== 'undefined') {
+            showLoadingModal("Loading Deleted Books...", "Retrieving archive data.");
+        }
         showLoadingState();
+
         try {
             const response = await fetch('api/superadmin/restoreBooks/fetch');
+            if (!response.ok) throw new Error("Failed to fetch data.");
+
             const data = await response.json();
+
+            // 2. CLOSE LOADING with minimum delay
+            const elapsed = Date.now() - startTime;
+            const minDelay = 500;
+            if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+            if (typeof Swal != 'undefined') Swal.close();
+
 
             if (data.success && Array.isArray(data.books)) {
                 allDeletedBooks = data.books;
@@ -167,6 +273,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 filterAndSearchBooks(true);
             }
         } catch (error) {
+            // 3. CLOSE LOADING and SHOW ERROR
+            if (typeof Swal != 'undefined') Swal.close();
             console.error('Network error fetching deleted books:', error);
             showErrorState(`Network error. Please check the console for details.`);
             allDeletedBooks = [];
@@ -281,8 +389,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleRestore(bookId, title, buttonEl) {
-        if (!confirm(`Are you sure you want to restore "${title}"?`)) return;
+        // Confirmation Modal
+        const isConfirmed = await showCustomConfirmationModal(
+            "Confirm Restoration",
+            `Are you sure you want to restore "${title}"? This book will be available in the catalog again.`,
+            "Yes, Restore!"
+        );
+        if (!isConfirmed) return;
 
+        showLoadingModal("Restoring Book...", `Restoring "${title}" to the active catalog.`);
+        const startTime = Date.now();
         buttonEl.disabled = true;
         buttonEl.classList.add('opacity-50');
 
@@ -297,23 +413,40 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
 
+            const elapsed = Date.now() - startTime;
+            if (elapsed < 500) await new Promise(r => setTimeout(r, 500 - elapsed)); // Min 500ms for Restore
+            Swal.close(); // Close loading modal
+
             if (result.success) {
-                alert(result.message);
+                showSuccessToast('Success!', result.message || 'Book restored successfully!');
                 fetchDeletedBooks();
             } else {
-                alert(`Restore failed: ${result.message}`);
+                showErrorToast('Restoration Failed', `Restore failed: ${result.message}`);
             }
         } catch (error) {
-            alert('An error occurred during restoration.');
+            Swal.close();
+            console.error(error);
+            showErrorToast('Error', 'An error occurred during restoration.');
         } finally {
             buttonEl.disabled = false;
             buttonEl.classList.remove('opacity-50');
         }
     }
 
+    // =========================================================================
+    // MODIFIED: handleArchive - Inalis ang full loading, ginawang 500ms processing
+    // =========================================================================
     async function handleArchive(bookId, title, buttonEl) {
-        if (!confirm(`ARCHIVE "${title}"? This will copy the record to the deleted_books table for good.`)) return;
+        // Confirmation Modal
+        const isConfirmed = await showCustomConfirmationModal(
+            "Confirm Permanent Archive",
+            `ARCHIVE "${title}"? This will permanently delete the record from the trash list. This action cannot be undone.`,
+            "Yes, Permanently Archive"
+        );
+        if (!isConfirmed) return;
 
+        showLoadingModal("Deleting Record...", `Deleting "${title}" permanently. Please wait.`);
+        const startTime = Date.now();
         buttonEl.disabled = true;
         buttonEl.classList.add('opacity-50');
 
@@ -325,21 +458,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     'X-CSRF-TOKEN': csrfToken
                 }
             });
-            const result = await response.json();
+
+            // --- Safe JSON parsing ---
+            let result;
+            const text = await response.text();
+            try {
+                result = JSON.parse(text);
+            } catch (err) {
+                console.error('Invalid JSON response from archive:', text);
+                result = { success: false, message: 'Invalid server response' };
+            }
+
+            const elapsed = Date.now() - startTime;
+            if (elapsed < 500) await new Promise(r => setTimeout(r, 500 - elapsed));
+            Swal.close(); // Close loading modal
 
             if (result.success) {
-                alert(result.message);
+                showSuccessToast('Success', result.message || 'Book archived successfully.');
                 fetchDeletedBooks();
             } else {
-                alert(`Archive failed: ${result.message}`);
+                showErrorToast('Archive Failed', `Archive failed: ${result.message}`);
             }
+
         } catch (error) {
-            alert('An error occurred during archiving.');
+            Swal.close();
+            console.error(error);
+            showErrorToast('Error', 'An error occurred during archiving.');
         } finally {
             buttonEl.disabled = false;
             buttonEl.classList.remove('opacity-50');
         }
     }
+
+    // =========================================================================
 
     function openBookDetailsModal(book) {
         modalBookAccessionNumber.textContent = book.accession_number || 'N/A';

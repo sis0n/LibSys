@@ -23,6 +23,51 @@ class TicketRepository
     return $student['student_id'] ?? null;
   }
 
+  public function getStudentDetailsById($studentId)
+  {
+    $sql = "
+        SELECT 
+            u.first_name,
+            u.middle_name,
+            u.last_name,
+            s.student_number,
+            s.year_level,
+            s.section,
+            c.course_title AS course
+        FROM students AS s
+        INNER JOIN users AS u ON s.user_id = u.user_id
+        LEFT JOIN courses AS c ON s.course_id = c.course_id
+        WHERE s.student_id = ?
+    ";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$studentId]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public function getBooksByTransactionCode($transactionCode)
+  {
+    $sql = "
+        SELECT 
+            bti.item_id,
+            bti.status,
+            b.book_id,
+            b.title,
+            b.author,
+            b.accession_number,
+            b.call_number,
+            b.subject
+        FROM borrow_transaction_items AS bti
+        INNER JOIN borrow_transactions AS bt ON bt.transaction_id = bti.transaction_id
+        INNER JOIN books AS b ON b.book_id = bti.book_id
+        WHERE bt.transaction_code = ?
+    ";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$transactionCode]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
   public function checkProfileCompletion(int $studentId): array
   {
     $sql = "SELECT s.profile_updated, u.profile_picture, s.registration_form

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Repositories\ReturningRepository;
+use App\Services\MailService;
 
 class ReturningController extends Controller
 {
@@ -96,6 +97,43 @@ class ReturningController extends Controller
       ]);
     } else {
       $this->sendJson(['success' => false, 'message' => 'Failed to extend due date. Transaction not found, already returned, or a database error occurred.']);
+    }
+  }
+
+  public function sendOverdueEmail()
+  {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+      $this->sendJson(['success' => false, 'message' => 'Method not allowed.'], 405);
+      return;
+    }
+
+    // Get JSON body from JS fetch request
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    // Basic validation
+    if (empty($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+      $this->sendJson(['success' => false, 'message' => 'Invalid or missing email address.'], 400);
+      return;
+    }
+    if (empty($data['name']) || empty($data['book_title']) || empty($data['due_date'])) {
+      $this->sendJson(['success' => false, 'message' => 'Missing required details (name, book, due date).'], 400);
+      return;
+    }
+
+    // Send using MailService
+    $mailService = new MailService();
+    $sent = $mailService->sendOverdueNotice(
+      $data['email'],
+      $data['name'],
+      $data['book_title'],
+      $data['due_date']
+    );
+
+    if ($sent) {
+      $this->sendJson(['success' => true, 'message' => 'Email sent successfully.']);
+    } else {
+      // Check server logs for actual PHPMailer error if this happens
+      $this->sendJson(['success' => false, 'message' => 'Failed to send email due to server error.'], 500);
     }
   }
 }

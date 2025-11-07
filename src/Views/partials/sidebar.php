@@ -19,7 +19,7 @@ $hasPermission = function ($code) use ($normalizedPermissions, $isSuperAdmin) {
     return in_array(trim(strtolower($code)), $normalizedPermissions);
 };
 
-$baseUrl = BASE_URL; 
+$baseUrl = BASE_URL;
 ?>
 
 <aside id="sidebar" class="fixed lg:sticky lg:top-0 left-0 top-0 h-screen w-64 
@@ -38,9 +38,9 @@ $baseUrl = BASE_URL;
     <div class="flex-1 space-y-1 overflow-hidden hover:overflow-y-auto scroll-smooth ...">
 
         <nav class="flex-1 px-4 py-6 space-y-2">
-            
+
             <?php if ($role === 'student'): ?>
-                
+
                 <a href="<?= $baseUrl ?>/dashboard"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'dashboard') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-house text-2xl"></i>
@@ -52,7 +52,7 @@ $baseUrl = BASE_URL;
                     <i class="ph ph-book text-2xl"></i>
                     <span class="text-base">Book Catalog</span>
                 </a>
-                
+
                 <div class="sidebar-dropdown" data-pages='["myCart", "qrBorrowingTicket"]'>
                     <button
                         class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition <?= (in_array($currentPage, ["myCart", "qrBorrowingTicket"])) ? 'bg-orange-100 text-orange-900' : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -121,7 +121,7 @@ $baseUrl = BASE_URL;
 
 
             <?php elseif ($role === 'faculty'): ?>
-                
+
                 <a href="<?= $baseUrl ?>/dashboard"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'dashboard') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-house text-2xl"></i>
@@ -191,7 +191,7 @@ $baseUrl = BASE_URL;
                 </div>
 
             <?php elseif ($role === 'staff'): ?>
-                
+
                 <a href="<?= $baseUrl ?>/dashboard"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'dashboard') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-house text-2xl"></i>
@@ -374,13 +374,34 @@ $baseUrl = BASE_URL;
                     </div>
                 </div>
 
-                <a href="<?= $baseUrl ?>/changePassword"
-                    class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                    <i class="ph ph-key text-2xl"></i>
-                    <span class="text-base">Change Password</span>
-                </a>
+                <div class="sidebar-dropdown" data-pages='["myProfile", "changePassword"]'>
+                    <button class="sidebar-dropdown-toggle flex items-center justify-between w-full gap-x-3 px-3 py-2 rounded-lg transition <?= (in_array($currentPage, ["myProfile", "changePassword"])) ? 'bg-orange-100 text-orange-900' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <span class="flex items-center gap-x-3">
+                            <i class="ph ph-user-gear text-2xl"></i>
+                            <span class="text-base">Account Settings</span>
+                        </span>
+                        <i class="ph ph-caret-down text-xl dropdown-icon transition-transform"></i>
+                    </button>
+                    <div class="pl-5 pt-1 space-y-1 hidden">
+                        <a href="<?= BASE_URL ?>/myProfile" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'myProfile') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                            <i class="ph ph-user-circle text-xl"></i>
+                            <span class="text-base text-sm">Profile</span>
+                        </a>
+                        <a href="<?= BASE_URL ?>/changePassword" class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                            <i class="ph ph-key text-xl"></i>
+                            <span class="text-base text-sm">Change Password</span>
+                        </a>
+                    </div>
+                </div>
 
             <?php elseif ($role === 'admin' || $role === 'librarian'): ?>
+                <?php if ($hasPermission('user management')): ?>
+                    <a href="<?= $baseUrl ?>/userManagement"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'userManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-users text-xl"></i>
+                        <span class="text-base text-sm">User Management</span>
+                    </a>
+                <?php endif; ?>
 
                 <?php if ($hasPermission('book management')): ?>
                     <a href="<?= $baseUrl ?>/bookManagement"
@@ -397,7 +418,7 @@ $baseUrl = BASE_URL;
                         <span class="text-base">QR Scanner</span>
                     </a>
                 <?php endif; ?>
-                
+
                 <?php if ($hasPermission('returning')): ?>
                     <a href="<?= $baseUrl ?>/returning"
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'returning' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -421,7 +442,7 @@ $baseUrl = BASE_URL;
                         <span class="text-base">Attendance Logs</span>
                     </a>
                 <?php endif; ?>
-                
+
                 <?php if ($hasPermission('reports')): ?>
                     <a href="<?= $baseUrl ?>/topVisitor"
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'topVisitor' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
@@ -446,6 +467,14 @@ $baseUrl = BASE_URL;
                     </a>
                 <?php endif; ?>
                 
+                <?php if ($hasPermission('restore users')): ?>
+                    <a href="<?= $baseUrl ?>/restoreUser"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-user-gear text-xl"></i>
+                        <span class="text-base text-sm">Restore User</span>
+                    </a>
+                <?php endif; ?>
+
                 <a href="<?= $baseUrl ?>/changePassword"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
                     <i class="ph ph-key text-2xl"></i>
@@ -457,37 +486,37 @@ $baseUrl = BASE_URL;
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentPage = '<?= $currentPage ?>';
-        const dropdowns = document.querySelectorAll('.sidebar-dropdown');
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = '<?= $currentPage ?>';
+            const dropdowns = document.querySelectorAll('.sidebar-dropdown');
 
-        dropdowns.forEach(dropdown => {
-            const toggle = dropdown.querySelector('.sidebar-dropdown-toggle');
-            if (!toggle) return;
+            dropdowns.forEach(dropdown => {
+                const toggle = dropdown.querySelector('.sidebar-dropdown-toggle');
+                if (!toggle) return;
 
-            const menu = toggle.nextElementSibling;
-            if (!menu) return;
+                const menu = toggle.nextElementSibling;
+                if (!menu) return;
 
-            const isManagedRole = ['admin', 'librarian'].includes('<?= $role ?>');
+                const isManagedRole = ['admin', 'librarian'].includes('<?= $role ?>');
 
 
-            const icon = toggle.querySelector('.dropdown-icon');
-            const pages = JSON.parse(dropdown.dataset.pages || '[]');
+                const icon = toggle.querySelector('.dropdown-icon');
+                const pages = JSON.parse(dropdown.dataset.pages || '[]');
 
-            if (pages.includes(currentPage)) {
-                menu.style.display = 'block';
-                if (icon) icon.classList.add('rotate-180');
-                toggle.classList.add('text-orange-900', 'font-semibold');
-            }
+                if (pages.includes(currentPage)) {
+                    menu.style.display = 'block';
+                    if (icon) icon.classList.add('rotate-180');
+                    toggle.classList.add('text-orange-900', 'font-semibold');
+                }
 
-            toggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                const isVisible = menu.style.display === 'block';
-                menu.style.display = isVisible ? 'none' : 'block';
-                if (icon) icon.classList.toggle('rotate-180', !isVisible);
+                toggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const isVisible = menu.style.display === 'block';
+                    menu.style.display = isVisible ? 'none' : 'block';
+                    if (icon) icon.classList.toggle('rotate-180', !isVisible);
+                });
             });
         });
-    });
     </script>
 
 </aside>

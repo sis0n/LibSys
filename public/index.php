@@ -13,6 +13,8 @@ require ROOT_PATH . '/vendor/autoload.php';
 use Dotenv\Dotenv;
 use App\Config\RouteConfig;
 
+date_default_timezone_set('Asia/Manila');
+
 // [3] I-load ang .env
 $dotenv = Dotenv::createImmutable(ROOT_PATH);
 $dotenv->load();

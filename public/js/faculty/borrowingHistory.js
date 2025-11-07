@@ -19,7 +19,7 @@ try {
         if (!isNaN(parsedPage) && parsedPage > 0) {
             currentPage = parsedPage;
         } else {
-            sessionStorage.removeItem('facultyBorrowingHistoryPage');
+            sessionStorage.removeItem('facultytBorrowingHistoryPage');
         }
     }
 } catch (e) {
@@ -65,34 +65,29 @@ function renderPagination(totalPages, currentPage) {
     paginationContainer.innerHTML = '';
     return;
   }
-
   let paginationHTML = `
     <div class="flex items-center justify-center">
-      <ul class="flex items-center font-medium justify-center space-x-1 bg-white border border-gray-200 rounded-full px-2 py-1 shadow-sm max-w-[420px] overflow-x-auto scrollbar-hide">
+      <div class="flex items-center justify-center space-x-1 bg-white border border-gray-200 rounded-full px-2 py-1 shadow-sm 
+        max-w-[420px] overflow-x-auto scrollbar-hide">
+        
+        <button class="pagination-link flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 
+          ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" 
+          data-page="${currentPage - 1}">
+          <i class="ph ph-caret-left"></i> Previous
+        </button>
   `;
-
-  // Previous Button
-  paginationHTML += `
-    <li>
-      <a href="#" data-page="${currentPage - 1}"
-        class="pagination-link flex items-center gap-1 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 
-        ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}">
-        <i class="ph ph-caret-left"></i> Previous
-      </a>
-    </li>
-  `;
-
-  // Ellipsis logic
   const createPageButton = (page, active = false) => `
-    <li>
-      <a href="#" data-page="${page}"
-        class="pagination-link w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium transition 
-        ${active ? 'bg-orange-600 text-white shadow-sm' : 'text-gray-700 hover:bg-gray-100'}">
-        ${page}
-      </a>
-    </li>
+    <button data-page="${page}" 
+      class="pagination-link w-8 h-8 rounded-full text-sm font-medium transition ${
+        active 
+          ? 'bg-orange-600 text-white shadow-sm' 
+          : 'text-gray-700 hover:bg-gray-100'
+      }">
+      ${page}
+    </button>
   `;
 
+  // Logic for visible page numbers
   let startPage = Math.max(1, currentPage - 1);
   let endPage = Math.min(totalPages, currentPage + 1);
 
@@ -102,7 +97,7 @@ function renderPagination(totalPages, currentPage) {
   // Always show first page
   if (startPage > 1) {
     paginationHTML += createPageButton(1, currentPage === 1);
-    if (startPage > 2) paginationHTML += `<li><span class="px-2 text-gray-400">...</span></li>`;
+    if (startPage > 2) paginationHTML += `<span class="px-2 text-gray-400">...</span>`;
   }
 
   // Middle pages
@@ -112,23 +107,15 @@ function renderPagination(totalPages, currentPage) {
 
   // Always show last page
   if (endPage < totalPages) {
-    if (endPage < totalPages - 1) paginationHTML += `<li><span class="px-2 text-gray-400">...</span></li>`;
+    if (endPage < totalPages - 1) paginationHTML += `<span class="px-2 text-gray-400">...</span>`;
     paginationHTML += createPageButton(totalPages, currentPage === totalPages);
   }
 
   // Next Button
   paginationHTML += `
-    <li>
-      <a href="#" data-page="${currentPage + 1}"
-        class="pagination-link flex items-center gap-1 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 
-        ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
+      <button class="pagination-link flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}" data-page="${currentPage + 1}">
         Next <i class="ph ph-caret-right"></i>
-      </a>
-    </li>
-  `;
-
-  paginationHTML += `
-      </ul>
+      </button>
     </div>
   `;
 
@@ -137,44 +124,103 @@ function renderPagination(totalPages, currentPage) {
 
 
 // --- Data Fetching ---
+// --- Data Fetching ---
 async function fetchBorrowingData(page = 1) {
-  // --- Page Memory ---
-  try {
-      sessionStorage.setItem('facultyBorrowingHistoryPage', page);
-  } catch (e) {
-      console.error("SessionStorage Error:", e);
-  }
-
-  if (typeof BASE_URL_JS === 'undefined') {
-    recordsContainer.innerHTML = `<div class="text-center py-10 text-red-500">Configuration error.</div>`;
-    return;
-  }
-
-  recordsContainer.innerHTML = `<div class="text-center py-10 text-gray-500">Loading history...</div>`;
-  paginationContainer.innerHTML = '';
-
-  try {
-    const response = await fetch(`${BASE_URL_JS}/api/faculty/borrowing-history/pagination?page=${page}&limit=${limit}`);
-    if (!response.ok) throw new Error('Network response was not ok');
+    // 1. Minimum delay start time
+    const start = Date.now();
     
-    const data = await response.json();
-
-    if (data.success) {
-      renderBorrowingTable(data.borrowingHistory);
-      renderPagination(data.totalPages, data.currentPage);
-      // Update stats only on first page load for efficiency
-      if (page === 1) {
-        fetchStats();
-      }
-    } else {
-      recordsContainer.innerHTML = `<div class="text-center py-10 text-red-500">${data.message || 'Failed to load history.'}</div>`;
+    // --- Page Memory ---
+    try {
+        sessionStorage.setItem('facultyBorrowingHistoryPage', page);
+    } catch (e) {
+        console.error("SessionStorage Error:", e);
     }
-  } catch (error) {
-    recordsContainer.innerHTML = `<div class="text-center py-10 text-red-500">Network error. Please try again.</div>`;
-    console.error('Fetch error:', error);
-  }
-}
 
+    if (typeof BASE_URL_JS === 'undefined') {
+        recordsContainer.innerHTML = `<div class="text-center py-10 text-red-500">Configuration error.</div>`;
+        return;
+    }
+
+    // Tanggalin ang default text loading indicator at pagination bago mag-load
+    recordsContainer.innerHTML = ''; 
+    paginationContainer.innerHTML = '';
+    
+    // 2. 🟠 SweetAlert2 Loading Animation (Same design as before)
+    if (typeof Swal != 'undefined') {
+        Swal.fire({
+            background: "transparent",
+            html: `
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                    <p class="text-gray-700 text-[14px]">Loading borrowing history...<br><span class="text-sm text-gray-500">Please wait.</span></p>
+                </div>
+            `,
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            customClass: {
+                // Orange theme styling
+                popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+            },
+        });
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL_JS}/api/faculty/borrowing-history/pagination?page=${page}&limit=${limit}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+
+        // 3. Close Loading Modal with Minimum Delay
+        const elapsed = Date.now() - start;
+        const minDelay = 500; // Minimum 300ms loading time
+        if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
+        if (typeof Swal != 'undefined') Swal.close();
+
+
+        if (data.success) {
+            renderBorrowingTable(data.borrowingHistory);
+            renderPagination(data.totalPages, data.currentPage);
+            // Update stats only on first page load for efficiency
+            if (page === 1) {
+                fetchStats();
+            }
+        } else {
+            recordsContainer.innerHTML = `<div class="text-center py-10 text-red-500">${data.message || 'Failed to load history.'}</div>`;
+        }
+    } catch (error) {
+        // 4. Close Loading Modal and show Error Toast
+        if (typeof Swal != 'undefined') {
+            Swal.close();
+            Swal.fire({
+                toast: true,
+                position: "bottom-end",
+                showConfirmButton: false,
+                timer: 4000,
+                width: "360px",
+                background: "transparent",
+                html: `
+                    <div class="flex flex-col text-left">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+                                <i class="ph ph-x-circle text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-semibold text-red-600">Loading Failed</h3>
+                                <p class="text-[13px] text-gray-700 mt-0.5">Could not retrieve borrowing history data.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                customClass: {
+                    popup: "!rounded-xl !shadow-md !border-2 !border-red-400 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ff6b6b70]",
+                },
+            });
+        }
+        
+        recordsContainer.innerHTML = `<div class="text-center py-10 text-red-500">Network error. Please try again.</div>`;
+        console.error('Fetch error:', error);
+    }
+}
 async function fetchStats() {
     try {
         const response = await fetch(`${BASE_URL_JS}/api/faculty/borrowing-history/stats`);

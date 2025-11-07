@@ -1,3 +1,170 @@
+// --- SweetAlert Helper Functions ---
+
+const showProfileToast = (icon, title, text, theme, duration = 3000) => {
+    if (typeof Swal == "undefined") return alert(`${title}: ${text}`);
+
+    const themeMap = {
+        'warning': { color: 'text-orange-600', bg: 'bg-orange-100', border: '!border-orange-400', icon: 'ph-warning' },
+        'error': { color: 'text-red-600', bg: 'bg-red-100', border: '!border-red-400', icon: 'ph-x-circle' },
+        'success': { color: 'text-green-600', bg: 'bg-green-100', border: '!border-green-400', icon: 'ph-check-circle' },
+    };
+    const selectedTheme = themeMap[theme];
+
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: duration,
+        width: "360px",
+        background: "transparent",
+        html: `
+            <div class="flex flex-col text-left">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full ${selectedTheme.bg} ${selectedTheme.color}">
+                        <i class="ph ${selectedTheme.icon} text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-[15px] font-semibold ${selectedTheme.color}">${title}</h3>
+                        <p class="text-[13px] text-gray-700 mt-0.5">${text}</p>
+                    </div>
+                </div>
+            </div>
+        `,
+        customClass: {
+            popup: `!rounded-xl !shadow-md !border-2 !p-4 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] backdrop-blur-sm ${selectedTheme.border} shadow-[0_0_8px_#ffb34770]`,
+        },
+    });
+};
+
+const showLoadingModal = (message = "Processing request...", subMessage = "Please wait.") => {
+    if (typeof Swal == "undefined") return;
+    Swal.fire({
+        background: "transparent",
+        html: `
+            <div class="flex flex-col items-center justify-center gap-2">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 border-t-orange-600"></div>
+                <p class="text-gray-700 text-[14px]">${message}<br><span class="text-sm text-gray-500">${subMessage}</span></p>
+            </div>
+        `,
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        customClass: {
+            popup: "!rounded-xl !shadow-md !border-2 !border-orange-400 !p-6 !bg-gradient-to-b !from-[#fffdfb] !to-[#fff6ef] shadow-[0_0_8px_#ffb34770]",
+        },
+    });
+};
+
+const showFinalModal = (isSuccess, title, message) => {
+    if (typeof Swal == "undefined") return alert(`${title}: ${message}`);
+    
+    const duration = 3000;
+    let timerInterval;
+
+    const theme = isSuccess ? {
+        bg: 'bg-green-50',
+        border: 'border-green-300',
+        text: 'text-green-700',
+        iconBg: 'bg-green-100',
+        iconColor: 'text-green-600',
+        iconClass: 'ph-check-circle',
+        progressBarColor: 'bg-green-500',
+    } : {
+        bg: 'bg-red-50',
+        border: 'border-red-300',
+        text: 'text-red-700',
+        iconBg: 'bg-red-100',
+        iconColor: 'text-red-600',
+        iconClass: 'ph-x-circle',
+        progressBarColor: 'bg-red-500',
+    };
+
+    Swal.fire({
+        showConfirmButton: false, 
+        showCancelButton: false,
+        buttonsStyling: false,
+        
+        width: '450px', 
+        
+        backdrop: `rgba(0,0,0,0.3) backdrop-filter: blur(6px)`,
+        timer: duration, 
+        
+        didOpen: () => {
+            const progressBar = Swal.getHtmlContainer().querySelector("#progress-bar");
+            let width = 100;
+            timerInterval = setInterval(() => {
+                width -= 100 / (duration / 100); 
+                if (progressBar) {
+                    progressBar.style.width = width + "%";
+                }
+            }, 100);
+        },
+        willClose: () => {
+            clearInterval(timerInterval);
+        },
+
+        html: `
+            <div class="w-full ${theme.bg} border-2 ${theme.border} rounded-2xl p-8 shadow-xl text-center">
+                <div class="flex items-center justify-center w-16 h-16 rounded-full ${theme.iconBg} mx-auto mb-4">
+                    <i class="ph ${theme.iconClass} ${theme.iconColor} text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold ${theme.text}">${title}</h3>
+                <p class="text-base ${theme.text} mt-3 mb-4">
+                    ${message}
+                </p>
+                <div class="w-full bg-gray-200 h-2 rounded mt-4 overflow-hidden">
+                    <div id="progress-bar" class="${theme.progressBarColor} h-2 w-full transition-all duration-100 ease-linear"></div>
+                </div>
+            </div>
+        `,
+        customClass: {
+            popup: "!block !bg-transparent !shadow-none !p-0 !border-0 !w-auto !min-w-0 !max-w-none",
+        },
+    });
+};
+
+// --- CORE CONFIRMATION FUNCTION (Template from Screenshot) ---
+async function showConfirmationModal(title, text, confirmText = "Confirm") {
+    if (typeof Swal == "undefined") return confirm(title);
+    const result = await Swal.fire({
+        background: "transparent",
+        buttonsStyling: false, // Required for custom buttons
+        width: '450px', 
+        
+        html: `
+            <div class="flex flex-col text-center">
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-orange-600">
+                        <i class="ph ph-warning-circle text-3xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">${title}</h3>
+                <p class="text-[14px] text-gray-700 mt-1">${text}</p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: confirmText,
+        cancelButtonText: "Cancel",
+        
+        customClass: {
+            // Modal/Popup Design: White BG, Orange Border, Shadow (Matching the screenshot)
+            popup:
+                "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
+                
+            // Confirm Button (Orange, Large, Bold)
+            confirmButton:
+                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
+                
+            // Cancel Button (Gray, Large, Bold)
+            cancelButton:
+                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
+
+            actions: "!mt-4"
+        },
+    });
+    return result.isConfirmed;
+}
+// ----------------------------------------------------
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const uploadInput = document.getElementById('uploadProfile');
@@ -33,6 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_FILE_SIZE = 1 * 1024 * 1024;
     let originalProfileData = {};
     let isEditing = false;
+    
+    // ==========================================================
 
     async function loadCourseOptions(currentCourseId = null) {
         if (!courseSelect) return;
@@ -40,9 +209,15 @@ document.addEventListener('DOMContentLoaded', () => {
         courseSelect.innerHTML = '<option value="">Loading Courses...</option>';
         courseSelect.disabled = true;
 
+        // 🟠 START LOADING FOR COURSE OPTIONS
+        showLoadingModal("Loading course options...", "Fetching data."); 
+
         try {
             const res = await fetch('api/data/getAllCourses');
             const data = await res.json();
+
+            // 🟠 CLOSE LOADING (SUCCESS PATH)
+            if (typeof Swal != "undefined") Swal.close(); 
 
             courseSelect.innerHTML = '';
             const defaultOption = new Option('Select a Course', '');
@@ -61,19 +236,31 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isEditing) courseSelect.disabled = true;
 
         } catch (err) {
+            // 🟠 CLOSE LOADING (ERROR PATH)
+            if (typeof Swal != "undefined") Swal.close(); 
             console.error("Error fetching course options:", err);
             courseSelect.innerHTML = `<option value="${currentCourseId || ''}">Error loading courses</option>`;
             courseSelect.disabled = true;
+            showProfileToast('ph-x-circle', 'Error', 'Failed to load course list.', 'error', 3000);
         }
     }
 
     async function loadProfile() {
+        // 🟠 START LOADING FOR PROFILE
+        showLoadingModal("Loading profile data...", "Retrieving your latest information.");
+
         try {
             const res = await fetch('api/student/myprofile/get');
             if (!res.ok) {
                 const errData = await res.json().catch(() => null);
                 throw new Error(errData?.message || `Failed to fetch profile. Status: ${res.status}`);
             }
+            // Forced delay to ensure loading modal is visible
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds delay bago close
+Swal.close();
+
+            // 🟠 CLOSE LOADING (SUCCESS PATH)
+            if (typeof Swal != "undefined") Swal.close(); 
 
             const data = await res.json();
             if (data.success && data.profile) {
@@ -134,9 +321,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Could not parse profile data.');
             }
         } catch (err) {
+            // 🟠 CLOSE LOADING (ERROR PATH)
+            if (typeof Swal != "undefined") Swal.close(); 
             console.error("Load profile error:", err);
-            if (typeof Swal !== 'undefined') Swal.fire('Error', 'Could not load your profile. ' + err.message, 'error');
-            else alert('Could not load your profile. ' + err.message);
+            showProfileToast('ph-x-circle', 'Error', 'Could not load your profile. ' + err.message, 'error', 5000);
         }
     }
 
@@ -158,6 +346,8 @@ document.addEventListener('DOMContentLoaded', () => {
             regFormUpload.disabled = false;
             viewRegForm.classList.add('hidden');
         } else {
+            loadProfile();
+
             editableInputs.forEach(input => {
                 input.disabled = true;
                 input.classList.add('bg-gray-50', 'border-gray-200');
@@ -181,13 +371,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (originalProfileData.registration_form) {
                 viewRegForm.classList.remove('hidden');
             }
-
-            // loadProfile();
         }
     }
 
     editProfileBtn?.addEventListener('click', () => toggleEdit(true));
-    cancelProfileBtn?.addEventListener('click', () => toggleEdit(false));
+    
+    // --- 🟠 CANCEL CONFIRMATION (Using the screenshot design style) ---
+    cancelProfileBtn?.addEventListener('click', async () => {
+        const isConfirmed = await showConfirmationModal(
+            'Discard Changes?',
+            "Are you sure you want to cancel? All unsaved changes will be lost.",
+            'Yes, Discard!'
+        );
+
+        if (isConfirmed) {
+            toggleEdit(false);
+        }
+    });
 
     profileForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -204,47 +404,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (missingFields.length > 0) {
-            Swal.fire('Missing Info', `Please fill in all required fields. Middle Name and Suffix are optional. (Missing: ${missingFields.join(', ')})`, 'warning');
+            showProfileToast('ph-warning', 'Missing Info', `Please fill in all required fields. Middle Name and Suffix are optional. (Missing: ${missingFields.join(', ')})`, 'warning');
             return;
         }
 
         const contact = formData.get('contact');
         if (!/^\d{11}$/.test(contact)) {
-            Swal.fire('Invalid Contact', 'Contact number must be numeric and 11 digits.', 'warning');
+            showProfileToast('ph-warning', 'Invalid Contact', 'Contact number must be numeric and 11 digits.', 'warning');
             return;
         }
 
         const email = formData.get('email');
         if (!/^[^--Ÿ -퟿豈-﷏ﷰ-￯]+@[^--Ÿ -퟿豈-﷏ﷰ-￯]+\.[^--Ÿ -퟿豈-﷏ﷰ-￯]+$/.test(email)) {
-            Swal.fire('Invalid Email', 'Please enter a valid email address.', 'warning');
+            showProfileToast('ph-warning', 'Invalid Email', 'Please enter a valid email address.', 'warning');
             return;
         }
 
-        const profileImage = formData.get('profile_image');
         const hasProfilePic = profilePreview.src && !profilePreview.classList.contains('hidden');
-        if (!hasProfilePic && (!profileImage || profileImage.size === 0)) {
-            Swal.fire('Missing Profile Picture', 'Profile picture is required.', 'warning');
+        if (!hasProfilePic && !croppedBlob) {
+            showProfileToast('ph-warning', 'Missing Profile Picture', 'Profile picture is required.', 'warning');
             return;
         }
 
-        const regForm = formData.get('reg_form');
-        const hasRegForm = viewRegForm.href && !viewRegForm.classList.contains('hidden');
-        if (!hasRegForm && (!regForm || regForm.size === 0)) {
-            Swal.fire('Missing Registration Form', 'Registration form is required.', 'warning');
+        const hasRegForm = viewRegForm.href && !viewRegForm.classList.contains('hidden') && !viewRegForm.href.includes('blob:');
+        if (!hasRegForm && (regFormUpload.files.length === 0)) {
+            showProfileToast('ph-warning', 'Missing Registration Form', 'Registration form is required.', 'warning');
             return;
         }
+        
+        // --- 🟠 CONFIRM CHANGES MODAL (Using the screenshot design style) ---
+        const confirm = await showConfirmationModal(
+            'Confirm Changes',
+            "Are you sure? You can only do this once.",
+            'Yes, save it!'
+        );
 
-        const confirm = await Swal.fire({
-            title: 'Confirm Changes',
-            text: "Are you sure? You can only do this once.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, save it!'
-        });
-
-        if (!confirm.isConfirmed) return;
+        if (!confirm) return;
+        
+        showLoadingModal("Saving profile...", "Updating your details. This might take a moment.");
 
         if (croppedBlob) {
             formData.append('profile_image', croppedBlob, 'profile.png');
@@ -259,49 +456,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 body: formData
             });
+            
+            Swal.close(); 
+
             const result = await res.json();
+            const message = result.message || 'Unknown response.';
 
             if (result.success) {
-                await Swal.fire('Saved!', 'Your profile has been updated.', 'success');
-                originalProfileData.profile_updated = 1;
+                showFinalModal(true, 'Saved!', 'Your profile has been successfully updated.');
 
+                originalProfileData.profile_updated = 1;
                 const headerFullname = document.getElementById('headerFullname');
                 if (headerFullname) {
-                    const newFullName = [
-                        formData.get('first_name'),
-                        formData.get('middle_name'),
-                        formData.get('last_name'),
-                        formData.get('suffix')
-                    ].filter(Boolean).join(' ');
+                    const newFullName = [formData.get('first_name'), formData.get('middle_name'), formData.get('last_name'), formData.get('suffix')].filter(Boolean).join(' ');
                     headerFullname.textContent = newFullName;
-                }
-
-                const headerAvatarContainer = document.getElementById('headerAvatarContainer');
-                if (headerAvatarContainer && croppedBlob) {
-                    headerAvatarContainer.innerHTML = '';
-                    const newImg = document.createElement('img');
-                    newImg.id = 'headerProfilePic';
-                    newImg.src = URL.createObjectURL(croppedBlob);
-                    newImg.alt = 'Profile';
-                    newImg.className = 'w-9 h-9 rounded-full object-cover border border-orange-200';
-                    headerAvatarContainer.appendChild(newImg);
                 }
 
                 loadProfile();
                 toggleEdit(false);
             } else {
-                throw new Error(result.message || 'Failed to save profile.');
+                showFinalModal(false, 'Error', message);
             }
         } catch (err) {
+            Swal.close();
             console.error("Save profile error:", err);
-            Swal.fire('Error', 'Could not save profile. ' + err.message, 'error');
+            showFinalModal(false, 'Network Error', 'Could not save profile due to connection issue.');
         }
     });
 
     uploadInput?.addEventListener('change', (e) => {
         const file = e.target.files[0]; if (!file) return;
         if (file.size > MAX_FILE_SIZE) {
-            alert("Image size must be less than 1MB. Please choose a smaller file.");
+            showProfileToast('ph-warning', 'File Too Large', 'Image size must be less than 1MB. Please choose a smaller file.', 'warning', 5000);
             uploadInput.value = ""; return;
         }
         const reader = new FileReader();
@@ -309,6 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cropImage) cropImage.src = reader.result;
             openModal(cropModal);
             setTimeout(() => {
+                if (cropper) cropper.destroy();
                 cropper = new Cropper(cropImage, {
                     aspectRatio: 1, viewMode: 1, dragMode: 'move',
                     background: false, autoCropArea: 1, responsive: true, guides: true,
@@ -328,7 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadInput.value = "";
     });
 
-    saveCrop?.addEventListener('click', () => {
+    saveCrop?.addEventListener('click', async () => {
+        showLoadingModal("Processing Image...", "Cropping and uploading profile picture.");
+        
         const canvas = cropper.getCroppedCanvas({ width: 200, height: 200 });
         const circleCanvas = document.createElement('canvas');
         circleCanvas.width = 200; circleCanvas.height = 200;
@@ -341,8 +530,12 @@ document.addEventListener('DOMContentLoaded', () => {
         profilePreview.classList.remove('hidden');
         if (profileIcon) profileIcon.style.display = 'none';
 
-        circleCanvas.toBlob((blob) => {
+        circleCanvas.toBlob(async (blob) => {
             croppedBlob = blob;
+            
+            showProfileToast('ph-check-circle', 'Image Cropped', 'Picture is ready to be saved with the profile changes.', 'success', 3000);
+
+            Swal.close(); 
         }, 'image/png');
 
         closeModal(cropModal);
@@ -352,13 +545,14 @@ document.addEventListener('DOMContentLoaded', () => {
     regFormUpload?.addEventListener('change', (e) => {
         const file = e.target.files[0]; if (!file) return;
         if (file.type !== 'application/pdf') {
-            alert('Please upload a valid PDF file.');
+            showProfileToast('ph-warning', 'Invalid File Type', 'Please upload a valid PDF file.', 'warning', 5000);
             regFormUpload.value = ''; return;
         }
         const fileURL = URL.createObjectURL(file);
         viewRegForm.href = fileURL;
         viewRegForm.classList.remove('hidden');
         uploadBtn.classList.add('hidden');
+        showProfileToast('ph-check-circle', 'Form Ready', 'Registration form has been attached.', 'success', 3000);
     });
 
     function openModal(modal) { if (modal) { modal.classList.remove("hidden"); document.body.classList.add("overflow-hidden"); } }
@@ -366,7 +560,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     isEditing = false;
     loadProfile();
-
-    // loadCourseOptions(null);
 
 });

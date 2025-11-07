@@ -262,6 +262,7 @@
                         <?php
                         $modules = [
                             'book management',
+                            'user management',
                             'qr scanner',
                             'returning',
                             'borrowing form',
@@ -269,17 +270,13 @@
                             'reports',
                             'transaction history',
                             'restore books',
-                            'user management',
-                            'restore users'
                         ];
 
                         foreach ($modules as $module):
                             $isUserManagement = ($module === 'user management');
-                            $isRestoreUser = ($module === 'restore users');
                             $wrapperId = $isUserManagement ? 'id="addUserUserManagementModuleWrapper"' : '';
-                            $restoreId = $isRestoreUser ? 'id="addUserRestoreUserModuleWrapper"' : '';
                         ?>
-                            <div <?= $wrapperId ?> <?= $restoreId ?> class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                            <div <?= $wrapperId ?> class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                                 <label class="inline-flex items-center text-sm text-gray-700">
                                     <input type="checkbox" class="mr-2 accent-orange-500" name="modules[]"
                                         value="<?= $module ?>">
@@ -477,6 +474,7 @@
                     <?php
                     $modules = [
                         'book management',
+                        'user management',
                         'qr scanner',
                         'returning',
                         'borrowing form',
@@ -484,17 +482,13 @@
                         'reports',
                         'transaction history',
                         'restore books',
-                        'user management',
-                        'restore users'
                     ];
 
                     foreach ($modules as $module):
                         $isUserManagement = ($module === 'user management');
-                        $isRestoreUser = ($module === 'restore users');
                         $wrapperId = $isUserManagement ? 'id="editUserUserManagementModuleWrapper"' : '';
-                        $restoreId = $isRestoreUser ? 'id="editUserRestoreUserModuleWrapper"' : '';
                     ?>
-                        <div <?= $wrapperId ?> <?= $restoreId ?> class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
+                        <div <?= $wrapperId ?> class="border rounded-md p-3 bg-orange-50/50 border-orange-200">
                             <label class="inline-flex items-center text-sm text-gray-700">
                                 <input type="checkbox" class="mr-2 accent-orange-500" name="editModules[]"
                                     value="<?= $module ?>">
@@ -519,4 +513,4 @@
     </div>
 </div>
 
-<script src="<?= BASE_URL ?>/js/superadmin/userManagement.js" defer></script>
+<script src="<?= BASE_URL ?>/js/admin/userManagement.js" defer></script>

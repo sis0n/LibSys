@@ -155,7 +155,7 @@
                 Clear
             </button>
             <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium">
-                TADO !
+                Submit
             </button>
         </div>
     </form>

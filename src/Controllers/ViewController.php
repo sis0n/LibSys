@@ -49,6 +49,8 @@ class ViewController extends Controller
           'reports',
           'transaction history',
           'restore books',
+          'user management',
+          'restore users'
         ];
 
         foreach ($priority_privileges as $privilege) {
@@ -107,6 +109,8 @@ class ViewController extends Controller
       'borrowingHistory',
       'myAttendance',
       'dashboard',
+      'attendance'
+
     ];
 
     if (array_key_exists($action, $protectedModules)) {

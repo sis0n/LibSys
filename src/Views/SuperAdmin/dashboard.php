@@ -48,8 +48,8 @@ $fullName = $_SESSION['user_data']['fullname'] ?? $_SESSION['role'] ?? 'Admin';
     <?php
     $cards = [
       ['id' => 'totalUsers', 'title' => 'Total Users', 'icon' => 'ph-user', 'color' => 'orange', 'subtitle' => '+0 this month'],
-      ['id' => 'dailyVisitors', 'title' => 'Daily Visitors', 'icon' => 'ph-users-three', 'color' => 'yellow', 'subtitle' => 'Today'],
-      ['id' => 'activeBooks', 'title' => 'Available Books', 'icon' => 'ph-book', 'color' => 'green', 'subtitle' => '0% available'],
+      ['id' => 'dailyVisitors', 'title' => 'Daily Visitors', 'icon' => 'ph-users-three', 'color' => 'blue', 'subtitle' => 'Today'],
+      ['id' => 'activeBooks', 'title' => 'Available Books', 'icon' => 'ph-book', 'color' => 'orange', 'subtitle' => '0% available'],
       ['id' => 'borrowedBooks', 'title' => 'Borrowed Books', 'icon' => 'ph-books', 'color' => 'blue', 'subtitle' => '0% of total books'],
     ];
     foreach ($cards as $c):

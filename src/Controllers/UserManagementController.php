@@ -198,7 +198,9 @@ class UserManagementController extends Controller
             'attendance logs',
             'reports',
             'transaction history',
-            'restore books'
+            'restore books',
+            'user management',
+            'restore users'
           ];
           $modules = array_filter($data['modules'], fn($m) => in_array($m, $validModules));
 

@@ -1,15 +1,15 @@
 // --- CORE CONFIRMATION FUNCTION (FINAL TEMPLATE - INLINE STYLE) ---
 async function showCustomConfirmationModal(title, text, confirmText = "Confirm") {
     if (typeof Swal == "undefined") return confirm(title);
-    
+
     // Inline CSS Style para sa Orange Border, White BG, at Black Shadow
     const inlineStyle = "border: 2px solid #f97316 !important; background: white !important; box-shadow: 0 0 15px #00000030 !important;";
 
     const result = await Swal.fire({
         background: "transparent",
-        buttonsStyling: false, 
-        width: '450px', 
-        
+        buttonsStyling: false,
+        width: '450px',
+
         html: `
             <div class="flex flex-col text-center">
                 <div class="flex justify-center mb-3">
@@ -24,17 +24,17 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm")
         showCancelButton: true,
         confirmButtonText: confirmText,
         cancelButtonText: "Cancel",
-        
+
         customClass: {
             // Tanggalin ang border/shadow/bg classes, hayaan ang rounded corners at padding
             popup: "!rounded-xl !p-6",
-            
+
             // Confirm Button (Orange, Large, Bold)
             confirmButton:
-                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
+                "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base",
             // Cancel Button (Gray, Large, Bold)
             cancelButton:
-                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
+                "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base",
 
             actions: "!mt-4"
         },
@@ -53,12 +53,12 @@ async function showCustomConfirmationModal(title, text, confirmText = "Confirm")
 
 // Utility for showing small, auto-closing toasts (RED BORDER ONLY)
 const showLibrarianToast = (title, text, duration = 3000) => {
-    
+
     // HARDCODED RED BORDER THEME (FOR INVALID TICKET/ERROR)
-    const iconClass = 'ph-x-circle'; 
-    const contentColor = 'text-red-600'; 
-    const bgColor = 'bg-red-100'; 
-    
+    const iconClass = 'ph-x-circle';
+    const contentColor = 'text-red-600';
+    const bgColor = 'bg-red-100';
+
     // INLINE CSS STYLE PARA SA RED BORDER (ito ang sa Invalid Ticket)
     const inlineStyle = "border: 2px solid #dc2626 !important;"; // Red 600
 
@@ -68,15 +68,15 @@ const showLibrarianToast = (title, text, duration = 3000) => {
         showConfirmButton: false,
         timer: duration,
         width: "360px",
-        
-        background: "white", 
+
+        background: "white",
         backdrop: `transparent`,
-        
+
         customClass: {
             // Tanggalin ang border classes, hayaan ang rounded corners at padding
-            popup: `!rounded-xl !p-4 backdrop-blur-sm`, 
+            popup: `!rounded-xl !p-4 backdrop-blur-sm`,
         },
-        
+
         html: `
             <div class="flex flex-col text-left">
                 <div class="flex items-center gap-3 mb-2">
@@ -90,7 +90,7 @@ const showLibrarianToast = (title, text, duration = 3000) => {
                 </div>
             </div>
         `,
-        
+
         // Gagamitin ang didOpen hook para i-inject ang style pagkatapos ma-render ang toast.
         didOpen: (toast) => {
             // I-apply ang style sa popup element
@@ -132,7 +132,7 @@ const showProfileToast = (icon, title, text, theme, duration = 3000) => {
         timer: duration,
         width: "360px",
         background: "white", // Explicitly set to white
-        
+
         html: `
             <div class="flex flex-col text-left">
                 <div class="flex items-center gap-3 mb-2">
@@ -159,7 +159,7 @@ const showProfileToast = (icon, title, text, theme, duration = 3000) => {
 
 const showLoadingModal = (message = "Processing request...", subMessage = "Please wait.") => {
     if (typeof Swal == "undefined") return;
-    
+
     // INLINE STYLE para sa ORANGE BORDER at ORANGE SHADOW (para sa Loading)
     const inlineStyle = "border: 2px solid #f97316 !important; background: white !important; box-shadow: 0 0 8px #f9731670 !important;"; // Orange 500 border/shadow
 
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const accessionInput = document.getElementById('accession-input');
     const scanButton = document.getElementById('scan-button');
     const qrCodeValueInput = document.getElementById('qrCodeValue');
-    
+
     // --- Close Modal Functions (Needed for Auto-Close) ---
     const closeReturnModal = () => { if (returnModal) returnModal.classList.add('hidden'); };
     const closeAvailableModal = () => { if (availableBookModal) availableBookModal.classList.add('hidden'); };
@@ -239,23 +239,35 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         data.forEach(book => {
+            // Check kung may valid email
+            const hasEmail = book.email && book.email.trim() !== '' && book.email !== 'N/A';
+
+            // Kung may email, ipakita ang Contact button. Kung wala, "No Email" text lang.
+            const contactAction = hasEmail
+                ? `<button class="contact-btn inline-flex items-center px-3 py-1.5 border border-orange-500 text-orange-600 bg-white rounded-md shadow-sm text-sm font-medium hover:bg-orange-50 transition"
+                        data-email="${book.email}"
+                        data-name="${book.user_name}"
+                        data-book="${book.item_borrowed}"
+                        data-due="${book.due_date}">
+                        <i class="ph ph-envelope-simple text-base mr-1"></i> Email
+                   </button>`
+                : `<span class="text-gray-400 text-xs italic inline-flex items-center px-3 py-1.5"><i class="ph ph-prohibit mr-1"></i> No Email</span>`;
+
             const row = `
-        <tr class="align-middle">
-            <td class="px-6 py-4 align-middle">
-                <div class="font-semibold text-gray-800">${book.user_name}</div>
-                <div class="text-gray-500 text-xs">${book.user_id}</div>
-                <div class="text-gray-500 text-xs">${book.department_or_course}</div>
-            </td>
-            <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
-            <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
-            <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
-            <td class="px-6 py-4 align-middle text-gray-800">${book.contact}</td>
-            <td class="px-6 py-4 align-middle">
-                <a href="tel:${book.contact}" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
-                    <i class="ph ph-phone text-base mr-1"></i> Contact
-                </a>
-            </td>
-        </tr>`;
+                <tr class="align-middle">
+                    <td class="px-6 py-4 align-middle">
+                        <div class="font-semibold text-gray-800">${book.user_name}</div>
+                        <div class="text-gray-500 text-xs">${book.user_id}</div>
+                        <div class="text-gray-500 text-xs">${book.department_or_course}</div>
+                    </td>
+                    <td class="px-6 py-4 align-middle text-gray-800 max-w-[240px] whitespace-normal break-words">${book.item_borrowed}</td>
+                    <td class="px-6 py-4 align-middle text-gray-800">${book.date_borrowed}</td>
+                    <td class="px-6 py-4 align-middle text-gray-800">${book.due_date}</td>
+                    <td class="px-6 py-4 align-middle text-gray-800">${book.email}</td>
+                    <td class="px-6 py-4 align-middle">
+                       ${contactAction}
+                    </td>
+                </tr>`;
             overdueBooksTableBody.insertAdjacentHTML('beforeend', row);
         });
     }
@@ -269,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
         scanInProgress = true;
 
         showLoadingModal("Checking Book Status...", "Please wait while we verify the Accession Number.");
-        
+
         try {
             const formData = new FormData();
             formData.append('accession_number', accessionNumber);
@@ -297,13 +309,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Gagamitin ang showProfileToast na may ORANGE border (warning)
                 else showProfileToast('ph-warning', 'Not Found', 'No book found with that Accession Number.', 'warning');
             } else {
-                 // Gagamitin ang showProfileToast na may BLACK/GRAY border (error)
+                // Gagamitin ang showProfileToast na may BLACK/GRAY border (error)
                 showProfileToast('ph-x-circle', 'Error', result.message || 'An error occurred.', 'error');
             }
         } catch (error) {
             Swal.close();
             console.error('Error checking book:', error);
-             // Gagamitin ang showProfileToast na may BLACK/GRAY border (error)
+            // Gagamitin ang showProfileToast na may BLACK/GRAY border (error)
             showProfileToast('ph-x-circle', 'Error', error.message || 'Could not connect to the server.', 'error');
         }
 
@@ -400,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modalExtendButton.addEventListener('click', async () => {
             const borrowingId = modalExtendButton.dataset.borrowingId;
             if (!borrowingId) return;
-            
+
             // NEW CODE: Isara ang Return Modal bago magpakita ng confirmation
             closeReturnModal();
 
@@ -422,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     const formData = new FormData();
                     formData.append('borrowing_id', borrowingId);
-                    formData.append('days', days); 
+                    formData.append('days', days);
 
                     const response = await fetch('api/librarian/returning/extend', {
                         method: 'POST',
@@ -549,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modalReturnButton.addEventListener('click', async () => {
             const borrowingId = modalReturnButton.dataset.borrowingId;
             if (!borrowingId) return;
-            
+
             // NEW CODE: Isara ang Return Modal bago magpakita ng confirmation
             closeReturnModal();
             // Isara rin ang available modal kung sakaling bukas (just in case)
@@ -582,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (result.success) {
                     showProfileToast('ph-check-circle', 'Success', 'Book marked as returned successfully.', 'success');
                     // Kung may error sa confirmation, baka kailangan i-close ulit:
-                    closeReturnModal(); 
+                    closeReturnModal();
                     fetchTableData();
                 } else {
                     showProfileToast('ph-x-circle', 'Error', result.message || 'Could not mark as returned.', 'error');
@@ -602,7 +614,61 @@ document.addEventListener('DOMContentLoaded', function () {
     if (cancelButton) cancelButton.addEventListener('click', closeReturnModal);
     if (returnModal) returnModal.addEventListener('click', e => { if (e.target === returnModal) closeReturnModal(); });
     if (availableModalCloseButton) availableModalCloseButton.addEventListener('click', closeAvailableModal);
-    if (availableModalCloseAction) availableModalCloseAction.addEventListener('click', closeAvailableModal);
     if (availableBookModal) availableBookModal.addEventListener('click', e => { if (e.target === availableBookModal) closeAvailableModal(); });
+
+    // --- CONTACT BUTTON CLICK HANDLER ---
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.contact-btn');
+        if (!btn) return;
+
+        // Iwasan ang double-click habang nagse-send
+        if (btn.hasAttribute('disabled')) return;
+
+        // I-save ang original text para pwede ibalik pag nag-fail
+        const originalContent = btn.innerHTML;
+
+        // Change button state to "Sending..."
+        btn.setAttribute('disabled', 'true');
+        btn.innerHTML = `<i class="ph ph-spinner animate-spin mr-1"></i> Sending...`;
+        btn.classList.remove('text-orange-600', 'border-orange-500', 'hover:bg-orange-50');
+        btn.classList.add('text-gray-500', 'border-gray-300', 'bg-gray-50', 'cursor-not-allowed');
+
+        const payload = {
+            email: btn.dataset.email,
+            name: btn.dataset.name,
+            book_title: btn.dataset.book,
+            due_date: btn.dataset.due
+        };
+
+        try {
+            const response = await fetch('api/librarian/returning/sendOverdueEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                btn.innerHTML = `<i class="ph ph-check-circle mr-1"></i> Sent`;
+                btn.classList.remove('text-gray-500', 'border-gray-300', 'bg-gray-50');
+                btn.classList.add('text-green-600', 'border-green-500', 'bg-green-50');
+                showProfileToast('ph-check-circle', 'Email Sent', `Notice sent to ${payload.name}.`, 'success');
+            } else {
+                throw new Error(result.message || 'Failed to send email');
+            }
+        } catch (error) {
+            console.error('Email sending failed:', error);
+            btn.removeAttribute('disabled');
+            btn.innerHTML = originalContent;
+            btn.classList.remove('text-gray-500', 'border-gray-300', 'bg-gray-50', 'cursor-not-allowed');
+            btn.classList.add('text-orange-600', 'border-orange-500', 'hover:bg-orange-50');
+
+            showProfileToast('ph-x-circle', 'Sending Failed', 'Could not send email. Please check connection.', 'error');
+        }
+    });
 
 });

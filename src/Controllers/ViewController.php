@@ -16,12 +16,6 @@ class ViewController extends Controller
 
   public function handleDashboard()
   {
-    echo "<pre style='background: #f4f4f4; padding: 10px; border: 1px solid #ccc; z-index: 9999; position: relative;'>";
-    echo "Role: " . $_SESSION['role'] . "<br>";
-    echo "Permissions in Session:<br>";
-    print_r($_SESSION['user_permissions'] ?? 'NO PERMISSIONS FOUND');
-    echo "</pre>";
-    die();
     if (!isset($_SESSION['user_id'])) {
       header('Location: ' . BASE_URL . '/login');
       exit;

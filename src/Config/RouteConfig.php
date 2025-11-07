@@ -152,6 +152,9 @@ class RouteConfig
         $router->post('api/admin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['user management']);
         $router->get('api/admin/userManagement/getAllCourses', 'DataController@getAllCourses', ['user management']);
         $router->get('api/admin/userManagement/getColleges', 'DataController@getColleges', ['user management']);
+        $router->get('api/admin/restoreUser/fetch', 'RestoreUserController@getDeletedUsersJson', ['restore users']);
+        $router->post('api/admin/restoreUser/restore', 'RestoreUserController@restore', ['restore users']);
+        $router->post('api/admin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['restore users']);
         //report dashboard
          $router->get('api/admin/dashboard/getData', 'DashboardController@getData', ['reports']);
 
@@ -190,7 +193,7 @@ class RouteConfig
         $router->post('api/superadmin/restoreUser/delete/{id}', 'RestoreUserController@archive', ['superadmin']);
         $router->get('api/superadmin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['superadmin']);
         $router->post('api/superadmin/restoreBooks/restore', 'RestoreBookController@restore', ['superadmin']);
-        $router->post('api/superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['superadmin']);
+        $router->post('api/superadmin/restoreBooks/archive/{id}', 'RestoreBookController@archive', ['superadmin']);
         $router->get('api/superadmin/backup/export/zip/{table}', 'BackupController@exportBothFormats', ['superadmin']);
         $router->get('api/superadmin/backup/database/full', 'BackupController@initiateBackup', ['superadmin']);
         $router->get('api/superadmin/backup/secure_download/{filename}', 'BackupController@downloadBackup', ['superadmin']);

@@ -1,4 +1,3 @@
-// --- SweetAlert Helper Functions (Global Declarations) ---
 
 function showSuccessToast(title, body = "") {
     if (typeof Swal == "undefined") return alert(title);
@@ -157,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showLoadingState() {
         // Updated to only clear the table and hide elements, SweetAlert2 handles the visual loading
-        deletedBooksTableBody.innerHTML = ''; 
+        deletedBooksTableBody.innerHTML = '';
         noDeletedBooksFound.classList.add('hidden');
         paginationContainer.classList.add('hidden');
     }
@@ -166,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Tiyakin na magsara ang SweetAlert2 bago mag-display ng error
         if (typeof Swal != 'undefined') Swal.close();
         showErrorToast('Load Failed', message);
-        
+
         deletedBooksTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500">${message}</td></tr>`;
         noDeletedBooksFound.classList.add('hidden');
         paginationContainer.classList.add('hidden');
@@ -191,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPage = 1;
             try {
                 sessionStorage.removeItem('restoreBooksPage');
-            } catch (e) {}
+            } catch (e) { }
         }
 
         goToPage(isInitialLoad ? currentPage : 1);
@@ -250,16 +249,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const startTime = Date.now();
         const minDelay = 500; // 👈 500ms minimum delay added
         if (typeof showLoadingModal !== 'undefined') {
-             showLoadingModal("Loading Deleted Books...", "Retrieving archive data.");
+            showLoadingModal("Loading Deleted Books...", "Retrieving archive data.");
         }
-        showLoadingState(); 
+        showLoadingState();
 
         try {
             const response = await fetch('api/admin/restoreBooks/fetch');
             if (!response.ok) throw new Error("Failed to fetch data.");
-            
+
             const data = await response.json();
-            
+
             // 2. CLOSE LOADING with minimum delay
             const elapsed = Date.now() - startTime;
             if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
@@ -417,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ book_id: bookId })
             });
             const result = await response.json();
-            
+
             // 2. CLOSE LOADING with minimum delay (500ms)
             const elapsed = Date.now() - startTime;
             if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
@@ -425,11 +424,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (result.success) {
                 showSuccessToast('Success!', result.message || 'Book restored successfully!');
-                
+
                 // ✅ Manual update ng data at re-render
                 allDeletedBooks = allDeletedBooks.filter(book => book.id !== bookId);
-                filterAndSearchBooks(); 
-                
+                filterAndSearchBooks();
+
             } else {
                 showErrorToast('Restoration Failed', `Restore failed: ${result.message}`);
             }
@@ -579,6 +578,19 @@ document.addEventListener('DOMContentLoaded', () => {
             closeBookDetailsModal();
         }
     });
+    if (CURRENT_USER_ROLE === "admin" || CURRENT_USER_ROLE === "librarian") {
+        document.querySelectorAll(".archive-btn").forEach(btn => {
+            btn.addEventListener("click", e => {
+                e.preventDefault();
+                showProfileToast(
+                    "ph-warning",
+                    "Restricted Action",
+                    "Admins and librarians cannot permanently delete books.",
+                    "warning"
+                );
+            });
+        });
+    }
 
     fetchDeletedBooks();
 });

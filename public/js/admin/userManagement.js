@@ -822,6 +822,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     // 2. Show Success Toast (UPDATED TO USE SWEETALERT)
                     showSuccessToast("User Added Successfully!", `${first_name} ${last_name} has been added.`);
                     closeAddUserModal();
+                    await loadUsers(currentPage);
                     
                 } else {
                     // 3. Show Error Toast (UPDATED TO USE SWEETALERT)

@@ -17,8 +17,9 @@ class RestoreBookController extends Controller
   private function validateCsrf(): bool
   {
     $csrfToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
-    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $csrfToken);
+    return isset($_SESSION['csrf_token']) && is_string($csrfToken) && hash_equals($_SESSION['csrf_token'], $csrfToken);
   }
+
 
   public function getDeletedBooksJson()
   {
@@ -98,6 +99,14 @@ class RestoreBookController extends Controller
       http_response_code(403);
       echo json_encode(['success' => false, 'message' => 'Admin User ID not found in session for archiving.']);
       return;
+    }
+
+    if (in_array($_SESSION['role'], ['admin', 'librarian'])) {
+      echo json_encode([
+        'success' => false,
+        'message' => 'You are not allowed to permanently delete books.'
+      ]);
+      exit;
     }
 
     try {

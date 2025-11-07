@@ -137,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!response.ok) throw new Error('Network response not ok');
             const result = await response.json();
             if (result.success) {
-                renderBooksNearDueTable(result.data.nearDue);
                 renderOverdueBooksTable(result.data.overdue);
             } else showTableError(result.message);
         } catch (error) {

@@ -25,8 +25,7 @@ foreach ($logs as $log) {
 }
 ?>
 
-<body class="min-h-screen p-6 bg-gray-50">
-    <div class="flex items-center justify-between mb-6">
+<main class="min-h-screen ">
         <div>
             <h2 class="text-2xl font-bold flex items-center gap-2 text-gray-800 mb-4">
                 Attendance Logs
@@ -35,45 +34,6 @@ foreach ($logs as $log) {
                 Monitor student visits and library usage patterns.
             </p>
         </div>
-        <button
-            class="px-4 py-2 text-sm font-medium border rounded-lg shadow-sm bg-[var(--color-card)] border-[var(--color-border)] hover:bg-orange-100 transition">
-            <i class="ph ph-download-simple mr-2"></i>
-            Export Logs
-        </button>
-    </div>
-
-    <div class="bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg shadow-sm mb-6">
-        <div class="p-4 border-b border-[var(--color-border)]">
-            <h3 class="text-md font-medium text-gray-800">Total Visitors</h3>
-            <p class="text-sm text-gray-500">View visitor statistics by time period</p>
-        </div>
-        <div class="p-4">
-            <div
-                class="flex items-center border border-orange-100 bg-orange-50/50 p-1 justify-center mb-4 rounded-full">
-                <button
-                    class="flex-1 py-2 text-sm rounded-full text-gray-600 hover:text-orange-700 font-medium period-btn"
-                    data-period="Week" data-count="0" data-active="true"> Week
-                </button>
-                <button class="flex-1 py-2 text-sm rounded-full text-gray-600 hover:text-orange-700 period-btn"
-                    data-period="Month" data-count="0">
-                    Month
-                </button>
-                <button class="flex-1 py-2 text-sm rounded-full text-gray-600 hover:text-orange-700 period-btn"
-                    data-period="Year" data-count="0">
-                    Year
-                </button>
-            </div>
-
-            <div class="flex flex-col items-center justify-center p-6 rounded-lg border border-[var(--color-border)]">
-                <span id="visitor-label" class="text-sm flex items-center gap-1 text-[var(--color-primary)]">
-                    This Week
-                </span>
-                <span id="visitor-count" class="text-3xl font-bold mt-2">0</span>
-                <span class="text-xs text-[var(--color-gray-500)]">Total visitors</span>
-            </div>
-        </div>
-
-    </div>
 
     <div class="bg-[var(--color-card)] border border-orange-200 rounded-xl shadow-sm p-6 mt-6">
         <div class="flex items-center justify-between mb-4">
@@ -198,4 +158,4 @@ foreach ($logs as $log) {
             }
         });
     </script>
-</body>
+</main>

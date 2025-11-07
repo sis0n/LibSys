@@ -168,7 +168,7 @@
             });
         }
     });
-</script>>
+</script>
 </body>
 
 </html>

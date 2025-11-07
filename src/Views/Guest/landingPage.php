@@ -431,7 +431,8 @@ if (isset($_SESSION['user_id'])) {
                 li.appendChild(a);
                 paginationList.appendChild(li);
             };
-
+            
+            createPageLink("prev", `<i class="flex ph ph-caret-left text-lg"></i> Previous`, page - 1, page === 1);
             const isMobile = window.innerWidth < 640; 
             let pagesToShow = new Set();
 

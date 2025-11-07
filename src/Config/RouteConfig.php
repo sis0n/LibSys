@@ -13,7 +13,7 @@ class RouteConfig
         $router = new Router();
 
         // --- VIEW ROUTES (Walang API prefix) ---
-        $router->get('landingPage', 'GuestController@guestDisplay');
+        $router->get('landingPage', 'ViewController@handleLandingPage');
         $router->get('login', 'AuthController@showLogin');
         $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
 

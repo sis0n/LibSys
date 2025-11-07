@@ -13,9 +13,9 @@ class Database {
         // === DATABASE CONFIGURATION ===
         $driver = 'mysql';
         $host = '127.0.0.1';               // your MySQL host
-        $db   = 'u896434489_libsys';       // your database name
-        $user = 'u896434489_libsysdata';   // your database username
-        $pass = '4vO$pew4>kX';             // your database password
+        $db   = 'u896434489_library_system';       // your database name
+        $user = 'u896434489_libsys';   // your database username
+        $pass = 'P0tzepD/7';             // your database password
 
         try {
             $this->connection = new PDO(

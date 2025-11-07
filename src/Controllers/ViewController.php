@@ -49,6 +49,8 @@ class ViewController extends Controller
           'reports',
           'transaction history',
           'restore books',
+          'user management',
+          'restore users'
         ];
 
         foreach ($priority_privileges as $privilege) {

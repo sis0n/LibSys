@@ -127,7 +127,7 @@ class QRScannerRepository
     try {
       $this->db->beginTransaction();
 
-      $dueDate = date('Y-m-d H:i:s', strtotime('+7 days'));
+      $dueDate = date('Y-m-d H:i:s', strtotime('+1 minute'));
 
       $stmt = $this->db->prepare("
                 UPDATE borrow_transactions

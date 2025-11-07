@@ -466,6 +466,14 @@ $baseUrl = BASE_URL;
                         <span class="text-base">Restore Books</span>
                     </a>
                 <?php endif; ?>
+                
+                <?php if ($hasPermission('restore users')): ?>
+                    <a href="<?= $baseUrl ?>/restoreUser"
+                        class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
+                        <i class="ph ph-user-gear text-xl"></i>
+                        <span class="text-base text-sm">Restore User</span>
+                    </a>
+                <?php endif; ?>
 
                 <a href="<?= $baseUrl ?>/changePassword"
                     class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= ($currentPage === 'changePassword') ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">

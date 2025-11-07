@@ -106,6 +106,20 @@
             if (result.status === "success") {
                 window.location.href = result.redirect;
             } else {
+                
+                // *** Dito ang Logic para sa Deactivated Account ***
+                let alertTitle = "Login Failed";
+                let alertMessage = "Invalid username or password. Please try again.";
+                let iconClass = "ph ph-x-circle text-red-600 text-3xl";
+
+                // I-check kung deactivated ang account gamit ang 'error_type'
+                if (result.error_type === 'deactivated') {
+                    alertTitle = "Account Suspended ";
+                    alertMessage = "Your account has been suspended by the administrator. Please contact support.";
+                    // Maaari ka ring magpalit ng icon kung gusto mo (hal. warning icon)
+                    iconClass = "ph ph-warning-circle text-orange-600 text-3xl"; 
+                }
+
                 Swal.fire({
                     position: "center",
                     showConfirmButton: false,
@@ -113,13 +127,13 @@
                         rgba(0,0,0,0.3)
                         backdrop-filter: blur(6px)
                     `,
-                    timer: 2000,
+                    timer: 3000, // Gawin nating 3 segundo para mabasa ang message
                     didOpen: () => {
                         const progressBar = Swal.getHtmlContainer().querySelector(
                             "#progress-bar");
                         let width = 100;
                         timerInterval = setInterval(() => {
-                            width -= 100 / 20; // 2s / 100ms = 20 intervals
+                            width -= 100 / 30; // 3s / 100ms = 30 intervals
                             if (progressBar) {
                                 progressBar.style.width = width + "%";
                             }
@@ -131,15 +145,15 @@
                     html: `
                         <div class="w-[400px] bg-red-50 border-2 border-red-300 rounded-2xl p-8 shadow-lg text-center animate-fade-in">
                             <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
-                                <i class="ph ph-x-circle text-red-600 text-3xl"></i>
+                                <i class="${iconClass}"></i>
                             </div>
-                            <h3 class="text-2xl font-bold text-red-700">Login Failed</h3>
-                            <p class="text-base text-red-600 mt-1">Invalid username or password. Please try again.</p>
+                            <h3 class="text-2xl font-bold text-red-700">${alertTitle}</h3>
+                            <p class="text-base text-red-600 mt-1">${alertMessage}</p>
                             <div class="w-full bg-red-100 h-2 rounded mt-4 overflow-hidden">
                                 <div id="progress-bar" class="bg-red-500 h-2 w-full transition-all"></div>
                             </div>
                         </div>
-                `,
+                    `,
                     customClass: {
                         popup: "block !bg-transparent !shadow-none !p-0 !border-0 !m-0 !w-auto !min-w-0 !max-w-none",
                     }
@@ -154,7 +168,7 @@
             });
         }
     });
-    </script>
+</script>
 </body>
 
 </html>

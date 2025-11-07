@@ -42,6 +42,7 @@ class User
         $normalizedPermissions = array_map('strtolower', $permissions);
 
         $orderedModules = [
+            'user management' => 'userManagement',
             'book management' => 'bookManagement',
             'qr scanner' => 'qrScanner',
             'returning' => 'returning',
@@ -51,7 +52,8 @@ class User
             'transaction history' => 'transactionHistory',
             'backup' => 'backup',
             'restore books' => 'restoreBooks',
-            'restore user' => 'restoreUser',
+            'restore users' => 'restoreUser',
+
         ];
 
         foreach ($orderedModules as $permission => $urlSegment) {

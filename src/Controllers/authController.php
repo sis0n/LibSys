@@ -87,7 +87,8 @@ class AuthController extends Controller
         if (isset($user['is_active']) && !$user['is_active']) {
             echo json_encode([
                 'status' => 'error',
-                'message' => 'Your account has been deactivated by the administrator.'
+                'error_type' => 'deactivated', // Idagdag ito para makilala
+                'message' => 'Your account has been deactivated by the administrator.' // Palitan sa mas pormal na mensahe
             ]);
             return;
         }

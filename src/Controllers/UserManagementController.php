@@ -192,14 +192,15 @@ class UserManagementController extends Controller
 
           $validModules = [
             'book management',
-            'user management',
             'qr scanner',
             'returning',
             'borrowing form',
             'attendance logs',
             'reports',
             'transaction history',
-            'restore books'
+            'restore books',
+            'user management',
+            'restore users'
           ];
           $modules = array_filter($data['modules'], fn($m) => in_array($m, $validModules));
 

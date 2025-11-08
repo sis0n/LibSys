@@ -18,7 +18,13 @@
                 <img id="profilePreview" src="" alt="Profile" class="hidden w-full h-full object-cover">
             </div>
 
-            <p id="profileName" class="text-xl font-semibold text-gray-800">Loading...</p>
+            <div class="flex items-center gap-2">
+                <p id="profileName" class="text-xl font-semibold text-gray-800">Loading...</p>
+                <span id="verificationBadge" class="hidden items-center gap-1 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <i class="ph-fill ph-seal-check text-base"></i>
+                    Verified
+                </span>
+            </div>
             <span id="profileFacultyId"
                 class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1 mt-1 mb-3">
                 Loading...

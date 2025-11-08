@@ -47,8 +47,26 @@ class StudentProfileRepository
     $stmt->execute([':userId' => $userId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result && $result['course_code'] && $result['course_title']) {
-      $result['course_full_name'] = $result['course_code'] . ' - ' . $result['course_title'];
+    if ($result) {
+        if ($result['course_code'] && $result['course_title']) {
+            $result['course_full_name'] = $result['course_code'] . ' - ' . $result['course_title'];
+        }
+
+        // --- BORROWING QUALIFICATION CHECK ---
+        $requiredFields = [
+            'first_name', 'last_name', 'email', 'profile_picture',
+            'course_id', 'year_level', 'section', 'contact', 'registration_form'
+        ];
+        
+        $isQualified = true;
+        foreach ($requiredFields as $field) {
+            if (empty($result[$field])) {
+                $isQualified = false;
+                break;
+            }
+        }
+        $result['is_qualified'] = $isQualified;
+        // --- END OF CHECK ---
     }
 
     return $result ?: null;

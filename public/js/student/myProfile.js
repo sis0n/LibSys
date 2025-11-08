@@ -317,6 +317,19 @@ Swal.close();
                     profileLockedInfo.classList.remove('hidden');
                 }
 
+                // --- Verification Badge Logic ---
+                const verificationBadge = document.getElementById('verificationBadge');
+                if (verificationBadge) {
+                    if (profile.profile_updated == 1 && profile.is_qualified) {
+                        verificationBadge.classList.remove('hidden');
+                        verificationBadge.classList.add('inline-flex');
+                    } else {
+                        verificationBadge.classList.add('hidden');
+                        verificationBadge.classList.remove('inline-flex');
+                    }
+                }
+                // --- End of Logic ---
+
             } else {
                 throw new Error(data.message || 'Could not parse profile data.');
             }

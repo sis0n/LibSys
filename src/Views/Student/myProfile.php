@@ -154,7 +154,8 @@
                 <!-- Contact -->
                 <div class="sm:col-span-1">
                     <label class="text-sm text-gray-500" for="contact">Contact</label>
-                    <input type="tel" id="contact" name="contact"
+                    <input type="tel" id="contact" name="contact" maxlength="11" pattern="[0-9]{11}"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)"
                         class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"
                         disabled>
                 </div>

@@ -149,6 +149,8 @@ class RouteConfig
         $router->post('api/admin/userManagement/add', 'UserManagementController@addUser', ['user management']);
         $router->post('api/admin/userManagement/update/{id}', 'UserManagementController@updateUser', ['user management']);
         $router->post('api/admin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['user management']);
+        $router->post('api/admin/userManagement/deleteMultiple', 'UserManagementController@deleteMultipleUsers', ['user management']);
+        $router->post('api/admin/userManagement/allowMultipleEdit', 'UserManagementController@allowMultipleEdit', ['user management']);
         $router->post('api/admin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['user management']);
         $router->post('api/admin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['user management']);
         $router->post('api/admin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['user management']);
@@ -172,9 +174,12 @@ class RouteConfig
         $router->post('api/superadmin/userManagement/add', 'UserManagementController@addUser', ['superadmin']);
         $router->post('api/superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
         $router->post('api/superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
-        $router->post('api/superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
-        $router->post('api/superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
-        $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
+        $router->post('api/superadmin/userManagement/deleteMultiple', 'UserManagementController@deleteMultipleUsers');
+        $router->post('api/superadmin/userManagement/allowMultipleEdit', 'UserManagementController@allowMultipleEdit');
+        $router->post('api/superadmin/userManagement/toggleStatus/([0-9]+)', 'UserManagementController@toggleStatus');
+        $router->post('api/superadmin/userManagement/update/([0-9]+)', 'UserManagementController@updateUser');
+        $router->post('api/superadmin/userManagement/allowEdit/([0-9]+)', 'UserManagementController@allowEdit');
+        $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport');
         $router->get('api/superadmin/userManagement/getAllCourses', 'DataController@getAllCourses', ['superadmin']);
         $router->get('api/superadmin/userManagement/getColleges', 'DataController@getColleges', ['superadmin']);
         $router->get('api/superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);

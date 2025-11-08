@@ -398,8 +398,8 @@ $baseUrl = BASE_URL;
                 <?php if ($hasPermission('user management')): ?>
                     <a href="<?= $baseUrl ?>/userManagement"
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'userManagement' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-users text-xl"></i>
-                        <span class="text-base text-sm">User Management</span>
+                        <i class="ph ph-users text-2xl"></i>
+                        <span class="text-base">User Management</span>
                     </a>
                 <?php endif; ?>
 
@@ -470,8 +470,8 @@ $baseUrl = BASE_URL;
                 <?php if ($hasPermission('restore users')): ?>
                     <a href="<?= $baseUrl ?>/restoreUser"
                         class="flex items-center gap-x-3 px-3 py-2 rounded-lg transition <?= $currentPage === 'restoreUser' ? 'bg-green-600 text-white font-medium' : 'hover:bg-orange-100 text-orange-900' ?>">
-                        <i class="ph ph-user-gear text-xl"></i>
-                        <span class="text-base text-sm">Restore User</span>
+                        <i class="ph ph-user-gear text-2xl"></i>
+                        <span class="text-base">Restore User</span>
                     </a>
                 <?php endif; ?>
 

@@ -73,9 +73,47 @@
         </div>
     </div>
 
-    <h4 id="resultsIndicator" class="text-sm text-gray-600 my-4">
-        Loading...
-    </h4>
+    <div class="flex items-center justify-between my-4">
+
+        <h4 id="resultsIndicator" class="text-sm text-gray-600">
+            Loading...
+        </h4>
+
+        <div class="inline-flex items-center gap-2">
+            <div id="multiSelectActions" class="hidden items-center gap-2">
+                <button id="multiDeleteBtn" title="Delete selected users"
+                    class="hidden items-center gap-2 bg-red-600 text-white rounded-lg px-3 py-2 text-sm font-medium hover:bg-red-700 transition">
+                    <i class="ph ph-trash text-base"></i>
+                    Delete (<span id="selectionCount">0</span>)
+                </button>
+                <button id="multiAllowEditBtn" title="Allow edit for selected students"
+                    class="hidden items-center gap-2 bg-blue-600 text-white rounded-lg px-3 py-2 text-sm font-medium hover:bg-blue-700 transition">
+                    <i class="ph ph-user-plus text-base"></i>
+                    Allow Edit
+                </button>
+
+                <div class="h-6 border-l border-gray-300 mx-2"></div>
+
+                <button id="selectAllBtn" title="Select-all"
+                    class="inline-flex items-center gap-2 border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 transition">
+                    <i class="ph ph-check-square-offset text-base"></i>
+                    Select All
+                </button>
+                <button id="cancelSelectionBtn" title="Cancel multi-select"
+                    class="inline-flex items-center gap-2 border border-gray-300 text-gray-700 rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-100 transition">
+                    <i class="ph ph-x text-base"></i>
+                    Cancel
+                </button>
+            </div>
+
+            <button id="multiSelectBtn" title="Multi-select"
+                class="inline-flex items-center gap-2 border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 transition">
+                <i class="ph ph-list-checks text-base"></i>
+                Multiple Select
+            </button>
+        </div>
+
+    </div>
 
     <div class="overflow-x-auto rounded-lg border border-orange-200">
         <table class="w-full text-sm border-collapse">

@@ -122,6 +122,14 @@ window.addEventListener("DOMContentLoaded", () => {
     // BAGONG DAGDAG: ID para sa Edit Modal
     const editUserUserManagementModuleWrapper = document.getElementById("editUserUserManagementModuleWrapper");
 
+    const multiSelectBtn = document.getElementById("multiSelectBtn");
+    const multiSelectActions = document.getElementById("multiSelectActions");
+    const selectAllBtn = document.getElementById("selectAllBtn");
+    const cancelSelectionBtn = document.getElementById("cancelSelectionBtn");
+    const multiDeleteBtn = document.getElementById("multiDeleteBtn");
+    const multiAllowEditBtn = document.getElementById("multiAllowEditBtn");
+    const selectionCount = document.getElementById("selectionCount");
+
     const userRoleValueEl = document.getElementById("userRoleDropdownValue");
 
     let allUsers = [];
@@ -129,6 +137,8 @@ window.addEventListener("DOMContentLoaded", () => {
     let selectedRole = "All Roles";
     let selectedStatus = "All Status";
     let currentEditingUserId = null;
+    let isMultiSelectMode = false;
+    let selectedUsers = new Set();
 
     let currentPage = 1;
     const limit = 10;
@@ -221,7 +231,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
 
-        paginationList.addEventListener('click', (e) => {
+        paginationList.addEventListener('click', async (e) => {
             e.preventDefault();
             if (isLoading) return;
             const target = e.target.closest('a[data-page]');
@@ -230,8 +240,20 @@ window.addEventListener("DOMContentLoaded", () => {
             if (pageStr === '...') return;
             const pageNum = parseInt(pageStr, 10);
             if (!isNaN(pageNum) && pageNum !== currentPage) {
-                // Gumamit ng default behavior (may loading modal) kapag nagpapalit ng page number
-                loadUsers(pageNum);
+                if (isMultiSelectMode && selectedUsers.size > 0) {
+                    const isConfirmed = await showConfirmationModal(
+                        "Clear Selection?",
+                        "Navigating to another page will clear your current selection. Do you want to continue?",
+                        "Yes, Continue"
+                    );
+                    if (isConfirmed) {
+                        selectedUsers.clear();
+                        updateMultiSelectButtons();
+                        loadUsers(pageNum);
+                    }
+                } else {
+                    loadUsers(pageNum);
+                }
             }
         });
     }
@@ -726,14 +748,49 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!userTableBody) return;
         userTableBody.innerHTML = "";
 
+        const headerRow = document.querySelector('thead tr');
+        if (headerRow) {
+            const firstHeader = headerRow.querySelector('th');
+            if (isMultiSelectMode) {
+                if (!firstHeader.classList.contains('multi-select-header')) {
+                    const th = document.createElement('th');
+                    th.className = 'px-4 py-3 font-medium multi-select-header';
+                    headerRow.insertBefore(th, firstHeader);
+                }
+            } else {
+                if (firstHeader && firstHeader.classList.contains('multi-select-header')) {
+                    firstHeader.remove();
+                }
+            }
+        }
+
+
         if (!usersToRender.length) {
-            userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
+            const colspan = document.querySelector('thead tr').children.length;
+            userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="${colspan}" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
             return;
         }
 
         usersToRender.forEach((user) => {
             const row = document.createElement("tr");
-            row.className = user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white";
+            const isSelected = selectedUsers.has(user.user_id);
+
+            row.className = `transition-colors ${isSelected ? "bg-orange-100" : (user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white")}`;
+            if (isMultiSelectMode) {
+                row.classList.add("cursor-pointer");
+                row.dataset.userId = user.user_id;
+            }
+
+
+            let checkboxCell = '';
+            if (isMultiSelectMode) {
+                checkboxCell = `
+                    <td class="px-4 py-3">
+                        <input type="checkbox" class="user-checkbox accent-orange-500 pointer-events-none" data-user-id="${user.user_id}" ${isSelected ? "checked" : ""}>
+                    </td>
+                `;
+            }
+
 
             let actions = `
                 <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
@@ -752,14 +809,21 @@ window.addEventListener("DOMContentLoaded", () => {
                 `;
             }
 
+            let actionsCellHTML = `<td class="px-4 py-3 actions-cell"><div class="flex items-center gap-2">${actions}</div></td>`;
+            if (isMultiSelectMode) {
+                actionsCellHTML = `<td class="px-4 py-3 actions-cell"></td>`;
+            }
+
             row.innerHTML = `
+                ${checkboxCell}
                 <td class="px-4 py-3"><p class="font-medium text-gray-800">${user.name}</p><p class="text-gray-500 text-xs">${user.username}</p></td>
                 <td class="px-4 py-3">${user.email || 'N/A'}</td>
                 <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
                 <td class="px-4 py-3"><span class="status-badge cursor-pointer toggle-status-btn">${getStatusBadge(user.status)}</span></td>
                 <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
-                <td class="px-4 py-3"><div class="flex items-center gap-2">${actions}</div></td>
+                ${actionsCellHTML}
             `;
+
             userTableBody.appendChild(row);
         });
     }
@@ -856,6 +920,20 @@ window.addEventListener("DOMContentLoaded", () => {
             const row = e.target.closest("tr");
             if (!row || row.dataset.placeholder) return;
 
+            const userId = row.dataset.userId ? parseInt(row.dataset.userId, 10) : null;
+
+            if (isMultiSelectMode && userId) {
+                if (selectedUsers.has(userId)) {
+                    selectedUsers.delete(userId);
+                } else {
+                    selectedUsers.add(userId);
+                }
+                renderTable(users);
+                updateMultiSelectButtons();
+                return;
+            }
+
+
             const validRows = Array.from(userTableBody.querySelectorAll("tr:not([data-placeholder='true'])"));
             const index = validRows.indexOf(row);
             if (index < 0) return;
@@ -947,6 +1025,7 @@ window.addEventListener("DOMContentLoaded", () => {
             // TOGGLE STATUS
             if (e.target.closest(".toggle-status-btn")) {
                 if (user.role.toLowerCase() === 'superadmin') return showErrorToast("Action Denied", "Superadmin status cannot be changed!");
+                if (user.role.toLowerCase() === 'scanner') return showErrorToast("Action Denied", "Scanner status cannot be changed!");
 
                 const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
 
@@ -1145,4 +1224,183 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     loadUsers(currentPage);
+
+
+    function updateMultiSelectButtons() {
+        const hasSelection = selectedUsers.size > 0;
+
+        if (isMultiSelectMode) {
+            multiSelectBtn.classList.add('hidden');
+            multiSelectActions.classList.remove('hidden');
+            multiSelectActions.classList.add('inline-flex');
+        } else {
+            multiSelectBtn.classList.remove('hidden');
+            multiSelectActions.classList.add('hidden');
+            multiSelectActions.classList.remove('inline-flex');
+        }
+
+        multiDeleteBtn.classList.toggle('hidden', !hasSelection);
+        multiAllowEditBtn.classList.toggle('hidden', !hasSelection);
+        if (selectionCount) selectionCount.textContent = selectedUsers.size;
+
+        const allVisibleUserIds = users.map(u => u.user_id);
+        const allSelectedOnPage = allVisibleUserIds.length > 0 && allVisibleUserIds.every(id => selectedUsers.has(id));
+
+        if (allSelectedOnPage) {
+            selectAllBtn.innerHTML = `<i class="ph ph-check-square-offset text-base"></i> Deselect All`;
+        } else {
+            selectAllBtn.innerHTML = `<i class="ph ph-check-square-offset text-base"></i> Select All`;
+        }
+    }
+
+
+    if (multiSelectBtn) {
+        multiSelectBtn.addEventListener('click', () => {
+            isMultiSelectMode = true;
+            updateMultiSelectButtons();
+            renderTable(users);
+        });
+    }
+
+    if (cancelSelectionBtn) {
+        cancelSelectionBtn.addEventListener('click', () => {
+            isMultiSelectMode = false;
+            selectedUsers.clear();
+            updateMultiSelectButtons();
+            renderTable(users);
+        });
+    }
+
+
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => {
+            const allVisibleUserIds = users.map(u => u.user_id);
+            const allSelectedOnPage = allVisibleUserIds.length > 0 && allVisibleUserIds.every(id => selectedUsers.has(id));
+
+            if (allSelectedOnPage) {
+                allVisibleUserIds.forEach(id => selectedUsers.delete(id));
+            } else {
+                allVisibleUserIds.forEach(id => selectedUsers.add(id));
+            }
+            renderTable(users);
+            updateMultiSelectButtons();
+        });
+    }
+
+    if (multiDeleteBtn) {
+        multiDeleteBtn.addEventListener('click', async () => {
+            const userIds = [...selectedUsers];
+            if (userIds.length === 0) {
+                return showErrorToast("No Users Selected", "Please select users to delete.");
+            }
+
+            const isConfirmed = await showConfirmationModal(
+                `Delete ${userIds.length} Users?`,
+                `Are you sure you want to permanently delete the selected ${userIds.length} user(s)? This action cannot be undone.`,
+                "Yes, Delete All"
+            );
+
+            if (!isConfirmed) return;
+
+            showLoadingModal("Deleting Users...", `Processing ${userIds.length} user(s).`);
+
+            try {
+                const res = await fetch('api/superadmin/userManagement/deleteMultiple', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_ids: userIds
+                    })
+                });
+
+                const data = await res.json();
+                Swal.close();
+
+                if (data.success) {
+                    showSuccessToast("Deletion Successful", data.message);
+                } else {
+                    let errorMessage = data.message;
+                    if (data.errors && data.errors.length > 0) {
+                        errorMessage += ` ${data.errors.join(' ')}`;
+                    }
+                    showErrorToast("Deletion Failed", errorMessage);
+                }
+
+                isMultiSelectMode = false;
+                selectedUsers.clear();
+                updateMultiSelectButtons();
+                loadUsers(1, false);
+
+            } catch (err) {
+                Swal.close();
+                console.error("Multi-delete error:", err);
+                showErrorToast("Network Error", "An error occurred while connecting to the server.");
+            }
+        });
+    }
+
+    if (multiAllowEditBtn) {
+        multiAllowEditBtn.addEventListener('click', async () => {
+            const selectedIds = [...selectedUsers];
+            if (selectedIds.length === 0) {
+                return showErrorToast("No Users Selected", "Please select students to allow edit access.");
+            }
+
+            const allAreStudents = selectedIds.every(id => {
+                const user = users.find(u => u.user_id === id);
+                return user && user.role.toLowerCase() === 'student';
+            });
+
+            if (!allAreStudents) {
+                return showErrorToast("Invalid Selection", "This action can only be applied to students.");
+            }
+
+            const isConfirmed = await showConfirmationModal(
+                `Allow Edit for ${selectedIds.length} Students?`,
+                `This will grant temporary profile edit access to the selected ${selectedIds.length} student(s). Continue?`,
+                "Yes, Grant Access"
+            );
+
+            if (!isConfirmed) return;
+
+            showLoadingModal("Granting Access...", `Processing ${selectedIds.length} student(s).`);
+
+            try {
+                const res = await fetch('api/superadmin/userManagement/allowMultipleEdit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_ids: selectedIds
+                    })
+                });
+
+                const data = await res.json();
+                Swal.close();
+
+                if (data.success) {
+                    showSuccessToast("Access Granted", data.message);
+                } else {
+                    let errorMessage = data.message;
+                    if (data.errors && data.errors.length > 0) {
+                        errorMessage += ` ${data.errors.join(' ')}`;
+                    }
+                    showErrorToast("Action Failed", errorMessage);
+                }
+
+                isMultiSelectMode = false;
+                selectedUsers.clear();
+                updateMultiSelectButtons();
+                loadUsers(currentPage, false);
+
+            } catch (err) {
+                Swal.close();
+                console.error("Multi-allow-edit error:", err);
+                showErrorToast("Network Error", "An error occurred while connecting to the server.");
+            }
+        });
+    }
 });

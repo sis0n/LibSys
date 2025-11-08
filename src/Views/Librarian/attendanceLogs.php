@@ -54,21 +54,6 @@ foreach ($logs as $log) {
                     <input type="date" id="datePickerInput"
                         class="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 outline-none transition text-sm text-gray-700 w-36 focus:ring-1 focus:ring-orange-400">
                 </div>
-
-                <div class="relative inline-block text-left">
-                    <button id="courseFilterBtn"
-                        class="border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 flex items-center justify-between gap-2 w-36 hover:bg-orange-50 transition">
-                        <span id="courseFilterValue">All Courses</span>
-                        <i class="ph ph-caret-down text-xs"></i>
-                    </button>
-                    <div id="courseFilterMenu"
-                        class="filter-dropdown-menu absolute mt-1 w-full bg-white border border-orange-200 rounded-lg shadow-md hidden z-20 text-sm">
-                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="All Courses">All Courses</div>
-                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSIT">BSIT</div>
-                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSCS">BSCS</div>
-                        <div class="dropdown-item px-3 py-2 hover:bg-orange-100 cursor-pointer" data-value="BSEMC">BSEMC</div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -87,7 +72,7 @@ foreach ($logs as $log) {
                     <tr id="noRecordsRow" class="bg-white">
                         <td colspan="5" class="text-center text-gray-500 py-10">
                             <i class="ph ph-clipboard text-4xl block mb-2"></i>
-                            Loading records...
+                            Currently no records are logs
                         </td>
                     </tr>
                 </tbody>
@@ -141,7 +126,7 @@ foreach ($logs as $log) {
         </div>
     </div>
 
-    <script src="<?= BASE_URL ?>/js/admin/attendanceLogs.js" defer></script>
+    <script src="<?= BASE_URL ?>/js/librarian/attendanceLogs.js" defer></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

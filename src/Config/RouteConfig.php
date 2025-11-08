@@ -178,9 +178,9 @@ class RouteConfig
         $router->post('api/superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
         $router->post('api/superadmin/userManagement/deleteMultiple', 'UserManagementController@deleteMultipleUsers');
         $router->post('api/superadmin/userManagement/allowMultipleEdit', 'UserManagementController@allowMultipleEdit');
-        $router->post('api/superadmin/userManagement/toggleStatus/([0-9]+)', 'UserManagementController@toggleStatus');
-        $router->post('api/superadmin/userManagement/update/([0-9]+)', 'UserManagementController@updateUser');
-        $router->post('api/superadmin/userManagement/allowEdit/([0-9]+)', 'UserManagementController@allowEdit');
+        $router->post('api/superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus');
+        $router->post('api/superadmin/userManagement/update/{id}', 'UserManagementController@updateUser');
+        $router->post('api/superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
         $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport');
         $router->get('api/superadmin/userManagement/getAllCourses', 'DataController@getAllCourses', ['superadmin']);
         $router->get('api/superadmin/userManagement/getColleges', 'DataController@getColleges', ['superadmin']);

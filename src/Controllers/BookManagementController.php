@@ -183,6 +183,66 @@ class BookManagementController extends Controller
         }
     }
 
+    public function deleteMultiple()
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $bookIds = $data['book_ids'] ?? [];
+
+        $deletedByUserId = $_SESSION['user_id'] ?? null;
+        if ($deletedByUserId === null) {
+            return $this->json(['success' => false, 'message' => 'Authentication required.'], 401);
+        }
+
+        if (empty($bookIds) || !is_array($bookIds)) {
+            return $this->json(['success' => false, 'message' => 'No book IDs provided.'], 400);
+        }
+
+        $deletedCount = 0;
+        $errors = [];
+
+        foreach ($bookIds as $bookId) {
+            $bookId = (int)$bookId;
+            $book = $this->bookRepo->findBookById($bookId);
+
+            if (!$book) {
+                $errors[] = "Book with ID $bookId not found.";
+                continue;
+            }
+
+            if ($book['availability'] === 'borrowed') {
+                $errors[] = "Cannot delete '{$book['title']}': It is currently borrowed.";
+                continue;
+            }
+
+            try {
+                $result = $this->bookRepo->deleteBook($bookId, $deletedByUserId);
+                if ($result['success']) {
+                    $deletedCount++;
+                } else {
+                    $errors[] = "Failed to delete '{$book['title']}': " . ($result['message'] ?? 'Unknown error');
+                }
+            } catch (\Exception $e) {
+                $errors[] = "Error deleting '{$book['title']}': " . $e->getMessage();
+            }
+        }
+
+        $response = [
+            'success' => $deletedCount > 0,
+            'message' => "Successfully deleted $deletedCount book(s).",
+            'deleted_count' => $deletedCount,
+            'errors' => $errors
+        ];
+
+        if ($deletedCount === 0 && !empty($errors)) {
+            $response['success'] = false;
+            $response['message'] = "No books were deleted. See errors for details.";
+        } else if ($deletedCount > 0 && !empty($errors)) {
+            $response['message'] = "Partially completed: Deleted $deletedCount book(s) with some errors.";
+        }
+
+        return $this->json($response);
+    }
+
     public function bulkImport()
     {
         header('Content-Type: application/json');

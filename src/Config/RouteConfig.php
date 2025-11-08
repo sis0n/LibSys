@@ -86,6 +86,7 @@ class RouteConfig
         $router->post('api/librarian/booksmanagement/store', 'BookManagementController@store', ['book management']);
         $router->post('api/librarian/booksmanagement/update/{id}', 'BookManagementController@update', ['book management']);
         $router->post('api/librarian/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
+        $router->post('api/librarian/booksmanagement/deleteMultiple', 'BookManagementController@deleteMultiple', ['book management']);
         $router->post('api/librarian/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
         $router->post('api/librarian/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/librarian/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
@@ -123,6 +124,7 @@ class RouteConfig
         $router->post('api/admin/bookManagement/store', 'BookManagementController@store', ['book management']);
         $router->post('api/admin/bookManagement/update/{id}', 'BookManagementController@update', ['book management']);
         $router->post('api/admin/bookManagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
+        $router->post('api/admin/bookManagement/deleteMultiple', 'BookManagementController@deleteMultiple', ['book management']);
         $router->post('api/admin/bookManagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
         $router->post('api/admin/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
@@ -187,6 +189,7 @@ class RouteConfig
         $router->post('api/superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
+        $router->post('api/superadmin/booksmanagement/deleteMultiple', 'BookManagementController@deleteMultiple', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['superadmin']);
         $router->post('api/superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
         $router->post('api/superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']);

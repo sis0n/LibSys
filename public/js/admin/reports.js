@@ -120,6 +120,51 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
+    // --- Circulated Equipments ---
+    async function populateCirculatedEquipments() {
+        const tbody = document.getElementById('circulated-equipments-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4"><i class="ph ph-spinner animate-spin text-lg mr-2"></i>Loading...</td></tr>';
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/admin/reports/circulated-equipments`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            tbody.innerHTML = ''; // Clear loading message
+
+            if (result.data && result.data.length > 0) {
+                result.data.forEach(row => {
+                    const isTotalRow = row.category === 'TOTAL';
+                    const tr = document.createElement('tr');
+                    
+                    if (isTotalRow) {
+                        tr.classList.add('bg-orange-50', 'font-bold');
+                    } else {
+                        tr.classList.add('border-b', 'border-orange-100');
+                    }
+
+                    tr.innerHTML = `
+                        <td class="px-4 py-2 text-left ${isTotalRow ? 'font-bold' : 'font-medium text-gray-700'}">${row.category}</td>
+                        <td class="px-4 py-2 text-center">${row.today || 0}</td>
+                        <td class="px-4 py-2 text-center">${row.week || 0}</td>
+                        <td class="px-4 py-2 text-center">${row.month || 0}</td>
+                        <td class="px-4 py-2 text-center">${row.year || 0}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">No data available.</td></tr>';
+            }
+            return true; // Success flag
+        } catch (error) {
+            console.error('Error loading circulated equipments report:', error);
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-red-500">Failed to load report.</td></tr>';
+            return false; // Failure flag
+        }
+    }
     
     // --- Deleted Books ---
     async function populateDeletedBooks() {
@@ -351,6 +396,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Run all parallel loading operations and get their status (success/fail)
         const results = await Promise.all([
             populateCirculatedBooks(),
+            populateCirculatedEquipments(),
             populateDeletedBooks(),
             populateLibraryVisitByDepartment(),
             populateTopVisitors(),
@@ -399,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Create a form to submit the data via POST to trigger the PDF download
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = `${BASE_URL}/generate-report`;
+                form.action = `${BASE_URL}/api/admin/reports/generate-report`;
                 form.target = '_blank'; // Open in a new tab to not interrupt the user's view
 
                 const startInput = document.createElement('input');

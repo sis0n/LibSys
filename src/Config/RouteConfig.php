@@ -97,6 +97,7 @@ class RouteConfig
         $router->post('api/librarian/returning/sendOverdueEmail', 'ReturningController@sendOverdueEmail', ['returning']);
         $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
         $router->get('api/librarian/reports/circulated-books', 'ReportController@getCirculatedBooksReport',['reports']);
+        $router->get('api/librarian/reports/circulated-equipments', 'ReportController@getCirculatedEquipmentsReport', ['reports']);
         $router->get('api/librarian/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
         $router->get('api/librarian/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/librarian/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
@@ -140,6 +141,7 @@ class RouteConfig
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
         $router->post('api/admin/returning/sendOverdueEmail', 'ReturningController@sendOverdueEmail', ['returning']);
         $router->get('api/admin/reports/circulated-books', 'ReportController@getCirculatedBooksReport',['reports']);
+        $router->get('api/admin/reports/circulated-equipments', 'ReportController@getCirculatedEquipmentsReport', ['reports']);
         $router->get('api/admin/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
         $router->get('api/admin/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
@@ -219,6 +221,7 @@ class RouteConfig
         $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
         $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
         $router->get('api/superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);
+        $router->get('api/superadmin/reports/circulated-equipments', 'ReportController@getCirculatedEquipmentsReport', ['superadmin']);
         $router->get('api/superadmin/reports/top-visitors', 'ReportController@getTopVisitors', ['superadmin']);
         $router->get('api/superadmin/reports/deleted-books', 'ReportController@getDeletedBooks', ['superadmin']);
         $router->get('api/superadmin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment', ['superadmin']);

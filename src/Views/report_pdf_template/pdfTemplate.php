@@ -2,6 +2,7 @@
 // Ensure variables are defined to avoid errors if they are empty
 $deletedBooks = !empty($deletedBooks) ? $deletedBooks[0] : ['today' => '-', 'week' => '-', 'month' => '-', 'year' => '-'];
 $circulatedBooks = $circulatedBooks ?? [];
+$circulatedEquipments = $circulatedEquipments ?? [];
 $topVisitors = $topVisitors ?? [];
 $libraryVisits = $libraryVisits ?? [];
 $dateRange = $dateRange ?? [null, null];
@@ -48,6 +49,22 @@ $dateRange = $dateRange ?? [null, null];
         <thead><tr><th>Category</th><th class="text-center">Today</th><th class="text-center">This Week</th><th class="text-center">This Month</th><th class="text-center">Total in Range</th></tr></thead>
         <tbody>
             <?php foreach ($circulatedBooks as $row): ?>
+            <tr>
+                <td><?= htmlspecialchars($row['category']) ?></td>
+                <td class="text-center"><?= htmlspecialchars($row['today']) ?></td>
+                <td class="text-center"><?= htmlspecialchars($row['week']) ?></td>
+                <td class="text-center"><?= htmlspecialchars($row['month']) ?></td>
+                <td class="text-center"><?= htmlspecialchars($row['year']) ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <h2>Circulated Equipments</h2>
+    <table>
+        <thead><tr><th>Category</th><th class="text-center">Today</th><th class="text-center">This Week</th><th class="text-center">This Month</th><th class="text-center">Total in Range</th></tr></thead>
+        <tbody>
+            <?php foreach ($circulatedEquipments as $row): ?>
             <tr>
                 <td><?= htmlspecialchars($row['category']) ?></td>
                 <td class="text-center"><?= htmlspecialchars($row['today']) ?></td>

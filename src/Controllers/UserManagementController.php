@@ -259,6 +259,7 @@ class UserManagementController extends Controller
     }
   }
 
+  // Updated
   public function deleteMultipleUsers()
   {
     header('Content-Type: application/json');
@@ -387,6 +388,7 @@ class UserManagementController extends Controller
 
     echo json_encode($response);
   }
+  // end
 
   public function toggleStatus($id)
   {

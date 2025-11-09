@@ -183,6 +183,7 @@ class BookManagementController extends Controller
         }
     }
 
+    // Updated
     public function deleteMultiple()
     {
         $data = json_decode(file_get_contents("php://input"), true);
@@ -242,6 +243,7 @@ class BookManagementController extends Controller
 
         return $this->json($response);
     }
+    // end
 
     public function bulkImport()
     {

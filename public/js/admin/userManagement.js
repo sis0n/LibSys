@@ -79,12 +79,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
             customClass: {
                 // FINAL FIX: Orange Border + White BG + Orange Shadow (Matching the theme)
-                popup: "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
+                popup:
+                    "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
 
                 // Confirm Button (Orange, Large, Bold)
-                confirmButton: "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base",
+                confirmButton:
+                    "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base",
                 // Cancel Button (Gray, Large, Bold)
-                cancelButton: "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base",
+                cancelButton:
+                    "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base",
 
                 actions: "!mt-4"
             },
@@ -119,6 +122,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // BAGONG DAGDAG: ID para sa Edit Modal
     const editUserUserManagementModuleWrapper = document.getElementById("editUserUserManagementModuleWrapper");
 
+    //updated
     const multiSelectBtn = document.getElementById("multiSelectBtn");
     const multiSelectActions = document.getElementById("multiSelectActions");
     const selectAllBtn = document.getElementById("selectAllBtn");
@@ -126,7 +130,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const multiDeleteBtn = document.getElementById("multiDeleteBtn");
     const multiAllowEditBtn = document.getElementById("multiAllowEditBtn");
     const selectionCount = document.getElementById("selectionCount");
-
+    //end
     const userRoleValueEl = document.getElementById("userRoleDropdownValue");
 
     let allUsers = [];
@@ -134,9 +138,10 @@ window.addEventListener("DOMContentLoaded", () => {
     let selectedRole = "All Roles";
     let selectedStatus = "All Status";
     let currentEditingUserId = null;
+    //updated
     let isMultiSelectMode = false;
     let selectedUsers = new Set();
-
+    //end
     let currentPage = 1;
     const limit = 10;
     let totalUsers = 0;
@@ -228,7 +233,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
 
-        paginationList.addEventListener('click', async (e) => {
+        paginationList.addEventListener('click', async (e) => { //Updated nalag lagay ng async
             e.preventDefault();
             if (isLoading) return;
             const target = e.target.closest('a[data-page]');
@@ -237,6 +242,8 @@ window.addEventListener("DOMContentLoaded", () => {
             if (pageStr === '...') return;
             const pageNum = parseInt(pageStr, 10);
             if (!isNaN(pageNum) && pageNum !== currentPage) {
+                 // Gumamit ng default behavior (may loading modal) kapag nagpapalit ng page number
+                 //updated
                 if (isMultiSelectMode && selectedUsers.size > 0) {
                     const isConfirmed = await showConfirmationModal(
                         "Clear Selection?",
@@ -251,6 +258,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 } else {
                     loadUsers(pageNum);
                 }
+                //end
             }
         });
     }
@@ -296,15 +304,30 @@ window.addEventListener("DOMContentLoaded", () => {
     function toggleModules(container, role, userModules = []) {
         if (!container) return;
         const normalizedRole = (role || "").trim().toLowerCase();
-        console.log("toggleModules:", normalizedRole, userModules);
+        // console.log("toggleModules:", normalizedRole, userModules); // For debugging
+
+        container.classList.add("hidden");
+        const userMgmtWrapper = container.querySelector('#addUserUserManagementModuleWrapper') || document.getElementById('addUserUserManagementModuleWrapper');
+        const restoreUserWrapper = container.querySelector('#addUserRestoreUserModuleWrapper') || document.getElementById('addUserRestoreUserModuleWrapper');
+
+        if (userMgmtWrapper) userMgmtWrapper.classList.add('hidden');
+        if (restoreUserWrapper) restoreUserWrapper.classList.add('hidden');
 
         if (normalizedRole === "admin" || normalizedRole === "librarian") {
             container.classList.remove("hidden");
+
             container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                 cb.checked = userModules.some(m => m.toLowerCase().trim() === cb.value.toLowerCase().trim()) || false;
             });
+
+            if (normalizedRole === 'admin') {
+                if (userMgmtWrapper) userMgmtWrapper.classList.remove('hidden');
+                if (restoreUserWrapper) restoreUserWrapper.classList.remove('hidden');
+            } else if (normalizedRole === 'librarian') {
+                if (userMgmtWrapper) userMgmtWrapper.classList.remove('hidden');
+            }
         } else {
-            container.classList.add("hidden");
+            // Kung hindi admin/librarian, siguraduhing naka-uncheck lahat
             container.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
     }
@@ -490,7 +513,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 currentPage = 1;
                 try {
                     sessionStorage.removeItem('userManagementPage');
-                } catch (e) {}
+                } catch (e) { }
                 // Hindi gagamit ng loading modal para sa search
                 loadUsers(1, false);
             }, 500);
@@ -501,7 +524,7 @@ window.addEventListener("DOMContentLoaded", () => {
         currentPage = 1;
         try {
             sessionStorage.removeItem('userManagementPage');
-        } catch (e) {}
+        } catch (e) { }
         // Hindi gagamit ng loading modal para sa dropdown filters
         loadUsers(1, false);
     }
@@ -720,7 +743,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
             try {
                 sessionStorage.removeItem('userManagementPage');
-            } catch (e) {}
+            } catch (e) { }
         } finally {
             isLoading = false;
         }
@@ -730,6 +753,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!userTableBody) return;
         userTableBody.innerHTML = "";
 
+        //updated
         const headerRow = document.querySelector('thead tr');
         if (headerRow) {
             const firstHeader = headerRow.querySelector('th');
@@ -745,16 +769,20 @@ window.addEventListener("DOMContentLoaded", () => {
                 }
             }
         }
-
+        //end
 
         if (!usersToRender.length) {
+            //updated edit this code: userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
             const colspan = document.querySelector('thead tr').children.length;
             userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="${colspan}" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
+            //end
             return;
         }
 
         usersToRender.forEach((user) => {
             const row = document.createElement("tr");
+            
+            //Updated edited this code : row.className = user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white";
             const isSelected = selectedUsers.has(user.user_id);
 
             row.className = `transition-colors ${isSelected ? "bg-orange-100" : (user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white")}`;
@@ -772,7 +800,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     </td>
                 `;
             }
-
+            //end
 
             let actions = `
                 <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
@@ -790,12 +818,14 @@ window.addEventListener("DOMContentLoaded", () => {
                     </button>
                 `;
             }
-
+            // Updated
             let actionsCellHTML = `<td class="px-4 py-3 actions-cell"><div class="flex items-center gap-2">${actions}</div></td>`;
             if (isMultiSelectMode) {
                 actionsCellHTML = `<td class="px-4 py-3 actions-cell"></td>`;
             }
+            // end
 
+            // Updated 
             row.innerHTML = `
                 ${checkboxCell}
                 <td class="px-4 py-3"><p class="font-medium text-gray-800">${user.name}</p><p class="text-gray-500 text-xs">${user.username}</p></td>
@@ -805,7 +835,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
                 ${actionsCellHTML}
             `;
-
+            // end
             userTableBody.appendChild(row);
         });
     }
@@ -884,7 +914,6 @@ window.addEventListener("DOMContentLoaded", () => {
                     showSuccessToast("User Added Successfully!", `${first_name} ${last_name} has been added.`);
                     closeAddUserModal();
                     await loadUsers(currentPage);
-
                 } else {
                     // 3. Show Error Toast (UPDATED TO USE SWEETALERT)
                     showErrorToast("Adding User Failed", data.message || "An unexpected error occurred.");
@@ -903,6 +932,7 @@ window.addEventListener("DOMContentLoaded", () => {
             const row = e.target.closest("tr");
             if (!row || row.dataset.placeholder) return;
 
+            // Updated
             const userId = row.dataset.userId ? parseInt(row.dataset.userId, 10) : null;
 
             if (isMultiSelectMode && userId) {
@@ -916,6 +946,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // end
 
             const validRows = Array.from(userTableBody.querySelectorAll("tr:not([data-placeholder='true'])"));
             const index = validRows.indexOf(row);
@@ -1007,7 +1038,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
             // TOGGLE STATUS
             if (e.target.closest(".toggle-status-btn")) {
-                if (user.role.toLowerCase() === 'admin') return showErrorToast("Action Denied", "Superadmin status cannot be changed!");
+                if (user.role.toLowerCase() === 'superadmin') return showErrorToast("Action Denied", "Superadmin status cannot be changed!");
+                if (user.role.toLowerCase() === 'scanner') return showErrorToast("Action Denied", "Scanner status cannot be changed!");
 
                 const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
 
@@ -1065,9 +1097,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 try {
                     const res = await fetch(`api/admin/userManagement/allowEdit/${userId}`, {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
+                        headers: { "Content-Type": "application/json" }
                     });
                     const data = await res.json();
 
@@ -1130,9 +1160,7 @@ window.addEventListener("DOMContentLoaded", () => {
             try {
                 const res = await fetch(`api/admin/userManagement/update/${currentEditingUserId}`, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
@@ -1197,7 +1225,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 return `<span class="bg-emerald-600 text-white ${base}">${role}</span>`;
             case "staff":
                 return `<span class="bg-teal-600 text-white ${base}">${role}</span>`;
-            case "admin":
+            case "superadmin":
                 return `<span class="bg-purple-600 text-white ${base}">${role}</span>`;
             default:
                 return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
@@ -1211,6 +1239,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     loadUsers(currentPage);
 
+    // Updated
     function updateMultiSelectButtons() {
         const hasSelection = selectedUsers.size > 0;
 
@@ -1388,4 +1417,5 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+    // end
 });

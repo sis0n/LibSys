@@ -122,6 +122,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // BAGONG DAGDAG: ID para sa Edit Modal
     const editUserUserManagementModuleWrapper = document.getElementById("editUserUserManagementModuleWrapper");
 
+    //updated
     const multiSelectBtn = document.getElementById("multiSelectBtn");
     const multiSelectActions = document.getElementById("multiSelectActions");
     const selectAllBtn = document.getElementById("selectAllBtn");
@@ -129,7 +130,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const multiDeleteBtn = document.getElementById("multiDeleteBtn");
     const multiAllowEditBtn = document.getElementById("multiAllowEditBtn");
     const selectionCount = document.getElementById("selectionCount");
-
+    //end
     const userRoleValueEl = document.getElementById("userRoleDropdownValue");
 
     let allUsers = [];
@@ -137,9 +138,10 @@ window.addEventListener("DOMContentLoaded", () => {
     let selectedRole = "All Roles";
     let selectedStatus = "All Status";
     let currentEditingUserId = null;
+    //updated
     let isMultiSelectMode = false;
     let selectedUsers = new Set();
-
+    //end
     let currentPage = 1;
     const limit = 10;
     let totalUsers = 0;
@@ -231,7 +233,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
 
-        paginationList.addEventListener('click', async (e) => {
+        paginationList.addEventListener('click', async (e) => { //Updated nalag lagay ng async
             e.preventDefault();
             if (isLoading) return;
             const target = e.target.closest('a[data-page]');
@@ -240,6 +242,8 @@ window.addEventListener("DOMContentLoaded", () => {
             if (pageStr === '...') return;
             const pageNum = parseInt(pageStr, 10);
             if (!isNaN(pageNum) && pageNum !== currentPage) {
+                 // Gumamit ng default behavior (may loading modal) kapag nagpapalit ng page number
+                 //updated
                 if (isMultiSelectMode && selectedUsers.size > 0) {
                     const isConfirmed = await showConfirmationModal(
                         "Clear Selection?",
@@ -254,6 +258,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 } else {
                     loadUsers(pageNum);
                 }
+                //end
             }
         });
     }
@@ -748,6 +753,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!userTableBody) return;
         userTableBody.innerHTML = "";
 
+        //updated
         const headerRow = document.querySelector('thead tr');
         if (headerRow) {
             const firstHeader = headerRow.querySelector('th');
@@ -763,16 +769,20 @@ window.addEventListener("DOMContentLoaded", () => {
                 }
             }
         }
-
+        //end
 
         if (!usersToRender.length) {
+            //updated edit this code: userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
             const colspan = document.querySelector('thead tr').children.length;
             userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="${colspan}" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
+            //end
             return;
         }
 
         usersToRender.forEach((user) => {
             const row = document.createElement("tr");
+            
+            //Updated edited this code : row.className = user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white";
             const isSelected = selectedUsers.has(user.user_id);
 
             row.className = `transition-colors ${isSelected ? "bg-orange-100" : (user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white")}`;
@@ -790,7 +800,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     </td>
                 `;
             }
-
+            //end
 
             let actions = `
                 <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
@@ -808,12 +818,14 @@ window.addEventListener("DOMContentLoaded", () => {
                     </button>
                 `;
             }
-
+            // Updated
             let actionsCellHTML = `<td class="px-4 py-3 actions-cell"><div class="flex items-center gap-2">${actions}</div></td>`;
             if (isMultiSelectMode) {
                 actionsCellHTML = `<td class="px-4 py-3 actions-cell"></td>`;
             }
+            // end
 
+            // Updated 
             row.innerHTML = `
                 ${checkboxCell}
                 <td class="px-4 py-3"><p class="font-medium text-gray-800">${user.name}</p><p class="text-gray-500 text-xs">${user.username}</p></td>
@@ -823,7 +835,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
                 ${actionsCellHTML}
             `;
-
+            // end
             userTableBody.appendChild(row);
         });
     }
@@ -920,6 +932,7 @@ window.addEventListener("DOMContentLoaded", () => {
             const row = e.target.closest("tr");
             if (!row || row.dataset.placeholder) return;
 
+            // Updated
             const userId = row.dataset.userId ? parseInt(row.dataset.userId, 10) : null;
 
             if (isMultiSelectMode && userId) {
@@ -933,6 +946,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // end
 
             const validRows = Array.from(userTableBody.querySelectorAll("tr:not([data-placeholder='true'])"));
             const index = validRows.indexOf(row);
@@ -1225,7 +1239,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     loadUsers(currentPage);
 
-
+    // Updated
     function updateMultiSelectButtons() {
         const hasSelection = selectedUsers.size > 0;
 
@@ -1403,4 +1417,5 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+    // end
 });

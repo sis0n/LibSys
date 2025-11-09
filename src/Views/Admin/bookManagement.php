@@ -188,6 +188,7 @@
         </div>
     </div>
 
+    <!-- Update -->
     <div class="flex items-center justify-between my-4">
         <h4 id="resultsIndicator" class="text-sm text-gray-600">
             Loading...
@@ -219,6 +220,7 @@
             </button>
         </div>
     </div>
+    <!-- end -->
 
     <div class="overflow-hidden border border-orange-200 rounded-lg shadow-sm">
         <table class="min-w-full text-sm text-gray-700">
@@ -547,12 +549,14 @@
     const fileInput = document.getElementById("csvFile");
     const importMessage = document.getElementById("importMessage");
 
+    // Updated
     const multiSelectBtn = document.getElementById("multiSelectBtn");
     const multiSelectActions = document.getElementById("multiSelectActions");
     const selectAllBtn = document.getElementById("selectAllBtn");
     const cancelSelectionBtn = document.getElementById("cancelSelectionBtn");
     const multiDeleteBtn = document.getElementById("multiDeleteBtn");
     const selectionCount = document.getElementById("selectionCount");
+    // end
 
     if (!bookTableBody || !addBookModal || !editBookModal || !importModal || !searchInput || !paginationList || !resultsIndicator || !viewBookModal) {
         console.error("BookManagement Error: Core components missing.");
@@ -563,7 +567,9 @@
     // ==========================
     // STATE VARIABLES
     // ==========================
+    // Updated
     let books = [];
+    // end
     let totalBooks = 0;
     let currentEditingBookId = null;
     let currentSort = 'default';
@@ -575,9 +581,10 @@
     let currentPage = 1;
     let totalPages = 1;
     let currentApiBaseUrl = '';
+    // Updated
     let isMultiSelectMode = false;
     let selectedBooks = new Set();
-
+// end
 
     fileInput.addEventListener("change", () => {
         if (fileInput.files.length) {
@@ -857,6 +864,7 @@
     const renderBooks = (booksToRender) => {
         bookTableBody.innerHTML = "";
 
+        // Updated
         const headerRow = document.querySelector('thead tr');
         if (headerRow) {
             const firstHeader = headerRow.querySelector('th');
@@ -872,6 +880,7 @@
                 }
             }
         }
+        // end
 
         if (!booksToRender || booksToRender.length === 0) {
             const colspan = document.querySelector('thead tr').children.length;
@@ -901,6 +910,7 @@
             const status = book.availability ? String(book.availability).replace(/</g, "&lt;") : 'N/A';
             const safeTitle = title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
+            // Updated
             let checkboxCell = '';
             if (isMultiSelectMode) {
                 checkboxCell = `
@@ -925,7 +935,6 @@
             if (isMultiSelectMode) {
                 actionsCellHTML = `<td class="py-3 px-4 text-center"></td>`;
             }
-
             rowsHtml += `
             <tr data-book-id="${book.book_id}" class="transition-colors ${isMultiSelectMode ? 'cursor-pointer' : ''} ${isSelected ? 'bg-orange-100' : ''}">
                 ${checkboxCell}
@@ -948,6 +957,7 @@
         });
         bookTableBody.innerHTML = rowsHtml;
     };
+            // end
 
     // ==========================
     // PAGINATION RENDER
@@ -1005,7 +1015,7 @@
         createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
     }
 
-    paginationList.addEventListener('click', async (e) => {
+    paginationList.addEventListener('click', async (e) => { //Updated Naglagay ng async
         e.preventDefault();
         if (isLoading) return;
         const target = e.target.closest('a[data-page]');
@@ -1014,6 +1024,8 @@
         if (pageStr === '...') return;
         const pageNum = parseInt(pageStr, 10);
         if (!isNaN(pageNum) && pageNum !== currentPage) {
+
+            // Updated
             if (isMultiSelectMode && selectedBooks.size > 0) {
                 const isConfirmed = await showConfirmationModal(
                     "Clear Selection?",
@@ -1028,6 +1040,7 @@
             } else {
                 loadBooks(pageNum);
             }
+            // end
         }
     });
 

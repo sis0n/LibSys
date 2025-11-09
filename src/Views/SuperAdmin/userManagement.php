@@ -72,7 +72,7 @@
             </div>
         </div>
     </div>
-
+    <!-- Updated -->
     <div class="flex items-center justify-between my-4">
 
         <h4 id="resultsIndicator" class="text-sm text-gray-600">
@@ -114,7 +114,7 @@
         </div>
 
     </div>
-
+    <!-- end -->
     <div class="overflow-x-auto rounded-lg border border-orange-200">
         <table class="w-full text-sm border-collapse">
             <thead class="bg-orange-50 text-gray-700 border border-orange-100">

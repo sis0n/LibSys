@@ -64,6 +64,55 @@ class ReportRepository
         }
     }
 
+    public function getCirculatedEquipmentsSummary()
+    {
+        try {
+            $sql = "
+                SELECT
+                    'Student' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = CURDATE() THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(CURDATE(), 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) AND MONTH(bt.borrowed_at) = MONTH(CURDATE()) THEN bti.item_id END) AS month,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) THEN bti.item_id END) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.student_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.equipment_id IS NOT NULL
+                UNION ALL
+                SELECT
+                    'Faculty' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = CURDATE() THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(CURDATE(), 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) AND MONTH(bt.borrowed_at) = MONTH(CURDATE()) THEN bti.item_id END) AS month,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) THEN bti.item_id END) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.faculty_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.equipment_id IS NOT NULL
+                UNION ALL
+                SELECT
+                    'Staff' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = CURDATE() THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(CURDATE(), 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) AND MONTH(bt.borrowed_at) = MONTH(CURDATE()) THEN bti.item_id END) AS month,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) THEN bti.item_id END) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.staff_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.equipment_id IS NOT NULL
+                UNION ALL
+                SELECT
+                    'TOTAL' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = CURDATE() THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(CURDATE(), 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) AND MONTH(bt.borrowed_at) = MONTH(CURDATE()) THEN bti.item_id END) AS month,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(CURDATE()) THEN bti.item_id END) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bti.status IN ('borrowed', 'returned', 'overdue') AND bti.equipment_id IS NOT NULL;
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getCirculatedEquipmentsSummary: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function getTopVisitorsByYear()
     {
         try {
@@ -193,7 +242,7 @@ class ReportRepository
                     COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
                     COUNT(bti.item_id) AS year
                 FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
-                WHERE bt.student_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bt.borrowed_at BETWEEN :startDate AND :endDate
+                WHERE bt.student_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.book_id IS NOT NULL AND DATE(bt.borrowed_at) BETWEEN :startDate AND :endDate
                 UNION ALL
                 SELECT
                     'Faculty' AS category,
@@ -202,7 +251,7 @@ class ReportRepository
                     COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
                     COUNT(bti.item_id) AS year
                 FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
-                WHERE bt.faculty_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bt.borrowed_at BETWEEN :startDate AND :endDate
+                WHERE bt.faculty_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.book_id IS NOT NULL AND DATE(bt.borrowed_at) BETWEEN :startDate AND :endDate
                 UNION ALL
                 SELECT
                     'Staff' AS category,
@@ -211,13 +260,71 @@ class ReportRepository
                     COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
                     COUNT(bti.item_id) AS year
                 FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
-                WHERE bt.staff_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bt.borrowed_at BETWEEN :startDate AND :endDate;
+                WHERE bt.staff_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.book_id IS NOT NULL AND DATE(bt.borrowed_at) BETWEEN :startDate AND :endDate
+                UNION ALL
+                SELECT
+                    'TOTAL' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = :endDate THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(:endDate, 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
+                    COUNT(bti.item_id) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bti.status IN ('borrowed', 'returned', 'overdue') AND bti.book_id IS NOT NULL AND DATE(bt.borrowed_at) BETWEEN :startDate AND :endDate;
             ";
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             error_log("ReportRepository error in getCirculatedBooksData: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getCirculatedEquipmentsData($startDate, $endDate)
+    {
+        try {
+            $sql = "
+                SELECT
+                    'Student' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = :endDate THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(:endDate, 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
+                    COUNT(bti.item_id) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.student_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.equipment_id IS NOT NULL AND DATE(bt.borrowed_at) BETWEEN :startDate AND :endDate
+                UNION ALL
+                SELECT
+                    'Faculty' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = :endDate THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(:endDate, 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
+                    COUNT(bti.item_id) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.faculty_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.equipment_id IS NOT NULL AND DATE(bt.borrowed_at) BETWEEN :startDate AND :endDate
+                UNION ALL
+                SELECT
+                    'Staff' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = :endDate THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(:endDate, 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
+                    COUNT(bti.item_id) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bt.staff_id IS NOT NULL AND bti.status IN ('borrowed', 'returned', 'overdue') AND bti.equipment_id IS NOT NULL AND DATE(bt.borrowed_at) BETWEEN :startDate AND :endDate
+                UNION ALL
+                SELECT
+                    'TOTAL' AS category,
+                    COUNT(CASE WHEN DATE(bt.borrowed_at) = :endDate THEN bti.item_id END) AS today,
+                    COUNT(CASE WHEN YEARWEEK(bt.borrowed_at, 1) = YEARWEEK(:endDate, 1) THEN bti.item_id END) AS week,
+                    COUNT(CASE WHEN YEAR(bt.borrowed_at) = YEAR(:endDate) AND MONTH(bt.borrowed_at) = MONTH(:endDate) THEN bti.item_id END) AS month,
+                    COUNT(bti.item_id) AS year
+                FROM borrow_transactions bt JOIN borrow_transaction_items bti ON bt.transaction_id = bti.transaction_id
+                WHERE bti.status IN ('borrowed', 'returned', 'overdue') AND bti.equipment_id IS NOT NULL AND DATE(bt.borrowed_at) BETWEEN :startDate AND :endDate;
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ReportRepository error in getCirculatedEquipmentsData: " . $e->getMessage());
             return [];
         }
     }

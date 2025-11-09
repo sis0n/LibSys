@@ -92,9 +92,6 @@ function initializeAttendanceLogs() {
     const count = document.getElementById('visitor-count');
     const searchInput = document.getElementById("attendanceSearchInput");
     const dateInput = document.getElementById("datePickerInput");
-    const courseBtn = document.getElementById("courseFilterBtn");
-    const courseMenu = document.getElementById("courseFilterMenu");
-    const courseValueSpan = document.getElementById("courseFilterValue");
     const tableBody = document.getElementById("attendanceTableBody");
     const noRecordsRow = document.getElementById("noRecordsRow");
     const checkinsModal = document.getElementById("viewCheckinsModal");
@@ -111,7 +108,7 @@ function initializeAttendanceLogs() {
     const nextPageBtn = document.getElementById('next-page');
 
     // --- VALIDATION ---
-    if (!searchInput || !dateInput || !courseBtn || !tableBody || !noRecordsRow || !checkinsModal || !paginationContainer) {
+    if (!searchInput || !dateInput || !tableBody || !noRecordsRow || !checkinsModal || !paginationContainer) {
         console.error("AttendanceLogs Error: Critical elements are missing.");
         if (tableBody) {
             tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-red-500 py-10">Page components failed to load. Please refresh.</td></tr>`;
@@ -122,7 +119,6 @@ function initializeAttendanceLogs() {
     // --- STATE ---
     let currentSearch = "";
     let currentDate = "";
-    let currentCourse = "All Courses";
     let currentGroupedLogs = []; // Holds the result of groupLogs()
     let searchTimeout; // For debounce
 
@@ -289,9 +285,6 @@ function initializeAttendanceLogs() {
         }
 
         let url = `${BASE_URL_JS}/api/attendance/logs/ajax?period=${periodToSend}&search=${currentSearch}`;
-        if (currentCourse !== "All Courses") {
-            url += `&course=${currentCourse}`;
-        }
 
         try {
             const res = await fetch(url);
@@ -351,27 +344,6 @@ function initializeAttendanceLogs() {
             });
         });
     }
-
-    // Filters
-    function setupDropdown(btn, menu, valueSpan, stateKey) {
-        if (!btn || !menu || !valueSpan) return;
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            menu.classList.toggle("hidden");
-        });
-        menu.querySelectorAll('.dropdown-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const value = item.getAttribute('data-value');
-                valueSpan.textContent = value;
-                menu.classList.add('hidden');
-                if (stateKey === 'course') currentCourse = value;
-                // WALANG LOADING MODAL SA DROPDOWN
-                fetchLogs(false); 
-            });
-        });
-    }
-    setupDropdown(courseBtn, courseMenu, courseValueSpan, 'course');
-    document.addEventListener("click", () => { if (courseMenu) courseMenu.classList.add("hidden"); });
 
     // Walang debounce sa search input para mabilis ang response
     searchInput.addEventListener("input", () => { 

@@ -59,9 +59,9 @@ window.addEventListener("DOMContentLoaded", () => {
         if (typeof Swal == "undefined") return confirm(title);
         const result = await Swal.fire({
             background: "transparent",
-            buttonsStyling: false, 
-            width: '450px', 
-            
+            buttonsStyling: false,
+            width: '450px',
+
             html: `
                 <div class="flex flex-col text-center">
                     <div class="flex justify-center mb-3">
@@ -76,18 +76,18 @@ window.addEventListener("DOMContentLoaded", () => {
             showCancelButton: true,
             confirmButtonText: confirmText,
             cancelButtonText: "Cancel",
-            
+
             customClass: {
                 // FINAL FIX: Orange Border + White BG + Orange Shadow (Matching the theme)
                 popup:
                     "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
-                    
+
                 // Confirm Button (Orange, Large, Bold)
                 confirmButton:
-                    "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base", 
+                    "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base",
                 // Cancel Button (Gray, Large, Bold)
                 cancelButton:
-                    "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base", 
+                    "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base",
 
                 actions: "!mt-4"
             },
@@ -115,13 +115,22 @@ window.addEventListener("DOMContentLoaded", () => {
     const bulkImportForm = document.getElementById("bulkImportForm");
     const fileInput = document.getElementById("csvFile");
     const importMessage = document.getElementById("importMessage");
-    
+
     const modulesSection = document.getElementById("modulesSection");
     const addUserUserManagementModuleWrapper = document.getElementById("addUserUserManagementModuleWrapper");
-    
+
     // BAGONG DAGDAG: ID para sa Edit Modal
     const editUserUserManagementModuleWrapper = document.getElementById("editUserUserManagementModuleWrapper");
-    
+
+    //updated
+    const multiSelectBtn = document.getElementById("multiSelectBtn");
+    const multiSelectActions = document.getElementById("multiSelectActions");
+    const selectAllBtn = document.getElementById("selectAllBtn");
+    const cancelSelectionBtn = document.getElementById("cancelSelectionBtn");
+    const multiDeleteBtn = document.getElementById("multiDeleteBtn");
+    const multiAllowEditBtn = document.getElementById("multiAllowEditBtn");
+    const selectionCount = document.getElementById("selectionCount");
+    //end
     const userRoleValueEl = document.getElementById("userRoleDropdownValue");
 
     let allUsers = [];
@@ -129,7 +138,10 @@ window.addEventListener("DOMContentLoaded", () => {
     let selectedRole = "All Roles";
     let selectedStatus = "All Status";
     let currentEditingUserId = null;
-
+    //updated
+    let isMultiSelectMode = false;
+    let selectedUsers = new Set();
+    //end
     let currentPage = 1;
     const limit = 10;
     let totalUsers = 0;
@@ -221,7 +233,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
 
-        paginationList.addEventListener('click', (e) => {
+        paginationList.addEventListener('click', async (e) => { //Updated nalag lagay ng async
             e.preventDefault();
             if (isLoading) return;
             const target = e.target.closest('a[data-page]');
@@ -230,8 +242,23 @@ window.addEventListener("DOMContentLoaded", () => {
             if (pageStr === '...') return;
             const pageNum = parseInt(pageStr, 10);
             if (!isNaN(pageNum) && pageNum !== currentPage) {
-                // Gumamit ng default behavior (may loading modal) kapag nagpapalit ng page number
-                loadUsers(pageNum);
+                 // Gumamit ng default behavior (may loading modal) kapag nagpapalit ng page number
+                 //updated
+                if (isMultiSelectMode && selectedUsers.size > 0) {
+                    const isConfirmed = await showConfirmationModal(
+                        "Clear Selection?",
+                        "Navigating to another page will clear your current selection. Do you want to continue?",
+                        "Yes, Continue"
+                    );
+                    if (isConfirmed) {
+                        selectedUsers.clear();
+                        updateMultiSelectButtons();
+                        loadUsers(pageNum);
+                    }
+                } else {
+                    loadUsers(pageNum);
+                }
+                //end
             }
         });
     }
@@ -277,15 +304,30 @@ window.addEventListener("DOMContentLoaded", () => {
     function toggleModules(container, role, userModules = []) {
         if (!container) return;
         const normalizedRole = (role || "").trim().toLowerCase();
-        console.log("toggleModules:", normalizedRole, userModules);
+        // console.log("toggleModules:", normalizedRole, userModules); // For debugging
+
+        container.classList.add("hidden");
+        const userMgmtWrapper = container.querySelector('#addUserUserManagementModuleWrapper') || document.getElementById('addUserUserManagementModuleWrapper');
+        const restoreUserWrapper = container.querySelector('#addUserRestoreUserModuleWrapper') || document.getElementById('addUserRestoreUserModuleWrapper');
+
+        if (userMgmtWrapper) userMgmtWrapper.classList.add('hidden');
+        if (restoreUserWrapper) restoreUserWrapper.classList.add('hidden');
 
         if (normalizedRole === "admin" || normalizedRole === "librarian") {
             container.classList.remove("hidden");
+
             container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                 cb.checked = userModules.some(m => m.toLowerCase().trim() === cb.value.toLowerCase().trim()) || false;
             });
+
+            if (normalizedRole === 'admin') {
+                if (userMgmtWrapper) userMgmtWrapper.classList.remove('hidden');
+                if (restoreUserWrapper) restoreUserWrapper.classList.remove('hidden');
+            } else if (normalizedRole === 'librarian') {
+                if (userMgmtWrapper) userMgmtWrapper.classList.remove('hidden');
+            }
         } else {
-            container.classList.add("hidden");
+            // Kung hindi admin/librarian, siguraduhing naka-uncheck lahat
             container.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
     }
@@ -382,15 +424,15 @@ window.addEventListener("DOMContentLoaded", () => {
         // For accurate module status on role change in the modal, we'd need more logic, 
         // but sticking to the current structure, we just toggle visibility based on the *new* role selected.
         const normalizedRole = (val || "").trim().toLowerCase();
-        
+
         if (editModulesContainer) {
             if (normalizedRole === 'admin' || normalizedRole === 'librarian') {
                 editModulesContainer.classList.remove("hidden");
-                
+
                 if (editUserUserManagementModuleWrapper) {
                     if (normalizedRole === 'admin') {
                         editUserUserManagementModuleWrapper.classList.remove('hidden');
-                    } else { 
+                    } else {
                         editUserUserManagementModuleWrapper.classList.add('hidden');
                     }
                 }
@@ -398,7 +440,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 editModulesContainer.classList.add("hidden");
             }
         }
-        
+
         // This is necessary to visually mark the selected option
         setActiveOption("editRoleDropdownMenu", el);
     };
@@ -422,7 +464,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     bulkImportForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        
+
         if (!fileInput) return showErrorToast("Import Error", "No file input found for bulk import.");
         if (!fileInput.files.length) return showErrorToast("Import Error", "Please pick a CSV file for bulk import.");
 
@@ -437,7 +479,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 body: formData
             });
             const data = await res.json();
-            
+
             await new Promise(r => setTimeout(r, 1000)); // Minimum delay 1000ms
             Swal.close();
 
@@ -451,7 +493,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 fileInput.value = "";
                 closeModal(modal);
                 // I-load ang users pagkatapos mag-import, gumagamit ng loading modal
-                await loadUsers(1, true); 
+                await loadUsers(1, true);
             } else {
                 showErrorToast("Import Failed", data.message || "Failed to import CSV.");
             }
@@ -471,9 +513,9 @@ window.addEventListener("DOMContentLoaded", () => {
                 currentPage = 1;
                 try {
                     sessionStorage.removeItem('userManagementPage');
-                } catch (e) {}
+                } catch (e) { }
                 // Hindi gagamit ng loading modal para sa search
-                loadUsers(1, false); 
+                loadUsers(1, false);
             }, 500);
         });
     }
@@ -482,9 +524,9 @@ window.addEventListener("DOMContentLoaded", () => {
         currentPage = 1;
         try {
             sessionStorage.removeItem('userManagementPage');
-        } catch (e) {}
+        } catch (e) { }
         // Hindi gagamit ng loading modal para sa dropdown filters
-        loadUsers(1, false); 
+        loadUsers(1, false);
     }
 
     function closeAddUserModal() {
@@ -524,14 +566,14 @@ window.addEventListener("DOMContentLoaded", () => {
         document.getElementById('passwordFields')?.classList.add('hidden');
         document.getElementById('editPassword') && (document.getElementById('editPassword').value = '');
         document.getElementById('confirmPassword') && (document.getElementById('confirmPassword').value = '');
-        
+
         // BAGONG DAGDAG: Siguraduhin na nakatago rin ito pag-close
         if (editUserUserManagementModuleWrapper) {
             editUserUserManagementModuleWrapper.classList.add('hidden');
         }
         const editModulesContainer = document.getElementById("editPermissionsContainer");
         if (editModulesContainer) {
-             editModulesContainer.classList.add('hidden');
+            editModulesContainer.classList.add('hidden');
         }
     }
     [closeEditUserBtn, cancelEditUserBtn].forEach(btn => btn?.addEventListener("click", closeEditUserModal));
@@ -617,19 +659,19 @@ window.addEventListener("DOMContentLoaded", () => {
         if (isLoading) return;
         isLoading = true;
         currentPage = page;
-        
+
         // --- 1. SET START TIME FOR DELAY CHECK ---
         const startTime = Date.now();
-        
+
         document.getElementById("paginationControls")?.classList.add('hidden');
         // document.getElementById("resultsIndicator").textContent = 'Loading...';
-        if (userTableBody) userTableBody.innerHTML = ""; 
-        
+        if (userTableBody) userTableBody.innerHTML = "";
+
         // --- 2. SHOW SWEETALERT LOADING MODAL (KUNG KAILANGAN) ---
         if (isShowLoadingModal) {
             showLoadingModal("Loading User List...", "Fetching data for page " + page);
         }
-        
+
 
         const offset = (page - 1) * limit;
         const search = document.getElementById("userSearchInput").value.trim();
@@ -646,7 +688,7 @@ window.addEventListener("DOMContentLoaded", () => {
             const res = await fetch(`api/admin/userManagement/pagination?${params.toString()}`);
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             const data = await res.json();
-            
+
             // --- 3. CLOSE LOADING MODAL (SUCCESS PATH) ---
             if (isShowLoadingModal) { // Kung nagpakita ng modal, isara ito
                 const elapsed = Date.now() - startTime;
@@ -661,7 +703,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 totalPages = Math.ceil(totalUsers / limit) || 1;
 
                 if (page > totalPages && totalPages > 0) {
-                    loadUsers(totalPages, isShowLoadingModal); 
+                    loadUsers(totalPages, isShowLoadingModal);
                     return;
                 }
 
@@ -693,15 +735,15 @@ window.addEventListener("DOMContentLoaded", () => {
         } catch (err) {
             // --- 4. CLOSE LOADING MODAL (ERROR PATH) ---
             if (isShowLoadingModal && typeof Swal != "undefined") Swal.close(); // Kung nagpakita ng modal, isara ito
-            
+
             console.error("Fetch users error:", err);
             if (userTableBody) userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-red-500 py-10">Error loading users.</td></tr>`;
             updateUserCounts(0, 0, 1, limit);
             showErrorToast("Loading Failed", "Could not retrieve user list. Check your connection.");
-            
+
             try {
                 sessionStorage.removeItem('userManagementPage');
-            } catch (e) {}
+            } catch (e) { }
         } finally {
             isLoading = false;
         }
@@ -711,14 +753,54 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!userTableBody) return;
         userTableBody.innerHTML = "";
 
+        //updated
+        const headerRow = document.querySelector('thead tr');
+        if (headerRow) {
+            const firstHeader = headerRow.querySelector('th');
+            if (isMultiSelectMode) {
+                if (!firstHeader.classList.contains('multi-select-header')) {
+                    const th = document.createElement('th');
+                    th.className = 'px-4 py-3 font-medium multi-select-header';
+                    headerRow.insertBefore(th, firstHeader);
+                }
+            } else {
+                if (firstHeader && firstHeader.classList.contains('multi-select-header')) {
+                    firstHeader.remove();
+                }
+            }
+        }
+        //end
+
         if (!usersToRender.length) {
-            userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
+            //updated edit this code: userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="6" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
+            const colspan = document.querySelector('thead tr').children.length;
+            userTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="${colspan}" class="text-center text-gray-500 py-10">No users found.</td></tr>`;
+            //end
             return;
         }
 
         usersToRender.forEach((user) => {
             const row = document.createElement("tr");
-            row.className = user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white";
+            
+            //Updated edited this code : row.className = user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white";
+            const isSelected = selectedUsers.has(user.user_id);
+
+            row.className = `transition-colors ${isSelected ? "bg-orange-100" : (user.status === "Inactive" ? "bg-gray-50 text-gray-500" : "bg-white")}`;
+            if (isMultiSelectMode) {
+                row.classList.add("cursor-pointer");
+                row.dataset.userId = user.user_id;
+            }
+
+
+            let checkboxCell = '';
+            if (isMultiSelectMode) {
+                checkboxCell = `
+                    <td class="px-4 py-3">
+                        <input type="checkbox" class="user-checkbox accent-orange-500 pointer-events-none" data-user-id="${user.user_id}" ${isSelected ? "checked" : ""}>
+                    </td>
+                `;
+            }
+            //end
 
             let actions = `
                 <button class="editUserBtn flex items-center gap-1 border border-orange-200 text-gray-600 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-orange-50 transition">
@@ -736,15 +818,24 @@ window.addEventListener("DOMContentLoaded", () => {
                     </button>
                 `;
             }
+            // Updated
+            let actionsCellHTML = `<td class="px-4 py-3 actions-cell"><div class="flex items-center gap-2">${actions}</div></td>`;
+            if (isMultiSelectMode) {
+                actionsCellHTML = `<td class="px-4 py-3 actions-cell"></td>`;
+            }
+            // end
 
+            // Updated 
             row.innerHTML = `
+                ${checkboxCell}
                 <td class="px-4 py-3"><p class="font-medium text-gray-800">${user.name}</p><p class="text-gray-500 text-xs">${user.username}</p></td>
                 <td class="px-4 py-3">${user.email || 'N/A'}</td>
                 <td class="px-4 py-3">${getRoleBadge(user.role)}</td>
                 <td class="px-4 py-3"><span class="status-badge cursor-pointer toggle-status-btn">${getStatusBadge(user.status)}</span></td>
                 <td class="px-4 py-3 text-gray-700">${user.joinDate}</td>
-                <td class="px-4 py-3"><div class="flex items-center gap-2">${actions}</div></td>
+                ${actionsCellHTML}
             `;
+            // end
             userTableBody.appendChild(row);
         });
     }
@@ -811,7 +902,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     })
                 });
                 const data = await res.json();
-                
+
                 // MABILIS NA PAGSARA
                 const elapsed = Date.now() - addStartTime;
                 const minModalDisplay = 500; // Minimum 500ms display time
@@ -823,7 +914,6 @@ window.addEventListener("DOMContentLoaded", () => {
                     showSuccessToast("User Added Successfully!", `${first_name} ${last_name} has been added.`);
                     closeAddUserModal();
                     await loadUsers(currentPage);
-                    
                 } else {
                     // 3. Show Error Toast (UPDATED TO USE SWEETALERT)
                     showErrorToast("Adding User Failed", data.message || "An unexpected error occurred.");
@@ -841,6 +931,22 @@ window.addEventListener("DOMContentLoaded", () => {
         userTableBody.addEventListener("click", async (e) => {
             const row = e.target.closest("tr");
             if (!row || row.dataset.placeholder) return;
+
+            // Updated
+            const userId = row.dataset.userId ? parseInt(row.dataset.userId, 10) : null;
+
+            if (isMultiSelectMode && userId) {
+                if (selectedUsers.has(userId)) {
+                    selectedUsers.delete(userId);
+                } else {
+                    selectedUsers.add(userId);
+                }
+                renderTable(users);
+                updateMultiSelectButtons();
+                return;
+            }
+
+            // end
 
             const validRows = Array.from(userTableBody.querySelectorAll("tr:not([data-placeholder='true'])"));
             const index = validRows.indexOf(row);
@@ -866,11 +972,11 @@ window.addEventListener("DOMContentLoaded", () => {
                 if (editModulesContainer) {
                     if (userRole === 'admin' || userRole === 'librarian') {
                         editModulesContainer.classList.remove("hidden");
-                        
+
                         if (editUserUserManagementModuleWrapper) {
                             if (userRole === 'admin') {
                                 editUserUserManagementModuleWrapper.classList.remove('hidden');
-                            } else { 
+                            } else {
                                 editUserUserManagementModuleWrapper.classList.add('hidden');
                             }
                         }
@@ -894,7 +1000,7 @@ window.addEventListener("DOMContentLoaded", () => {
             if (e.target.closest(".deleteUserBtn")) {
                 // Use the FINAL CUSTOMIZED confirmation modal
                 const isConfirmed = await showConfirmationModal(
-                    "Confirm Deletion", 
+                    "Confirm Deletion",
                     `Are you sure you want to delete user: ${user.name} (${user.role})? This action cannot be undone.`,
                     "Yes, Delete!"
                 );
@@ -909,17 +1015,17 @@ window.addEventListener("DOMContentLoaded", () => {
                         method: "POST"
                     });
                     const data = await res.json();
-                    
+
                     // CLOSE LOADING (Minimal display: 500ms)
                     const elapsed = Date.now() - deleteStartTime;
                     const minModalDisplay = 500;
                     if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
-                    Swal.close(); 
+                    Swal.close();
 
                     if (data.success) {
                         showSuccessToast("User Deleted!", `User ${user.name} was successfully removed.`);
                         // REFRESH TABLE W/O LOADING MODAL
-                        await loadUsers(currentPage, false); 
+                        await loadUsers(currentPage, false);
                     } else {
                         showErrorToast("Deletion Failed", data.message || "Failed to delete the user.");
                     }
@@ -932,20 +1038,21 @@ window.addEventListener("DOMContentLoaded", () => {
 
             // TOGGLE STATUS
             if (e.target.closest(".toggle-status-btn")) {
-                if (user.role.toLowerCase() === 'admin') return showErrorToast("Action Denied", "Superadmin status cannot be changed!");
+                if (user.role.toLowerCase() === 'superadmin') return showErrorToast("Action Denied", "Superadmin status cannot be changed!");
+                if (user.role.toLowerCase() === 'scanner') return showErrorToast("Action Denied", "Scanner status cannot be changed!");
 
                 const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
-                
+
                 // Use the FINAL CUSTOMIZED confirmation modal
                 const isConfirmed = await showConfirmationModal(
-                    "Confirm Status Change", 
+                    "Confirm Status Change",
                     `Are you sure you want to change the status of ${user.name} to **${newStatus}**?`,
                     `Yes, ${newStatus}`
                 );
                 if (!isConfirmed) return;
 
                 // --- BAGONG LOGIC PARA SA MABILIS NA LOADING ---
-                showLoadingModal("Updating Status...", `Setting status to ${newStatus}.`); 
+                showLoadingModal("Updating Status...", `Setting status to ${newStatus}.`);
                 const statusStartTime = Date.now();
 
                 try {
@@ -953,17 +1060,17 @@ window.addEventListener("DOMContentLoaded", () => {
                         method: "POST"
                     });
                     const data = await res.json();
-                    
+
                     // Isara agad ang loading modal (minimal delay lang para makita ang animation)
                     const elapsed = Date.now() - statusStartTime;
                     const minModalDisplay = 500; // 500ms minimum display time
                     if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
-                    Swal.close(); 
+                    Swal.close();
 
                     if (data.success) {
                         showSuccessToast("Status Updated", `${user.name} is now ${data.newStatus}.`);
                         // I-reload ang users nang walang loading modal para mas mabilis (false parameter)
-                        await loadUsers(currentPage, false); 
+                        await loadUsers(currentPage, false);
                     } else {
                         showErrorToast("Status Update Failed", data.message || "Failed to update user status.");
                     }
@@ -976,7 +1083,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
             if (e.target.closest(".allow-edit-btn")) {
                 const userId = user.user_id;
-                
+
                 // Use the FINAL CUSTOMIZED confirmation modal
                 const isConfirmed = await showConfirmationModal(
                     "Allow Profile Edit?",
@@ -993,13 +1100,13 @@ window.addEventListener("DOMContentLoaded", () => {
                         headers: { "Content-Type": "application/json" }
                     });
                     const data = await res.json();
-                    
+
                     await new Promise(r => setTimeout(r, 1000)); // Minimum delay 1000ms
                     Swal.close();
 
                     if (data.success) {
                         showSuccessToast("Permission Granted", data.message || "User can now edit their profile.");
-                        
+
                     } else {
                         showErrorToast("Permission Failed", data.message || "Failed to allow edit for the user.");
                     }
@@ -1049,7 +1156,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
             showLoadingModal("Saving Changes...", `Updating user details for ${payload.first_name} ${payload.last_name}.`);
             const editStartTime = Date.now();
-            
+
             try {
                 const res = await fetch(`api/admin/userManagement/update/${currentEditingUserId}`, {
                     method: "POST",
@@ -1057,14 +1164,14 @@ window.addEventListener("DOMContentLoaded", () => {
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-                
+
                 await new Promise(r => setTimeout(r, 1000)); // Minimum delay 1000ms
                 Swal.close();
 
                 if (data.success) {
                     showSuccessToast("User Updated!", "User information saved successfully.");
                     closeEditUserModal();
-                   
+
                 } else {
                     showErrorToast("Update Failed", data.message || "Failed to update user information.");
                 }
@@ -1118,7 +1225,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 return `<span class="bg-emerald-600 text-white ${base}">${role}</span>`;
             case "staff":
                 return `<span class="bg-teal-600 text-white ${base}">${role}</span>`;
-            case "admin":
+            case "superadmin":
                 return `<span class="bg-purple-600 text-white ${base}">${role}</span>`;
             default:
                 return `<span class="bg-gray-300 text-gray-800 ${base}">${role}</span>`;
@@ -1131,4 +1238,184 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     loadUsers(currentPage);
+
+    // Updated
+    function updateMultiSelectButtons() {
+        const hasSelection = selectedUsers.size > 0;
+
+        if (isMultiSelectMode) {
+            multiSelectBtn.classList.add('hidden');
+            multiSelectActions.classList.remove('hidden');
+            multiSelectActions.classList.add('inline-flex');
+        } else {
+            multiSelectBtn.classList.remove('hidden');
+            multiSelectActions.classList.add('hidden');
+            multiSelectActions.classList.remove('inline-flex');
+        }
+
+        multiDeleteBtn.classList.toggle('hidden', !hasSelection);
+        multiAllowEditBtn.classList.toggle('hidden', !hasSelection);
+        if (selectionCount) selectionCount.textContent = selectedUsers.size;
+
+        const allVisibleUserIds = users.map(u => u.user_id);
+        const allSelectedOnPage = allVisibleUserIds.length > 0 && allVisibleUserIds.every(id => selectedUsers.has(id));
+
+        if (allSelectedOnPage) {
+            selectAllBtn.innerHTML = `<i class="ph ph-check-square-offset text-base"></i> Deselect All`;
+        } else {
+            selectAllBtn.innerHTML = `<i class="ph ph-check-square-offset text-base"></i> Select All`;
+        }
+    }
+
+
+    if (multiSelectBtn) {
+        multiSelectBtn.addEventListener('click', () => {
+            isMultiSelectMode = true;
+            updateMultiSelectButtons();
+            renderTable(users);
+        });
+    }
+
+    if (cancelSelectionBtn) {
+        cancelSelectionBtn.addEventListener('click', () => {
+            isMultiSelectMode = false;
+            selectedUsers.clear();
+            updateMultiSelectButtons();
+            renderTable(users);
+        });
+    }
+
+
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => {
+            const allVisibleUserIds = users.map(u => u.user_id);
+            const allSelectedOnPage = allVisibleUserIds.length > 0 && allVisibleUserIds.every(id => selectedUsers.has(id));
+
+            if (allSelectedOnPage) {
+                allVisibleUserIds.forEach(id => selectedUsers.delete(id));
+            } else {
+                allVisibleUserIds.forEach(id => selectedUsers.add(id));
+            }
+            renderTable(users);
+            updateMultiSelectButtons();
+        });
+    }
+
+    if (multiDeleteBtn) {
+        multiDeleteBtn.addEventListener('click', async () => {
+            const userIds = [...selectedUsers];
+            if (userIds.length === 0) {
+                return showErrorToast("No Users Selected", "Please select users to delete.");
+            }
+
+            const isConfirmed = await showConfirmationModal(
+                `Delete ${userIds.length} Users?`,
+                `Are you sure you want to permanently delete the selected ${userIds.length} user(s)? This action cannot be undone.`,
+                "Yes, Delete All"
+            );
+
+            if (!isConfirmed) return;
+
+            showLoadingModal("Deleting Users...", `Processing ${userIds.length} user(s).`);
+
+            try {
+                const res = await fetch('api/admin/userManagement/deleteMultiple', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_ids: userIds
+                    })
+                });
+
+                const data = await res.json();
+                Swal.close();
+
+                if (data.success) {
+                    showSuccessToast("Deletion Successful", data.message);
+                } else {
+                    let errorMessage = data.message;
+                    if (data.errors && data.errors.length > 0) {
+                        errorMessage += ` ${data.errors.join(' ')}`;
+                    }
+                    showErrorToast("Deletion Failed", errorMessage);
+                }
+
+                isMultiSelectMode = false;
+                selectedUsers.clear();
+                updateMultiSelectButtons();
+                loadUsers(1, false);
+
+            } catch (err) {
+                Swal.close();
+                console.error("Multi-delete error:", err);
+                showErrorToast("Network Error", "An error occurred while connecting to the server.");
+            }
+        });
+    }
+
+    if (multiAllowEditBtn) {
+        multiAllowEditBtn.addEventListener('click', async () => {
+            const selectedIds = [...selectedUsers];
+            if (selectedIds.length === 0) {
+                return showErrorToast("No Users Selected", "Please select students to allow edit access.");
+            }
+
+            const allAreStudents = selectedIds.every(id => {
+                const user = users.find(u => u.user_id === id);
+                return user && user.role.toLowerCase() === 'student';
+            });
+
+            if (!allAreStudents) {
+                return showErrorToast("Invalid Selection", "This action can only be applied to students.");
+            }
+
+            const isConfirmed = await showConfirmationModal(
+                `Allow Edit for ${selectedIds.length} Students?`,
+                `This will grant temporary profile edit access to the selected ${selectedIds.length} student(s). Continue?`,
+                "Yes, Grant Access"
+            );
+
+            if (!isConfirmed) return;
+
+            showLoadingModal("Granting Access...", `Processing ${selectedIds.length} student(s).`);
+
+            try {
+                const res = await fetch('api/admin/userManagement/allowMultipleEdit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_ids: selectedIds
+                    })
+                });
+
+                const data = await res.json();
+                Swal.close();
+
+                if (data.success) {
+                    showSuccessToast("Access Granted", data.message);
+                } else {
+                    let errorMessage = data.message;
+                    if (data.errors && data.errors.length > 0) {
+                        errorMessage += ` ${data.errors.join(' ')}`;
+                    }
+                    showErrorToast("Action Failed", errorMessage);
+                }
+
+                isMultiSelectMode = false;
+                selectedUsers.clear();
+                updateMultiSelectButtons();
+                loadUsers(currentPage, false);
+
+            } catch (err) {
+                Swal.close();
+                console.error("Multi-allow-edit error:", err);
+                showErrorToast("Network Error", "An error occurred while connecting to the server.");
+            }
+        });
+    }
+    // end
 });

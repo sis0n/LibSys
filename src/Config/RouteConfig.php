@@ -81,12 +81,15 @@ class RouteConfig
         $router->get('api/librarian/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['restore books']);
         $router->post('api/librarian/restoreBooks/restore', 'RestoreBookController@restore', ['restore books']);
         $router->post('api/librarian/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['restore books']);
+        // updated
         $router->get('api/librarian/booksmanagement/fetch', 'BookManagementController@fetch', ['book management']);
         $router->get('api/librarian/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['book management']);
         $router->post('api/librarian/booksmanagement/store', 'BookManagementController@store', ['book management']);
         $router->post('api/librarian/booksmanagement/update/{id}', 'BookManagementController@update', ['book management']);
         $router->post('api/librarian/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
+        $router->post('api/librarian/booksmanagement/deleteMultiple', 'BookManagementController@deleteMultiple', ['book management']);
         $router->post('api/librarian/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
+        // --end
         $router->post('api/librarian/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/librarian/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
         $router->get('api/librarian/returning/getTableData', 'ReturningController@getOverdue', ['returning']);
@@ -96,6 +99,9 @@ class RouteConfig
         $router->post('api/librarian/returning/sendOverdueEmail', 'ReturningController@sendOverdueEmail', ['returning']);
         $router->get('api/librarian/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
         $router->get('api/librarian/reports/circulated-books', 'ReportController@getCirculatedBooksReport',['reports']);
+       //updated
+        $router->get('api/librarian/reports/circulated-equipments', 'ReportController@getCirculatedEquipmentsReport', ['reports']);
+       //--end 
         $router->get('api/librarian/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
         $router->get('api/librarian/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/librarian/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
@@ -118,12 +124,15 @@ class RouteConfig
         $router->get('api/admin/restoreBooks/fetch', 'RestoreBookController@getDeletedBooksJson', ['restore books']);
         $router->post('api/admin/restoreBooks/restore', 'RestoreBookController@restore', ['restore books']);
         $router->post('api/admin/restoreBooks/archive/{id}', 'RestoreBookController@archiveBookAction', ['restore books']);
+        // -- updated
         $router->get('api/admin/bookManagement/fetch', 'BookManagementController@fetch', ['book management']);
         $router->get('api/admin/bookManagement/get/{id}', 'BookManagementController@getDetails', ['book management']);
         $router->post('api/admin/bookManagement/store', 'BookManagementController@store', ['book management']);
         $router->post('api/admin/bookManagement/update/{id}', 'BookManagementController@update', ['book management']);
         $router->post('api/admin/bookManagement/delete/{id}', 'BookManagementController@destroy', ['book management']);
+        $router->post('api/admin/bookManagement/deleteMultiple', 'BookManagementController@deleteMultiple', ['book management']);
         $router->post('api/admin/bookManagement/bulkImport', 'BookManagementController@bulkImport', ['book management']);
+        // --end
         $router->post('api/admin/qrScanner/scanTicket', 'QRScannerController@scan', ['qr scanner']);
         $router->post('api/admin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['qr scanner']);
         $router->get('api/admin/transactionHistory/json', 'TransactionHistoryController@getTransactionsJson', ['transaction history']);
@@ -138,6 +147,9 @@ class RouteConfig
         $router->post('api/admin/returning/extend', 'ReturningController@extendDueDate', ['returning']);
         $router->post('api/admin/returning/sendOverdueEmail', 'ReturningController@sendOverdueEmail', ['returning']);
         $router->get('api/admin/reports/circulated-books', 'ReportController@getCirculatedBooksReport',['reports']);
+        // updated
+        $router->get('api/admin/reports/circulated-equipments', 'ReportController@getCirculatedEquipmentsReport', ['reports']);
+        // end
         $router->get('api/admin/reports/top-visitors', 'ReportController@getTopVisitors',['reports']);
         $router->get('api/admin/reports/deleted-books', 'ReportController@getDeletedBooks',['reports']);
         $router->get('api/admin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment',['reports']);
@@ -149,6 +161,8 @@ class RouteConfig
         $router->post('api/admin/userManagement/add', 'UserManagementController@addUser', ['user management']);
         $router->post('api/admin/userManagement/update/{id}', 'UserManagementController@updateUser', ['user management']);
         $router->post('api/admin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['user management']);
+        $router->post('api/admin/userManagement/deleteMultiple', 'UserManagementController@deleteMultipleUsers', ['user management']);
+        $router->post('api/admin/userManagement/allowMultipleEdit', 'UserManagementController@allowMultipleEdit', ['user management']);
         $router->post('api/admin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['user management']);
         $router->post('api/admin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['user management']);
         $router->post('api/admin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['user management']);
@@ -170,18 +184,26 @@ class RouteConfig
         $router->get('api/superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
         $router->get('api/superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);
         $router->post('api/superadmin/userManagement/add', 'UserManagementController@addUser', ['superadmin']);
+        //date update --
         $router->post('api/superadmin/userManagement/update/{id}', 'UserManagementController@updateUser', ['superadmin']);
         $router->post('api/superadmin/userManagement/delete/{id}', 'UserManagementController@deleteUser', ['superadmin']);
-        $router->post('api/superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus', ['superadmin']);
+        $router->post('api/superadmin/userManagement/deleteMultiple', 'UserManagementController@deleteMultipleUsers');
+        $router->post('api/superadmin/userManagement/allowMultipleEdit', 'UserManagementController@allowMultipleEdit');
+        $router->post('api/superadmin/userManagement/toggleStatus/{id}', 'UserManagementController@toggleStatus');
+        $router->post('api/superadmin/userManagement/update/{id}', 'UserManagementController@updateUser');
         $router->post('api/superadmin/userManagement/allowEdit/{id}', 'UserManagementController@allowEdit', ['superadmin']);
-        $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport', ['superadmin']);
+        // -- end
+        $router->post('api/superadmin/userManagement/bulkImport', 'UserManagementController@bulkImport');
         $router->get('api/superadmin/userManagement/getAllCourses', 'DataController@getAllCourses', ['superadmin']);
         $router->get('api/superadmin/userManagement/getColleges', 'DataController@getColleges', ['superadmin']);
         $router->get('api/superadmin/booksmanagement/fetch', 'BookManagementController@fetch', ['superadmin']);
+        //updated
         $router->get('api/superadmin/booksmanagement/get/{id}', 'BookManagementController@getDetails', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/store', 'BookManagementController@store', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/update/{id}', 'BookManagementController@update', ['superadmin']);
         $router->post('api/superadmin/booksmanagement/delete/{id}', 'BookManagementController@destroy', ['superadmin']);
+        $router->post('api/superadmin/booksmanagement/deleteMultiple', 'BookManagementController@deleteMultiple', ['superadmin']);
+        //-- end
         $router->post('api/superadmin/booksmanagement/bulkImport', 'BookManagementController@bulkImport', ['superadmin']);
         $router->post('api/superadmin/qrScanner/scanTicket', 'QRScannerController@scan', ['superadmin']);
         $router->post('api/superadmin/qrScanner/borrowTransaction', 'QRScannerController@borrowTransaction', ['superadmin']);
@@ -211,6 +233,7 @@ class RouteConfig
         $router->post('api/superadmin/borrowingForm/checkUser', 'ManualBorrowingController@checkUser');
         $router->post('api/superadmin/borrowingForm/create', 'ManualBorrowingController@create');
         $router->get('api/superadmin/reports/circulated-books', 'ReportController@getCirculatedBooksReport', ['superadmin']);
+        $router->get('api/superadmin/reports/circulated-equipments', 'ReportController@getCirculatedEquipmentsReport', ['superadmin']);
         $router->get('api/superadmin/reports/top-visitors', 'ReportController@getTopVisitors', ['superadmin']);
         $router->get('api/superadmin/reports/deleted-books', 'ReportController@getDeletedBooks', ['superadmin']);
         $router->get('api/superadmin/reports/library-visits-department', 'ReportController@getLibraryVisitsByDepartment', ['superadmin']);

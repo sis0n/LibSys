@@ -259,6 +259,137 @@ class UserManagementController extends Controller
     }
   }
 
+  // Updated
+  public function deleteMultipleUsers()
+  {
+    header('Content-Type: application/json');
+    $data = json_decode(file_get_contents("php://input"), true);
+    $userIds = $data['user_ids'] ?? [];
+
+    $deletedBy = $_SESSION['user_id'] ?? null;
+    if (!$deletedBy) {
+      echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+      return;
+    }
+
+    if (empty($userIds) || !is_array($userIds)) {
+      echo json_encode(['success' => false, 'message' => 'No user IDs provided.']);
+      return;
+    }
+
+    $deletedCount = 0;
+    $errors = [];
+
+    foreach ($userIds as $id) {
+      $id = (int)$id;
+      $user = $this->userRepo->getUserById($id);
+
+      if (!$user) {
+        $errors[] = "User with ID $id not found.";
+        continue;
+      }
+
+      if (strtolower($user['role']) === 'superadmin') {
+        $errors[] = "Cannot delete Superadmin: {$user['username']}.";
+        continue;
+      }
+
+      if ($id === $deletedBy) {
+        $errors[] = "You cannot delete your own account.";
+        continue;
+      }
+
+      if ($this->userRepo->hasBorrowedItems($id)) {
+        $errors[] = "Cannot delete {$user['username']}: User has borrowed items.";
+        continue;
+      }
+
+      try {
+        if ($this->userRepo->deleteUserWithCascade($id, $deletedBy)) {
+          $deletedCount++;
+        } else {
+          $errors[] = "Failed to delete user: {$user['username']}.";
+        }
+      } catch (\Exception $e) {
+        $errors[] = "Error deleting {$user['username']}: " . $e->getMessage();
+      }
+    }
+
+    $response = [
+      'success' => $deletedCount > 0,
+      'message' => "Successfully deleted $deletedCount user(s).",
+      'deleted_count' => $deletedCount,
+      'errors' => $errors
+    ];
+
+    if ($deletedCount === 0 && !empty($errors)) {
+      $response['success'] = false;
+      $response['message'] = "No users were deleted. See errors for details.";
+    } else if ($deletedCount > 0 && !empty($errors)) {
+      $response['message'] = "Partially completed: Deleted $deletedCount user(s) with some errors.";
+    }
+
+    echo json_encode($response);
+  }
+
+  public function allowMultipleEdit()
+  {
+    header('Content-Type: application/json');
+    $data = json_decode(file_get_contents("php://input"), true);
+    $userIds = $data['user_ids'] ?? [];
+
+    if (empty($userIds) || !is_array($userIds)) {
+      echo json_encode(['success' => false, 'message' => 'No user IDs provided.']);
+      return;
+    }
+
+    $studentProfileRepo = new \App\Repositories\StudentProfileRepository();
+    $updatedCount = 0;
+    $errors = [];
+
+    foreach ($userIds as $id) {
+      $id = (int)$id;
+      $user = $this->userRepo->getUserById($id);
+
+      if (!$user) {
+        $errors[] = "User with ID $id not found.";
+        continue;
+      }
+
+      if (strtolower($user['role']) !== 'student') {
+        $errors[] = "User {$user['username']} is not a student.";
+        continue;
+      }
+
+      try {
+        if ($studentProfileRepo->setEditAccess($id, true)) {
+          $updatedCount++;
+        } else {
+          $errors[] = "Failed to grant access to {$user['username']}.";
+        }
+      } catch (\Exception $e) {
+        $errors[] = "Error granting access to {$user['username']}: " . $e->getMessage();
+      }
+    }
+
+    $response = [
+      'success' => $updatedCount > 0,
+      'message' => "Successfully granted edit access to $updatedCount student(s).",
+      'updated_count' => $updatedCount,
+      'errors' => $errors
+    ];
+
+    if ($updatedCount === 0 && !empty($errors)) {
+      $response['success'] = false;
+      $response['message'] = "No access was granted. See errors for details.";
+    } else if ($updatedCount > 0 && !empty($errors)) {
+      $response['message'] = "Partially completed: Granted access to $updatedCount student(s) with some errors.";
+    }
+
+    echo json_encode($response);
+  }
+  // end
+
   public function toggleStatus($id)
   {
     header('Content-Type: application/json');

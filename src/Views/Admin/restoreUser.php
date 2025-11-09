@@ -1,3 +1,10 @@
+<?php
+$currentUserRole = strtolower($_SESSION['role'] ?? 'guest');
+?>
+<?php if (!empty($csrf_token)) : ?>
+  <input type="hidden" id="csrf_token" value="<?= $csrf_token ?>">
+<?php endif; ?>
+
 <main class="min-h-screen">
     <div class="flex items-center gap-3 mb-6">
         <i class="ph-fill ph-user-plus text-3xl text-gray-700"></i>
@@ -127,7 +134,8 @@
                 </button>
 
                 <button
-                    class="archive-btn inline-flex items-center gap-2 px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition">
+                    class="archive-btn inline-flex items-center gap-2 px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition"
+                     <?= in_array($currentUserRole, ['admin', 'librarian']) ? 'hidden' : '' ?>>
                     <i class="ph ph-archive text-base"></i> 
                     <span>Archive</span>
                 </button>

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Repositories\StaffTicketRepository;
+use App\Repositories\StaffProfileRepository;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -13,10 +14,12 @@ use Endroid\QrCode\Writer\PngWriter;
 class StaffTicketController extends Controller
 {
   protected StaffTicketRepository $ticketRepo;
+  protected StaffProfileRepository $staffProfileRepo;
 
   public function __construct()
   {
     $this->ticketRepo = new StaffTicketRepository();
+    $this->staffProfileRepo = new StaffProfileRepository();
   }
 
   private function generateQr(string $transactionCode): string
@@ -75,20 +78,22 @@ class StaffTicketController extends Controller
       exit;
     }
 
+    // --- NEW, CENTRALIZED PROFILE COMPLETION CHECK ---
+    $profile = $this->staffProfileRepo->getProfileByUserId((int)$userId);
+    if (!$profile || !$profile['is_qualified']) {
+        http_response_code(400);
+        echo json_encode([
+            "success" => false, 
+            "message" => "Profile details are incomplete. Please complete your profile before checking out."
+        ]);
+        exit;
+    }
+    // --- END OF CHECK ---
+
     $staffId = $this->ticketRepo->getStaffIdByUserId((int)$userId);
     if (!$staffId) {
       http_response_code(403);
       echo json_encode(['success' => false, 'message' => 'No staff record found for this user.']);
-      exit;
-    }
-
-    $profileCheck = $this->ticketRepo->checkProfileCompletion($staffId);
-    if (!$profileCheck['complete']) {
-      http_response_code(400);
-      echo json_encode([
-        'success' => false,
-        'message' => $profileCheck['message']
-      ]);
       exit;
     }
 

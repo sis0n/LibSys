@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Repositories\FacultyTicketRepository;
+use App\Repositories\FacultyProfileRepository;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -13,10 +14,12 @@ use Endroid\QrCode\Writer\PngWriter;
 class FacultyTicketController extends Controller
 {
   protected FacultyTicketRepository $ticketRepo;
+  protected FacultyProfileRepository $facultyProfileRepo;
 
   public function __construct()
   {
     $this->ticketRepo = new FacultyTicketRepository();
+    $this->facultyProfileRepo = new FacultyProfileRepository();
   }
 
   private function generateQr(string $transactionCode): string
@@ -75,20 +78,22 @@ class FacultyTicketController extends Controller
       exit;
     }
 
+    // --- NEW, CENTRALIZED PROFILE COMPLETION CHECK ---
+    $profile = $this->facultyProfileRepo->getProfileByUserId((int)$userId);
+    if (!$profile || !$profile['is_qualified']) {
+        http_response_code(400);
+        echo json_encode([
+            "success" => false, 
+            "message" => "Profile details are incomplete. Please complete your profile before checking out."
+        ]);
+        exit;
+    }
+    // --- END OF CHECK ---
+
     $facultyId = $this->ticketRepo->getFacultyIdByUserId((int)$userId);
     if (!$facultyId) {
       http_response_code(403);
       echo json_encode(['success' => false, 'message' => 'No faculty record found for this user.']);
-      exit;
-    }
-
-    $profileCheck = $this->ticketRepo->checkProfileCompletion($facultyId);
-    if (!$profileCheck['complete']) {
-      http_response_code(400);
-      echo json_encode([
-        'success' => false,
-        'message' => $profileCheck['message']
-      ]);
       exit;
     }
 

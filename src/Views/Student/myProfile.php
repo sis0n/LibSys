@@ -19,7 +19,13 @@
                 <img id="profilePreview" src="" alt="Profile" class="hidden w-full h-full object-cover">
             </div>
 
-            <p id="profileName" class="text-xl font-semibold text-gray-800">Loading...</p>
+            <div class="flex items-center gap-2">
+                <p id="profileName" class="text-xl font-semibold text-gray-800">Loading...</p>
+                <span id="verificationBadge" class="hidden items-center gap-1 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <i class="ph-fill ph-seal-check text-base"></i>
+                    Verified
+                </span>
+            </div>
             <span id="profileStudentId"
                 class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1 mt-1 mb-3">
                 Loading...
@@ -154,7 +160,8 @@
                 <!-- Contact -->
                 <div class="sm:col-span-1">
                     <label class="text-sm text-gray-500" for="contact">Contact</label>
-                    <input type="tel" id="contact" name="contact"
+                    <input type="tel" id="contact" name="contact" maxlength="11" pattern="[0-9]{11}"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)"
                         class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"
                         disabled>
                 </div>

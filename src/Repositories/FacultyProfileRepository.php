@@ -44,8 +44,26 @@ class FacultyProfileRepository
     $stmt->execute([':userId' => $userId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result && $result['college_code'] && $result['college_name']) {
-      $result['college_full_name'] = $result['college_code'] . ' - ' . $result['college_name'];
+    if ($result) {
+        if ($result['college_code'] && $result['college_name']) {
+            $result['college_full_name'] = $result['college_code'] . ' - ' . $result['college_name'];
+        }
+
+        // --- BORROWING QUALIFICATION CHECK ---
+        $requiredFields = [
+            'first_name', 'last_name', 'email', 'profile_picture',
+            'college_id', 'contact'
+        ];
+        
+        $isQualified = true;
+        foreach ($requiredFields as $field) {
+            if (empty($result[$field])) {
+                $isQualified = false;
+                break;
+            }
+        }
+        $result['is_qualified'] = $isQualified;
+        // --- END OF CHECK ---
     }
 
     return $result ?: null;

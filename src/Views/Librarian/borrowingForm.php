@@ -17,50 +17,14 @@
             </div>
 
             <div class="space-y-4">
-                <!-- Name -->
-                <div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span
-                                    class="text-red-500">*</span></label>
-                            <input type="text" placeholder="Juan" name="first_name"
-                                class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
-                            <input type="text" placeholder="Dela" name="middle_name"
-                                class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span
-                                    class="text-red-500">*</span></label>
-                            <input type="text" placeholder="Cruz" name="last_name"
-                                class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Suffix</label>
-                            <input type="text" name="suffix" placeholder="(Jr., Sr.)"
-                                class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Other Details -->
+
+                 <!-- Other Details -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                     <div>
                         <label for="input_user_id" class="block text-sm font-medium text-gray-700 mb-1">User ID <span
                                 class="text-red-500">*</span></label>
                         <input type="text" id="input_user_id" name="input_user_id"
-                            class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                    </div>
-                    <div>
-                        <label for="contact" class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                        <input type="text" id="contact" name="contact"
-                            class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                    </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="text" id="email" name="email"
                             class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
                     </div>
                     <div>
@@ -110,7 +74,48 @@
                             </div>
                         </div>
                     </div>
+                    <div>
+                        <label for="contact" class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                        <input type="text" id="contact" name="contact"
+                            class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="text" id="email" name="email"
+                            class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                    </div>
+                    
+                    
                 </div>
+                <!-- Name -->
+                <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" placeholder="Juan" name="first_name"
+                                class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
+                            <input type="text" placeholder="Dela" name="middle_name"
+                                class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" placeholder="Cruz" name="last_name"
+                                class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Suffix</label>
+                            <input type="text" name="suffix" placeholder="(Jr., Sr.)"
+                                class="w-full px-4 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                        </div>
+                    </div>
+                </div>
+
+               
             </div>
         </div>
 

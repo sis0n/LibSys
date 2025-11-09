@@ -188,9 +188,39 @@
         </div>
     </div>
 
-    <h4 id="resultsIndicator" class="text-sm text-gray-600 mb-3">
-        Loading...
-    </h4>
+    <!-- Update -->
+    <div class="flex items-center justify-between my-4">
+        <h4 id="resultsIndicator" class="text-sm text-gray-600">
+            Loading...
+        </h4>
+
+        <div class="inline-flex items-center gap-2">
+            <div id="multiSelectActions" class="hidden items-center gap-2">
+                <button id="multiDeleteBtn" title="Delete selected books"
+                    class="hidden items-center gap-2 bg-red-600 text-white rounded-lg px-3 py-2 text-sm font-medium hover:bg-red-700 transition">
+                    <i class="ph ph-trash text-base"></i>
+                    Delete (<span id="selectionCount">0</span>)
+                </button>
+                <div class="h-6 border-l border-gray-300 mx-2"></div>
+                <button id="selectAllBtn" title="Select-all"
+                    class="inline-flex items-center gap-2 border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 transition">
+                    <i class="ph ph-check-square-offset text-base"></i>
+                    Select All
+                </button>
+                <button id="cancelSelectionBtn" title="Cancel multi-select"
+                    class="inline-flex items-center gap-2 border border-gray-300 text-gray-700 rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-100 transition">
+                    <i class="ph ph-x text-base"></i>
+                    Cancel
+                </button>
+            </div>
+            <button id="multiSelectBtn" title="Multi-select"
+                class="inline-flex items-center gap-2 border border-orange-200 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 transition">
+                <i class="ph ph-list-checks text-base"></i>
+                Multiple Select
+            </button>
+        </div>
+    </div>
+    <!-- end -->
 
     <div class="overflow-hidden border border-orange-200 rounded-lg shadow-sm">
         <table class="min-w-full text-sm text-gray-700">
@@ -519,6 +549,15 @@
     const fileInput = document.getElementById("csvFile");
     const importMessage = document.getElementById("importMessage");
 
+    // Updated
+    const multiSelectBtn = document.getElementById("multiSelectBtn");
+    const multiSelectActions = document.getElementById("multiSelectActions");
+    const selectAllBtn = document.getElementById("selectAllBtn");
+    const cancelSelectionBtn = document.getElementById("cancelSelectionBtn");
+    const multiDeleteBtn = document.getElementById("multiDeleteBtn");
+    const selectionCount = document.getElementById("selectionCount");
+    // end
+
     if (!bookTableBody || !addBookModal || !editBookModal || !importModal || !searchInput || !paginationList || !resultsIndicator || !viewBookModal) {
         console.error("BookManagement Error: Core components missing.");
         if (bookTableBody) bookTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="7" class="text-center text-red-500 py-10">Page Error: Components missing.</td></tr>`;
@@ -528,6 +567,9 @@
     // ==========================
     // STATE VARIABLES
     // ==========================
+    // Updated
+    let books = [];
+    // end
     let totalBooks = 0;
     let currentEditingBookId = null;
     let currentSort = 'default';
@@ -539,7 +581,10 @@
     let currentPage = 1;
     let totalPages = 1;
     let currentApiBaseUrl = '';
-
+    // Updated
+    let isMultiSelectMode = false;
+    let selectedBooks = new Set();
+// end
 
     fileInput.addEventListener("change", () => {
         if (fileInput.files.length) {
@@ -552,9 +597,6 @@
         
         if (!fileInput.files.length) return showErrorToast("Import Error", "Please select a CSV file.");
 
-        // TINANGGAL ANG LOADING MODAL DITO
-        // showLoadingModal("Importing Books...", "Uploading and processing CSV file.");
-
         const formData = new FormData();
         formData.append("csv_file", fileInput.files[0]);
         
@@ -566,10 +608,6 @@
 
             const data = await res.json();
             
-            // TINANGGAL ANG DELAY AT MODAL CLOSE DITO
-            // await new Promise(r => setTimeout(r, 300));
-            // Swal.close();
-
             if (data.success) {
                 if (importMessage) {
                     importMessage.textContent = `Imported: ${data.imported} rows successfully!`;
@@ -579,14 +617,11 @@
                 showSuccessToast("Import Successful", `Successfully imported ${data.imported} books!`);
                 fileInput.value = "";
                 closeModal(document.getElementById("importModal"));
-                // Ginagamit ang 'false' para siguruhing walang loading modal ang pag-refresh
                 await loadBooks(1, false); 
             } else {
                 showErrorToast("Import Failed", data.message || "Failed to import CSV.");
             }
         } catch (err) {
-            // TINANGGAL ANG MODAL CLOSE
-            // Swal.close();
             console.error("Error importing CSV:", err);
             showErrorToast("Import Failed", "An error occurred during CSV import.");
         }
@@ -643,13 +678,6 @@
     editBookModal?.addEventListener("click", e => {
         if (e.target === editBookModal) closeModal(editBookModal);
     });
-
-    // TANGGALIN NATIN ANG LOGIC SA VIEW MODAL (JS PART)
-    // closeViewModal?.addEventListener("click", () => closeModal(viewBookModal));
-    // closeViewModalBtn?.addEventListener("click", () => closeModal(viewBookModal));
-    // viewBookModal?.addEventListener("click", e => {
-    //   if (e.target === viewBookModal) closeModal(viewBookModal);
-    // });
 
     input?.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -726,7 +754,6 @@
         try {
             sessionStorage.removeItem('bookManagementPage');
         } catch (e) {}
-        // TINANGGAL ANG LOADING MODAL SA SORT
         loadBooks(currentPage, false); 
     };
     window.selectStatus = (el, val) => {
@@ -739,7 +766,6 @@
         try {
             sessionStorage.removeItem('bookManagementPage');
         } catch (e) {}
-        // TINANGGAL ANG LOADING MODAL SA STATUS FILTER
         loadBooks(currentPage, false);
     };
 
@@ -756,7 +782,6 @@
             try {
                 sessionStorage.removeItem('bookManagementPage');
             } catch (e) {}
-            // TINANGGAL ANG LOADING MODAL SA SEARCH
             loadBooks(currentPage, false); 
         }, 500);
     });
@@ -775,7 +800,6 @@
         paginationControls.classList.add('hidden');
         resultsIndicator.textContent = 'Loading...';
         
-        // SHOW LOADING MODAL KUNG TRUE ANG FLAG (default sa page load/pagination)
         if (isShowLoadingModal && typeof Swal != 'undefined') {
             showLoadingModal("Loading Book Catalog...", "Retrieving library records.");
         }
@@ -795,15 +819,15 @@
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             const data = await res.json();
 
-            // I-CLOSE ANG LOADING MODAL KUNG NAGPAKITA
             if (isShowLoadingModal) {
                 const elapsed = Date.now() - startTime;
-                const minDelay = 1000; // Minimum 1000ms delay for table load (default value)
+                const minDelay = 1000;
                 if (elapsed < minDelay) await new Promise(r => setTimeout(r, minDelay - elapsed));
                 if (typeof Swal != 'undefined') Swal.close();
             }
 
             if (data.success && Array.isArray(data.books)) {
+                books = data.books;
                 totalBooks = data.totalCount;
                 totalPages = Math.ceil(totalBooks / limit) || 1;
 
@@ -825,7 +849,7 @@
             bookTableBody.innerHTML = `<tr data-placeholder="true"><td colspan="7" class="text-center text-red-500 py-10">Error loading books: ${err.message}</td></tr>`;
             updateBookCounts(0, 0, 1, limit);
             showErrorToast("Data Load Failed", "Could not retrieve book list data.");
-            if (isShowLoadingModal && typeof Swal != 'undefined') Swal.close(); // Close modal on error
+            if (isShowLoadingModal && typeof Swal != 'undefined') Swal.close();
             try {
                 sessionStorage.removeItem('bookManagementPage');
             } catch (e) {}
@@ -840,10 +864,29 @@
     const renderBooks = (booksToRender) => {
         bookTableBody.innerHTML = "";
 
+        // Updated
+        const headerRow = document.querySelector('thead tr');
+        if (headerRow) {
+            const firstHeader = headerRow.querySelector('th');
+            if (isMultiSelectMode) {
+                if (!firstHeader.classList.contains('multi-select-header')) {
+                    const th = document.createElement('th');
+                    th.className = 'py-3 px-4 font-medium multi-select-header';
+                    headerRow.insertBefore(th, firstHeader);
+                }
+            } else {
+                if (firstHeader && firstHeader.classList.contains('multi-select-header')) {
+                    firstHeader.remove();
+                }
+            }
+        }
+        // end
+
         if (!booksToRender || booksToRender.length === 0) {
+            const colspan = document.querySelector('thead tr').children.length;
             bookTableBody.innerHTML = `
             <tr data-placeholder="true">
-                <td colspan="7" class="py-10 text-center">
+                <td colspan="${colspan}" class="py-10 text-center">
                     <div class="flex flex-col items-center justify-center text-gray-500">
                         <i class="ph ph-books text-5xl mb-3"></i>
                         <p class="font-medium text-gray-700">No books found</p>
@@ -857,6 +900,7 @@
 
         let rowsHtml = "";
         booksToRender.forEach((book) => {
+            const isSelected = selectedBooks.has(book.book_id);
             const statusColor = book.availability === "available" ? "bg-green-600" : book.availability === "borrowed" ? "bg-orange-500" : "bg-gray-600";
             const title = book.title ? String(book.title).replace(/</g, "&lt;") : 'N/A';
             const author = book.author ? String(book.author).replace(/</g, "&lt;") : 'N/A';
@@ -866,8 +910,34 @@
             const status = book.availability ? String(book.availability).replace(/</g, "&lt;") : 'N/A';
             const safeTitle = title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
+            // Updated
+            let checkboxCell = '';
+            if (isMultiSelectMode) {
+                checkboxCell = `
+                    <td class="px-4 py-3">
+                        <input type="checkbox" class="book-checkbox accent-orange-500 pointer-events-none" data-book-id="${book.book_id}" ${isSelected ? "checked" : ""}>
+                    </td>
+                `;
+            }
+
+            let actionsCellHTML = `
+                <td class="py-3 px-4 text-center">
+                    <button onclick="editBook(${book.book_id})"
+                        class="border border-orange-300 text-orange-700 px-2 py-1 rounded hover:bg-orange-100">
+                        <i class='ph ph-pencil pointer-events-none'></i>
+                    </button>
+                    <button onclick="deleteBook(${book.book_id}, '${safeTitle}')"
+                        class="border border-orange-300 text-orange-700 px-2 py-1 rounded hover:bg-orange-100">
+                        <i class='ph ph-trash pointer-events-none'></i>
+                    </button>
+                </td>`;
+
+            if (isMultiSelectMode) {
+                actionsCellHTML = `<td class="py-3 px-4 text-center"></td>`;
+            }
             rowsHtml += `
-            <tr>
+            <tr data-book-id="${book.book_id}" class="transition-colors ${isMultiSelectMode ? 'cursor-pointer' : ''} ${isSelected ? 'bg-orange-100' : ''}">
+                ${checkboxCell}
                 <td class="py-3 px-4">
                     <div class="max-w-[240px] ">
                         <p class="font-medium text-gray-800 whitespace-normal break-words">${title}</p>
@@ -882,23 +952,15 @@
                         ${status}
                     </span>
                 </td>
-                <td class="py-3 px-4 text-center">
-                    <button onclick="editBook(${book.book_id})"
-                        class="border border-orange-300 text-orange-700 px-2 py-1 rounded hover:bg-orange-100">
-                        <i class='ph ph-pencil pointer-events-none'></i>
-                    </button>
-                    <button onclick="deleteBook(${book.book_id}, '${safeTitle}')"
-                        class="border border-orange-300 text-orange-700 px-2 py-1 rounded hover:bg-orange-100">
-                        <i class='ph ph-trash pointer-events-none'></i>
-                    </button>
-                </td>
+                ${actionsCellHTML}
             </tr>`;
         });
         bookTableBody.innerHTML = rowsHtml;
     };
+            // end
 
     // ==========================
-    // PAGINATION RENDER (GAYA NG SA BOOKCATALOG.JS)
+    // PAGINATION RENDER
     // ==========================
     function renderPagination(totalPages, page) {
         if (totalPages <= 1) {
@@ -953,8 +1015,7 @@
         createPageLink("next", `Next <i class="flex ph ph-caret-right text-lg"></i>`, page + 1, page === totalPages);
     }
 
-    // PAGINATION CLICK
-    paginationList.addEventListener('click', (e) => {
+    paginationList.addEventListener('click', async (e) => { //Updated Naglagay ng async
         e.preventDefault();
         if (isLoading) return;
         const target = e.target.closest('a[data-page]');
@@ -963,8 +1024,23 @@
         if (pageStr === '...') return;
         const pageNum = parseInt(pageStr, 10);
         if (!isNaN(pageNum) && pageNum !== currentPage) {
-            // Pagpapalit ng page number (default: may loading modal)
-            loadBooks(pageNum); 
+
+            // Updated
+            if (isMultiSelectMode && selectedBooks.size > 0) {
+                const isConfirmed = await showConfirmationModal(
+                    "Clear Selection?",
+                    "Navigating to another page will clear your current selection. Do you want to continue?",
+                    "Yes, Continue"
+                );
+                if (isConfirmed) {
+                    selectedBooks.clear();
+                    updateMultiSelectButtons();
+                    loadBooks(pageNum);
+                }
+            } else {
+                loadBooks(pageNum);
+            }
+            // end
         }
     });
 
@@ -994,7 +1070,6 @@
             return;
         }
         
-        // IBINALIK ANG LOADING MODAL DITO (MABILIS)
         showLoadingModal("Adding Book...", "Saving new record to catalog.");
         const startTime = Date.now();
 
@@ -1005,9 +1080,8 @@
             });
             const result = await res.json();
             
-            // MABILIS NA PAGSARA
             const elapsed = Date.now() - startTime;
-            const minModalDisplay = 300; // Minimum 300ms display time
+            const minModalDisplay = 300;
             if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
             Swal.close();
 
@@ -1017,13 +1091,12 @@
                 addBookForm.reset();
                 previewContainer.classList.add('hidden');
                 uploadText.textContent = 'Upload Image';
-                // Ginagamit ang 'false' para siguruhing walang loading modal ang pag-refresh
                 loadBooks(1, false); 
             } else {
                 showErrorToast('Error', result.message || 'Failed to add book.');
             }
         } catch (err) {
-            Swal.close(); // Isara ang modal kung may error
+            Swal.close();
             console.error("Add book error:", err);
             showErrorToast('Error', 'An error occurred while adding the book.');
         }
@@ -1087,7 +1160,6 @@
             return;
         }
         
-        // IBINALIK ANG LOADING MODAL DITO (MABILIS)
         showLoadingModal("Saving Changes...", "Updating book record.");
         const startTime = Date.now();
 
@@ -1098,69 +1170,186 @@
             });
             const result = await res.json();
             
-            // MABILIS NA PAGSARA
             const elapsed = Date.now() - startTime;
-            const minModalDisplay = 300; // Minimum 300ms display time
+            const minModalDisplay = 300;
             if (elapsed < minModalDisplay) await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
             Swal.close();
 
             if (result.success) {
                 showSuccessToast('Success!', result.message || 'Book updated successfully!');
                 closeModal(editBookModal);
-                // Ginagamit ang 'false' para siguruhing walang loading modal ang pag-refresh
                 loadBooks(currentPage, false);
             } else {
                 showErrorToast('Error', result.message || 'Failed to update book.');
             }
         } catch (err) {
-            Swal.close(); // Isara ang modal kung may error
+            Swal.close();
             console.error("Update book error:", err);
             showErrorToast('Error', 'An error occurred while updating the book.');
         }
     });
 
     window.deleteBook = async (bookId, title) => {
-        if (!bookId) return;
-        
+
+    if (!bookId) return;
+
+    const isConfirmed = await showConfirmationModal(
+        'Confirm Deletion',
+        `Are you sure you want to delete the book: **${title}**? This action cannot be undone.`,
+        'Yes, Delete It!'
+    );
+
+    if (!isConfirmed) return;
+
+    showLoadingModal("Deleting Book...", "Removing book record from the system.");
+    const startTime = Date.now();
+
+    try {
+        const res = await fetch(`api/admin/bookManagement/delete/${bookId}`, {
+            method: "POST"
+        });
+        const result = await res.json();
+
+        const elapsed = Date.now() - startTime;
+        const minModalDisplay = 500;
+        if (elapsed < minModalDisplay) {
+            await new Promise(r => setTimeout(r, minModalDisplay - elapsed));
+        }
+        Swal.close();
+
+        if (result.success) {
+            showSuccessToast('Deleted!', result.message || 'Book deleted successfully.');
+            loadBooks(currentPage, false);
+        } else {
+            showErrorToast('Error', result.message || 'Failed to delete the book.');
+        }
+
+    } catch (err) {
+        Swal.close();
+        console.error("Delete book error:", err);
+        showErrorToast('Error', 'An error occurred during deletion.');
+    }
+};
+
+    bookTableBody.addEventListener("click", (e) => {
+        const row = e.target.closest("tr");
+        if (!row || !row.dataset.bookId) return;
+
+        const bookId = parseInt(row.dataset.bookId, 10);
+        if (!isMultiSelectMode) return;
+
+        if (selectedBooks.has(bookId)) {
+            selectedBooks.delete(bookId);
+        } else {
+            selectedBooks.add(bookId);
+        }
+        renderBooks(books);
+        updateMultiSelectButtons();
+    });
+
+    function updateMultiSelectButtons() {
+        const hasSelection = selectedBooks.size > 0;
+
+        if (isMultiSelectMode) {
+            multiSelectBtn.classList.add('hidden');
+            multiSelectActions.classList.remove('hidden');
+            multiSelectActions.classList.add('inline-flex');
+        } else {
+            multiSelectBtn.classList.remove('hidden');
+            multiSelectActions.classList.add('hidden');
+            multiSelectActions.classList.remove('inline-flex');
+        }
+
+        multiDeleteBtn.classList.toggle('hidden', !hasSelection);
+        if (selectionCount) selectionCount.textContent = selectedBooks.size;
+
+        const allVisibleBookIds = books.map(b => b.book_id);
+        const allSelectedOnPage = allVisibleBookIds.length > 0 && allVisibleBookIds.every(id => selectedBooks.has(id));
+
+        if (allSelectedOnPage) {
+            selectAllBtn.innerHTML = `<i class="ph ph-check-square-offset text-base"></i> Deselect All`;
+        } else {
+            selectAllBtn.innerHTML = `<i class="ph ph-check-square-offset text-base"></i> Select All`;
+        }
+    }
+
+    multiSelectBtn.addEventListener('click', () => {
+        isMultiSelectMode = true;
+        updateMultiSelectButtons();
+        renderBooks(books);
+    });
+
+    cancelSelectionBtn.addEventListener('click', () => {
+        isMultiSelectMode = false;
+        selectedBooks.clear();
+        updateMultiSelectButtons();
+        renderBooks(books);
+    });
+
+    selectAllBtn.addEventListener('click', () => {
+        const allVisibleBookIds = books.map(b => b.book_id);
+        const allSelectedOnPage = allVisibleBookIds.length > 0 && allVisibleBookIds.every(id => selectedBooks.has(id));
+
+        if (allSelectedOnPage) {
+            allVisibleBookIds.forEach(id => selectedBooks.delete(id));
+        } else {
+            allVisibleBookIds.forEach(id => selectedBooks.add(id));
+        }
+        renderBooks(books);
+        updateMultiSelectButtons();
+    });
+
+    multiDeleteBtn.addEventListener('click', async () => {
+        const bookIds = [...selectedBooks];
+        if (bookIds.length === 0) {
+            return showErrorToast("No Books Selected", "Please select books to delete.");
+        }
+
         const isConfirmed = await showConfirmationModal(
-            'Confirm Deletion',
-            `Are you sure you want to delete the book: **${title}**? This action cannot be undone.`,
-            'Yes, Delete It!'
+            `Delete ${bookIds.length} Books?`,
+            `Are you sure you want to permanently delete the selected ${bookIds.length} book(s)? This action cannot be undone.`,
+            "Yes, Delete All"
         );
 
         if (!isConfirmed) return;
-        
-        // TINANGGAL ANG LOADING MODAL DITO
-        // showLoadingModal("Deleting Book...", "Removing book record from the system."); 
+
+        showLoadingModal("Deleting Books...", `Processing ${bookIds.length} book(s).`);
 
         try {
-            const res = await fetch(`api/admin/bookManagement/delete/${bookId}`, {
-                method: "POST"
+            const res = await fetch('api/admin/bookManagement/deleteMultiple', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ book_ids: bookIds })
             });
-            const result = await res.json();
-            
-            // TINANGGAL ANG DELAY AT MODAL CLOSE DITO
-            // await new Promise(r => setTimeout(r, 300));
-            // Swal.close();
 
-            if (result.success) {
-                showSuccessToast('Deleted!', result.message || 'Book deleted successfully.');
-                // Ginagamit ang 'false' para siguruhing walang loading modal ang pag-refresh
-                loadBooks(currentPage, false); 
+            const data = await res.json();
+            Swal.close();
+
+            if (data.success) {
+                showSuccessToast("Deletion Successful", data.message);
             } else {
-                showErrorToast('Error', result.message || 'Failed to delete the book.');
+                let errorMessage = data.message;
+                if (data.errors && data.errors.length > 0) {
+                    errorMessage += ` ${data.errors.join(' ')}`;
+                }
+                showErrorToast("Deletion Failed", errorMessage);
             }
+
+            isMultiSelectMode = false;
+            selectedBooks.clear();
+            updateMultiSelectButtons();
+            loadBooks(1, false);
+
         } catch (err) {
-            // TINANGGAL ANG MODAL CLOSE
-            // Swal.close();
-            console.error("Delete book error:", err);
-            showErrorToast('Error', 'An error occurred during deletion.');
+            Swal.close();
+            console.error("Multi-delete error:", err);
+            showErrorToast("Network Error", "An error occurred while connecting to the server.");
         }
-    };
+    });
 
     // ==========================
     // INIT
     // ==========================
-    loadBooks(currentPage); // Initial load (default: may loading modal)
+    loadBooks(currentPage);
 });
 </script>

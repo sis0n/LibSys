@@ -5,17 +5,18 @@ namespace App\Core;
 use PDO;
 use PDOException;
 
-class Database {
+class Database
+{
     private static $instance = null;
     private $connection;
 
-    private function __construct() {
-        // === DATABASE CONFIGURATION ===
+    private function __construct()
+    {
         $driver = 'mysql';
-        $host = '127.0.0.1';               // your MySQL host
-        $db   = 'u896434489_library_system';       // your database name
-        $user = 'u896434489_libsys';   // your database username
-        $pass = 'P0tzepD/7';             // your database password
+        $host = '127.0.0.1';            
+        $db   = 'u896434489_library_system';     
+        $user = 'u896434489_libsys';  
+        $pass = ':8kC!zfaEX8w';             
 
         try {
             $this->connection = new PDO(
@@ -29,14 +30,16 @@ class Database {
         }
     }
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance === null) {
             self::$instance = new Database();
         }
         return self::$instance;
     }
 
-    public function getConnection() {
+    public function getConnection()
+    {
         return $this->connection;
     }
 }

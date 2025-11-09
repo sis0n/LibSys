@@ -91,13 +91,12 @@ class ViewController extends Controller
       'returning' => 'returning',
       'borrowingForm' => 'borrowing form',
       'attendanceLogs' => 'attendance logs',
-      'reports' => 'reports',
       'topVisitor' => 'reports',
       'transactionHistory' => 'transaction history',
       'backup' => 'backup',
       'restoreBooks' => 'restore books',
       'restoreUser' => 'restore users',
-      'userManagement' => 'user management' 
+      'userManagement' => 'user management'
     ];
 
     $universalPages = [
@@ -128,8 +127,7 @@ class ViewController extends Controller
         exit;
       }
     } else if (in_array($action, $universalPages)) {
-    }
-    else {
+    } else {
       $this->view("errors/404", ["title" => "Not Found"], false);
       exit;
     }
@@ -141,5 +139,17 @@ class ViewController extends Controller
     ];
 
     $this->view($viewPath, $data);
+  }
+
+  public function handleLandingPage()
+  {
+    if (isset($_SESSION['user_id'])) {
+      header('Location: ' . BASE_URL . '/dashboard');
+      exit;
+    }
+
+    $this->view("guest/landingPage", [
+      "title" => "Book Collections"
+    ], false);
   }
 }

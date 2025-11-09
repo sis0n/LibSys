@@ -18,13 +18,20 @@
                 <img id="profilePreview" src="" alt="Profile" class="hidden w-full h-full object-cover">
             </div>
 
-            <p id="profileName" class="text-xl font-semibold text-gray-800">Loading...</p>
+            <div class="flex items-center gap-2">
+                <p id="profileName" class="text-xl font-semibold text-gray-800">Loading...</p>
+                <span id="verificationBadge" class="hidden items-center gap-1 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <i class="ph-fill ph-seal-check text-base"></i>
+                    Verified
+                </span>
+            </div>
             <span id="profileFacultyId"
                 class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1 mt-1 mb-3">
                 Loading...
             </span>
 
-            <label for="uploadProfile" id="uploadLabel" class="cursor-pointer text-sm text-green-600 font-medium hover:underline hidden">
+            <label for="uploadProfile" id="uploadLabel"
+                class="cursor-pointer text-sm text-green-600 font-medium hover:underline hidden">
                 Upload Image
             </label>
             <input id="uploadProfile" type="file" accept="image/*" class="hidden">
@@ -34,7 +41,8 @@
                 Only images below 1 MB are accepted.
             </p>
 
-            <div id="profileLockedInfo" class="text-center text-gray-500 text-sm mt-6 p-4 bg-gray-100 rounded-md hidden">
+            <div id="profileLockedInfo"
+                class="text-center text-gray-500 text-sm mt-6 p-4 bg-gray-100 rounded-md hidden">
                 <i class="ph ph-lock text-lg mr-1"></i>
                 Profile locked.
             </div>
@@ -50,9 +58,12 @@
                     <img id="cropImage" src="" alt="To crop" class="max-h-full select-none">
                 </div>
                 <div class="flex justify-center gap-3 mb-4">
-                    <button type="button" id="zoomIn" class="px-3 py-1 border rounded text-sm hover:bg-gray-100">Zoom In</button>
-                    <button type="button" id="zoomOut" class="px-3 py-1 border rounded text-sm hover:bg-gray-100">Zoom Out</button>
-                    <button type="button" id="resetCrop" class="px-3 py-1 border rounded text-sm hover:bg-gray-100">Reset</button>
+                    <button type="button" id="zoomIn" class="px-3 py-1 border rounded text-sm hover:bg-gray-100">Zoom
+                        In</button>
+                    <button type="button" id="zoomOut" class="px-3 py-1 border rounded text-sm hover:bg-gray-100">Zoom
+                        Out</button>
+                    <button type="button" id="resetCrop"
+                        class="px-3 py-1 border rounded text-sm hover:bg-gray-100">Reset</button>
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" id="cancelCrop"
@@ -69,7 +80,8 @@
                     <i class="ph ph-identification-card"></i>
                     Basic Information
                 </h3>
-                <button type="button" id="editProfileBtn" class="px-4 py-1.5 text-sm rounded-md border border-orange-600 bg-orange-50 text-orange-700 hover:bg-orange-100 transition hidden">
+                <button type="button" id="editProfileBtn"
+                    class="px-4 py-1.5 text-sm rounded-md border border-orange-600 bg-orange-50 text-orange-700 hover:bg-orange-100 transition hidden">
                     <i class="ph ph-pencil-simple text-sm mr-1"></i>
                     Edit Profile
                 </button>
@@ -78,19 +90,27 @@
             <div class="flex flex-wrap ml-9 items-start gap-x-10 gap-y-6">
                 <div class="min-w-[200px]">
                     <label class="text-sm text-gray-500" for="lastName">Last Name</label>
-                    <input type="text" id="lastName" name="last_name" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+                    <input type="text" id="lastName" name="last_name"
+                        class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"
+                        disabled>
                 </div>
                 <div class="min-w-[200px]">
                     <label class="text-sm text-gray-500" for="firstName">First Name</label>
-                    <input type="text" id="firstName" name="first_name" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+                    <input type="text" id="firstName" name="first_name"
+                        class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"
+                        disabled>
                 </div>
                 <div class="min-w-[200px]">
                     <label class="text-sm text-gray-500" for="middleName">Middle Name</label>
-                    <input type="text" id="middleName" name="middle_name" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+                    <input type="text" id="middleName" name="middle_name"
+                        class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"
+                        disabled>
                 </div>
                 <div class="min-w-[200px]">
                     <label class="text-sm text-gray-500" for="suffix">Suffix</label>
-                    <input type="text" id="suffix" name="suffix" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+                    <input type="text" id="suffix" name="suffix"
+                        class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"
+                        disabled>
                 </div>
             </div>
         </section>
@@ -104,26 +124,34 @@
                 <div class="flex items-center gap-3">
                     <div>
                         <label class="text-sm text-gray-500" for="facultyId">Staff Id</label>
-                        <input type="text" id="facultyId" name="faculty_id" class="font-medium text-gray-800 bg-gray-100 border-gray-300 border rounded-md px-2 py-1 w-full" disabled>
+                        <input type="text" id="facultyId" name="faculty_id"
+                            class="font-medium text-gray-800 bg-gray-100 border-gray-300 border rounded-md px-2 py-1 w-full"
+                            disabled>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <div>
                         <label class="text-sm text-gray-500" for="position">Position</label>
-                        <input type="text" id="position" name="position" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+                        <input type="text" id="position" name="position"
+                            class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"
+                            disabled>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <div>
                         <label class="text-sm text-gray-500" for="email">Email</label>
-                        <input type="email" id="email" name="email" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
+                        <input type="email" id="email" name="email"
+                            class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"
+                            disabled>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div>
-                        <label class="text-sm text-gray-500" for="contact">Contact</label>
-                        <input type="tel" id="contact" name="contact" class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full" disabled>
-                    </div>
+                <!-- Contact -->
+                <div class="sm:col-span-1">
+                    <label class="text-sm text-gray-500" for="contact">Contact</label>
+                    <input type="tel" id="contact" name="contact" maxlength="11" pattern="[0-9]{11}"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)"
+                        class="font-medium text-gray-800 bg-gray-50 border-gray-200 border rounded-md px-2 py-1 w-full"
+                        disabled>
                 </div>
             </div>
         </section>
@@ -132,7 +160,8 @@
             <button type="button" id="cancelProfileBtn"
                 class="px-6 py-2 text-sm rounded-md border border-gray-300 hover:bg-gray-100 transition">Cancel</button>
             <button type="submit" id="saveProfileBtn"
-                class="px-6 py-2 text-sm rounded-md bg-green-600 text-white hover:bg-green-700 transition">Save Changes</button>
+                class="px-6 py-2 text-sm rounded-md bg-green-600 text-white hover:bg-green-700 transition">Save
+                Changes</button>
         </div>
     </form>
 </div>

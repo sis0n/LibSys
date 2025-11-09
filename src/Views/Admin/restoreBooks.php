@@ -143,7 +143,7 @@ $currentUserRole = strtolower($_SESSION['role'] ?? 'guest');
       </button>
       <button
         class="archive-btn inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 <?= in_array($currentUserRole, ['admin', 'librarian']) ? 'opacity-50 cursor-not-allowed' : '' ?>"
-        <?= in_array($currentUserRole, ['admin', 'librarian']) ? 'disabled' : '' ?>>
+        <?= in_array($currentUserRole, ['admin', 'librarian']) ? 'hidden' : '' ?>>
         <i class="ph ph-archive text-lg mr-1"></i> Archive
       </button>
     </td>

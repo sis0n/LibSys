@@ -39,6 +39,25 @@ class StaffProfileRepository
         ");
     $stmt->execute([':userId' => $userId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        // --- BORROWING QUALIFICATION CHECK ---
+        $requiredFields = [
+            'first_name', 'last_name', 'email', 'profile_picture',
+            'position', 'contact'
+        ];
+        
+        $isQualified = true;
+        foreach ($requiredFields as $field) {
+            if (empty($result[$field])) {
+                $isQualified = false;
+                break;
+            }
+        }
+        $result['is_qualified'] = $isQualified;
+        // --- END OF CHECK ---
+    }
+
     return $result ?: null;
   }
 

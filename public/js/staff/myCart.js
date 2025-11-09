@@ -159,7 +159,39 @@ async function checkoutCart() {
             checkedMap = {};
             loadCart();
         } else {
-            showCustomAlert(false, 'Checkout Failed', data.message || "An error occurred during checkout.");
+            // --- REDIRECT TO PROFILE IF INCOMPLETE ---
+            if (data.message && data.message.includes("Profile details are incomplete")) {
+                Swal.fire({
+                    background: "transparent",
+                    html: `
+                        <div class="flex flex-col text-center">
+                            <div class="flex justify-center mb-3">
+                                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-orange-600">
+                                    <i class="ph ph-user-circle-gear text-3xl"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">Incomplete Profile</h3>
+                            <p class="text-[14px] text-gray-700 mt-1">${data.message}</p>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: "Go to Profile",
+                    cancelButtonText: "Cancel",
+                    customClass: {
+                        popup: "!rounded-xl !shadow-lg !p-6 !bg-white !border-2 !border-orange-400 shadow-[0_0_15px_#ffb34780]",
+                        confirmButton: "!bg-orange-600 !text-white !px-5 !py-2.5 !rounded-lg hover:!bg-orange-700 !mx-2 !font-semibold !text-base",
+                        cancelButton: "!bg-gray-200 !text-gray-800 !px-5 !py-2.5 !rounded-lg hover:!bg-gray-300 !mx-2 !font-semibold !text-base",
+                        actions: "!mt-4"
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'myProfile';
+                    }
+                });
+            } else {
+                // --- Fallback for other errors ---
+                showCustomAlert(false, 'Checkout Failed', data.message || "An error occurred during checkout.");
+            }
         }
 
     } catch (err) {

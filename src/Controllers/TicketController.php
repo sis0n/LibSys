@@ -22,7 +22,7 @@ class TicketController extends Controller
 
   private function generateQr(string $transactionCode): string
   {
-    $qrDir = __DIR__ . "/../../public/qrcodes";
+    $qrDir = __DIR__ . "/../../public_html/qrcodes";
     $qrPath = $qrDir . "/{$transactionCode}.png";
 
     if (!is_dir($qrDir)) {
@@ -270,7 +270,7 @@ class TicketController extends Controller
 
       unset($_SESSION['last_ticket_code']);
 
-      $qrFile = __DIR__ . "/../../public/qrcodes/{$transactionCode}.png";
+      $qrFile = __DIR__ . "/../../public_html/qrcodes/{$transactionCode}.png";
       if (file_exists($qrFile)) {
         unlink($qrFile);
       }

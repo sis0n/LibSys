@@ -37,18 +37,18 @@ class UserManagementController extends Controller
   {
     header('Content-Type: application/json');
     try {
-        $limit = (int)($_GET['limit'] ?? 10);
-        $offset = (int)($_GET['offset'] ?? 0);
-        $search = $_GET['search'] ?? '';
-        $role = $_GET['role'] ?? 'All Roles';
-        $status = $_GET['status'] ?? 'All Status';
+      $limit = (int)($_GET['limit'] ?? 10);
+      $offset = (int)($_GET['offset'] ?? 0);
+      $search = $_GET['search'] ?? '';
+      $role = $_GET['role'] ?? 'All Roles';
+      $status = $_GET['status'] ?? 'All Status';
 
-        $users = $this->userRepo->getPaginatedUsers($limit, $offset, $search, $role, $status);
-        $totalCount = $this->userRepo->countPaginatedUsers($search, $role, $status);
+      $users = $this->userRepo->getPaginatedUsers($limit, $offset, $search, $role, $status);
+      $totalCount = $this->userRepo->countPaginatedUsers($search, $role, $status);
 
-        echo json_encode(['success' => true, 'users' => $users, 'totalCount' => $totalCount]);
+      echo json_encode(['success' => true, 'users' => $users, 'totalCount' => $totalCount]);
     } catch (\Exception $e) {
-        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+      echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     exit;
   }
@@ -559,29 +559,33 @@ class UserManagementController extends Controller
 
         try {
           if (strtolower($role) === 'student') {
-            $userRepo->insertStudent([
+            // 1. Insert sa users table
+            $userId = $userRepo->insertUser([
+              'username' => $username,
+              'password' => password_hash('12345', PASSWORD_DEFAULT),
               'first_name' => $firstName,
               'middle_name' => $middleName ?: null,
               'last_name' => $lastName,
-              'username' => $username,
               'role' => 'student',
-              'password' => password_hash('defaultpassword', PASSWORD_DEFAULT),
-              'is_active' => 1
-            ]);
-          } else {
-            $userRepo->insertUser([
-              'first_name' => $firstName,
-              'middle_name' => $middleName ?: null,
-              'last_name' => $lastName,
-              'username' => $username,
-              'role' => $role,
-              'password' => password_hash('defaultpassword', PASSWORD_DEFAULT),
               'is_active' => 1,
               'created_at' => date('Y-m-d H:i:s')
             ]);
-          }
 
-          $imported++;
+            $courseIdRaw = $row[5] ?? null;
+            $courseId = ($courseIdRaw === '' || $courseIdRaw === null) ? null : filter_var($courseIdRaw, FILTER_VALIDATE_INT);
+
+            $yearLevel = filter_var($row[6] ?? 1, FILTER_VALIDATE_INT);
+
+            $this->studentRepo->insertStudent(
+              $userId,
+              $username,
+              $courseId,
+              $yearLevel,
+              'enrolled'
+            );
+
+            $imported++;
+          }
         } catch (\Exception $e) {
           $errors[] = "Row $rowNumber: " . $e->getMessage();
         }

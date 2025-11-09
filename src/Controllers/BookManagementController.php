@@ -27,16 +27,20 @@ class BookManagementController extends Controller
         if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
             return null;
         }
-        $targetDir = "uploads/book_covers/";
+
+        $targetDir = __DIR__ . '/../../public_html/uploads/book_covers/';
         if (!file_exists($targetDir)) {
             mkdir($targetDir, 0777, true);
         }
+
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $fileName = uniqid('book_', true) . '.' . $extension;
         $targetFile = $targetDir . $fileName;
+
         if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-            return BASE_URL . $targetFile;
+            return BASE_URL . '/uploads/book_covers/' . $fileName;
         }
+
         return null;
     }
 
@@ -159,7 +163,7 @@ class BookManagementController extends Controller
                 return $this->json([
                     'success' => false,
                     'message' => 'Cannot delete book. It is currently borrowed.'
-                ], 409); 
+                ], 409);
             }
 
             $result = $this->bookRepo->deleteBook($bookId, $deletedByUserId);
@@ -268,7 +272,7 @@ class BookManagementController extends Controller
 
         if (($handle = fopen($file, 'r')) !== false) {
             $header = fgetcsv($handle);
-            $rowNumber = 2; 
+            $rowNumber = 2;
 
             while (($row = fgetcsv($handle)) !== false) {
                 $accessionNumber = trim($row[0] ?? '');

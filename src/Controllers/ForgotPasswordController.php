@@ -190,7 +190,7 @@ class ForgotPasswordController extends Controller
       'csrf_token' => $_SESSION['csrf_token'],
       'email' => $_SESSION['reset_email']
     ];
-    $this->view('auth/verifyotp', $viewData, false);
+    $this->view('auth/verifyOTP', $viewData, false);
   }
 
   public function resendOTP()

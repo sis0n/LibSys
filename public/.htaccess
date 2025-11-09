@@ -1,10 +1,18 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
 
-    # Siguraduhin na hindi ito file o directory
+    # Kung ang nire-request ay HINDI isang totoong file
     RewriteCond %{REQUEST_FILENAME} !-f
+    # At kung HINDI rin isang totoong directory
     RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Ipadala LAHAT ng request sa index.php
+    # PERO, huwag na itong baguhin at gawing ?url=
+    RewriteRule . index.php [L]
+</IfModule>
 
-    # I-redirect lahat sa index.php
-    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+<IfModule mod_security.c>
+    SecFilterEngine Off
+    SecFilterScanPOST Off
 </IfModule>

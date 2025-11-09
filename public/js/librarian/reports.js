@@ -445,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Create a form to submit the data via POST to trigger the PDF download
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = `${BASE_URL}/api/librarian/reports/generate-report`;
+                form.action = `api/librarian/reports/generate-report`;
                 form.target = '_blank'; // Open in a new tab to not interrupt the user's view
 
                 const startInput = document.createElement('input');

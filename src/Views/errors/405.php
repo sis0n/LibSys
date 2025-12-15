@@ -3,125 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>405 Method Not Allowed</title>
-    <style>
-        /* CSS to match the style of the image: Orange background, centered, and the hanging sign look */
-        body {  
-            background-color: #ff6a00; /* Bright orange background */
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: #fff; /* White text for general info */
-            overflow: hidden; /* Hide scrollbars if the content is centered */
-        }
-
-        .sign-container {
-            /* This div simulates the pulley/rope mechanism */
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 50px; /* Space for the pulley/rope */
-        }
-
-        .pulley {
-            /* The top hanging point/pulley */
-            width: 15px;
-            height: 15px;
-            background-color: #fff;
-            border: 2px solid #000;
-            border-radius: 50%;
-            position: absolute;
-            top: 0;
-            z-index: 2;
-        }
-
-        .rope {
-            /* The rope/line the sign hangs from */
-            width: 2px;
-            height: 50px; /* Length of the rope */
-            background-color: #000;
-            position: absolute;
-            top: 15px; /* Below the pulley */
-            z-index: 1;
-        }
-
-        .error-sign {
-            /* The actual white sign */
-            background-color: #fff;
-            padding: 20px 40px;
-            border: 2px solid #000;
-            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.2); /* Slight shadow effect */
-            position: relative;
-            z-index: 3;
-            margin-top: -5px; /* Adjust to better align with the rope */
-        }
-
-        .error-code {
-            /* The '403' text style */
-            font-size: 10em; /* Very large text */
-            font-weight: bold;
-            color: #000;
-            margin: 0;
-            /* To simulate the outline look in the image */
-            -webkit-text-stroke: 4px #000;
-            color: transparent; /* Makes the fill transparent, showing only the stroke */
-        }
-        
-        /* Additional text below the sign */
-        .message-box {
-            margin-top: 30px;
-            text-align: center;
-        }
-        
-        .message-box h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .message-box p {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-        
-        .message-box a {
-            color: #000; /* Link color */
-            background-color: #fff; /* White button look */
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            /* 🎯 Ito ang kailangan para maging button: */
-            display: inline-block; 
-            margin-top: 20px;
-            transition: background-color 0.3s;
-        }
-        
-        .message-box a:hover {
-            background-color: #f0f0f0;
-        }
-    </style>
+    <title>405 - Method Not Allowed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<body>
-    <div class="sign-container">
-        <div class="pulley"></div>
-        <div class="rope"></div>
+<body class="bg-white text-gray-800 h-screen flex flex-col relative overflow-hidden font-sans">
+    <main class="flex-grow flex flex-col items-center justify-center px-4 text-center">
+        <h1 class="text-9xl font-bold text-orange-500 tracking-tighter">405</h1>
+        <h2 class="mt-4 text-2xl md:text-3xl font-semibold text-gray-900">Method Not Allowed</h2>
+        <p class="mt-3 text-gray-500 max-w-md mx-auto">The method specified in the request is not allowed.</p>
         
-        <div class="error-sign">
-            <h1 class="error-code">405</h1>
+        <div class="mt-8 flex justify-center">
+            <a href="/" class="flex items-center justify-center px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 shadow-sm">
+                <i class="ph ph-arrow-left text-xl mr-2"></i>
+                Back to Homepage
+            </a>
         </div>
-    </div>
+    </main>
     
-    <div class="message-box">
-        <h1>Not Found</h1>
-        <p>The request method is not supported for the requested resource.</p>
-        <a href= "../auth/login.php">Go back to login</a>
+    <div class="absolute bottom-6 right-6">
+        <button class="bg-gray-900 text-white p-3 rounded-full shadow-lg hover:bg-gray-800 transition-transform hover:scale-105">
+            <i class="ph ph-question text-xl"></i>
+        </button>
     </div>
 </body>
 </html>
-
- <!-- <a href="<?= BASE_URL ?>/login">Go back to login</a> -->

@@ -16,7 +16,6 @@ class RouteConfig
     $router->get('login', 'AuthController@showLogin');
     $router->get('scanner/attendance', 'ScannerController@scannerDisplay', ['scanner']);
 
-
     $router->get('forgotPassword', 'ForgotPasswordController@index');
     $router->post('forgot-password/send-otp', 'ForgotPasswordController@sendOTP');
 
@@ -176,7 +175,6 @@ class RouteConfig
     $router->post('api/admin/reports/generate-report', 'DomPdfTemplateController@generateLibraryReport', ['reports']);
 
     // --- SUPERADMIN (AJAX/Data Routes) ---
-    // $router->get('api/superadmin/userManagement/getAll', 'UserManagementController@getAll', ['superadmin']);
     $router->get('api/superadmin/userManagement/pagination', 'UserManagementController@fetchPaginatedUsers', ['superadmin']); // Pagination Route
     $router->get('api/superadmin/userManagement/get/{id}', 'UserManagementController@getUserById', ['superadmin']);
     $router->get('api/superadmin/userManagement/search', 'UserManagementController@search', ['superadmin']);

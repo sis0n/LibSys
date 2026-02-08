@@ -155,12 +155,12 @@ class FacultyProfileController extends Controller
     ];
 
     $updated = $this->facultyRepo->updateFacultyProfile($currentUserId, $facultyData);
-    if (!$updated) {
-      return $this->json(['success' => false, 'message' => 'Profile update failed. No changes were made or a repository error occurred.'], 500);
+    if (isset($_SESSION['user_data'])) {
+      $_SESSION['user_data']['fullname'] = $fullName;
+      if ($imagePath) {
+        $_SESSION['user_data']['profile_picture'] = $imagePath;
+      }
     }
-
-    $_SESSION['fullname'] = $fullName;
-    if (isset($imagePath)) $_SESSION['profile_picture'] = $imagePath;
 
     $this->json(['success' => true, 'message' => 'Profile updated successfully!']);
   }

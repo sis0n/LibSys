@@ -417,7 +417,6 @@ function initializeAttendanceLogs() {
         }
     });
 
-    // --- INITIALIZATION ---
     currentDate = formatDate(getPhDate());
     dateInput.value = currentDate;
     // Initial load (default: may loading modal)

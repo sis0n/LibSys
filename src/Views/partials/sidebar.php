@@ -32,7 +32,7 @@ $baseUrl = BASE_URL;
         class="flex items-center gap-4 px-6 py-4 border-b border-orange-200 cursor-pointer">
         <img src="<?= $baseUrl ?>/assets/library-icons/apple-touch-icon.png" alt="Logo" class="h-18">
         <span class="font-semibold text-lg text-orange-700">
-            Library Online Software
+            Library Management System
         </span>
     </a>
     <div class="flex-1 space-y-1 overflow-hidden hover:overflow-y-auto scroll-smooth ...">

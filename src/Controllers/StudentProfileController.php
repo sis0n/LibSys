@@ -216,8 +216,12 @@ class StudentProfileController extends Controller
 
       $this->studentRepo->updateStudentProfile($currentUserId, $studentData);
 
-      $_SESSION['fullname'] = $fullName;
-      if ($imagePath) $_SESSION['profile_picture'] = $imagePath;
+      if (isset($_SESSION['user_data'])) {
+        $_SESSION['user_data']['fullname'] = $fullName;
+        if ($imagePath) {
+          $_SESSION['user_data']['profile_picture'] = $imagePath;
+        }
+      }
 
       $this->json(['success' => true, 'message' => 'Profile updated successfully!']);
     } catch (\Exception $e) {

@@ -164,9 +164,12 @@ class StaffProfileController extends Controller
     ];
     $this->staffRepo->updateStaffProfile($currentUserId, $staffData);
 
-    // --- Update session ---
-    $_SESSION['fullname'] = $fullName;
-    if (isset($imagePath)) $_SESSION['profile_picture'] = $imagePath;
+    if (isset($_SESSION['user_data'])) {
+      $_SESSION['user_data']['fullname'] = $fullName;
+      if ($imagePath) {
+        $_SESSION['user_data']['profile_picture'] = $imagePath;
+      }
+    }
 
     return $this->json(['success' => true, 'message' => 'Profile updated successfully!']);
   }

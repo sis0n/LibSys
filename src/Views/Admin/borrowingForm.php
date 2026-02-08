@@ -1,4 +1,4 @@
-<main class="min-h-screen">
+    <main class="min-h-screen">
     <div class="mb-6">
         <h2 class="text-2xl font-bold mb-4">Borrowing Form</h2>
         <div class="text-gray-700">Manually process for borrowing library items.</div>
